@@ -47,11 +47,39 @@ impl PointCloud {
     fn len(&self) -> usize {
         self.data.len()
     }
+
+    fn center(&self) -> Option<Point> {
+        let size = self.len();
+
+        if size < 1 {
+            return None;
+        }
+
+        let sizef = size as f64;
+
+        let mut sumx: f64 = 0.0;
+        let mut sumy: f64 = 0.0;
+        let mut sumz: f64 = 0.0;
+
+        for p in &self.data {
+            sumx += p.x;
+            sumy += p.y;
+            sumz += p.z;
+        }
+
+        return Some(Point {
+            x: (sumx / sizef),
+            y: (sumy / sizef),
+            z: (sumz / sizef)
+        })
+
+    }
 }
 
 
 fn main() {
     let p = Point::new();
+    let p2 = Point{x: 100.0, y: 200.0, z: 400.0};
     println!("Gello! {}", p);
 
     let mut pc = PointCloud::new();
@@ -59,5 +87,8 @@ fn main() {
     println!("len : {}", pc.len());
     pc.push(p);
     println!("len : {}", pc.len());
+
+    pc.push(p2);
+    println!("center : {}", pc.center().unwrap())
 
 }
