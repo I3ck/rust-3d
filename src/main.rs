@@ -72,7 +72,30 @@ impl PointCloud {
             y: (sumy / sizef),
             z: (sumz / sizef)
         })
+    }
 
+    fn bbox(&self) -> Option<(Point, Point)> {
+        if self.len() < 2 {
+            return None;
+        }
+
+        let mut minx = self.data[0].x;
+        let mut miny = self.data[0].y;
+        let mut minz = self.data[0].z;
+        let mut maxx = self.data[0].x;
+        let mut maxy = self.data[0].y;
+        let mut maxz = self.data[0].z;
+
+        for p in &self.data {
+            if p.x < minx { minx = p.x; }
+            if p.y < miny { miny = p.y; }
+            if p.z < minz { minz = p.z; }
+            if p.x > maxx { maxx = p.x; }
+            if p.y > maxy { maxy = p.y; }
+            if p.z > maxz { maxz = p.z; }
+        }
+
+        return Some((Point{x: minx, y: miny, z: minz}, Point{x: maxx, y: maxy, z: maxz}));
     }
 }
 
@@ -89,6 +112,11 @@ fn main() {
     println!("len : {}", pc.len());
 
     pc.push(p2);
-    println!("center : {}", pc.center().unwrap())
+    println!("center : {}", pc.center().expect("Can't calculate center of empty path"));
+
+    let (pmin, pmax) = pc.bbox().expect("Can't calculate bounding box with less than two elemts");
+
+    println!("min : {}", pmin);
+    println!("max : {}", pmax);
 
 }
