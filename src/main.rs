@@ -24,8 +24,40 @@ impl fmt::Display for Point {
     }
 }
 
+impl Point {
+    fn new() -> Point {
+        Point{x: 0.0, y: 0.0, z: 0.0}
+    }
+}
+
+
+struct PointCloud {
+    data: Vec<Point>
+}
+
+impl PointCloud {
+    fn new() -> PointCloud {
+        PointCloud{data: Vec::new()}
+    }
+
+    fn push(&mut self, p: Point) {
+        self.data.push(p);
+    }
+
+    fn len(&self) -> usize {
+        self.data.len()
+    }
+}
+
 
 fn main() {
-    let p = Point{x: 1.0, y: 2.0, z: 3.0};
+    let p = Point::new();
     println!("Gello! {}", p);
+
+    let mut pc = PointCloud::new();
+
+    println!("len : {}", pc.len());
+    pc.push(p);
+    println!("len : {}", pc.len());
+
 }
