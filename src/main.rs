@@ -147,29 +147,56 @@ impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
             let disty = p.y - pmin.y;
             let distz = p.z - pmin.z;
 
+            let unitsx = match T::from(distx / unitsizex) {
+                None        => return None,
+                Some(res)   => res
+            };
+
+            let unitsy = match T::from(disty / unitsizey) {
+                None        => return None,
+                Some(res)   => res
+            };
+
+            let unitsz = match T::from(distz / unitsizez) {
+                None        => return None,
+                Some(res)   => res
+            };
+
             data.push(CompressedPoint{
-                unitsx: T::from(distx / unitsizex).unwrap(),
-                unitsy: T::from(disty / unitsizey).unwrap(),
-                unitsz: T::from(distz / unitsizez).unwrap()
+                unitsx: unitsx,
+                unitsy: unitsy,
+                unitsz: unitsz
             })
         }
         return Some(CompressedPointCloud::<T>{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data});
     }
 
-    fn decompress(&self) -> PointCloud {
+    fn decompress(&self) -> Option<PointCloud> {
         let mut pc = PointCloud::new();
 
         for p in &self.data {
-            pc.push(Point{
-                x: self.start.x + (self.unitsizex * (p.unitsx.to_f64().unwrap())),
-                y: self.start.y + (self.unitsizey * (p.unitsy.to_f64().unwrap())),
-                z: self.start.z + (self.unitsizez * (p.unitsz.to_f64().unwrap()))
-            })
+            let unitsxf = match p.unitsx.to_f64() {
+                None        => return None,
+                Some(res)   => res
+            };
+            let unitsyf = match p.unitsy.to_f64() {
+                None        => return None,
+                Some(res)   => res
+            };
+            let unitszf = match p.unitsz.to_f64() {
+                None        => return None,
+                Some(res)   => res
+            };
 
+            pc.push(Point{
+                x: self.start.x + (self.unitsizex * unitsxf),
+                y: self.start.y + (self.unitsizey * unitsyf),
+                z: self.start.z + (self.unitsizez * unitszf)
+            });
         }
 
 
-        return pc;
+        return Some(pc);
     }
 
 }
@@ -196,7 +223,7 @@ fn main() {
 
     let compressed = CompressedPointCloud::<u8>::compress(&pc).expect("Could not compress!");
 
-    let decompressed = compressed.decompress();
+    let decompressed = compressed.decompress().expect("Could not decompress!");
 
     println!("{}", decompressed.data[0]);
     println!("{}", decompressed.data[1]);
