@@ -121,16 +121,24 @@ struct CompressedPointCloud<T> where T: Unsigned + PrimInt {
 
 ///@todo better error handling
 impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
-    fn new(pc: &PointCloud) -> CompressedPointCloud<T> {
-        let (pmin, pmax) = pc.bbox().expect("Can't compress PointCloud with less than two points");
+    fn compress(pc: &PointCloud) -> Option<CompressedPointCloud<T>> {
+        let (pmin, pmax) = match pc.bbox() {
+            None        => return None,
+            Some(res)   => res,
+        };
 
         let rangex = (pmax.x - pmin.x).abs();
         let rangey = (pmax.y - pmin.y).abs();
         let rangez = (pmax.z - pmin.z).abs();
 
-        let unitsizex = rangex / (T::max_value().to_f64().unwrap());
-        let unitsizey = rangey / (T::max_value().to_f64().unwrap());
-        let unitsizez = rangez / (T::max_value().to_f64().unwrap());
+        let maxval = match T::max_value().to_f64() {
+            None        => return None,
+            Some(res)   => res,
+        };
+
+        let unitsizex = rangex / maxval;
+        let unitsizey = rangey / maxval;
+        let unitsizez = rangez / maxval;
 
         let mut data = Vec::new();
 
@@ -145,7 +153,7 @@ impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
                 unitsz: T::from(distz / unitsizez).unwrap()
             })
         }
-        return CompressedPointCloud::<T>{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data};
+        return Some(CompressedPointCloud::<T>{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data});
     }
 
     fn decompress(&self) -> PointCloud {
@@ -186,7 +194,7 @@ fn main() {
     println!("min : {}", pmin);
     println!("max : {}", pmax);
 
-    let compressed = CompressedPointCloud::<u8>::new(&pc);
+    let compressed = CompressedPointCloud::<u8>::compress(&pc).expect("Could not compress!");
 
     let decompressed = compressed.decompress();
 
