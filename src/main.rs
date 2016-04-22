@@ -99,6 +99,51 @@ impl PointCloud {
     }
 }
 
+//------------------------------------------------------------------------------
+
+struct CompressedPoint { ///@todo u16 templated
+    unitsx: u16,
+    unitsy: u16,
+    unitsz: u16
+}
+
+struct CompressedPointCloud {
+    start: Point,
+    unitsizex: f64,
+    unitsizey: f64,
+    unitsizez: f64,
+    data: Vec<CompressedPoint>
+}
+
+impl CompressedPointCloud {
+    fn new(pc: &PointCloud) -> CompressedPointCloud {
+        let (pmin, pmax) = pc.bbox().expect("Can't compress PointCloud with less than two points");
+
+        let rangex = (pmax.x - pmin.x).abs();
+        let rangey = (pmax.y - pmin.y).abs();
+        let rangez = (pmax.z - pmin.z).abs();
+
+        let unitsizex = rangex / (u16::max_value() as f64);
+        let unitsizey = rangey / (u16::max_value() as f64);
+        let unitsizez = rangez / (u16::max_value() as f64);
+
+        let mut data = Vec::new();
+
+        for p in &pc.data {
+            let distx = p.x - pmin.x;
+            let disty = p.y - pmin.y;
+            let distz = p.z - pmin.z;
+
+            data.push(CompressedPoint{
+                unitsx: (distx / unitsizex) as u16,
+                unitsy: (disty / unitsizey) as u16,
+                unitsz: (distz / unitsizez) as u16
+            })
+        }
+        return CompressedPointCloud{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data};
+    }
+}
+
 
 fn main() {
     let p = Point::new();
@@ -118,5 +163,7 @@ fn main() {
 
     println!("min : {}", pmin);
     println!("max : {}", pmax);
+
+    let compressed = CompressedPointCloud::new(&pc);
 
 }
