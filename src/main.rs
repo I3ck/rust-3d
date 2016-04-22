@@ -1,4 +1,8 @@
+extern crate num;
+
 use std::fmt;
+use num::traits::PrimInt;
+use num::traits::Unsigned;
 
 struct Point {
     x: f64,
@@ -101,31 +105,32 @@ impl PointCloud {
 
 //------------------------------------------------------------------------------
 
-struct CompressedPoint { ///@todo u16 templated
-    unitsx: u16,
-    unitsy: u16,
-    unitsz: u16
+struct CompressedPoint<T> where T: Unsigned + PrimInt  { ///@todo u16 templated
+    unitsx: T,
+    unitsy: T,
+    unitsz: T
 }
 
-struct CompressedPointCloud {
+struct CompressedPointCloud<T> where T: Unsigned + PrimInt {
     start: Point,
     unitsizex: f64,
     unitsizey: f64,
     unitsizez: f64,
-    data: Vec<CompressedPoint>
+    data: Vec<CompressedPoint<T>>
 }
 
-impl CompressedPointCloud {
-    fn new(pc: &PointCloud) -> CompressedPointCloud {
+///@todo better error handling
+impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
+    fn new(pc: &PointCloud) -> CompressedPointCloud<T> {
         let (pmin, pmax) = pc.bbox().expect("Can't compress PointCloud with less than two points");
 
         let rangex = (pmax.x - pmin.x).abs();
         let rangey = (pmax.y - pmin.y).abs();
         let rangez = (pmax.z - pmin.z).abs();
 
-        let unitsizex = rangex / (u16::max_value() as f64);
-        let unitsizey = rangey / (u16::max_value() as f64);
-        let unitsizez = rangez / (u16::max_value() as f64);
+        let unitsizex = rangex / (T::max_value().to_f64().unwrap());
+        let unitsizey = rangey / (T::max_value().to_f64().unwrap());
+        let unitsizez = rangez / (T::max_value().to_f64().unwrap());
 
         let mut data = Vec::new();
 
@@ -135,12 +140,12 @@ impl CompressedPointCloud {
             let distz = p.z - pmin.z;
 
             data.push(CompressedPoint{
-                unitsx: (distx / unitsizex) as u16,
-                unitsy: (disty / unitsizey) as u16,
-                unitsz: (distz / unitsizez) as u16
+                unitsx: T::from(distx / unitsizex).unwrap(),
+                unitsy: T::from(disty / unitsizey).unwrap(),
+                unitsz: T::from(distz / unitsizez).unwrap()
             })
         }
-        return CompressedPointCloud{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data};
+        return CompressedPointCloud::<T>{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data};
     }
 
     fn decompress(&self) -> PointCloud {
@@ -148,9 +153,9 @@ impl CompressedPointCloud {
 
         for p in &self.data {
             pc.push(Point{
-                x: self.start.x + (self.unitsizex * (p.unitsx as f64)),
-                y: self.start.y + (self.unitsizey * (p.unitsy as f64)),
-                z: self.start.z + (self.unitsizez * (p.unitsz as f64))
+                x: self.start.x + (self.unitsizex * (p.unitsx.to_f64().unwrap())),
+                y: self.start.y + (self.unitsizey * (p.unitsy.to_f64().unwrap())),
+                z: self.start.z + (self.unitsizez * (p.unitsz.to_f64().unwrap()))
             })
 
         }
@@ -181,7 +186,7 @@ fn main() {
     println!("min : {}", pmin);
     println!("max : {}", pmax);
 
-    let compressed = CompressedPointCloud::new(&pc);
+    let compressed = CompressedPointCloud::<u8>::new(&pc);
 
     let decompressed = compressed.decompress();
 
