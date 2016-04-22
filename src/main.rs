@@ -142,6 +142,23 @@ impl CompressedPointCloud {
         }
         return CompressedPointCloud{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data};
     }
+
+    fn decompress(&self) -> PointCloud {
+        let mut pc = PointCloud::new();
+
+        for p in &self.data {
+            pc.push(Point{
+                x: self.start.x + (self.unitsizex * (p.unitsx as f64)),
+                y: self.start.y + (self.unitsizey * (p.unitsy as f64)),
+                z: self.start.z + (self.unitsizez * (p.unitsz as f64))
+            })
+
+        }
+
+
+        return pc;
+    }
+
 }
 
 
@@ -165,5 +182,10 @@ fn main() {
     println!("max : {}", pmax);
 
     let compressed = CompressedPointCloud::new(&pc);
+
+    let decompressed = compressed.decompress();
+
+    println!("{}", decompressed.data[0]);
+    println!("{}", decompressed.data[1]);
 
 }
