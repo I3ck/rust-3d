@@ -105,7 +105,7 @@ impl PointCloud {
 
 //------------------------------------------------------------------------------
 
-struct CompressedPoint<T> where T: Unsigned + PrimInt  { ///@todo u16 templated
+struct CompressedPoint<T> where T: Unsigned + PrimInt  {
     unitsx: T,
     unitsy: T,
     unitsz: T
@@ -175,30 +175,16 @@ impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
         let mut pc = PointCloud::new();
 
         for p in &self.data {
-            let unitsxf = match p.unitsx.to_f64() {
-                None        => return None,
-                Some(res)   => res
-            };
-            let unitsyf = match p.unitsy.to_f64() {
-                None        => return None,
-                Some(res)   => res
-            };
-            let unitszf = match p.unitsz.to_f64() {
-                None        => return None,
-                Some(res)   => res
-            };
-
-            pc.push(Point{
-                x: self.start.x + (self.unitsizex * unitsxf),
-                y: self.start.y + (self.unitsizey * unitsyf),
-                z: self.start.z + (self.unitsizez * unitszf)
-            });
+            if let (Some(unitsxf), Some(unitsyf), Some(unitszf)) = (p.unitsx.to_f64(), p.unitsy.to_f64(), p.unitsz.to_f64()) {
+                pc.push(Point{
+                    x: self.start.x + (self.unitsizex * unitsxf),
+                    y: self.start.y + (self.unitsizey * unitsyf),
+                    z: self.start.z + (self.unitsizez * unitszf)
+                });
+            }
         }
-
-
         return Some(pc);
     }
-
 }
 
 
