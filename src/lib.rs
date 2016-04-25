@@ -1,5 +1,7 @@
 mod structs;
 mod traits;
+mod impls;
+mod functions;
 
 #[cfg(test)]
 mod tests {
