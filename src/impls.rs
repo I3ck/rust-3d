@@ -48,6 +48,24 @@ impl MoveAble for PointCloud {
 
 //------------------------------------------------------------------------------
 
+impl fmt::Display for PointCloud {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for p in &self.data {
+            match p.fmt(f) {
+                Ok(_) => (),
+                Err(err) => return Err(err)
+            }
+            match f.write_str("\n") {
+                Ok(_) => (),
+                Err(err) => return Err(err)
+            }
+        }
+        return Ok(());
+    }
+}
+
+//------------------------------------------------------------------------------
+
 impl PointCloud {
     pub fn new() -> PointCloud {
         PointCloud{data: Vec::new()}

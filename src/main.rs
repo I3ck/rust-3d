@@ -40,5 +40,6 @@ fn main() {
 
 
     println!("pCenter : {}", pCenter);
+    println!("pc : {}", pc);
 
 }
