@@ -8,6 +8,8 @@ use self::num::traits::Unsigned;
 use structs::{Point, PointCloud, CompressedPoint, CompressedPointCloud};
 use traits::{MoveAble};
 
+//------------------------------------------------------------------------------
+
 impl MoveAble for Point {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         self.x += x;
@@ -16,11 +18,15 @@ impl MoveAble for Point {
     }
 }
 
+//------------------------------------------------------------------------------
+
 impl fmt::Display for Point {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({}, {}, {})", self.x, self.y, self.z)
     }
 }
+
+//------------------------------------------------------------------------------
 
 impl Point {
     pub fn new() -> Point {
@@ -28,18 +34,38 @@ impl Point {
     }
 }
 
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+impl MoveAble for PointCloud {
+    fn move_by(&mut self, x: f64, y: f64, z: f64) {
+        for p in &mut self.data {
+            p.move_by(x, y, z);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
 impl PointCloud {
     pub fn new() -> PointCloud {
         PointCloud{data: Vec::new()}
     }
 
+//------------------------------------------------------------------------------
+
     pub fn push(&mut self, p: Point) {
         self.data.push(p);
     }
 
+//------------------------------------------------------------------------------
+
     pub fn len(&self) -> usize {
         self.data.len()
     }
+
+//------------------------------------------------------------------------------
 
     pub fn center(&self) -> Option<Point> {
         let size = self.len();
@@ -67,6 +93,8 @@ impl PointCloud {
         })
     }
 
+//------------------------------------------------------------------------------
+
     pub fn bbox(&self) -> Option<(Point, Point)> {
         if self.len() < 2 {
             return None;
@@ -92,10 +120,10 @@ impl PointCloud {
     }
 }
 
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-
-
-///@todo better error handling
 impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
     pub fn compress(pc: &PointCloud) -> Option<CompressedPointCloud<T>> {
         let (pmin, pmax) = match pc.bbox() {
@@ -146,6 +174,8 @@ impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
         }
         return Some(CompressedPointCloud::<T>{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data});
     }
+
+//------------------------------------------------------------------------------
 
     pub fn decompress(&self) -> Option<PointCloud> {
         let mut pc = PointCloud::new();
