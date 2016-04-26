@@ -1,4 +1,5 @@
-use structs::{Point, PointCloud, CompressedPoint, CompressedPointCloud};
+use structs::{PointCloud, CompressedPoint, CompressedPointCloud};
+use traits::{Point};
 
 pub fn center(p1: &Point, p2: &Point) -> Point {
     Point {
