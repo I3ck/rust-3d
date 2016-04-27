@@ -1,14 +1,16 @@
 extern crate num;
 
-use traits::{Point};
-
 use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
+pub struct Point {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64
+}
 
-
-pub struct PointCloud<P> where P: Point {
-    pub data: Vec<P>
+pub struct PointCloud {
+    pub data: Vec<Point>
 }
 
 pub struct CompressedPoint<T> where T: Unsigned + PrimInt  {

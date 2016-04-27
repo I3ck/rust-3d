@@ -5,8 +5,8 @@ use std::fmt;
 use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
-use structs::{PointCloud, CompressedPoint, CompressedPointCloud};
-use traits::{Point, MoveAble};
+use structs::{Point, PointCloud, CompressedPoint, CompressedPointCloud};
+use traits::{MoveAble};
 
 //------------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ impl Point {
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-impl<P> MoveAble for PointCloud<P> where P: Point  {
+impl MoveAble for PointCloud {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         for p in &mut self.data {
             p.move_by(x, y, z);
@@ -48,7 +48,7 @@ impl<P> MoveAble for PointCloud<P> where P: Point  {
 
 //------------------------------------------------------------------------------
 
-impl<P> fmt::Display for PointCloud<P> where P: Point {
+impl fmt::Display for PointCloud {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {
             match p.fmt(f) {
@@ -66,8 +66,8 @@ impl<P> fmt::Display for PointCloud<P> where P: Point {
 
 //------------------------------------------------------------------------------
 
-impl<P> PointCloud<P> where P: Point {
-    pub fn new() -> PointCloud<P> {
+impl PointCloud {
+    pub fn new() -> PointCloud {
         PointCloud{data: Vec::new()}
     }
 
@@ -141,9 +141,9 @@ impl<P> PointCloud<P> where P: Point {
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-TODO remove Point struct for P trait
+
 impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
-    pub fn compress(pc: &PointCloud<P>) -> Option<CompressedPointCloud<T>> {
+    pub fn compress(pc: &PointCloud) -> Option<CompressedPointCloud<T>> {
         let (pmin, pmax) = match pc.bbox() {
             None        => return None,
             Some(res)   => res,
