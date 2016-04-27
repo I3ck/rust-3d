@@ -26,3 +26,13 @@ pub struct CompressedPointCloud<T> where T: Unsigned + PrimInt {
     pub unitsizez: f64,
     pub data: Vec<CompressedPoint<T>>
 }
+
+pub struct KdTree {
+    pub root: KdNode
+}
+
+pub struct KdNode {
+    pub left: Option<Box<KdNode>>,
+    pub right: Option<Box<KdNode>>,
+    pub dimension: i8
+}

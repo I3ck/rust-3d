@@ -5,7 +5,7 @@ use std::fmt;
 use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
-use structs::{Point, PointCloud, CompressedPoint, CompressedPointCloud};
+use structs::{Point, PointCloud, CompressedPoint, CompressedPointCloud, KdTree, KdNode};
 use traits::{MoveAble};
 
 //------------------------------------------------------------------------------
@@ -208,5 +208,17 @@ impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
             }
         }
         return Some(pc);
+    }
+}
+
+impl KdTree {
+    pub fn new(pc: &PointCloud) -> KdTree {
+        KdTree{root: KdNode::new(0)}
+    }
+}
+
+impl KdNode {
+    pub fn new(dim: i8) -> KdNode {
+        KdNode{left: None, right: None, dimension: dim}
     }
 }
