@@ -214,7 +214,9 @@ impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
 
 impl KdTree {
     pub fn new(pc: PointCloud) -> KdTree {
-        KdTree{root: KdNode::new(0)}
+        let mut node = KdNode::new(0);
+        node.build(pc.data);
+        KdTree{root: node}
     }
 }
 
@@ -222,13 +224,16 @@ impl KdNode {
     pub fn new(dim: i8) -> KdNode {
         KdNode{left: None, right: None, dimension: dim}
     }
-    pub fn build(&mut self, pc: &mut PointCloud) { ///@todo pass moved or copied, but not mut ref
-        pc.data.sort_by(|a, b| match self.dimension {
+    pub fn build(&mut self, mut pc: Vec<Point>) {
+        pc.sort_by(|a, b| match self.dimension {
             0 => a.x.partial_cmp(&b.x).unwrap_or(Ordering::Equal),
             1 => a.y.partial_cmp(&b.y).unwrap_or(Ordering::Equal),
             2 => a.z.partial_cmp(&b.z).unwrap_or(Ordering::Equal),
             _ => Ordering::Equal
-        })
+        });
+        let indexMedian = pc.len() / 2;
+
+        ///@todo split on median, set median as value, build left and right
 
     }
 }
