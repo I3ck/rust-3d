@@ -222,6 +222,10 @@ impl KdTree {
             _ => Some(KdTree{root: KdNode::new(0, pc.data)})
         }
     }
+
+    pub fn size(&self) -> usize {
+        self.root.size()
+    }
 }
 
 impl KdNode {
@@ -271,5 +275,13 @@ impl KdNode {
             val: val,
             dimension: dimension
         }
+    }
+
+    pub fn size(&self) -> usize {
+        let mut result: usize = 0;
+        if let Some(ref n) = (&self).left { result += n.size(); }
+        result += 1;
+        if let Some(ref n) = (&self).right { result += n.size(); }
+        result
     }
 }

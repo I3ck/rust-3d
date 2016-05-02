@@ -6,7 +6,7 @@ mod traits;
 mod impls;
 mod functions;
 
-use structs::{Point, PointCloud, CompressedPoint, CompressedPointCloud};
+use structs::{Point, PointCloud, CompressedPoint, CompressedPointCloud, KdTree};
 use traits::{MoveAble};
 
 //------------------------------------------------------------------------------
@@ -40,6 +40,10 @@ fn main() {
 
 
     println!("pCenter : {}", pCenter);
-    println!("pc : {}", pc);
+    println!("pc :\n {}", pc);
+
+    let tree = KdTree::new(pc).expect("Could not parse tree!");
+
+    println!("tree.size() : {}", tree.size());
 
 }
