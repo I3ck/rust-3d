@@ -34,5 +34,6 @@ pub struct KdTree {
 pub struct KdNode {
     pub left: Option<Box<KdNode>>,
     pub right: Option<Box<KdNode>>,
+    pub val: Point,
     pub dimension: i8
 }

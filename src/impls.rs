@@ -33,6 +33,9 @@ impl Point {
     pub fn new() -> Point {
         Point{x: 0.0, y: 0.0, z: 0.0}
     }
+    pub fn clone(&self) -> Point { //@todo use trait?
+        Point { x: self.x, y: self.y, z: self.z }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -213,27 +216,60 @@ impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
 }
 
 impl KdTree {
-    pub fn new(pc: PointCloud) -> KdTree {
-        let mut node = KdNode::new(0);
-        node.build(pc.data);
-        KdTree{root: node}
+    pub fn new(pc: PointCloud) -> Option<KdTree> {
+        match pc.len() {
+            0 => None,
+            _ => Some(KdTree{root: KdNode::new(0, pc.data)})
+        }
     }
 }
 
 impl KdNode {
-    pub fn new(dim: i8) -> KdNode {
-        KdNode{left: None, right: None, dimension: dim}
-    }
-    pub fn build(&mut self, mut pc: Vec<Point>) {
-        pc.sort_by(|a, b| match self.dimension {
+    pub fn new(dim: i8, mut pc: Vec<Point>) -> KdNode {
+        let dimension = dim % 2;
+        let mut val = Point::new();
+        if pc.len() == 1 {
+            return KdNode {
+                left: None,
+                right: None,
+                val: pc[0].clone(),
+                dimension: dimension
+            }
+        }
+
+        pc.sort_by(|a, b| match dimension {
             0 => a.x.partial_cmp(&b.x).unwrap_or(Ordering::Equal),
             1 => a.y.partial_cmp(&b.y).unwrap_or(Ordering::Equal),
             2 => a.z.partial_cmp(&b.z).unwrap_or(Ordering::Equal),
             _ => Ordering::Equal
         });
-        let indexMedian = pc.len() / 2;
+        let median = pc.len() / 2;
+        let mut pcLeft = Vec::new();
+        let mut pcRight = Vec::new();
 
-        ///@todo split on median, set median as value, build left and right
+        let mut val = Point::new();
 
+        for (i, p) in pc.into_iter().enumerate() {
+            if      i < median  { pcLeft.push(p); }
+            else if i > median  { pcRight.push(p); }
+            else                { val = p; }
+        }
+
+        let left = match pcLeft.len() {
+            0 => None,
+            _ => Some(Box::new(KdNode::new(dimension+1, pcLeft)))
+        };
+
+        let right = match pcRight.len() {
+            0 => None,
+            _ => Some(Box::new(KdNode::new(dimension+1, pcRight)))
+        };
+
+        KdNode {
+            left: left,
+            right: right,
+            val: val,
+            dimension: dimension
+        }
     }
 }
