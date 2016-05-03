@@ -1,6 +1,7 @@
 extern crate num;
 
 use std::fmt;
+use std::cmp;
 use std::cmp::Ordering;
 
 use self::num::traits::PrimInt;
@@ -8,6 +9,7 @@ use self::num::traits::Unsigned;
 
 use structs::{Point, PointCloud, CompressedPoint, CompressedPointCloud, KdTree, KdNode};
 use traits::{MoveAble};
+use functions::{dist, sqr_dist, dimension_compare, sort_and_limit};
 
 //------------------------------------------------------------------------------
 
@@ -233,6 +235,13 @@ impl KdTree {
         result
     }
 
+    pub fn knearest(&self, search: &Point, n: usize) -> PointCloud {
+        let mut result = PointCloud::new();
+        if n < 1 { return result; }
+        self.root.knearest(search, n, &mut result);
+        return result;
+    }
+
 }
 
 impl KdNode {
@@ -297,4 +306,68 @@ impl KdNode {
         pc.push(self.val.clone());
         if let Some(ref n) = (&self).right { n.toPointCloud(pc); }
     }
+
+    pub fn knearest(&self, search: &Point, n: usize, pc: &mut PointCloud) {
+        if pc.len() < n || sqr_dist(search, &self.val) < sqr_dist(search, &pc.data[&pc.len() -1 ]) {
+            pc.push(self.val.clone());
+        }
+
+        let comp = dimension_compare(search, &self.val, self.dimension);
+
+        match comp {
+            Some(res) => match res {
+                Ordering::Less  => if let Some(ref node) = (&self).left { node.knearest(search, n, pc); },
+                _               => if let Some(ref node) = (&self).right { node.knearest(search, n, pc); }
+            },
+            None => {}
+        }
+
+        sort_and_limit(pc, search, n);
+
+        let distanceBest = dist(search, &pc.data[&pc.len() -1 ]);
+        let borderLeft = match self.dimension {
+            0 => search.x - distanceBest,
+            1 => search.y - distanceBest,
+            _ => search.z - distanceBest
+        };
+        let borderRight = match self.dimension {
+            0 => search.x + distanceBest,
+            1 => search.y + distanceBest,
+            _ => search.z + distanceBest
+        };
+
+        match comp {
+            Some(res) => match res {
+                Ordering::Less => if let Some(ref node) = (&self).right {
+                    if(pc.len() < n || borderRight >= )
+                }
+            }
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    fn is_leaf(&self) -> bool {
+        self.left.is_none() && self.right.is_none()
+    }
+
+
 }

@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use structs::{Point, PointCloud, CompressedPoint, CompressedPointCloud};
 
 pub fn center(p1: &Point, p2: &Point) -> Point {
@@ -6,4 +8,25 @@ pub fn center(p1: &Point, p2: &Point) -> Point {
         y: (p1.y + (p2.y - p1.y) / 2.0),
         z: (p1.z + (p2.z - p1.z) / 2.0)
     }
+}
+
+pub fn dist(p1: &Point, p2: &Point) -> f64 {
+    sqr_dist(p1,p2).sqrt()
+}
+
+pub fn sqr_dist(p1: &Point, p2: &Point) -> f64 {
+    (p1.x - p2.x).powi(2) + (p1.y - p2.y).powi(2) + (p1.z - p2.z).powi(2)
+}
+
+pub fn dimension_compare(lhs: &Point, rhs: &Point, dim: i8) -> Option<Ordering> {
+    match dim {
+        0 => lhs.x.partial_cmp(&rhs.x),
+        1 => lhs.y.partial_cmp(&rhs.y),
+        2 => lhs.z.partial_cmp(&rhs.z),
+        _ => None
+    }
+}
+
+pub fn sort_and_limit(pc: &mut PointCloud, search: &Point, n: usize) {
+    //@todo
 }
