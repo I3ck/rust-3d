@@ -226,6 +226,13 @@ impl KdTree {
     pub fn size(&self) -> usize {
         self.root.size()
     }
+
+    pub fn toPointCloud(&self) -> PointCloud {
+        let mut result = PointCloud::new();
+        self.root.toPointCloud(&mut result);
+        result
+    }
+
 }
 
 impl KdNode {
@@ -283,5 +290,11 @@ impl KdNode {
         result += 1;
         if let Some(ref n) = (&self).right { result += n.size(); }
         result
+    }
+
+    pub fn toPointCloud(&self, pc: &mut PointCloud) {
+        if let Some(ref n) = (&self).left { n.toPointCloud(pc); }
+        pc.push(self.val.clone());
+        if let Some(ref n) = (&self).right { n.toPointCloud(pc); }
     }
 }

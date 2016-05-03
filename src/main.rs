@@ -46,4 +46,8 @@ fn main() {
 
     println!("tree.size() : {}", tree.size());
 
+    let pcFromTree = tree.toPointCloud();
+
+    println!("pcFromTree :\n {}", pcFromTree);
+
 }
