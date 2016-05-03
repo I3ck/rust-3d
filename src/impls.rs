@@ -242,6 +242,10 @@ impl KdTree {
         return result;
     }
 
+    pub fn nearest(&self, search: &Point) -> PointCloud { //@todo implemented on its own, since the code can be faster without vecs
+        self.knearest(search, 1)
+    }
+
 }
 
 impl KdNode {
