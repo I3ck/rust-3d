@@ -50,4 +50,8 @@ fn main() {
 
     println!("pcFromTree :\n {}", pcFromTree);
 
+    let nearest = tree.knearest(&Point{x: 10.0,y: 199.0,z: 350.0}, 1);
+
+    println!("single nearest to 100/199/350 : {}", nearest);
+
 }

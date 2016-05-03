@@ -27,6 +27,15 @@ pub fn dimension_compare(lhs: &Point, rhs: &Point, dim: i8) -> Option<Ordering> 
     }
 }
 
-pub fn sort_and_limit(pc: &mut PointCloud, search: &Point, n: usize) {
-    //@todo
+pub fn sort_and_limit(mut pc: &mut PointCloud, search: &Point, maxSize: usize) {
+    if pc.len() > maxSize {
+        pc.data.sort_by(|a, b| sqr_dist(search, a).partial_cmp(&sqr_dist(search, b)).unwrap_or(Ordering::Equal));
+        let mut result = Vec::new();
+        for i in pc.data.iter().take(maxSize) {
+            result.push(i.clone());
+        }
+        pc.data = result;
+
+    }
+
 }

@@ -324,46 +324,35 @@ impl KdNode {
 
         sort_and_limit(pc, search, n);
 
+        let (currentSearch, currentVal) = match self.dimension {
+            0 => (search.x, self.val.x),
+            1 => (search.y, self.val.y),
+            _ => (search.z, self.val.z)
+        };
+
         let distanceBest = dist(search, &pc.data[&pc.len() -1 ]);
-        let borderLeft = match self.dimension {
-            0 => search.x - distanceBest,
-            1 => search.y - distanceBest,
-            _ => search.z - distanceBest
-        };
-        let borderRight = match self.dimension {
-            0 => search.x + distanceBest,
-            1 => search.y + distanceBest,
-            _ => search.z + distanceBest
-        };
+        let borderLeft = currentSearch - distanceBest;
+        let borderRight = currentSearch + distanceBest;
 
         match comp {
             Some(res) => match res {
                 Ordering::Less => if let Some(ref node) = (&self).right {
-                    if(pc.len() < n || borderRight >= )
-                }
-            }
+                    if pc.len() < n || borderRight >= currentVal {
+                        node.knearest(search, n, pc);
+                    }
+                },
+                Ordering::Greater => if let Some(ref node) = (&self).left {
+                    if pc.len() < n || borderRight <= currentVal {
+                        node.knearest(search, n, pc);
+                    }
+                },
+                Ordering::Equal => {}
+            },
+            None => {}
         }
 
-
+        sort_and_limit(pc, search, n);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     fn is_leaf(&self) -> bool {
         self.left.is_none() && self.right.is_none()
