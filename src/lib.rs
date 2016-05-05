@@ -5,6 +5,8 @@ mod pointCloud;
 mod compressedPoint;
 mod compressedPointCloud;
 mod kdTree;
+mod octNode;
+mod octTree;
 
 #[cfg(test)]
 mod tests {

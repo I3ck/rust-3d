@@ -1,4 +1,5 @@
 use point::{Point};
+use octNode::{OctNode};
 
 pub struct OctTree {
     pub root: OctNode,

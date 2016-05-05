@@ -8,6 +8,8 @@ mod pointCloud;
 mod compressedPoint;
 mod compressedPointCloud;
 mod kdTree;
+mod octNode;
+mod octTree;
 
 use point::{Point};
 use pointCloud::{PointCloud};
