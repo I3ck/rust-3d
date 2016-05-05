@@ -1,4 +1,9 @@
+use std::fmt;
+
+use traits::{MoveAble};
 use point::{Point};
+
+
 
 pub struct PointCloud {
     pub data: Vec<Point>
@@ -73,5 +78,31 @@ impl PointCloud {
         }
 
         return Some((Point{x: minx, y: miny, z: minz}, Point{x: maxx, y: maxy, z: maxz}));
+    }
+}
+
+impl MoveAble for PointCloud {
+    fn move_by(&mut self, x: f64, y: f64, z: f64) {
+        for p in &mut self.data {
+            p.move_by(x, y, z);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+impl fmt::Display for PointCloud {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for p in &self.data {
+            match p.fmt(f) {
+                Ok(_) => (),
+                Err(err) => return Err(err)
+            }
+            match f.write_str("\n") {
+                Ok(_) => (),
+                Err(err) => return Err(err)
+            }
+        }
+        return Ok(());
     }
 }

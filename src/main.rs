@@ -2,7 +2,6 @@ use std::fmt;
 
 
 mod traits;
-mod impls;
 mod functions;
 mod point;
 mod pointCloud;
