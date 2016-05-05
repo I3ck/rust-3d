@@ -3,11 +3,7 @@ extern crate num;
 use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
-pub struct Point {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64
-}
+use point::{Point};
 
 pub struct PointCloud {
     pub data: Vec<Point>

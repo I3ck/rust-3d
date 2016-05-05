@@ -7,7 +7,8 @@ use std::cmp::Ordering;
 use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
-use structs::{Point, PointCloud, CompressedPoint, CompressedPointCloud};
+use point::{Point};
+use structs::{PointCloud, CompressedPoint, CompressedPointCloud};
 use traits::{MoveAble};
 use functions::{dist, sqr_dist, dimension_compare, dimension_dist, sort_and_limit};
 
@@ -31,14 +32,7 @@ impl fmt::Display for Point {
 
 //------------------------------------------------------------------------------
 
-impl Point {
-    pub fn new() -> Point {
-        Point{x: 0.0, y: 0.0, z: 0.0}
-    }
-    pub fn clone(&self) -> Point { //@todo use trait?
-        Point { x: self.x, y: self.y, z: self.z }
-    }
-}
+
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
