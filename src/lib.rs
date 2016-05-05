@@ -3,6 +3,7 @@ mod traits;
 mod impls;
 mod functions;
 mod point;
+mod pointCloud;
 mod kdTree;
 
 #[cfg(test)]

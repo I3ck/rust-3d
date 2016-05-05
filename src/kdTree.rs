@@ -1,8 +1,8 @@
 use std::cmp;
 use std::cmp::Ordering;
 
-use structs::{PointCloud};
 use point::{Point};
+use pointCloud::{PointCloud};
 use functions::{dist, sqr_dist, dimension_compare, dimension_dist, sort_and_limit};
 
 pub struct KdTree {

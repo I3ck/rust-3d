@@ -6,10 +6,12 @@ mod traits;
 mod impls;
 mod functions;
 mod point;
+mod pointCloud;
 mod kdTree;
 
-use structs::{PointCloud, CompressedPoint, CompressedPointCloud};
+use structs::{CompressedPoint, CompressedPointCloud};
 use point::{Point};
+use pointCloud::{PointCloud};
 use kdTree::{KdTree};
 use traits::{MoveAble};
 
