@@ -242,6 +242,20 @@ impl KdTree {
         return result;
     }
 
+    pub fn in_sphere(&self, search: &Point, radius: f64) -> PointCloud {
+        let mut result = PointCloud::new();
+        if radius <= 0.0 { return result; }
+        self.root.in_sphere(search, radius, &mut result);
+        return result;
+    }
+
+    pub fn in_box(&self, search: &Point, xSize: f64, ySize: f64, zSize: f64) -> PointCloud {
+        let mut result = PointCloud::new();
+        if xSize <= 0.0 || ySize <= 0.0 || zSize <= 0.0 { return result; }
+        self.root.in_box(search, xSize, ySize, zSize, &mut result);
+        return result;
+    }
+
     pub fn nearest(&self, search: &Point) -> PointCloud { //@todo implemented on its own, since the code can be faster without vecs
         self.knearest(search, 1)
     }
