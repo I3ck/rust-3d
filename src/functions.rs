@@ -37,5 +37,4 @@ pub fn sort_and_limit(mut pc: &mut PointCloud, search: &Point, maxSize: usize) {
         pc.data = result;
 
     }
-
 }

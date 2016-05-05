@@ -358,6 +358,56 @@ impl KdNode {
         sort_and_limit(pc, search, n);
     }
 
+    pub fn in_sphere(&self, search: &Point, radius: f64, pc: &mut PointCloud) {
+        if radius <= 0.0 { return; }
+
+        if dist(search, &self.val) <= radius {
+            pc.push(self.val.clone());
+        }
+
+        if self.is_leaf() { return; }
+
+        let comp = dimension_compare(search, &self.val, self.dimension);
+
+        match comp {
+            Some(res) => match res {
+                Ordering::Less  => if let Some(ref node) = (&self).left { node.in_sphere(search, radius, pc); },
+                _               => if let Some(ref node) = (&self).right { node.in_sphere(search, radius, pc); }
+            },
+            None => {}
+        }
+
+        let (currentSearch, currentVal) = match self.dimension {
+            0 => (search.x, self.val.x),
+            1 => (search.y, self.val.y),
+            _ => (search.z, self.val.z)
+        };
+
+        let borderLeft = currentSearch - radius;
+        let borderRight = currentSearch + radius;
+
+
+
+        match comp {
+            Some(res) => match res {
+                Ordering::Less => if let Some(ref node) = (&self).right {
+                    if borderRight >= currentVal {
+                        node.in_sphere(search, radius, pc);
+                    }
+                },
+                Ordering::Greater => if let Some(ref node) = (&self).left {
+                    if borderRight <= currentVal {
+                        node.in_sphere(search, radius, pc);
+                    }
+                },
+                Ordering::Equal => {}
+            },
+            None => {}
+        }
+    }
+
+
+
     fn is_leaf(&self) -> bool {
         self.left.is_none() && self.right.is_none()
     }
