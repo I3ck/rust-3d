@@ -2,7 +2,6 @@ use std::cmp::Ordering;
 
 use point::{Point};
 use pointCloud::{PointCloud};
-use structs::{CompressedPoint, CompressedPointCloud};
 
 pub fn center(p1: &Point, p2: &Point) -> Point {
     Point {
