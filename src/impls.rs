@@ -9,7 +9,7 @@ use self::num::traits::Unsigned;
 
 use structs::{Point, PointCloud, CompressedPoint, CompressedPointCloud, KdTree, KdNode};
 use traits::{MoveAble};
-use functions::{dist, sqr_dist, dimension_compare, sort_and_limit};
+use functions::{dist, sqr_dist, dimension_compare, dimension_dist, sort_and_limit};
 
 //------------------------------------------------------------------------------
 
@@ -403,6 +403,54 @@ impl KdNode {
                 Ordering::Equal => {}
             },
             None => {}
+        }
+    }
+
+    pub fn in_box(&self, search: &Point, xSize: f64, ySize: f64, zSize: f64, pc: &mut PointCloud) {
+        if xSize <= 0.0 || ySize <= 0.0 || zSize <= 0.0 { return; }
+
+        if let (Some(distX), Some(distY), Some(distZ)) = (dimension_dist(search, &self.val, 0), dimension_dist(search, &self.val, 1), dimension_dist(search, &self.val, 2)) {
+            if distX <= 0.5 * xSize && distY <= 0.5 * ySize && distZ <= 0.5 * zSize {
+                pc.push(self.val.clone());
+            }
+
+            if self.is_leaf()  { return; }
+
+            let comp = dimension_compare(search, &self.val, self.dimension);
+
+            match comp {
+                Some(res) => match res {
+                    Ordering::Less  => if let Some(ref node) = (&self).left { node.in_box(search, xSize, ySize, zSize, pc); },
+                    _               => if let Some(ref node) = (&self).right { node.in_box(search, xSize, ySize, zSize, pc); }
+                },
+                None => {}
+            }
+
+            let (currentSearch, currentVal, currentSize) = match self.dimension {
+                0 => (search.x, self.val.x, xSize),
+                1 => (search.y, self.val.y, ySize),
+                _ => (search.z, self.val.z, zSize)
+            };
+
+            let borderLeft = currentSearch - 0.5 * currentSize;
+            let borderRight = currentSearch + 0.5 * currentSize;
+
+            match comp {
+                Some(res) => match res {
+                    Ordering::Less => if let Some(ref node) = (&self).right {
+                        if borderRight >= currentVal {
+                            node.in_box(search, xSize, ySize, zSize, pc);
+                        }
+                    },
+                    Ordering::Greater => if let Some(ref node) = (&self).left {
+                        if borderRight <= currentVal {
+                            node.in_box(search, xSize, ySize, zSize, pc);
+                        }
+                    },
+                    Ordering::Equal => {}
+                },
+                None => {}
+            }
         }
     }
 

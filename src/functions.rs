@@ -27,6 +27,15 @@ pub fn dimension_compare(lhs: &Point, rhs: &Point, dim: i8) -> Option<Ordering> 
     }
 }
 
+pub fn dimension_dist(lhs: &Point, rhs: &Point, dim: i8) -> Option<f64> {
+    match dim {
+        0 => Some((lhs.x - rhs.x).abs()),
+        1 => Some((lhs.y - rhs.y).abs()),
+        2 => Some((lhs.z - rhs.z).abs()),
+        _ => None
+    }
+}
+
 pub fn sort_and_limit(mut pc: &mut PointCloud, search: &Point, maxSize: usize) {
     if pc.len() > maxSize {
         pc.data.sort_by(|a, b| sqr_dist(search, a).partial_cmp(&sqr_dist(search, b)).unwrap_or(Ordering::Equal));
