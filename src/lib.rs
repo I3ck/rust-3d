@@ -2,6 +2,7 @@ mod structs;
 mod traits;
 mod impls;
 mod functions;
+mod kdTree;
 
 #[cfg(test)]
 mod tests {
