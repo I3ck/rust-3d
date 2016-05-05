@@ -1,4 +1,3 @@
-mod structs;
 mod traits;
 mod impls;
 mod functions;

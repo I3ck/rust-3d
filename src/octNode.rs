@@ -1,15 +1,5 @@
-extern crate num;
+use octTree{OctTree};
 
-use self::num::traits::PrimInt;
-use self::num::traits::Unsigned;
-
-use point::{Point};
-
-pub struct OctTree {
-    pub root: OctNode,
-    pub min: Point,
-    pub max: Point
-}
 
 pub enum OctNode {
     Leaf(Point),

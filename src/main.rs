@@ -1,7 +1,6 @@
 use std::fmt;
 
 
-mod structs;
 mod traits;
 mod impls;
 mod functions;
