@@ -5,61 +5,54 @@ use functions::{center};
 
 pub enum OctNode {
     Leaf(Point),
-    Internal {
-        tfl: Option<Box<OctNode>>, //top front left
-        tfr: Option<Box<OctNode>>, //top front right
-        tbl: Option<Box<OctNode>>, //top back left
-        tbr: Option<Box<OctNode>>, //top back right
-        bfl: Option<Box<OctNode>>, //bottom front left
-        bfr: Option<Box<OctNode>>, //bottom front right
-        bbl: Option<Box<OctNode>>, //bottom back left
-        bbr: Option<Box<OctNode>>  //bottom back right
+    Internal { // naming : p == positive, n == negative ||| xyz   => pnp => x positive, y negative, z positive direction from center
+        ppp: Option<Box<OctNode>>,
+        ppn: Option<Box<OctNode>>,
+        pnp: Option<Box<OctNode>>,
+        pnn: Option<Box<OctNode>>,
+        npp: Option<Box<OctNode>>,
+        npn: Option<Box<OctNode>>,
+        nnp: Option<Box<OctNode>>,
+        nnn: Option<Box<OctNode>>
     }
 }
 
 impl OctNode {
     pub fn new(min: &Point, max: &Point, mut pc: Vec<Point>) -> OctNode {
-        let mut pctfl = Vec::new(); //@todo rename all these to positive/negative x/y/z (also nodes in struct def)
-        let mut pctfr = Vec::new();
-        let mut pctbl = Vec::new();
-        let mut pctbr = Vec::new();
-        let mut pcbfl = Vec::new();
-        let mut pcbfr = Vec::new();
-        let mut pcbbl = Vec::new();
-        let mut pcbbr = Vec::new();
+        let mut pcppp = Vec::new();
+        let mut pcppn = Vec::new();
+        let mut pcpnp = Vec::new();
+        let mut pcpnn = Vec::new();
+        let mut pcnpp = Vec::new();
+        let mut pcnpn = Vec::new();
+        let mut pcnnp = Vec::new();
+        let mut pcnnn = Vec::new();
 
         let middle = center(min, max);
 
         for p in pc { //@todo >= or <= ? //@todo define helper method and enum for this
             if p.x >= middle.x && p.Y >= middle.y && p.Z >= middle.Z {
-                pctfl.push(p);
-            }
-            else if p.x < middle.x && p.Y >= middle.y && p.Z >= middle.Z {
-                pctfr.push(p);
-            }
-            else if p.x >= middle.x && p.Y < middle.y && p.Z >= middle.Z {
-                pctbl.push(p);
-            }
-            else if p.x < middle.x && p.Y < middle.y && p.Z >= middle.Z {
-                pctbr.push(p);
-            }
-            if p.x >= middle.x && p.Y >= middle.y && p.Z < middle.Z {
-                pcbfl.push(p);
-            }
-            else if p.x < middle.x && p.Y >= middle.y && p.Z < middle.Z {
-                pcbfr.push(p);
-            }
-            else if p.x >= middle.x && p.Y < middle.y && p.Z < middle.Z {
-                pcbbl.push(p);
-            }
-            else // if p.x < middle.x && p.Y < middle.y && p.Z < middle.Z {
-                pcbbr.push(p);
+                pcppp.push(p);
+            } else if p.x >= middle.x && p.Y >= middle.y && p.Z < middle.Z {
+                pcppn.push(p);
+            } else if p.x >= middle.x && p.Y < middle.y && p.Z >= middle.Z {
+                pcpnp.push(p);
+            } else if p.x >= middle.x && p.Y < middle.y && p.Z < middle.Z {
+                pcpnn.push(p);
+            } else if p.x < middle.x && p.Y >= middle.y && p.Z >= middle.Z {
+                pcnpp.push(p);
+            } else if p.x < middle.x && p.Y >= middle.y && p.Z < middle.Z {
+                pcnpn.push(p);
+            } else if p.x >= middle.x && p.Y < middle.y && p.Z < middle.Z {
+                pcnnp.push(p);
+            } else { //if p.x < middle.x && p.Y < middle.y && p.Z < middle.Z {
+                pcnnn.push(p);
             }
         }
 
-        let tfl = match pctfl.len() {
+        let ppp = match pcppp.len() {
             0 => None,
-            _ => Some(Box::new(OctNode::new(TODO)))
+            _ => Some(Box::new(OctNode::new()))
         }
 
 
