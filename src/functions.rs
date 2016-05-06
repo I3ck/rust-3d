@@ -2,6 +2,7 @@ use std::cmp::Ordering;
 
 use point::{Point};
 use pointCloud::{PointCloud};
+use octNode::{Direction};
 
 pub fn center(p1: &Point, p2: &Point) -> Point {
     Point {
@@ -46,5 +47,30 @@ pub fn sort_and_limit(mut pc: &mut PointCloud, search: &Point, maxSize: usize) {
         }
         pc.data = result;
 
+    }
+}
+
+pub fn calcSubMinMax(dir: Direction, min: &Point, max: &Point) -> (Point, Point) { //@todo better name
+    let middle = center(min, max);
+
+    let px = max.x;
+    let py = max.y;
+    let pz = max.z;
+    let nx = min.x;
+    let ny = min.y;
+    let nz = min.z;
+    let mx = middle.x;
+    let my = middle.y;
+    let mz = middle.z;
+
+    match dir {
+        Direction::PPP => (middle,                         max.clone()),
+        Direction::PPN => (Point{x: mx, y: my, z: nz},     Point{x: px, y: py, z: mz}),
+        Direction::PNP => (Point{x: mx, y: ny, z: mz},     Point{x: px, y: my, z: pz}),
+        Direction::PNN => (Point{x: mx, y: ny, z: nz},     Point{x: px, y: my, z: mz}),
+        Direction::NPP => (Point{x: nx, y: my, z: mz},     Point{x: mx, y: py, z: pz}),
+        Direction::NPN => (Point{x: nx, y: my, z: nz},     Point{x: mx, y: py, z: mz}),
+        Direction::NNP => (Point{x: nx, y: ny, z: mz},     Point{x: mx, y: my, z: pz}),
+        Direction::NNN => (min.clone(),                    middle)
     }
 }
