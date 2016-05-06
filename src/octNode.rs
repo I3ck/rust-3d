@@ -32,6 +32,8 @@ pub enum Direction { //@todo rename //@todo private?
 
 impl OctNode {
     pub fn new(min: &Point, max: &Point, mut pc: Vec<Point>) -> OctNode {
+        if pc.len() == 1 { return OctNode::Leaf(pc[0].clone()); }
+
         let mut pcppp = Vec::new();
         let mut pcppn = Vec::new();
         let mut pcpnp = Vec::new();
