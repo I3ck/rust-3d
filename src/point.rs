@@ -1,4 +1,9 @@
+extern crate core;
+
+use std::f64;
 use std::fmt;
+
+use self::core::str::FromStr;
 
 use traits::{MoveAble};
 
@@ -12,6 +17,29 @@ pub struct Point {
 impl Point {
     pub fn new() -> Point {
         Point{x: 0.0, y: 0.0, z: 0.0}
+    }
+    pub fn parse(text: String) -> Option<Point> {
+        let mut split = text.split(" ");
+        let words = split.collect::<Vec<&str>>();
+        match words.len() {
+            3 => {
+                let mut p = Point::new();
+                match f64::from_str(words[0]) {
+                    Err(_) => return None,
+                    Ok(x) => p.x = x
+                };
+                match f64::from_str(words[1]) {
+                    Err(_) => return None,
+                    Ok(y) => p.y = y
+                };
+                match f64::from_str(words[2]) {
+                    Err(_) => return None,
+                    Ok(z) => p.z = z
+                };
+                Some(p)
+            },
+            _ => None
+        }
     }
     pub fn clone(&self) -> Point { //@todo use trait?
         Point { x: self.x, y: self.y, z: self.z }

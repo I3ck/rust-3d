@@ -19,6 +19,13 @@ use kdTree::{KdTree};
 use traits::{MoveAble};
 
 
+//io
+use std::error::Error;
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
+
+
 //------------------------------------------------------------------------------
 
 fn main() {
@@ -63,5 +70,50 @@ fn main() {
     let nearest = tree.knearest(&Point{x: 10.0,y: 199.0,z: 350.0}, 1);
 
     println!("single nearest to 100/199/350 : {}", nearest);
+
+
+
+
+
+
+
+    let path = Path::new("exampledata.tmp");
+    let display = path.display();
+
+    // Open the path in read-only mode, returns `io::Result<File>`
+    let mut file = match File::open(&path) {
+        // The `description` method of `io::Error` returns a string that
+        // describes the error
+        Err(why) => panic!("couldn't open {}: {}", display,
+                                                   Error::description(&why)),
+        Ok(file) => file,
+    };
+
+    // Read the file contents into a string, returns `io::Result<usize>`
+    let mut s = String::new();
+    match file.read_to_string(&mut s) {
+        Err(why) => panic!("couldn't read {}: {}", display,
+                                                   Error::description(&why)),
+        Ok(_) => {
+            print!("{} contains:\n{}", display, s);
+
+            let lines = s.split("\n");
+
+            let mut pc = PointCloud::new();
+            for line in lines {
+                match Point::parse(String::from(line)) {
+                    Some(p) => pc.push(p),
+                    None => {} //@todo error?
+                }
+            }
+
+            println!("parsed len : {}", pc.len());
+            println!("parsed pc : {}", pc);
+
+
+        }
+    }
+
+
 
 }
