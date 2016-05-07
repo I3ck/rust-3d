@@ -28,6 +28,16 @@ impl PointCloud {
         Some(pc)
     }
 
+    pub fn clone(&self) -> PointCloud {
+        let mut data = Vec::new();
+
+        for p in &self.data {
+            data.push(p.clone());
+        }
+
+        PointCloud { data: data }
+    }
+
 //------------------------------------------------------------------------------
 
     pub fn push(&mut self, p: Point) {

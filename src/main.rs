@@ -16,6 +16,7 @@ use pointCloud::{PointCloud};
 use compressedPoint::{CompressedPoint};
 use compressedPointCloud::{CompressedPointCloud};
 use kdTree::{KdTree};
+use ocTree::{OcTree};
 use traits::{MoveAble};
 
 
@@ -80,16 +81,12 @@ fn main() {
     let path = Path::new("exampledata.tmp");
     let display = path.display();
 
-    // Open the path in read-only mode, returns `io::Result<File>`
     let mut file = match File::open(&path) {
-        // The `description` method of `io::Error` returns a string that
-        // describes the error
         Err(why) => panic!("couldn't open {}: {}", display,
                                                    Error::description(&why)),
-        Ok(file) => file,
+        Ok(file) => file
     };
 
-    // Read the file contents into a string, returns `io::Result<usize>`
     let mut s = String::new();
     match file.read_to_string(&mut s) {
         Err(why) => panic!("couldn't read {}: {}", display,
@@ -98,13 +95,21 @@ fn main() {
             print!("{} contains:\n{}", display, s);
 
             match PointCloud::parse(String::from(s)) {
-                Some(pc) => {
-                    println!("parsed len : {}", pc.len());
-                    println!("parsed pc : {}", pc);
-                }
                 None => {
                     println!("failed to parse pc data!");
+                },
+                Some(pc) => {
+                    println!("parsed len : {}", pc.len());
+
+                    let kdTree = KdTree::new(pc.clone()).expect("Could not parse kdTree!");
+                    println!("tree.size() : {}", tree.size());
+                    let nearestTen = kdTree.knearest(&Point{x: 9.0,y: 56.0,z: 0.0}, 10);
+                    println!("nearest ten to 9/56/0 : {}", nearestTen);
+
+                    //@todo stack overflow
+                    //let ocTree = OcTree::new(pc).expect("Could not parse ocTree!");
                 }
+
             }
         }
     }
