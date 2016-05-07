@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use point::{Point};
 use pointCloud::{PointCloud};
-use octNode::{Direction};
+use ocNode::{Direction};
 
 pub fn center(p1: &Point, p2: &Point) -> Point {
     Point {

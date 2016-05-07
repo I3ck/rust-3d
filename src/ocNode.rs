@@ -3,20 +3,20 @@ use pointCloud::{PointCloud};
 use functions::{center, calcSubMinMax};
 //@todo either merge Oct code or splot KdNode and Tree into seperate files
 
-pub enum OctNode {
+pub enum OcNode {
     Leaf(Point),
     Node(Internal)
 }
 
 struct Internal { // naming : p == positive, n == negative ||| xyz   => pnp => x positive, y negative, z positive direction from center
-    ppp: Option<Box<OctNode>>,
-    ppn: Option<Box<OctNode>>,
-    pnp: Option<Box<OctNode>>,
-    pnn: Option<Box<OctNode>>,
-    npp: Option<Box<OctNode>>,
-    npn: Option<Box<OctNode>>,
-    nnp: Option<Box<OctNode>>,
-    nnn: Option<Box<OctNode>>
+    ppp: Option<Box<OcNode>>,
+    ppn: Option<Box<OcNode>>,
+    pnp: Option<Box<OcNode>>,
+    pnn: Option<Box<OcNode>>,
+    npp: Option<Box<OcNode>>,
+    npn: Option<Box<OcNode>>,
+    nnp: Option<Box<OcNode>>,
+    nnn: Option<Box<OcNode>>
 }
 
 pub enum Direction { //@todo rename //@todo private?
@@ -30,9 +30,9 @@ pub enum Direction { //@todo rename //@todo private?
     NNN
 }
 
-impl OctNode {
-    pub fn new(min: &Point, max: &Point, mut pc: Vec<Point>) -> OctNode {
-        if pc.len() == 1 { return OctNode::Leaf(pc[0].clone()); }
+impl OcNode {
+    pub fn new(min: &Point, max: &Point, mut pc: Vec<Point>) -> OcNode {
+        if pc.len() == 1 { return OcNode::Leaf(pc[0].clone()); }
 
         let mut pcppp = Vec::new();
         let mut pcppn = Vec::new();
@@ -70,7 +70,7 @@ impl OctNode {
             0 => None,
             _ => {
                 let (newMin, newMax) = calcSubMinMax(Direction::PPP, min, max);
-                Some(Box::new(OctNode::new(&newMin, &newMax, pcppp)))
+                Some(Box::new(OcNode::new(&newMin, &newMax, pcppp)))
             }
         };
 
@@ -78,7 +78,7 @@ impl OctNode {
             0 => None,
             _ => {
                 let (newMin, newMax) = calcSubMinMax(Direction::PPN, min, max);
-                Some(Box::new(OctNode::new(&newMin, &newMax, pcppn)))
+                Some(Box::new(OcNode::new(&newMin, &newMax, pcppn)))
             }
         };
 
@@ -86,7 +86,7 @@ impl OctNode {
             0 => None,
             _ => {
                 let (newMin, newMax) = calcSubMinMax(Direction::PNP, min, max);
-                Some(Box::new(OctNode::new(&newMin, &newMax, pcpnp)))
+                Some(Box::new(OcNode::new(&newMin, &newMax, pcpnp)))
             }
         };
 
@@ -94,7 +94,7 @@ impl OctNode {
             0 => None,
             _ => {
                 let (newMin, newMax) = calcSubMinMax(Direction::PNN, min, max);
-                Some(Box::new(OctNode::new(&newMin, &newMax, pcpnn)))
+                Some(Box::new(OcNode::new(&newMin, &newMax, pcpnn)))
             }
         };
 
@@ -102,7 +102,7 @@ impl OctNode {
             0 => None,
             _ => {
                 let (newMin, newMax) = calcSubMinMax(Direction::NPP, min, max);
-                Some(Box::new(OctNode::new(&newMin, &newMax, pcnpp)))
+                Some(Box::new(OcNode::new(&newMin, &newMax, pcnpp)))
             }
         };
 
@@ -110,7 +110,7 @@ impl OctNode {
             0 => None,
             _ => {
                 let (newMin, newMax) = calcSubMinMax(Direction::NPN, min, max);
-                Some(Box::new(OctNode::new(&newMin, &newMax, pcnpn)))
+                Some(Box::new(OcNode::new(&newMin, &newMax, pcnpn)))
             }
         };
 
@@ -118,7 +118,7 @@ impl OctNode {
             0 => None,
             _ => {
                 let (newMin, newMax) = calcSubMinMax(Direction::NNP, min, max);
-                Some(Box::new(OctNode::new(&newMin, &newMax, pcnnp)))
+                Some(Box::new(OcNode::new(&newMin, &newMax, pcnnp)))
             }
         };
 
@@ -126,7 +126,7 @@ impl OctNode {
             0 => None,
             _ => {
                 let (newMin, newMax) = calcSubMinMax(Direction::NNN, min, max);
-                Some(Box::new(OctNode::new(&newMin, &newMax, pcnnn)))
+                Some(Box::new(OcNode::new(&newMin, &newMax, pcnnn)))
             }
         };
 
@@ -141,7 +141,7 @@ impl OctNode {
             nnn: nnn
         };
 
-        OctNode::Node(result)
+        OcNode::Node(result)
     }
 
 
