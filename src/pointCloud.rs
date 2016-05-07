@@ -14,6 +14,20 @@ impl PointCloud {
         PointCloud{data: Vec::new()}
     }
 
+    pub fn parse(text: String) -> Option<PointCloud> {
+        let lines = text.split("\n");
+
+        let mut pc = PointCloud::new();
+        for line in lines {
+            match Point::parse(String::from(line)) {
+                Some(p) => pc.push(p),
+                None => {}
+            }
+        }
+        if pc.len() == 0 { return None; }
+        Some(pc)
+    }
+
 //------------------------------------------------------------------------------
 
     pub fn push(&mut self, p: Point) {

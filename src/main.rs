@@ -97,23 +97,15 @@ fn main() {
         Ok(_) => {
             print!("{} contains:\n{}", display, s);
 
-            let lines = s.split("\n");
-
-            let mut pc = PointCloud::new();
-            for line in lines {
-                match Point::parse(String::from(line)) {
-                    Some(p) => pc.push(p),
-                    None => {} //@todo error?
+            match PointCloud::parse(String::from(s)) {
+                Some(pc) => {
+                    println!("parsed len : {}", pc.len());
+                    println!("parsed pc : {}", pc);
+                }
+                None => {
+                    println!("failed to parse pc data!");
                 }
             }
-
-            println!("parsed len : {}", pc.len());
-            println!("parsed pc : {}", pc);
-
-
         }
     }
-
-
-
 }
