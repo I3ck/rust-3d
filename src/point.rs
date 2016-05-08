@@ -2,16 +2,35 @@ extern crate core;
 
 use std::f64;
 use std::fmt;
+use std::cmp::{Eq, Ordering};
+use std::hash::{Hash, SipHasher, Hasher};
 
 use self::core::str::FromStr;
 
 use traits::{MoveAble};
+use functions::{sqr_dist};
 
-
+#[derive (PartialEq, PartialOrd)]
 pub struct Point {
     pub x: f64,
     pub y: f64,
     pub z: f64
+}
+
+impl Eq for Point {}
+impl Ord for Point {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let origin = Point::new();
+        sqr_dist(&origin, self).partial_cmp(&sqr_dist(&origin, other)).unwrap_or(Ordering::Equal)
+    }
+}
+
+impl Hash for Point { //@todo poor precision this way
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        (self.x as u64).hash(state);
+        (self.y as u64).hash(state);
+        (self.z as u64).hash(state);
+    }
 }
 
 impl Point {
