@@ -4,3 +4,4 @@ target
 Cargo.lock
 *.tmp
 exampledata.xyz
+collect.xyz

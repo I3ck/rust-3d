@@ -118,8 +118,11 @@ fn main() {
                     let collect2 = ocTree.collect(2);
                     println!("collect 2 : {}", collect2);
 
-                    let collect3 = ocTree.collect(3);
-                    println!("collect 3 : {}", collect3);
+                    let collect = ocTree.collect(5);
+                    println!("collect: {}", collect);
+
+                    let mut f = File::create("collect.xyz").expect("Could not create file");
+                    f.write_all(collect.toStr().as_bytes()).expect("Could not write to file");
                 }
             }
         }
