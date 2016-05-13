@@ -150,7 +150,7 @@ impl OcNode {
     }
 
     pub fn collect(&self, depth: i8, maxdepth: i8, pc: &mut PointCloud) {
-        if depth > maxdepth { return; } //@todo > or >= or ... ?
+        if maxdepth >= 0 && depth > maxdepth { return; } //@todo > or >= or ... ?
         match self {
             &OcNode::Leaf(ref p) => pc.push(p.clone()),
 

@@ -118,7 +118,7 @@ fn main() {
                     let collect2 = ocTree.collect(2);
                     println!("collect 2 : {}", collect2);
 
-                    let collect = ocTree.collect(5);
+                    let collect = ocTree.collect(-1);
                     println!("collect: {}", collect);
 
                     let mut f = File::create("collect.xyz").expect("Could not create file");
