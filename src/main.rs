@@ -78,7 +78,7 @@ fn main() {
 
 
 
-    let path = Path::new("exampledata.tmp");
+    let path = Path::new("exampledata.xyz");
     let display = path.display();
 
     let mut file = match File::open(&path) {
