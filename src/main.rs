@@ -108,8 +108,19 @@ fn main() {
 
                     let ocTree = OcTree::new(pc).expect("Could not parse ocTree!");
                     println!("could create octree");
-                }
 
+                    let collect0 = ocTree.collect(0);
+                    println!("collect 0 : {}", collect0);
+
+                    let collect1 = ocTree.collect(1);
+                    println!("collect 1 : {}", collect1);
+
+                    let collect2 = ocTree.collect(2);
+                    println!("collect 2 : {}", collect2);
+
+                    let collect3 = ocTree.collect(3);
+                    println!("collect 3 : {}", collect3);
+                }
             }
         }
     }

@@ -24,4 +24,11 @@ impl OcTree {
             }
         }
     }
+
+    //@todo rewrite or make new method which returns cog instead of stopping recursion
+    pub fn collect(&self,  maxdepth: i8) -> PointCloud {
+        let mut result = PointCloud::new();
+        self.root.collect(0, maxdepth, &mut result);
+        return result;
+    }
 }

@@ -60,6 +60,14 @@ impl Point {
             _ => None
         }
     }
+    //@todo make trait
+    pub fn toStr(&self) -> String {
+        let sX: String = self.x.to_string();
+        let sY: String = self.y.to_string();
+        let sZ: String = self.z.to_string();
+
+        sX + " " + &sY + " " + &sZ
+    }
     pub fn clone(&self) -> Point { //@todo use trait?
         Point { x: self.x, y: self.y, z: self.z }
     }

@@ -28,6 +28,16 @@ impl PointCloud {
         Some(pc)
     }
 
+    pub fn toStr(&self) -> String {
+        let mut result = String::new();
+
+        for p in &self.data {
+            result = result + &p.toStr() + "\n";
+        }
+
+        result
+    }
+
     pub fn clone(&self) -> PointCloud {
         let mut data = Vec::new();
 
