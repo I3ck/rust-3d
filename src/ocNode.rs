@@ -30,7 +30,24 @@ pub enum Direction { //@todo rename //@todo private?
     NNN
 }
 
+//@todo define somewhere else
+fn collect_center_or_all(n: &OcNode, onlyCollectCenters: bool, depth: i8, maxdepth: i8, mut pc: &mut PointCloud) {
+    if onlyCollectCenters {
+        let mut subPc = PointCloud::new();
+        n.collect(depth+1, maxdepth, &mut subPc);
+        if let Some(c) = subPc.center() {
+            pc.push(c);
+        }
+    } else {
+        n.collect(depth+1, maxdepth, pc);
+    }
+}
+
+
 impl OcNode {
+
+
+
     pub fn new(min: &Point, max: &Point, mut pc: Vec<Point>) -> OcNode {
         if pc.len() == 1 { return OcNode::Leaf(pc[0].clone()); };
         let mut pcppp = Vec::new();
@@ -157,92 +174,28 @@ impl OcNode {
 
             &OcNode::Node(ref internal) => {
                 if let Some(ref n) = internal.ppp {
-                    if onlyCollectCenters {
-                        let mut subPc = PointCloud::new();
-                        n.collect(depth+1, maxdepth, &mut subPc);
-                        if let Some(c) = subPc.center() {
-                            pc.push(c);
-                        }
-                    } else {
-                        n.collect(depth+1, maxdepth, pc);
-                    }
+                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.ppn {
-                    if onlyCollectCenters {
-                        let mut subPc = PointCloud::new();
-                        n.collect(depth+1, maxdepth, &mut subPc);
-                        if let Some(c) = subPc.center() {
-                            pc.push(c);
-                        }
-                    } else {
-                        n.collect(depth+1, maxdepth, pc);
-                    }
+                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.pnp {
-                    if onlyCollectCenters {
-                        let mut subPc = PointCloud::new();
-                        n.collect(depth+1, maxdepth, &mut subPc);
-                        if let Some(c) = subPc.center() {
-                            pc.push(c);
-                        }
-                    } else {
-                        n.collect(depth+1, maxdepth, pc);
-                    }
+                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.pnn {
-                    if onlyCollectCenters {
-                        let mut subPc = PointCloud::new();
-                        n.collect(depth+1, maxdepth, &mut subPc);
-                        if let Some(c) = subPc.center() {
-                            pc.push(c);
-                        }
-                    } else {
-                        n.collect(depth+1, maxdepth, pc);
-                    }
+                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.npp {
-                    if onlyCollectCenters {
-                        let mut subPc = PointCloud::new();
-                        n.collect(depth+1, maxdepth, &mut subPc);
-                        if let Some(c) = subPc.center() {
-                            pc.push(c);
-                        }
-                    } else {
-                        n.collect(depth+1, maxdepth, pc);
-                    }
+                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.npn {
-                    if onlyCollectCenters {
-                        let mut subPc = PointCloud::new();
-                        n.collect(depth+1, maxdepth, &mut subPc);
-                        if let Some(c) = subPc.center() {
-                            pc.push(c);
-                        }
-                    } else {
-                        n.collect(depth+1, maxdepth, pc);
-                    }
+                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.nnp {
-                    if onlyCollectCenters {
-                        let mut subPc = PointCloud::new();
-                        n.collect(depth+1, maxdepth, &mut subPc);
-                        if let Some(c) = subPc.center() {
-                            pc.push(c);
-                        }
-                    } else {
-                        n.collect(depth+1, maxdepth, pc);
-                    }
+                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.nnn {
-                    if onlyCollectCenters {
-                        let mut subPc = PointCloud::new();
-                        n.collect(depth+1, maxdepth, &mut subPc);
-                        if let Some(c) = subPc.center() {
-                            pc.push(c);
-                        }
-                    } else {
-                        n.collect(depth+1, maxdepth, pc);
-                    }
+                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
                 }
             }
         }
