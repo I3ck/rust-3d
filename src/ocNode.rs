@@ -43,11 +43,19 @@ fn collect_center_or_all(n: &OcNode, onlyCollectCenters: bool, depth: i8, maxdep
     }
 }
 
+///@todo define somewhere else
+fn build_subnode(pc: Vec<Point>,bb: (Point, Point)) -> Option<Box<OcNode>> {
+    match pc.len() {
+        0 => None,
+        _ => {
+            let (newMin, newMax) = bb;
+            Some(Box::new(OcNode::new(&newMin, &newMax, pc)))
+        }
+    }
+}
+
 
 impl OcNode {
-
-
-
     pub fn new(min: &Point, max: &Point, mut pc: Vec<Point>) -> OcNode {
         if pc.len() == 1 { return OcNode::Leaf(pc[0].clone()); };
         let mut pcppp = Vec::new();
@@ -88,69 +96,14 @@ impl OcNode {
             }
         }
 
-        let ppp = match pcppp.len() {
-            0 => None,
-            _ => {
-                let (newMin, newMax) = bbppp;
-                Some(Box::new(OcNode::new(&newMin, &newMax, pcppp)))
-            }
-        };
-
-        let ppn = match pcppn.len() {
-            0 => None,
-            _ => {
-                let (newMin, newMax) = bbppn;
-                Some(Box::new(OcNode::new(&newMin, &newMax, pcppn)))
-            }
-        };
-
-        let pnp = match pcpnp.len() {
-            0 => None,
-            _ => {
-                let (newMin, newMax) = bbpnp;
-                Some(Box::new(OcNode::new(&newMin, &newMax, pcpnp)))
-            }
-        };
-
-        let pnn = match pcpnn.len() {
-            0 => None,
-            _ => {
-                let (newMin, newMax) = bbpnn;
-                Some(Box::new(OcNode::new(&newMin, &newMax, pcpnn)))
-            }
-        };
-
-        let npp = match pcnpp.len() {
-            0 => None,
-            _ => {
-                let (newMin, newMax) = bbnpp;
-                Some(Box::new(OcNode::new(&newMin, &newMax, pcnpp)))
-            }
-        };
-
-        let npn = match pcnpn.len() {
-            0 => None,
-            _ => {
-                let (newMin, newMax) = bbnpn;
-                Some(Box::new(OcNode::new(&newMin, &newMax, pcnpn)))
-            }
-        };
-
-        let nnp = match pcnnp.len() {
-            0 => None,
-            _ => {
-                let (newMin, newMax) = bbnnp;
-                Some(Box::new(OcNode::new(&newMin, &newMax, pcnnp)))
-            }
-        };
-
-        let nnn = match pcnnn.len() {
-            0 => None,
-            _ => {
-                let (newMin, newMax) = bbnnn;
-                Some(Box::new(OcNode::new(&newMin, &newMax, pcnnn)))
-            }
-        };
+        let ppp = build_subnode(pcppp, bbppp);
+        let ppn = build_subnode(pcppn, bbppn);
+        let pnp = build_subnode(pcpnp, bbpnp);
+        let pnn = build_subnode(pcpnn, bbpnn);
+        let npp = build_subnode(pcnpp, bbnpp);
+        let npn = build_subnode(pcnpn, bbnpn);
+        let nnp = build_subnode(pcnnp, bbnnp);
+        let nnn = build_subnode(pcnnn, bbnnn);
 
         let mut result: Internal = Internal {
             ppp: ppp,
