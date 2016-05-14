@@ -5,8 +5,10 @@ use point::{Point};
 use pointCloud::{PointCloud};
 use functions::{dist, sqr_dist, dimension_compare, dimension_dist, sort_and_limit};
 
+use traits::{IsTree, IsKdTree};
+
 pub struct KdTree {
-    pub root: KdNode
+    pub root: Option<KdNode>
 }
 pub struct KdNode {
     pub left: Option<Box<KdNode>>,
@@ -15,49 +17,78 @@ pub struct KdNode {
     pub dimension: i8
 }
 
-impl KdTree {
-    pub fn new(pc: PointCloud) -> Option<KdTree> {
+impl IsTree for KdTree {
+    fn new() -> KdTree {
+        KdTree { root: None }
+    }
+
+    fn build(&mut self, pc: PointCloud) -> bool {
         match pc.len() {
-            0 => None,
-            _ => Some(KdTree{root: KdNode::new(0, pc.data)})
+            0 => false,
+            _ => {
+                self.root = Some(KdNode::new(0, pc.data));
+                true
+            }
         }
     }
 
+}
+
+impl IsKdTree for KdTree {
+    fn knearest(&self, search: &Point, n: usize) -> PointCloud {
+        let mut result = PointCloud::new();
+        if n < 1 { return result; }
+        if let Some(ref node) = self.root {
+            node.knearest(search, n, &mut result);
+        }
+        return result;
+    }
+
+    fn in_sphere(&self, search: &Point, radius: f64) -> PointCloud {
+        let mut result = PointCloud::new();
+        if radius <= 0.0 { return result; }
+        if let Some(ref node) = self.root {
+            node.in_sphere(search, radius, &mut result);
+        }
+        return result;
+    }
+
+    fn in_box(&self, search: &Point, xSize: f64, ySize: f64, zSize: f64) -> PointCloud {
+        let mut result = PointCloud::new();
+        if xSize <= 0.0 || ySize <= 0.0 || zSize <= 0.0 { return result; }
+        if let Some(ref node) = self.root {
+            node.in_box(search, xSize, ySize, zSize, &mut result);
+        }
+        return result;
+    }
+
+    fn nearest(&self, search: &Point) -> Option<Point> { //@todo implemented on its own, since the code can be faster without vecs
+        let result = self.knearest(search, 1);
+        match result.len() {
+            0 => None,
+            _ => {
+                let p = result.data[0].clone();
+                Some(p)
+            }
+        }
+    }
+}
+
+impl KdTree {
     pub fn size(&self) -> usize {
-        self.root.size()
+        match self.root {
+            None => 0,
+            Some(ref node) => node.size()
+        }
     }
 
     pub fn toPointCloud(&self) -> PointCloud {
         let mut result = PointCloud::new();
-        self.root.toPointCloud(&mut result);
+        if let Some(ref node) = self.root {
+            node.toPointCloud(&mut result);
+        }
         result
     }
-
-    pub fn knearest(&self, search: &Point, n: usize) -> PointCloud {
-        let mut result = PointCloud::new();
-        if n < 1 { return result; }
-        self.root.knearest(search, n, &mut result);
-        return result;
-    }
-
-    pub fn in_sphere(&self, search: &Point, radius: f64) -> PointCloud {
-        let mut result = PointCloud::new();
-        if radius <= 0.0 { return result; }
-        self.root.in_sphere(search, radius, &mut result);
-        return result;
-    }
-
-    pub fn in_box(&self, search: &Point, xSize: f64, ySize: f64, zSize: f64) -> PointCloud {
-        let mut result = PointCloud::new();
-        if xSize <= 0.0 || ySize <= 0.0 || zSize <= 0.0 { return result; }
-        self.root.in_box(search, xSize, ySize, zSize, &mut result);
-        return result;
-    }
-
-    pub fn nearest(&self, search: &Point) -> PointCloud { //@todo implemented on its own, since the code can be faster without vecs
-        self.knearest(search, 1)
-    }
-
 }
 
 impl KdNode {

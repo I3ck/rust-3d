@@ -17,7 +17,7 @@ use compressedPoint::{CompressedPoint};
 use compressedPointCloud::{CompressedPointCloud};
 use kdTree::{KdTree};
 use ocTree::{OcTree};
-use traits::{MoveAble};
+use traits::{MoveAble, IsTree, IsOcTree, IsKdTree};
 
 
 //io
@@ -60,7 +60,8 @@ fn main() {
     println!("pCenter : {}", pCenter);
     println!("pc :\n {}", pc);
 
-    let tree = KdTree::new(pc).expect("Could not parse tree!");
+    let mut tree = KdTree::new();
+    tree.build(pc);
 
     println!("tree.size() : {}", tree.size());
 
@@ -101,7 +102,8 @@ fn main() {
                 Some(pc) => {
                     println!("parsed len : {}", pc.len());
 
-                    let kdTree = KdTree::new(pc.clone()).expect("Could not parse kdTree!");
+                    let mut kdTree = KdTree::new();
+                    kdTree.build(pc.clone());
                     println!("tree.size() : {}", tree.size());
                     let nearestTen = kdTree.knearest(&Point{x: 9.0,y: 56.0,z: 0.0}, 10);
                     println!("nearest ten to 9/56/0 : {}", nearestTen);
