@@ -50,7 +50,7 @@ pub fn sort_and_limit(mut pc: &mut PointCloud, search: &Point, maxSize: usize) {
     }
 }
 
-pub fn calcDirection(reference: &Point, p: &Point) -> Direction {
+pub fn calc_direction(reference: &Point, p: &Point) -> Direction {
     if p.x >= reference.x && p.y >= reference.y && p.z >= reference.z {
         Direction::PPP
     } else if p.x >= reference.x && p.y >= reference.y && p.z < reference.z {
@@ -70,7 +70,7 @@ pub fn calcDirection(reference: &Point, p: &Point) -> Direction {
     }
 }
 
-pub fn calcSubMinMax(dir: Direction, min: &Point, max: &Point) -> (Point, Point) { //@todo better name
+pub fn calc_sub_min_max(dir: Direction, min: &Point, max: &Point) -> (Point, Point) { //@todo better name
     let middle = center(min, max);
 
     let px = max.x;
@@ -95,7 +95,7 @@ pub fn calcSubMinMax(dir: Direction, min: &Point, max: &Point) -> (Point, Point)
     }
 }
 
-pub fn inBB(p: &Point, min: &Point, max: &Point) -> bool {
+pub fn in_bb(p: &Point, min: &Point, max: &Point) -> bool {
     p.x >= min.x && p.x <= max.x &&
     p.y >= min.y && p.y <= max.y &&
     p.z >= min.z && p.z <= max.z

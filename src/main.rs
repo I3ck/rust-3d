@@ -125,7 +125,7 @@ fn main() {
                     println!("collect: {}", collect);
 
                     let mut f = File::create("collect.xyz").expect("Could not create file");
-                    f.write_all(collect.toStr().as_bytes()).expect("Could not write to file");
+                    f.write_all(collect.to_str().as_bytes()).expect("Could not write to file");
                 }
             }
         }

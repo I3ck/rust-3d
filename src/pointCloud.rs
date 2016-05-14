@@ -28,11 +28,11 @@ impl PointCloud {
         Some(pc)
     }
 
-    pub fn toStr(&self) -> String {
+    pub fn to_str(&self) -> String {
         let mut result = String::new();
 
         for p in &self.data {
-            result = result + &p.toStr() + "\n";
+            result = result + &p.to_str() + "\n";
         }
 
         result

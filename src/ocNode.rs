@@ -1,6 +1,6 @@
 use point::{Point};
 use pointCloud::{PointCloud};
-use functions::{center, calcSubMinMax, calcDirection, inBB};
+use functions::{center, calc_sub_min_max, calc_direction, in_bb};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
 
 pub enum OcNode {
@@ -42,31 +42,31 @@ impl OcNode {
         let mut pcnnp = Vec::new();
         let mut pcnnn = Vec::new();
 
-        let bbppp = calcSubMinMax(Direction::PPP, min, max);
-        let bbppn = calcSubMinMax(Direction::PPN, min, max);
-        let bbpnp = calcSubMinMax(Direction::PNP, min, max);
-        let bbpnn = calcSubMinMax(Direction::PNN, min, max);
-        let bbnpp = calcSubMinMax(Direction::NPP, min, max);
-        let bbnpn = calcSubMinMax(Direction::NPN, min, max);
-        let bbnnp = calcSubMinMax(Direction::NNP, min, max);
-        let bbnnn = calcSubMinMax(Direction::NNN, min, max);
+        let bbppp = calc_sub_min_max(Direction::PPP, min, max);
+        let bbppn = calc_sub_min_max(Direction::PPN, min, max);
+        let bbpnp = calc_sub_min_max(Direction::PNP, min, max);
+        let bbpnn = calc_sub_min_max(Direction::PNN, min, max);
+        let bbnpp = calc_sub_min_max(Direction::NPP, min, max);
+        let bbnpn = calc_sub_min_max(Direction::NPN, min, max);
+        let bbnnp = calc_sub_min_max(Direction::NNP, min, max);
+        let bbnnn = calc_sub_min_max(Direction::NNN, min, max);
 
         for p in pc {
-            if inBB(&p, &bbppp.0, &bbppp.1) {
+            if in_bb(&p, &bbppp.0, &bbppp.1) {
                 pcppp.push(p);
-            } else if inBB(&p, &bbppn.0, &bbppn.1) {
+            } else if in_bb(&p, &bbppn.0, &bbppn.1) {
                 pcppn.push(p);
-            } else if inBB(&p, &bbpnp.0, &bbpnp.1) {
+            } else if in_bb(&p, &bbpnp.0, &bbpnp.1) {
                 pcpnp.push(p);
-            } else if inBB(&p, &bbpnn.0, &bbpnn.1) {
+            } else if in_bb(&p, &bbpnn.0, &bbpnn.1) {
                 pcpnn.push(p);
-            } else if inBB(&p, &bbnpp.0, &bbnpp.1) {
+            } else if in_bb(&p, &bbnpp.0, &bbnpp.1) {
                 pcnpp.push(p);
-            } else if inBB(&p, &bbnpn.0, &bbnpn.1) {
+            } else if in_bb(&p, &bbnpn.0, &bbnpn.1) {
                 pcnpn.push(p);
-            } else if inBB(&p, &bbnnp.0, &bbnnp.1) {
+            } else if in_bb(&p, &bbnnp.0, &bbnnp.1) {
                 pcnnp.push(p);
-            } else if inBB(&p, &bbnnn.0, &bbnnn.1) {
+            } else if in_bb(&p, &bbnnn.0, &bbnnn.1) {
                 pcnnn.push(p);
             }
         }

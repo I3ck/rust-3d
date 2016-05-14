@@ -3,7 +3,7 @@ extern crate core;
 use std::f64;
 use std::fmt;
 use std::cmp::{Eq, Ordering};
-use std::hash::{Hash, SipHasher, Hasher};
+use std::hash::{Hash, Hasher};
 
 use self::core::str::FromStr;
 
@@ -38,7 +38,7 @@ impl Point {
         Point{x: 0.0, y: 0.0, z: 0.0}
     }
     pub fn parse(text: String) -> Option<Point> {
-        let mut split = text.split(" ");
+        let split = text.split(" ");
         let words = split.collect::<Vec<&str>>();
         match words.len() {
             3 => {
@@ -61,12 +61,12 @@ impl Point {
         }
     }
     //@todo make trait
-    pub fn toStr(&self) -> String {
-        let sX: String = self.x.to_string();
-        let sY: String = self.y.to_string();
-        let sZ: String = self.z.to_string();
+    pub fn to_str(&self) -> String {
+        let sx: String = self.x.to_string();
+        let sy: String = self.y.to_string();
+        let sz: String = self.z.to_string();
 
-        sX + " " + &sY + " " + &sZ
+        sx + " " + &sy + " " + &sz
     }
     pub fn clone(&self) -> Point { //@todo use trait?
         Point { x: self.x, y: self.y, z: self.z }
