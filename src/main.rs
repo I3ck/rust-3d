@@ -108,7 +108,8 @@ fn main() {
                     let nearestTen = kdTree.knearest(&Point{x: 9.0,y: 56.0,z: 0.0}, 10);
                     println!("nearest ten to 9/56/0 : {}", nearestTen);
 
-                    let ocTree = OcTree::new(pc).expect("Could not parse ocTree!");
+                    let mut ocTree = OcTree::new();
+                    ocTree.build(pc);
                     println!("could create octree");
 
                     let collect0 = ocTree.collect(0);
