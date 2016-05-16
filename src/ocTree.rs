@@ -28,6 +28,10 @@ impl IsTree for OcTree {
         }
     }
 
+    fn to_pointcloud(&self) -> PointCloud {
+        self.collect(-1)
+    }
+
     fn build(&mut self, pc: PointCloud) -> bool {
         match pc.bbox() {
             None => false,

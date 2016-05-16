@@ -29,6 +29,14 @@ impl IsTree for KdTree {
         }
     }
 
+    fn to_pointcloud(&self) -> PointCloud {
+        let mut result = PointCloud::new();
+        if let Some(ref node) = self.root {
+            node.toPointCloud(&mut result);
+        }
+        result
+    }
+
     fn build(&mut self, pc: PointCloud) -> bool {
         match pc.len() {
             0 => false,
@@ -78,16 +86,6 @@ impl IsKdTree for KdTree {
                 Some(p)
             }
         }
-    }
-}
-
-impl KdTree {
-    pub fn toPointCloud(&self) -> PointCloud {
-        let mut result = PointCloud::new();
-        if let Some(ref node) = self.root {
-            node.toPointCloud(&mut result);
-        }
-        result
     }
 }
 
