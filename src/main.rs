@@ -17,7 +17,7 @@ use compressedPoint::{CompressedPoint};
 use compressedPointCloud::{CompressedPointCloud};
 use kdTree::{KdTree};
 use ocTree::{OcTree};
-use traits::{MoveAble, IsTree, IsOcTree, IsKdTree};
+use traits::{IsMoveable, IsTree, IsOcTree, IsKdTree};
 
 
 //io

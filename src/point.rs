@@ -7,7 +7,7 @@ use std::hash::{Hash, Hasher};
 
 use self::core::str::FromStr;
 
-use traits::{MoveAble};
+use traits::{IsMoveable};
 use functions::{sqr_dist};
 
 #[derive (PartialEq, PartialOrd)]
@@ -73,7 +73,7 @@ impl Point {
     }
 }
 
-impl MoveAble for Point {
+impl IsMoveable for Point {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         self.x += x;
         self.y += y;

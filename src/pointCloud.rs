@@ -1,6 +1,6 @@
 use std::fmt;
 
-use traits::{MoveAble};
+use traits::{IsMoveable};
 use point::{Point};
 
 
@@ -115,7 +115,7 @@ impl PointCloud {
     }
 }
 
-impl MoveAble for PointCloud {
+impl IsMoveable for PointCloud {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         for p in &mut self.data {
             p.move_by(x, y, z);
