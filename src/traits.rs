@@ -7,6 +7,25 @@ pub trait IsMoveable {
     fn move_by(&mut self, x: f64, y: f64, z: f64);
 }
 
+pub trait HasPosition {
+    fn x(&self) -> f64;
+    fn y(&self) -> f64;
+    fn z(&self) -> f64;
+    fn set_x(&mut self, val: f64);
+    fn set_y(&mut self, val: f64);
+    fn set_z(&mut self, val: f64);
+
+    fn pos(&self) -> (f64, f64, f64) {
+        ( self.x(), self.y(), self.z() )
+    }
+
+    fn set_pos(&mut self, x: f64, y: f64, z: f64) {
+        self.set_x(x);
+        self.set_y(y);
+        self.set_z(z);
+    }
+}
+
 //@todo currently it is not possible to create immutable trees because of this
 //@todo add method, which builds from data directly
 //@todo abstract to only use a HasPosition trait instead of Points

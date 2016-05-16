@@ -7,7 +7,7 @@ use std::hash::{Hash, Hasher};
 
 use self::core::str::FromStr;
 
-use traits::{IsMoveable};
+use traits::{IsMoveable, HasPosition};
 use functions::{sqr_dist};
 
 #[derive (PartialEq, PartialOrd)]
@@ -78,6 +78,30 @@ impl IsMoveable for Point {
         self.x += x;
         self.y += y;
         self.z += z;
+    }
+}
+
+impl HasPosition for Point {
+    fn x(&self) -> f64 {
+        self.x
+    }
+    fn y(&self) -> f64 {
+        self.y
+    }
+    fn z(&self) -> f64 {
+        self.z
+    }
+
+    fn set_x(&mut self, val: f64) {
+        self.x = val;
+    }
+
+    fn set_y(&mut self, val: f64) {
+        self.y = val;
+    }
+
+    fn set_z(&mut self, val: f64) {
+        self.z = val;
     }
 }
 
