@@ -21,6 +21,13 @@ impl IsTree for OcTree {
         }
     }
 
+    fn size(&self) -> usize {
+        match self.root {
+            None => 0,
+            Some(ref node) => node.size()
+        }
+    }
+
     fn build(&mut self, pc: PointCloud) -> bool {
         match pc.bbox() {
             None => false,

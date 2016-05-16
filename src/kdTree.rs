@@ -22,6 +22,13 @@ impl IsTree for KdTree {
         KdTree { root: None }
     }
 
+    fn size(&self) -> usize {
+        match self.root {
+            None => 0,
+            Some(ref node) => node.size()
+        }
+    }
+
     fn build(&mut self, pc: PointCloud) -> bool {
         match pc.len() {
             0 => false,
@@ -75,13 +82,6 @@ impl IsKdTree for KdTree {
 }
 
 impl KdTree {
-    pub fn size(&self) -> usize {
-        match self.root {
-            None => 0,
-            Some(ref node) => node.size()
-        }
-    }
-
     pub fn toPointCloud(&self) -> PointCloud {
         let mut result = PointCloud::new();
         if let Some(ref node) = self.root {

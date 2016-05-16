@@ -11,7 +11,7 @@ pub trait MoveAble { //@todo rename to isMoveable
 //@todo add method, which builds from data directly
 pub trait IsTree {
     fn new() -> Self;
-    //size
+    fn size(&self) -> usize;
     //toPointcloud (could be collect method)
     fn build(&mut self, pc : PointCloud) -> bool;
 }

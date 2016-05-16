@@ -119,6 +119,24 @@ impl OcNode {
         OcNode::Node(result)
     }
 
+    pub fn size(&self) -> usize {
+        match self {
+            &OcNode::Leaf(_) => 1,
+            &OcNode::Node(ref internal) => {
+                let mut result: usize = 0;
+                if let Some(ref n) = internal.ppp { result += n.size(); }
+                if let Some(ref n) = internal.ppn { result += n.size(); }
+                if let Some(ref n) = internal.pnp { result += n.size(); }
+                if let Some(ref n) = internal.pnn { result += n.size(); }
+                if let Some(ref n) = internal.npp { result += n.size(); }
+                if let Some(ref n) = internal.npn { result += n.size(); }
+                if let Some(ref n) = internal.nnp { result += n.size(); }
+                if let Some(ref n) = internal.nnn { result += n.size(); }
+                result
+            }
+        }
+    }
+
 //@todo define helpers here to simplify code (and in other areas)
     pub fn collect(&self, depth: i8, maxdepth: i8, pc: &mut PointCloud) {
         let onlyCollectCenters = maxdepth >= 0 && depth > maxdepth; //@todo make this depend on a setting?

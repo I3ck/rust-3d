@@ -104,13 +104,15 @@ fn main() {
 
                     let mut kdTree = KdTree::new();
                     kdTree.build(pc.clone());
-                    println!("tree.size() : {}", tree.size());
+                    println!("kdTree.size() : {}", tree.size());
                     let nearestTen = kdTree.knearest(&Point{x: 9.0,y: 56.0,z: 0.0}, 10);
                     println!("nearest ten to 9/56/0 : {}", nearestTen);
 
                     let mut ocTree = OcTree::new();
                     ocTree.build(pc);
                     println!("could create octree");
+
+                    println!("ocTree.size() : {}", ocTree.size());
 
                     let collect0 = ocTree.collect(0);
                     println!("collect 0 : {}", collect0);
