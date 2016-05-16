@@ -7,6 +7,7 @@ pub trait IsMoveable {
     fn move_by(&mut self, x: f64, y: f64, z: f64);
 }
 
+//@todo maybe rename to HasCenter to not confuse
 pub trait HasPosition {
     fn x(&self) -> f64;
     fn y(&self) -> f64;

@@ -32,7 +32,8 @@ use std::path::Path;
 fn main() {
     let p = Point::new();
     let p2 = Point{x: 100.0, y: 200.0, z: 400.0};
-    let pCenter = functions::center(&p, &p2);
+    let mut pCenter = Point::new();
+    functions::center(&p, &p2, &mut pCenter);
 
     let mut pc = PointCloud::new();
 
