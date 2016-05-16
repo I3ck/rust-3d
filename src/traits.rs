@@ -12,7 +12,7 @@ pub trait HasPosition {
     fn x(&self) -> f64;
     fn y(&self) -> f64;
     fn z(&self) -> f64;
-    fn set_x(&mut self, val: f64);
+    fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable? Or remove moveable trait
     fn set_y(&mut self, val: f64);
     fn set_z(&mut self, val: f64);
 
@@ -25,6 +25,18 @@ pub trait HasPosition {
         self.set_y(y);
         self.set_z(z);
     }
+}
+
+//@todo implement for pointcloud (already has a method for bbox)
+pub trait HasBoundingBox : HasPosition {
+    fn bounding_box(&self) -> Option<(Point, Point)>;
+    //@todo below methods can be implemented in here
+    fn min_pos(&self) -> Option<(Point)>;
+    fn max_pos(&self) -> Option<(Point)>;
+    fn is_inside<B>(&self, other: &B) -> bool where B: HasBoundingBox;
+    fn contains<P>(&self, other: &P) -> bool where P: HasPosition;
+    fn contains_fully<B>(&self, other: &B) -> bool where B: HasBoundingBox;
+    fn collides_with<B>(&self, other: &B) -> bool where B: HasBoundingBox;
 }
 
 //@todo currently it is not possible to create immutable trees because of this
