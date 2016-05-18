@@ -71,7 +71,7 @@ pub fn calc_direction<P>(reference: &Point, p: &Point) -> Direction where P: Has
 
 //@todo refactor to work with HasPosition?
 pub fn calc_sub_min_max(dir: Direction, min: &Point, max: &Point) -> (Point, Point) { //@todo better name
-    let mut middle = Point::new();
+    let mut middle = *Point::new();
     center(min, max, &mut middle);
 
     let px = max.x;

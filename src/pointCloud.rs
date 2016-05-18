@@ -42,7 +42,7 @@ impl<P> PointCloud<P> where P: HasPosition{
         let mut data = Vec::new();
 
         for p in &self.data {
-            data.push(Box::new(p.clone()));
+            data.push(Box::new(*p.clone()));
         }
 
         PointCloud { data: data }

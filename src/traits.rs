@@ -1,5 +1,9 @@
+extern crate core;
+
 use point::{Point};
 use pointCloud::{PointCloud};
+
+use self::core::str::FromStr;
 
 //@todo point and pc also as trait
 
@@ -9,8 +13,8 @@ pub trait IsMoveable {
 
 //@todo maybe rename to HasCenter to not confuse
 pub trait HasPosition {
-    fn new() -> Self;
-    fn build(x: f64, y: f64, z: f64) -> Self;
+    fn new() -> Box<Self>;
+    fn build(x: f64, y: f64, z: f64) -> Box<Self>; //@todo can be implemented here
     fn x(&self) -> f64;
     fn y(&self) -> f64;
     fn z(&self) -> f64;
@@ -35,6 +39,30 @@ pub trait HasPosition {
         let sz: String = self.z().to_string();
 
         sx + " " + &sy + " " + &sz
+    }
+
+    fn parse(text: String) -> Option<Box<Self>> {
+        let split = text.split(" ");
+        let words = split.collect::<Vec<&str>>();
+        match words.len() {
+            3 => {
+                let mut p = Self::new();
+                match f64::from_str(words[0]) {
+                    Err(_) => return None,
+                    Ok(x) => p.set_x(x)
+                };
+                match f64::from_str(words[1]) {
+                    Err(_) => return None,
+                    Ok(y) => p.set_y(y)
+                };
+                match f64::from_str(words[2]) {
+                    Err(_) => return None,
+                    Ok(z) => p.set_z(z)
+                };
+                Some(p)
+            },
+            _ => None
+        }
     }
 }
 
