@@ -37,12 +37,12 @@ pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where P: HasP
     }
 }
 
-pub fn sort_and_limit(mut pc: &mut PointCloud, search: &Point, maxSize: usize) {
+pub fn sort_and_limit<P>(mut pc: &mut PointCloud<P>, search: &P, maxSize: usize) where P: HasPosition {
     if pc.len() > maxSize {
         pc.data.sort_by(|a, b| sqr_dist(search, a).partial_cmp(&sqr_dist(search, b)).unwrap_or(Ordering::Equal));
         let mut result = Vec::new();
         for i in pc.data.iter().take(maxSize) {
-            result.push(i.clone());
+            result.push(*i.clone());
         }
         pc.data = result;
 

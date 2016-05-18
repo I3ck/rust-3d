@@ -34,9 +34,7 @@ impl Hash for Point { //@todo poor precision this way
 }
 
 impl Point {
-    pub fn new() -> Point {
-        Point{x: 0.0, y: 0.0, z: 0.0}
-    }
+
     pub fn parse(text: String) -> Option<Point> {
         let split = text.split(" ");
         let words = split.collect::<Vec<&str>>();
@@ -61,6 +59,7 @@ impl Point {
         }
     }
     //@todo make trait
+    //@todo remove
     pub fn to_str(&self) -> String {
         let sx: String = self.x.to_string();
         let sy: String = self.y.to_string();
@@ -68,9 +67,7 @@ impl Point {
 
         sx + " " + &sy + " " + &sz
     }
-    pub fn clone(&self) -> Point { //@todo use trait?
-        Point { x: self.x, y: self.y, z: self.z }
-    }
+
 }
 
 impl IsMoveable for Point {
@@ -82,6 +79,15 @@ impl IsMoveable for Point {
 }
 
 impl HasPosition for Point {
+    fn new() -> Self {
+        Point{x: 0.0, y: 0.0, z: 0.0}
+    }
+
+    fn build(x: f64, y: f64, z: f64) -> Self {
+        Point{x: x, y: y, z: z}
+    }
+
+
     fn x(&self) -> f64 {
         self.x
     }
@@ -103,6 +109,12 @@ impl HasPosition for Point {
     fn set_z(&mut self, val: f64) {
         self.z = val;
     }
+
+    fn clone(&self) -> Point {
+        Point { x: self.x, y: self.y, z: self.z }
+    }
+
+
 }
 
 impl fmt::Display for Point {

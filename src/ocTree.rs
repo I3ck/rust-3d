@@ -4,20 +4,20 @@ use std::iter::IntoIterator;
 use point::{Point};
 use pointCloud::{PointCloud};
 use ocNode::{OcNode};
-use traits::{IsTree, IsOcTree};
+use traits::{HasPosition, IsTree, IsOcTree};
 
-pub struct OcTree {
-    pub root: Option<OcNode>,
-    pub min: Point,
-    pub max: Point
+pub struct OcTree<P> where P: HasPosition {
+    pub root: Option<OcNode<P>>,
+    pub min: P,
+    pub max: P
 }
 
-impl IsTree for OcTree {
-    fn new() -> OcTree {
+impl<P> IsTree<P> for OcTree<P> where P: HasPosition {
+    fn new() -> OcTree<P> {
         OcTree {
             root: None,
-            min: Point::new(),
-            max: Point::new()
+            min: P::new(),
+            max: P::new()
         }
     }
 
@@ -28,11 +28,11 @@ impl IsTree for OcTree {
         }
     }
 
-    fn to_pointcloud(&self) -> PointCloud {
+    fn to_pointcloud(&self) -> PointCloud<P> {
         self.collect(-1)
     }
 
-    fn build(&mut self, pc: PointCloud) -> bool {
+    fn build(&mut self, pc: PointCloud<P>) -> bool {
         match pc.bbox() {
             None => false,
             Some((min, max)) => {
@@ -48,18 +48,13 @@ impl IsTree for OcTree {
     }
 }
 
-impl IsOcTree for OcTree {
+impl<P> IsOcTree<P> for OcTree<P> where P: HasPosition {
     //@todo rewrite or make new method which returns cog instead of stopping recursion
-    fn collect(&self,  maxdepth: i8) -> PointCloud {
+    fn collect(&self,  maxdepth: i8) -> PointCloud<P> {
         let mut result = PointCloud::new();
         if let Some(ref node) = self.root {
             node.collect(0, maxdepth, &mut result);
         }
         return result;
     }
-}
-
-impl OcTree {
-
-
 }

@@ -1,22 +1,23 @@
+use traits::HasPosition;
 use point::{Point};
 use pointCloud::{PointCloud};
 use functions::{center, calc_sub_min_max, calc_direction, in_bb};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
 
-pub enum OcNode {
-    Leaf(Point),
-    Node(Internal)
+pub enum OcNode<P> where P: HasPosition {
+    Leaf(P),
+    Node(Internal<P>)
 }
 
-struct Internal { // naming : p == positive, n == negative ||| xyz   => pnp => x positive, y negative, z positive direction from center
-    ppp: Option<Box<OcNode>>,
-    ppn: Option<Box<OcNode>>,
-    pnp: Option<Box<OcNode>>,
-    pnn: Option<Box<OcNode>>,
-    npp: Option<Box<OcNode>>,
-    npn: Option<Box<OcNode>>,
-    nnp: Option<Box<OcNode>>,
-    nnn: Option<Box<OcNode>>
+struct Internal<P> where P: HasPosition { // naming : p == positive, n == negative ||| xyz   => pnp => x positive, y negative, z positive direction from center
+    ppp: Option<Box<OcNode<P>>>,
+    ppn: Option<Box<OcNode<P>>>,
+    pnp: Option<Box<OcNode<P>>>,
+    pnn: Option<Box<OcNode<P>>>,
+    npp: Option<Box<OcNode<P>>>,
+    npn: Option<Box<OcNode<P>>>,
+    nnp: Option<Box<OcNode<P>>>,
+    nnn: Option<Box<OcNode<P>>>
 }
 
 pub enum Direction { //@todo rename //@todo private?
@@ -31,7 +32,7 @@ pub enum Direction { //@todo rename //@todo private?
 }
 
 //@todo define somewhere else
-fn collect_center_or_all(n: &OcNode, onlyCollectCenters: bool, depth: i8, maxdepth: i8, mut pc: &mut PointCloud) {
+fn collect_center_or_all<P>(n: &OcNode<P>, onlyCollectCenters: bool, depth: i8, maxdepth: i8, mut pc: &mut PointCloud<P>) where P: HasPosition {
     if onlyCollectCenters {
         let mut subPc = PointCloud::new();
         n.collect(depth+1, maxdepth, &mut subPc);
@@ -44,7 +45,7 @@ fn collect_center_or_all(n: &OcNode, onlyCollectCenters: bool, depth: i8, maxdep
 }
 
 ///@todo define somewhere else
-fn build_subnode(pc: Vec<Point>,bb: (Point, Point)) -> Option<Box<OcNode>> {
+fn build_subnode<P>(pc: Vec<P>,bb: (P, P)) -> Option<Box<OcNode<P>>> where P: HasPosition {
     match pc.len() {
         0 => None,
         _ => {
@@ -55,8 +56,8 @@ fn build_subnode(pc: Vec<Point>,bb: (Point, Point)) -> Option<Box<OcNode>> {
 }
 
 
-impl OcNode {
-    pub fn new(min: &Point, max: &Point, mut pc: Vec<Point>) -> OcNode {
+impl<P> OcNode<P> where P: HasPosition {
+    pub fn new(min: &P, max: &P, mut pc: Vec<P>) -> OcNode<P> {
         if pc.len() == 1 { return OcNode::Leaf(pc[0].clone()); };
         let mut pcppp = Vec::new();
         let mut pcppn = Vec::new();
@@ -138,7 +139,7 @@ impl OcNode {
     }
 
 //@todo define helpers here to simplify code (and in other areas)
-    pub fn collect(&self, depth: i8, maxdepth: i8, pc: &mut PointCloud) {
+    pub fn collect(&self, depth: i8, maxdepth: i8, pc: &mut PointCloud<P>) {
         let onlyCollectCenters = maxdepth >= 0 && depth > maxdepth; //@todo make this depend on a setting?
         match self {
             &OcNode::Leaf(ref p) => pc.push(p.clone()),

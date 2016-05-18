@@ -1,25 +1,25 @@
 use std::fmt;
 
-use traits::{IsMoveable};
+use traits::{IsMoveable, HasPosition};
 use point::{Point};
 
 
 
-pub struct PointCloud {
-    pub data: Vec<Point>
+pub struct PointCloud<P> where P: HasPosition {
+    pub data: Vec<Box<P>>
 }
 
-impl PointCloud {
-    pub fn new() -> PointCloud {
+impl<P> PointCloud<P> where P: HasPosition{
+    pub fn new() -> PointCloud<P> {
         PointCloud{data: Vec::new()}
     }
 
-    pub fn parse(text: String) -> Option<PointCloud> {
+    pub fn parse(text: String) -> Option<PointCloud<P>> {
         let lines = text.split("\n");
 
         let mut pc = PointCloud::new();
         for line in lines {
-            match Point::parse(String::from(line)) {
+            match Point::parse(String::from(line)) { //@todo must be templated too
                 Some(p) => pc.push(p),
                 None => {}
             }
@@ -38,11 +38,11 @@ impl PointCloud {
         result
     }
 
-    pub fn clone(&self) -> PointCloud {
+    pub fn clone(&self) -> PointCloud<P> {
         let mut data = Vec::new();
 
         for p in &self.data {
-            data.push(p.clone());
+            data.push(Box::new(p.clone()));
         }
 
         PointCloud { data: data }
@@ -50,7 +50,7 @@ impl PointCloud {
 
 //------------------------------------------------------------------------------
 
-    pub fn push(&mut self, p: Point) {
+    pub fn push(&mut self, p: P) {
         self.data.push(p);
     }
 
@@ -115,7 +115,7 @@ impl PointCloud {
     }
 }
 
-impl IsMoveable for PointCloud {
+impl<P> IsMoveable for PointCloud<P> where P: HasPosition {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         for p in &mut self.data {
             p.move_by(x, y, z);
@@ -125,7 +125,7 @@ impl IsMoveable for PointCloud {
 
 //------------------------------------------------------------------------------
 
-impl fmt::Display for PointCloud {
+impl<P> fmt::Display for PointCloud<P> where P: HasPosition {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {
             match p.fmt(f) {

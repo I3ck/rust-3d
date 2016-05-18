@@ -5,20 +5,20 @@ use point::{Point};
 use pointCloud::{PointCloud};
 use functions::{dist, sqr_dist, dimension_compare, dimension_dist, sort_and_limit};
 
-use traits::{IsTree, IsKdTree};
+use traits::{HasPosition, IsTree, IsKdTree};
 
-pub struct KdTree {
-    pub root: Option<KdNode>
+pub struct KdTree<P> where P: HasPosition {
+    pub root: Option<KdNode<P>>
 }
-pub struct KdNode {
-    pub left: Option<Box<KdNode>>,
-    pub right: Option<Box<KdNode>>,
-    pub val: Point,
+pub struct KdNode<P> where P: HasPosition {
+    pub left: Option<Box<KdNode<P>>>,
+    pub right: Option<Box<KdNode<P>>>,
+    pub val: P,
     pub dimension: i8
 }
 
-impl IsTree for KdTree {
-    fn new() -> KdTree {
+impl<P> IsTree<P> for KdTree<P> where P: HasPosition {
+    fn new() -> KdTree<P> {
         KdTree { root: None }
     }
 
@@ -29,7 +29,7 @@ impl IsTree for KdTree {
         }
     }
 
-    fn to_pointcloud(&self) -> PointCloud {
+    fn to_pointcloud(&self) -> PointCloud<P>{
         let mut result = PointCloud::new();
         if let Some(ref node) = self.root {
             node.toPointCloud(&mut result);
@@ -37,7 +37,7 @@ impl IsTree for KdTree {
         result
     }
 
-    fn build(&mut self, pc: PointCloud) -> bool {
+    fn build(&mut self, pc: PointCloud<P>) -> bool {
         match pc.len() {
             0 => false,
             _ => {
@@ -49,8 +49,8 @@ impl IsTree for KdTree {
 
 }
 
-impl IsKdTree for KdTree {
-    fn knearest(&self, search: &Point, n: usize) -> PointCloud {
+impl<P> IsKdTree<P> for KdTree<P> where P: HasPosition {
+    fn knearest(&self, search: &P, n: usize) -> PointCloud<P> {
         let mut result = PointCloud::new();
         if n < 1 { return result; }
         if let Some(ref node) = self.root {
@@ -59,7 +59,7 @@ impl IsKdTree for KdTree {
         return result;
     }
 
-    fn in_sphere(&self, search: &Point, radius: f64) -> PointCloud {
+    fn in_sphere(&self, search: &P, radius: f64) -> PointCloud<P> {
         let mut result = PointCloud::new();
         if radius <= 0.0 { return result; }
         if let Some(ref node) = self.root {
@@ -68,7 +68,7 @@ impl IsKdTree for KdTree {
         return result;
     }
 
-    fn in_box(&self, search: &Point, xSize: f64, ySize: f64, zSize: f64) -> PointCloud {
+    fn in_box(&self, search: &P, xSize: f64, ySize: f64, zSize: f64) -> PointCloud<P> {
         let mut result = PointCloud::new();
         if xSize <= 0.0 || ySize <= 0.0 || zSize <= 0.0 { return result; }
         if let Some(ref node) = self.root {
@@ -77,7 +77,7 @@ impl IsKdTree for KdTree {
         return result;
     }
 
-    fn nearest(&self, search: &Point) -> Option<Point> { //@todo implemented on its own, since the code can be faster without vecs
+    fn nearest(&self, search: &P) -> Option<P> { //@todo implemented on its own, since the code can be faster without vecs
         let result = self.knearest(search, 1);
         match result.len() {
             0 => None,
@@ -89,8 +89,8 @@ impl IsKdTree for KdTree {
     }
 }
 
-impl KdNode {
-    pub fn new(dim: i8, mut pc: Vec<Point>) -> KdNode {
+impl<P> KdNode<P> where P: HasPosition {
+    pub fn new(dim: i8, mut pc: Vec<Point>) -> KdNode<P> {
         let dimension = dim % 2;
         let mut val = Point::new();
         if pc.len() == 1 {
@@ -146,13 +146,13 @@ impl KdNode {
         result
     }
 
-    pub fn toPointCloud(&self, pc: &mut PointCloud) {
+    pub fn toPointCloud(&self, pc: &mut PointCloud<P>) {
         if let Some(ref n) = (&self).left { n.toPointCloud(pc); }
         pc.push(self.val.clone());
         if let Some(ref n) = (&self).right { n.toPointCloud(pc); }
     }
 
-    pub fn knearest(&self, search: &Point, n: usize, pc: &mut PointCloud) {
+    pub fn knearest(&self, search: &Point, n: usize, pc: &mut PointCloud<P>) {
         if pc.len() < n || sqr_dist(search, &self.val) < sqr_dist(search, &pc.data[&pc.len() -1 ]) {
             pc.push(self.val.clone());
         }
@@ -199,7 +199,7 @@ impl KdNode {
         sort_and_limit(pc, search, n);
     }
 
-    pub fn in_sphere(&self, search: &Point, radius: f64, pc: &mut PointCloud) {
+    pub fn in_sphere(&self, search: &P, radius: f64, pc: &mut PointCloud<P>) {
         if radius <= 0.0 { return; }
 
         if dist(search, &self.val) <= radius {
@@ -247,7 +247,7 @@ impl KdNode {
         }
     }
 
-    pub fn in_box(&self, search: &Point, xSize: f64, ySize: f64, zSize: f64, pc: &mut PointCloud) {
+    pub fn in_box(&self, search: &P, xSize: f64, ySize: f64, zSize: f64, pc: &mut PointCloud<P>) {
         if xSize <= 0.0 || ySize <= 0.0 || zSize <= 0.0 { return; }
 
         if let (Some(distX), Some(distY), Some(distZ)) = (dimension_dist(search, &self.val, 0), dimension_dist(search, &self.val, 1), dimension_dist(search, &self.val, 2)) {

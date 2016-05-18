@@ -3,6 +3,7 @@ extern crate num;
 use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
+use traits::{HasPosition};
 use point::{Point};
 use pointCloud::{PointCloud};
 use compressedPoint::{CompressedPoint};
@@ -17,7 +18,7 @@ pub struct CompressedPointCloud<T> where T: Unsigned + PrimInt {
 
 
 impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
-    pub fn compress(pc: &PointCloud) -> Option<CompressedPointCloud<T>> {
+    pub fn compress<P>(pc: &PointCloud<P>) -> Option<CompressedPointCloud<T>> where P: HasPosition {
         let (pmin, pmax) = match pc.bbox() {
             None        => return None,
             Some(res)   => res,
@@ -69,7 +70,7 @@ impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
 
 //------------------------------------------------------------------------------
 
-    pub fn decompress(&self) -> Option<PointCloud> {
+    pub fn decompress<P>(&self) -> Option<PointCloud<P>> where P: HasPosition {
         let mut pc = PointCloud::new();
 
         for p in &self.data {
