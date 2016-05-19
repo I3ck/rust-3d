@@ -40,9 +40,9 @@ impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
         let mut data = Vec::new();
 
         for p in &pc.data {
-            let distx = p.x - pmin.x;
-            let disty = p.y - pmin.y;
-            let distz = p.z - pmin.z;
+            let distx = p.x() - pmin.x;
+            let disty = p.y() - pmin.y;
+            let distz = p.z() - pmin.z;
 
             let unitsx = match T::from(distx / unitsizex) {
                 None        => return None,
@@ -75,11 +75,11 @@ impl<T> CompressedPointCloud<T> where T: Unsigned + PrimInt {
 
         for p in &self.data {
             if let (Some(unitsxf), Some(unitsyf), Some(unitszf)) = (p.unitsx.to_f64(), p.unitsy.to_f64(), p.unitsz.to_f64()) {
-                pc.push(Point{
-                    x: self.start.x + (self.unitsizex * unitsxf),
-                    y: self.start.y + (self.unitsizey * unitsyf),
-                    z: self.start.z + (self.unitsizez * unitszf)
-                });
+                pc.push(*P::build(
+                    self.start.x + (self.unitsizex * unitsxf),
+                    self.start.y + (self.unitsizey * unitsyf),
+                    self.start.z + (self.unitsizez * unitszf)
+                ));
             }
         }
         return Some(pc);

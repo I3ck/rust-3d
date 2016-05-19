@@ -90,9 +90,9 @@ impl<P> IsKdTree<P> for KdTree<P> where P: HasPosition {
 }
 
 impl<P> KdNode<P> where P: HasPosition {
-    pub fn new(dim: i8, mut pc: Vec<Point>) -> KdNode<P> {
+    pub fn new(dim: i8, mut pc: Vec<Box<P>>) -> KdNode<P> {
         let dimension = dim % 2;
-        let mut val = Point::new();
+        let mut val = P::new();
         if pc.len() == 1 {
             return KdNode {
                 left: None,
@@ -103,16 +103,16 @@ impl<P> KdNode<P> where P: HasPosition {
         }
 
         pc.sort_by(|a, b| match dimension {
-            0 => a.x.partial_cmp(&b.x).unwrap_or(Ordering::Equal),
-            1 => a.y.partial_cmp(&b.y).unwrap_or(Ordering::Equal),
-            2 => a.z.partial_cmp(&b.z).unwrap_or(Ordering::Equal),
+            0 => a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal),
+            1 => a.y().partial_cmp(&b.y()).unwrap_or(Ordering::Equal),
+            2 => a.z().partial_cmp(&b.z()).unwrap_or(Ordering::Equal),
             _ => Ordering::Equal
         });
         let median = pc.len() / 2;
         let mut pcLeft = Vec::new();
         let mut pcRight = Vec::new();
 
-        let mut val = Point::new();
+        let mut val = P::new();
 
         for (i, p) in pc.into_iter().enumerate() {
             if      i < median  { pcLeft.push(p); }
@@ -133,7 +133,7 @@ impl<P> KdNode<P> where P: HasPosition {
         KdNode {
             left: left,
             right: right,
-            val: val,
+            val: *val,
             dimension: dimension
         }
     }
@@ -152,7 +152,7 @@ impl<P> KdNode<P> where P: HasPosition {
         if let Some(ref n) = (&self).right { n.toPointCloud(pc); }
     }
 
-    pub fn knearest(&self, search: &Point, n: usize, pc: &mut PointCloud<P>) {
+    pub fn knearest(&self, search: &P, n: usize, pc: &mut PointCloud<P>) {
         if pc.len() < n || sqr_dist(search, &self.val) < sqr_dist(search, &pc.data[&pc.len() -1 ]) {
             pc.push(self.val.clone());
         }
@@ -170,9 +170,9 @@ impl<P> KdNode<P> where P: HasPosition {
         sort_and_limit(pc, search, n);
 
         let (currentSearch, currentVal) = match self.dimension {
-            0 => (search.x, self.val.x),
-            1 => (search.y, self.val.y),
-            _ => (search.z, self.val.z)
+            0 => (search.x(), self.val.x()),
+            1 => (search.y(), self.val.y()),
+            _ => (search.z(), self.val.z())
         };
 
         let distanceBest = dist(search, &pc.data[&pc.len() -1 ]);
@@ -219,9 +219,9 @@ impl<P> KdNode<P> where P: HasPosition {
         }
 
         let (currentSearch, currentVal) = match self.dimension {
-            0 => (search.x, self.val.x),
-            1 => (search.y, self.val.y),
-            _ => (search.z, self.val.z)
+            0 => (search.x(), self.val.x()),
+            1 => (search.y(), self.val.y()),
+            _ => (search.z(), self.val.z())
         };
 
         let borderLeft = currentSearch - radius;
@@ -268,9 +268,9 @@ impl<P> KdNode<P> where P: HasPosition {
             }
 
             let (currentSearch, currentVal, currentSize) = match self.dimension {
-                0 => (search.x, self.val.x, xSize),
-                1 => (search.y, self.val.y, ySize),
-                _ => (search.z, self.val.z, zSize)
+                0 => (search.x(), self.val.x(), xSize),
+                1 => (search.y(), self.val.y(), ySize),
+                _ => (search.z(), self.val.z(), zSize)
             };
 
             let borderLeft = currentSearch - 0.5 * currentSize;
