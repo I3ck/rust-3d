@@ -106,7 +106,7 @@ impl<P> OcNode<P> where P: HasPosition {
         let nnp = build_subnode(pcnnp, bbnnp);
         let nnn = build_subnode(pcnnn, bbnnn);
 
-        let mut result: Internal = Internal {
+        let mut result: Internal<P> = Internal {
             ppp: ppp,
             ppn: ppn,
             pnp: pnp,

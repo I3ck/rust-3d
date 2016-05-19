@@ -70,34 +70,34 @@ pub fn calc_direction<P>(reference: &Point, p: &Point) -> Direction where P: Has
 }
 
 //@todo refactor to work with HasPosition?
-pub fn calc_sub_min_max(dir: Direction, min: &Point, max: &Point) -> (Point, Point) { //@todo better name
-    let mut middle = *Point::new();
+pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where P: HasPosition { //@todo better name
+    let mut middle = *P::new();
     center(min, max, &mut middle);
 
-    let px = max.x;
-    let py = max.y;
-    let pz = max.z;
-    let nx = min.x;
-    let ny = min.y;
-    let nz = min.z;
-    let mx = middle.x;
-    let my = middle.y;
-    let mz = middle.z;
+    let px = max.x();
+    let py = max.y();
+    let pz = max.z();
+    let nx = min.x();
+    let ny = min.y();
+    let nz = min.z();
+    let mx = middle.x();
+    let my = middle.y();
+    let mz = middle.z();
 
     match dir {
-        Direction::PPP => (middle,                         max.clone()),
-        Direction::PPN => (Point{x: mx, y: my, z: nz},     Point{x: px, y: py, z: mz}),
-        Direction::PNP => (Point{x: mx, y: ny, z: mz},     Point{x: px, y: my, z: pz}),
-        Direction::PNN => (Point{x: mx, y: ny, z: nz},     Point{x: px, y: my, z: mz}),
-        Direction::NPP => (Point{x: nx, y: my, z: mz},     Point{x: mx, y: py, z: pz}),
-        Direction::NPN => (Point{x: nx, y: my, z: nz},     Point{x: mx, y: py, z: mz}),
-        Direction::NNP => (Point{x: nx, y: ny, z: mz},     Point{x: mx, y: my, z: pz}),
-        Direction::NNN => (min.clone(),                    middle)
+        Direction::PPP => (middle,                  max.clone()),
+        Direction::PPN => (*P::build(mx, my, nz),   *P::build(px, py, mz)),
+        Direction::PNP => (*P::build(mx, ny, mz),   *P::build(px, my, pz)),
+        Direction::PNN => (*P::build(mx, ny, nz),   *P::build(px, my, mz)),
+        Direction::NPP => (*P::build(nx, my, mz),   *P::build(mx, py, pz)),
+        Direction::NPN => (*P::build(nx, my, nz),   *P::build(mx, py, mz)),
+        Direction::NNP => (*P::build(nx, ny, mz),   *P::build(mx, my, pz)),
+        Direction::NNN => (min.clone(),             middle)
     }
 }
 
-pub fn in_bb(p: &Point, min: &Point, max: &Point) -> bool {
-    p.x >= min.x && p.x <= max.x &&
-    p.y >= min.y && p.y <= max.y &&
-    p.z >= min.z && p.z <= max.z
+pub fn in_bb<P>(p: &P, min: &P, max: &P) -> bool where P: HasPosition {
+    p.x() >= min.x() && p.x() <= max.x() &&
+    p.y() >= min.y() && p.y() <= max.y() &&
+    p.z() >= min.z() && p.z() <= max.z()
 }
