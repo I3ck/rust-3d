@@ -1,23 +1,23 @@
 use std::fmt;
 
-use traits::{IsMoveable, HasPosition};
-use point::{Point};
+use traits::{IsMoveable3D, HasPosition3D};
+use point::{Point3D};
 
 
 
-pub struct PointCloud<P> where P: HasPosition {
+pub struct Point3DCloud3D<P> where P: HasPosition3D {
     pub data: Vec<Box<P>>
 }
 
-impl<P> PointCloud<P> where P: HasPosition{
-    pub fn new() -> PointCloud<P> {
-        PointCloud{data: Vec::new()}
+impl<P> Point3DCloud3D<P> where P: HasPosition3D{
+    pub fn new() -> Point3DCloud3D<P> {
+        Point3DCloud3D{data: Vec::new()}
     }
 
-    pub fn parse(text: String) -> Option<PointCloud<P>> {
+    pub fn parse(text: String) -> Option<Point3DCloud3D<P>> {
         let lines = text.split("\n");
 
-        let mut pc = PointCloud::new();
+        let mut pc = Point3DCloud3D::new();
         for line in lines {
             match P::parse(String::from(line)) { //@todo must be templated too
                 Some(p) => pc.push(*p),
@@ -38,7 +38,7 @@ impl<P> PointCloud<P> where P: HasPosition{
         result
     }
 
-    pub fn clone(&self) -> PointCloud<P> {
+    pub fn clone(&self) -> Point3DCloud3D<P> {
         let mut data: Vec<Box<P>>;
         data = Vec::new();
 
@@ -46,7 +46,7 @@ impl<P> PointCloud<P> where P: HasPosition{
             data.push(Box::new((*p).clone()));
         }
 
-        PointCloud { data: data }
+        Point3DCloud3D { data: data }
     }
 
 //------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ impl<P> PointCloud<P> where P: HasPosition{
 
 //------------------------------------------------------------------------------
 
-    pub fn bbox(&self) -> Option<(Point, Point)> { //@todo return P ?
+    pub fn bbox(&self) -> Option<(Point3D, Point3D)> { //@todo return P ?
         if self.len() < 2 {
             return None;
         }
@@ -112,11 +112,11 @@ impl<P> PointCloud<P> where P: HasPosition{
             if p.z() > maxz { maxz = p.z(); }
         }
 
-        return Some((Point{x: minx, y: miny, z: minz}, Point{x: maxx, y: maxy, z: maxz}));
+        return Some((Point3D{x: minx, y: miny, z: minz}, Point3D{x: maxx, y: maxy, z: maxz}));
     }
 }
 
-impl<P> IsMoveable for PointCloud<P> where P: HasPosition + IsMoveable {
+impl<P> IsMoveable3D for Point3DCloud3D<P> where P: HasPosition3D + IsMoveable3D {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         for p in &mut self.data {
             p.move_by(x, y, z);
@@ -126,7 +126,7 @@ impl<P> IsMoveable for PointCloud<P> where P: HasPosition + IsMoveable {
 
 //------------------------------------------------------------------------------
 
-impl<P> fmt::Display for PointCloud<P> where P: HasPosition + fmt::Display {
+impl<P> fmt::Display for Point3DCloud3D<P> where P: HasPosition3D + fmt::Display {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {
             match p.fmt(f) {

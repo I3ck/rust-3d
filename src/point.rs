@@ -5,25 +5,25 @@ use std::hash::{Hash, Hasher};
 
 
 
-use traits::{IsMoveable, HasPosition};
+use traits::{IsMoveable3D, HasPosition3D};
 use functions::{sqr_dist};
 
 #[derive (PartialEq, PartialOrd)]
-pub struct Point {
+pub struct Point3D {
     pub x: f64,
     pub y: f64,
     pub z: f64
 }
 
-impl Eq for Point {}
-impl Ord for Point {
+impl Eq for Point3D {}
+impl Ord for Point3D {
     fn cmp(&self, other: &Self) -> Ordering {
-        let origin = *Point::new();
+        let origin = *Point3D::new();
         sqr_dist(&origin, self).partial_cmp(&sqr_dist(&origin, other)).unwrap_or(Ordering::Equal)
     }
 }
 
-impl Hash for Point { //@todo poor precision this way
+impl Hash for Point3D { //@todo poor precision this way
     fn hash<H: Hasher>(&self, state: &mut H) {
         (self.x as u64).hash(state);
         (self.y as u64).hash(state);
@@ -31,7 +31,7 @@ impl Hash for Point { //@todo poor precision this way
     }
 }
 
-impl IsMoveable for Point {
+impl IsMoveable3D for Point3D {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         self.x += x;
         self.y += y;
@@ -39,13 +39,13 @@ impl IsMoveable for Point {
     }
 }
 
-impl HasPosition for Point {
+impl HasPosition3D for Point3D {
     fn new() -> Box<Self> {
-        Box::new(Point{x: 0.0, y: 0.0, z: 0.0})
+        Box::new(Point3D{x: 0.0, y: 0.0, z: 0.0})
     }
 
     fn build(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(Point{x: x, y: y, z: z})
+        Box::new(Point3D{x: x, y: y, z: z})
     }
 
 
@@ -71,14 +71,14 @@ impl HasPosition for Point {
         self.z = val;
     }
 
-    fn clone(&self) -> Point {
-        Point { x: self.x, y: self.y, z: self.z }
+    fn clone(&self) -> Point3D {
+        Point3D { x: self.x, y: self.y, z: self.z }
     }
 
 
 }
 
-impl fmt::Display for Point {
+impl fmt::Display for Point3D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({}, {}, {})", self.x, self.y, self.z)
     }

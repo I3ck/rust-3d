@@ -1,9 +1,9 @@
 mod traits;
 mod functions;
 mod point;
-mod pointCloud;
-mod compressedPoint;
-mod compressedPointCloud;
+mod pointCloud3D;
+mod compressedPoint3D;
+mod compressedPointCloud3D;
 mod kdTree;
 mod ocNode;
 mod ocTree;

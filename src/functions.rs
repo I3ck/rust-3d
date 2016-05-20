@@ -1,25 +1,25 @@
 use std::cmp::Ordering;
 
-use point::{Point};
-use pointCloud::{PointCloud};
+use point::{Point3D};
+use pointCloud3D::{Point3DCloud3D};
 use ocNode::{Direction};
-use traits::{HasPosition};
+use traits::{HasPosition3D};
 
-pub fn center<P>(p1: &P, p2: &P, res: &mut P) where P: HasPosition {
+pub fn center<P>(p1: &P, p2: &P, res: &mut P) where P: HasPosition3D {
     res.set_x(p1.x() + (p2.x() - p1.x()) / 2.0);
     res.set_y(p1.y() + (p2.y() - p1.y()) / 2.0);
     res.set_z(p1.z() + (p2.z() - p1.z()) / 2.0);
 }
 
-pub fn dist<P>(p1: &P, p2: &P) -> f64 where P: HasPosition {
+pub fn dist<P>(p1: &P, p2: &P) -> f64 where P: HasPosition3D {
     sqr_dist(p1,p2).sqrt()
 }
 
-pub fn sqr_dist<P>(p1: &P, p2: &P) -> f64 where P: HasPosition {
+pub fn sqr_dist<P>(p1: &P, p2: &P) -> f64 where P: HasPosition3D {
     (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2) + (p1.z() - p2.z()).powi(2)
 }
 
-pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Option<Ordering> where P: HasPosition {
+pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Option<Ordering> where P: HasPosition3D {
     match dim {
         0 => lhs.x().partial_cmp(&rhs.x()),
         1 => lhs.y().partial_cmp(&rhs.y()),
@@ -28,7 +28,7 @@ pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Option<Ordering> where
     }
 }
 
-pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where P: HasPosition {
+pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where P: HasPosition3D {
     match dim {
         0 => Some((lhs.x() - rhs.x()).abs()),
         1 => Some((lhs.y() - rhs.y()).abs()),
@@ -37,7 +37,7 @@ pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where P: HasP
     }
 }
 
-pub fn sort_and_limit<P>(mut pc: &mut PointCloud<P>, search: &P, maxSize: usize) where P: HasPosition {
+pub fn sort_and_limit<P>(mut pc: &mut Point3DCloud3D<P>, search: &P, maxSize: usize) where P: HasPosition3D {
     if pc.len() > maxSize {
         pc.data.sort_by(|a, b| sqr_dist(search, a).partial_cmp(&sqr_dist(search, b)).unwrap_or(Ordering::Equal));
         let mut result : Vec<Box<P>>;
@@ -50,7 +50,7 @@ pub fn sort_and_limit<P>(mut pc: &mut PointCloud<P>, search: &P, maxSize: usize)
     }
 }
 
-pub fn calc_direction<P>(reference: &Point, p: &Point) -> Direction where P: HasPosition {
+pub fn calc_direction<P>(reference: &Point3D, p: &Point3D) -> Direction where P: HasPosition3D {
     if p.x() >= reference.x() && p.y() >= reference.y() && p.z() >= reference.z() {
         Direction::PPP
     } else if p.x() >= reference.x() && p.y() >= reference.y() && p.z() < reference.z() {
@@ -70,8 +70,8 @@ pub fn calc_direction<P>(reference: &Point, p: &Point) -> Direction where P: Has
     }
 }
 
-//@todo refactor to work with HasPosition?
-pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where P: HasPosition { //@todo better name
+//@todo refactor to work with HasPosition3D?
+pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where P: HasPosition3D { //@todo better name
     let mut middle = *P::new();
     center(min, max, &mut middle);
 
@@ -97,7 +97,7 @@ pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where P: 
     }
 }
 
-pub fn in_bb<P>(p: &P, min: &P, max: &P) -> bool where P: HasPosition {
+pub fn in_bb<P>(p: &P, min: &P, max: &P) -> bool where P: HasPosition3D {
     p.x() >= min.x() && p.x() <= max.x() &&
     p.y() >= min.y() && p.y() <= max.y() &&
     p.z() >= min.z() && p.z() <= max.z()

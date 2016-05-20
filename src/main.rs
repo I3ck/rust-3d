@@ -4,20 +4,20 @@ use std::fmt;
 mod traits;
 mod functions;
 mod point;
-mod pointCloud;
-mod compressedPoint;
-mod compressedPointCloud;
+mod pointCloud3D;
+mod compressedPoint3D;
+mod compressedPointCloud3D;
 mod kdTree;
 mod ocNode;
 mod ocTree;
 
-use point::{Point};
-use pointCloud::{PointCloud};
-use compressedPoint::{CompressedPoint};
-use compressedPointCloud::{CompressedPointCloud};
+use point::{Point3D};
+use pointCloud3D::{Point3DCloud3D};
+use compressedPoint3D::{CompressedPoint3D};
+use compressedPointCloud3D::{CompressedPoint3DCloud3D};
 use kdTree::{KdTree};
 use ocTree::{OcTree};
-use traits::{IsMoveable, HasPosition, IsTree, IsOcTree, IsKdTree};
+use traits::{IsMoveable3D, HasPosition3D, IsTree3D, IsOcTree, IsKdTree3D};
 
 
 //io
@@ -30,12 +30,12 @@ use std::path::Path;
 //------------------------------------------------------------------------------
 
 fn main() {
-    let p = *Point::new();
-    let p2 = *Point::build(100.0, 200.0, 400.0);
-    let mut pCenter = Point::new();
+    let p = *Point3D::new();
+    let p2 = *Point3D::build(100.0, 200.0, 400.0);
+    let mut pCenter = Point3D::new();
     functions::center(&p, &p2, &mut pCenter);
 
-    let mut pc = PointCloud::new();
+    let mut pc = Point3DCloud3D::new();
 
     println!("len : {}", pc.len());
     pc.push(p);
@@ -49,8 +49,8 @@ fn main() {
     println!("min : {}", pmin);
     println!("max : {}", pmax);
 
-    let compressed = CompressedPointCloud::<u8>::compress(&pc).expect("Could not compress!");
-    let decompressed = compressed.decompress::<Point>().expect("Could not decompress!");
+    let compressed = CompressedPoint3DCloud3D::<u8>::compress(&pc).expect("Could not compress!");
+    let decompressed = compressed.decompress::<Point3D>().expect("Could not decompress!");
 
     println!("{}", decompressed.data[0]);
     println!("{}", decompressed.data[1]);
@@ -69,7 +69,7 @@ fn main() {
 
     println!("pcFromTree :\n {}", pcFromTree);
 
-    let nearest = tree.knearest(&Point{x: 10.0,y: 199.0,z: 350.0}, 1);
+    let nearest = tree.knearest(&Point3D{x: 10.0,y: 199.0,z: 350.0}, 1);
 
     println!("single nearest to 100/199/350 : {}", nearest);
 
@@ -95,7 +95,7 @@ fn main() {
         Ok(_) => {
             print!("{} contains:\n{}", display, s);
 
-            match PointCloud::parse(String::from(s)) {
+            match Point3DCloud3D::parse(String::from(s)) {
                 None => {
                     println!("failed to parse pc data!");
                 },
@@ -105,7 +105,7 @@ fn main() {
                     let mut kdTree = KdTree::new();
                     kdTree.build(pc.clone());
                     println!("kdTree.size() : {}", tree.size());
-                    let nearestTen = kdTree.knearest(&Point{x: 9.0,y: 56.0,z: 0.0}, 10);
+                    let nearestTen = kdTree.knearest(&Point3D{x: 9.0,y: 56.0,z: 0.0}, 10);
                     println!("nearest ten to 9/56/0 : {}", nearestTen);
 
                     let mut ocTree = OcTree::new();
