@@ -7,9 +7,58 @@ use self::core::str::FromStr;
 use std::hash::{Hash};
 
 //@todo point and pc also as trait
+pub trait IsMoveable2D {
+    fn move_by(&mut self, x: f64, y: f64);
+}
 
 pub trait IsMoveable3D {
     fn move_by(&mut self, x: f64, y: f64, z: f64);
+}
+
+pub trait HasPosition2D : Eq + PartialEq + Ord + PartialOrd + Hash {
+    fn new() -> Box<Self>;
+    fn build(x: f64, y: f64) -> Box<Self>; //@todo can be implemented here
+    fn x(&self) -> f64;
+    fn y(&self) -> f64;
+    fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable3D? Or remove moveable trait
+    fn set_y(&mut self, val: f64);
+    fn clone(&self) -> Self;
+
+    fn pos(&self) -> (f64, f64) {
+        ( self.x(), self.y() )
+    }
+
+    fn set_pos(&mut self, x: f64, y: f64) {
+        self.set_x(x);
+        self.set_y(y);
+    }
+
+    fn to_str(&self) -> String {
+        let sx: String = self.x().to_string();
+        let sy: String = self.y().to_string();
+
+        sx + " " + &sy
+    }
+
+    fn parse(text: String) -> Option<Box<Self>> {
+        let split = text.split(" ");
+        let words = split.collect::<Vec<&str>>();
+        match words.len() {
+            2 => {
+                let mut p = Self::new();
+                match f64::from_str(words[0]) {
+                    Err(_) => return None,
+                    Ok(x) => p.set_x(x)
+                };
+                match f64::from_str(words[1]) {
+                    Err(_) => return None,
+                    Ok(y) => p.set_y(y)
+                };
+                Some(p)
+            },
+            _ => None
+        }
+    }
 }
 
 pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
@@ -67,6 +116,7 @@ pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
 }
 
 //@todo implement for pointcloud (already has a method for bbox)
+//@todo could be defined for any number of dimensions
 pub trait HasBoundingBox3D : HasPosition3D {
     fn bounding_box(&self) -> Option<(Point3D, Point3D)>;
     //@todo below methods can be implemented in here
