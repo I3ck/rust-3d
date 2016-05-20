@@ -3,7 +3,7 @@ use std::fmt;
 
 mod traits;
 mod functions;
-mod point;
+mod point3D;
 mod pointCloud3D;
 mod compressedPoint3D;
 mod compressedPointCloud3D;
@@ -11,7 +11,7 @@ mod kdTree;
 mod ocNode;
 mod ocTree;
 
-use point::{Point3D};
+use point3D::{Point3D};
 use pointCloud3D::{Point3DCloud3D};
 use compressedPoint3D::{CompressedPoint3D};
 use compressedPointCloud3D::{CompressedPoint3DCloud3D};

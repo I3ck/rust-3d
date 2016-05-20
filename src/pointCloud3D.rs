@@ -1,7 +1,7 @@
 use std::fmt;
 
 use traits::{IsMoveable3D, HasPosition3D};
-use point::{Point3D};
+use point3D::{Point3D};
 
 
 

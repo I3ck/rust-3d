@@ -1,6 +1,6 @@
 extern crate core;
 
-use point::{Point3D};
+use point3D::{Point3D};
 use pointCloud3D::{Point3DCloud3D};
 
 use self::core::str::FromStr;

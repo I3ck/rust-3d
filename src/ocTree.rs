@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::iter::IntoIterator;
 
-use point::{Point3D};
+use point3D::{Point3D};
 use pointCloud3D::{Point3DCloud3D};
 use ocNode::{OcNode};
 use traits::{HasPosition3D, IsTree3D, IsOcTree};

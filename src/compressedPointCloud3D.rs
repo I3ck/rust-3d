@@ -4,7 +4,7 @@ use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
 use traits::{HasPosition3D};
-use point::{Point3D};
+use point3D::{Point3D};
 use pointCloud3D::{Point3DCloud3D};
 use compressedPoint3D::{CompressedPoint3D};
 

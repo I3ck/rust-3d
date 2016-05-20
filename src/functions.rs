@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use point::{Point3D};
+use point3D::{Point3D};
 use pointCloud3D::{Point3DCloud3D};
 use ocNode::{Direction};
 use traits::{HasPosition3D};

@@ -1,7 +1,7 @@
 use std::cmp;
 use std::cmp::Ordering;
 
-use point::{Point3D};
+use point3D::{Point3D};
 use pointCloud3D::{Point3DCloud3D};
 use functions::{dist, sqr_dist, dimension_compare, dimension_dist, sort_and_limit};
 

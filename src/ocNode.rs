@@ -1,5 +1,5 @@
 use traits::HasPosition3D;
-use point::{Point3D};
+use point3D::{Point3D};
 use pointCloud3D::{Point3DCloud3D};
 use functions::{center, calc_sub_min_max, calc_direction, in_bb};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
