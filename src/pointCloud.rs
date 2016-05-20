@@ -39,10 +39,11 @@ impl<P> PointCloud<P> where P: HasPosition{
     }
 
     pub fn clone(&self) -> PointCloud<P> {
-        let mut data = Vec::new();
+        let mut data: Vec<Box<P>>;
+        data = Vec::new();
 
         for p in &self.data {
-            data.push(*p.clone());
+            data.push(Box::new((*p).clone()));
         }
 
         PointCloud { data: data }

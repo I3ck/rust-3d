@@ -17,7 +17,7 @@ use compressedPoint::{CompressedPoint};
 use compressedPointCloud::{CompressedPointCloud};
 use kdTree::{KdTree};
 use ocTree::{OcTree};
-use traits::{IsMoveable, IsTree, IsOcTree, IsKdTree};
+use traits::{IsMoveable, HasPosition, IsTree, IsOcTree, IsKdTree};
 
 
 //io
@@ -30,8 +30,8 @@ use std::path::Path;
 //------------------------------------------------------------------------------
 
 fn main() {
-    let p = Point::new();
-    let p2 = Point{x: 100.0, y: 200.0, z: 400.0};
+    let p = *Point::new();
+    let p2 = *Point::build(100.0, 200.0, 400.0);
     let mut pCenter = Point::new();
     functions::center(&p, &p2, &mut pCenter);
 
@@ -50,8 +50,7 @@ fn main() {
     println!("max : {}", pmax);
 
     let compressed = CompressedPointCloud::<u8>::compress(&pc).expect("Could not compress!");
-
-    let decompressed = compressed.decompress().expect("Could not decompress!");
+    let decompressed = compressed.decompress::<Point>().expect("Could not decompress!");
 
     println!("{}", decompressed.data[0]);
     println!("{}", decompressed.data[1]);

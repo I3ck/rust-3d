@@ -37,11 +37,16 @@ impl<P> IsTree<P> for OcTree<P> where P: HasPosition {
             None => false,
             Some((min, max)) => {
                 let mut uniqueData = Vec::new();
-                let mut set: HashSet<P> = pc.data.into_iter().collect();
+                let mut set = HashSet::new();
+                for p in pc.data {
+                    set.insert(*p);
+                }
+                //let mut set: HashSet<P> = pc.data.into_iter().unbox().collect();
                 uniqueData.extend(set.into_iter());
-                self.root = Some(OcNode::new(&min, &max, uniqueData));
-                self.min = min;
-                self.max = max;
+                self.min = *P::build(min.x, min.y, min.z);
+                self.max = *P::build(max.x, max.y, max.z);
+                self.root = Some(OcNode::new(&self.min, &self.max, uniqueData));
+
                 true
             }
         }

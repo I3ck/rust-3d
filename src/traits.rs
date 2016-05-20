@@ -4,6 +4,7 @@ use point::{Point};
 use pointCloud::{PointCloud};
 
 use self::core::str::FromStr;
+use std::hash::{Hash};
 
 //@todo point and pc also as trait
 
@@ -12,7 +13,7 @@ pub trait IsMoveable {
 }
 
 //@todo maybe rename to HasCenter to not confuse
-pub trait HasPosition {
+pub trait HasPosition : Eq + PartialEq + Ord + PartialOrd + Hash {
     fn new() -> Box<Self>;
     fn build(x: f64, y: f64, z: f64) -> Box<Self>; //@todo can be implemented here
     fn x(&self) -> f64;
