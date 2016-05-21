@@ -61,6 +61,14 @@ pub trait HasPosition2D : Eq + PartialEq + Ord + PartialOrd + Hash {
     }
 }
 
+pub trait TransFormableTo3D : HasPosition2D {
+    fn transform_to_3D<P>(&self, z: f64) -> P where P: HasPosition3D;
+}
+
+pub trait TransFormableTo2D : HasPosition3D {
+    fn transform_to_2D<P>(&self) -> P where P: HasPosition2D;
+}
+
 pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
     fn new() -> Box<Self>;
     fn build(x: f64, y: f64, z: f64) -> Box<Self>; //@todo can be implemented here
