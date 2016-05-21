@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use point3D::{Point3D};
 use pointCloud3D::{Point3DCloud3D};
 use ocNode::{Direction};
-use traits::{HasPosition3D};
+use traits::{HasPosition2D, HasPosition3D};
 
 pub fn center<P>(p1: &P, p2: &P, res: &mut P) where P: HasPosition3D {
     res.set_x(p1.x() + (p2.x() - p1.x()) / 2.0);
@@ -11,11 +11,19 @@ pub fn center<P>(p1: &P, p2: &P, res: &mut P) where P: HasPosition3D {
     res.set_z(p1.z() + (p2.z() - p1.z()) / 2.0);
 }
 
-pub fn dist<P>(p1: &P, p2: &P) -> f64 where P: HasPosition3D {
-    sqr_dist(p1,p2).sqrt()
+pub fn dist2D<P>(p1: &P, p2: &P) -> f64 where P: HasPosition2D {
+    sqr_dist2D(p1,p2).sqrt()
 }
 
-pub fn sqr_dist<P>(p1: &P, p2: &P) -> f64 where P: HasPosition3D {
+pub fn dist3D<P>(p1: &P, p2: &P) -> f64 where P: HasPosition3D {
+    sqr_dist3D(p1,p2).sqrt()
+}
+
+pub fn sqr_dist2D<P>(p1: &P, p2: &P) -> f64 where P: HasPosition2D {
+    (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2)
+}
+
+pub fn sqr_dist3D<P>(p1: &P, p2: &P) -> f64 where P: HasPosition3D {
     (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2) + (p1.z() - p2.z()).powi(2)
 }
 
@@ -39,7 +47,7 @@ pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where P: HasP
 
 pub fn sort_and_limit<P>(mut pc: &mut Point3DCloud3D<P>, search: &P, maxSize: usize) where P: HasPosition3D {
     if pc.len() > maxSize {
-        pc.data.sort_by(|a, b| sqr_dist(search, a).partial_cmp(&sqr_dist(search, b)).unwrap_or(Ordering::Equal));
+        pc.data.sort_by(|a, b| sqr_dist3D(search, a).partial_cmp(&sqr_dist3D(search, b)).unwrap_or(Ordering::Equal));
         let mut result : Vec<Box<P>>;
         result = Vec::new();
         for i in pc.data.iter().take(maxSize) {

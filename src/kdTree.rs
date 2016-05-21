@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 
 use point3D::{Point3D};
 use pointCloud3D::{Point3DCloud3D};
-use functions::{dist, sqr_dist, dimension_compare, dimension_dist, sort_and_limit};
+use functions::{dist3D, sqr_dist3D, dimension_compare, dimension_dist, sort_and_limit};
 
 use traits::{HasPosition3D, IsTree3D, IsKdTree3D};
 
@@ -153,7 +153,7 @@ impl<P> KdNode<P> where P: HasPosition3D {
     }
 
     pub fn knearest(&self, search: &P, n: usize, pc: &mut Point3DCloud3D<P>) {
-        if pc.len() < n || sqr_dist(search, &self.val) < sqr_dist(search, &pc.data[&pc.len() -1 ]) {
+        if pc.len() < n || sqr_dist3D(search, &self.val) < sqr_dist3D(search, &pc.data[&pc.len() -1 ]) {
             pc.push(self.val.clone());
         }
 
@@ -175,7 +175,7 @@ impl<P> KdNode<P> where P: HasPosition3D {
             _ => (search.z(), self.val.z())
         };
 
-        let distanceBest = dist(search, &pc.data[&pc.len() -1 ]);
+        let distanceBest = dist3D(search, &pc.data[&pc.len() -1 ]);
         let borderLeft = currentSearch - distanceBest;
         let borderRight = currentSearch + distanceBest;
 
@@ -202,7 +202,7 @@ impl<P> KdNode<P> where P: HasPosition3D {
     pub fn in_sphere(&self, search: &P, radius: f64, pc: &mut Point3DCloud3D<P>) {
         if radius <= 0.0 { return; }
 
-        if dist(search, &self.val) <= radius {
+        if dist3D(search, &self.val) <= radius {
             pc.push(self.val.clone());
         }
 

@@ -6,7 +6,7 @@ use std::hash::{Hash, Hasher};
 
 
 use traits::{IsMoveable3D, HasPosition3D};
-use functions::{sqr_dist};
+use functions::{sqr_dist3D};
 
 #[derive (PartialEq, PartialOrd)]
 pub struct Point3D {
@@ -19,7 +19,7 @@ impl Eq for Point3D {}
 impl Ord for Point3D {
     fn cmp(&self, other: &Self) -> Ordering {
         let origin = *Point3D::new();
-        sqr_dist(&origin, self).partial_cmp(&sqr_dist(&origin, other)).unwrap_or(Ordering::Equal)
+        sqr_dist3D(&origin, self).partial_cmp(&sqr_dist3D(&origin, other)).unwrap_or(Ordering::Equal)
     }
 }
 

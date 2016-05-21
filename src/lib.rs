@@ -1,5 +1,6 @@
 mod traits;
 mod functions;
+mod point2D;
 mod point3D;
 mod pointCloud3D;
 mod compressedPoint3D;
