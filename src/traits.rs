@@ -33,6 +33,14 @@ pub trait HasPosition2D : Eq + PartialEq + Ord + PartialOrd + Hash {
         self.set_y(y);
     }
 
+    fn dot<P>(&self, other: &P) -> f64 where P: HasPosition2D {
+        self.x() * other.x() + self.y() * other.y()
+    }
+
+    fn cross<P>(&self, other: &P) -> f64 where P: HasPosition2D {
+        self.x() * other.y() - self.y() * other.x()
+    }
+
     fn to_str(&self) -> String {
         let sx: String = self.x().to_string();
         let sy: String = self.y().to_string();
@@ -88,6 +96,17 @@ pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
         self.set_x(x);
         self.set_y(y);
         self.set_z(z);
+    }
+
+    fn dot<P>(&self, other: &P) -> f64 where P: HasPosition3D {
+        self.x() * other.x() + self.y() * other.y() + self.z() * other.z()
+    }
+
+    fn cross<P>(&self, other: &P) -> Box<Self> where P: HasPosition3D {
+        let x = self.y() * other.z() - self.z() * other.y();
+        let y = self.z() * other.x() - self.x() * other.z();
+        let z = self.x() * other.y() - self.y() * other.x();
+        Self::build(x, y, z)
     }
 
     fn to_str(&self) -> String {
