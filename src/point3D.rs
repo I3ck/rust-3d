@@ -5,7 +5,7 @@ use std::hash::{Hash, Hasher};
 
 
 
-use traits::{IsMoveable3D, HasPosition3D};
+use traits::{IsMoveable3D, HasPosition2D, HasPosition3D, TransFormableTo2D};
 use functions::{sqr_dist3D};
 
 #[derive (PartialEq, PartialOrd)]
@@ -74,8 +74,12 @@ impl HasPosition3D for Point3D {
     fn clone(&self) -> Point3D {
         Point3D { x: self.x, y: self.y, z: self.z }
     }
+}
 
-
+impl TransFormableTo2D for Point3D {
+    fn transform_to_2D<P>(&self) -> P where P: HasPosition2D {
+        *P::build(self.x, self.y)
+    }
 }
 
 impl fmt::Display for Point3D {

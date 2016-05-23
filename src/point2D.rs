@@ -4,8 +4,7 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 
-
-use traits::{IsMoveable2D, HasPosition2D};
+use traits::{IsMoveable2D, HasPosition2D, HasPosition3D, TransFormableTo3D};
 use functions::{sqr_dist2D};
 
 #[derive (PartialEq, PartialOrd)]
@@ -63,8 +62,12 @@ impl HasPosition2D for Point2D {
     fn clone(&self) -> Point2D {
         Point2D { x: self.x, y: self.y }
     }
+}
 
-
+impl TransFormableTo3D for Point2D {
+    fn transform_to_3D<P>(&self, z: f64) -> P where P: HasPosition3D {
+        *P::build(self.x, self.y, z)
+    }
 }
 
 impl fmt::Display for Point2D {
