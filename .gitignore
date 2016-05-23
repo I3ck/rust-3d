@@ -3,5 +3,6 @@ Cargo.lock
 target
 Cargo.lock
 *.tmp
+*.swp
 exampledata.xyz
 collect.xyz

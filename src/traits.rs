@@ -15,15 +15,17 @@ pub trait IsMoveable3D {
     fn move_by(&mut self, x: f64, y: f64, z: f64);
 }
 
-pub trait IsPlane3D {
-    fn origin<P>(&self) -> P where P: HasPosition3D;
-    fn set_origin<P>(&mut self, origin: P) where P: HasPosition3D;
-    fn normal<P>(&self) -> P where P: HasPosition3D;
-    fn set_normal<P>(&mut self, normal: P) where P: HasPosition3D;
+pub trait IsPlane3D<P> where P: HasPosition3D {
+    fn new() -> Box<Self>;
+    fn build(origin: P, normal: P, width: f64, height: f64) -> Box<Self>; //@todo can be implemented here
+    fn origin(&self) -> P;
+    fn set_origin(&mut self, origin: P);
+    fn normal(&self) -> P;
+    fn set_normal(&mut self, normal: P);
     fn width(&self) -> f64;
-    fn set_width(&mut self, f64); //@todo ensure only positive floats are passed
+    fn set_width(&mut self, width: f64); //@todo ensure only positive floats are passed
     fn height(&self) -> f64;
-    fn set_height(&self) -> f64; //@todo ensure only positive floats are passed
+    fn set_height(&mut self, height: f64); //@todo ensure only positive floats are passed
 }
 
 pub trait HasPosition2D : Eq + PartialEq + Ord + PartialOrd + Hash {
