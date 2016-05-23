@@ -46,12 +46,47 @@ pub trait HasPosition2D : Eq + PartialEq + Ord + PartialOrd + Hash {
         self.set_y(y);
     }
 
+    fn add<P>(&mut self, other: &P) where P: HasPosition2D {
+        let x = self.x() + other.x();
+        let y = self.y() + other.y();
+        self.set_x(x);
+        self.set_y(y);
+    }
+
+    fn substract<P>(&mut self, other: &P) where P: HasPosition2D {
+        let x = self.x() - other.x();
+        let y = self.y() - other.y();
+        self.set_x(x);
+        self.set_y(y);
+    }
+
+    fn scale(&mut self, val: f64) {
+        let x = val * self.x();
+        let y = val * self.y();
+        self.set_x(x);
+        self.set_y(y);
+    }
+
     fn dot<P>(&self, other: &P) -> f64 where P: HasPosition2D {
         self.x() * other.x() + self.y() * other.y()
     }
 
     fn cross<P>(&self, other: &P) -> f64 where P: HasPosition2D {
         self.x() * other.y() - self.y() * other.x()
+    }
+
+    fn abs(&self) -> f64 {
+        (self.x()).powi(2) + (self.y()).powi(2)
+    }
+
+    fn normalized(&self) -> Option<Box<Self>> {
+        let l = self.abs();
+        if l <= 0.0 {
+            None
+        }
+        else {
+            Some(Self::build(self.x() / l, self.y() / l))
+        }
     }
 
     fn to_str(&self) -> String {
@@ -111,6 +146,33 @@ pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
         self.set_z(z);
     }
 
+    fn add<P>(&mut self, other: &P) where P: HasPosition3D {
+        let x = self.x() + other.x();
+        let y = self.y() + other.y();
+        let z = self.z() + other.z();
+        self.set_x(x);
+        self.set_y(y);
+        self.set_z(z);
+    }
+
+    fn substract<P>(&mut self, other: &P) where P: HasPosition3D {
+        let x = self.x() - other.x();
+        let y = self.y() - other.y();
+        let z = self.z() - other.z();
+        self.set_x(x);
+        self.set_y(y);
+        self.set_z(z);
+    }
+
+    fn scale(&mut self, val: f64) {
+        let x = val * self.x();
+        let y = val * self.y();
+        let z = val * self.z();
+        self.set_x(x);
+        self.set_y(y);
+        self.set_z(z);
+    }
+
     fn dot<P>(&self, other: &P) -> f64 where P: HasPosition3D {
         self.x() * other.x() + self.y() * other.y() + self.z() * other.z()
     }
@@ -120,6 +182,20 @@ pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
         let y = self.z() * other.x() - self.x() * other.z();
         let z = self.x() * other.y() - self.y() * other.x();
         Self::build(x, y, z)
+    }
+
+    fn abs(&self) -> f64 {
+        (self.x()).powi(2) + (self.y()).powi(2) + (self.z()).powi(2)
+    }
+
+    fn normalized(&self) -> Option<Box<Self>> {
+        let l = self.abs();
+        if l <= 0.0 {
+            None
+        }
+        else {
+            Some(Self::build(self.x() / l, self.y() / l, self.z() / l))
+        }
     }
 
     fn to_str(&self) -> String {

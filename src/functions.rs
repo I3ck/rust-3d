@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use point3D::{Point3D};
 use pointCloud3D::{Point3DCloud3D};
 use ocNode::{Direction};
-use traits::{HasPosition2D, HasPosition3D};
+use traits::{HasPosition2D, HasPosition3D, IsPlane3D};
 
 pub fn center<P>(p1: &P, p2: &P, res: &mut P) where P: HasPosition3D {
     res.set_x(p1.x() + (p2.x() - p1.x()) / 2.0);
@@ -109,4 +109,27 @@ pub fn in_bb<P>(p: &P, min: &P, max: &P) -> bool where P: HasPosition3D {
     p.x() >= min.x() && p.x() <= max.x() &&
     p.y() >= min.y() && p.y() <= max.y() &&
     p.z() >= min.z() && p.z() <= max.z()
+}
+
+//@todo rename or overload operators
+//@todo implement for 2D aswell, maybe move to traits
+pub fn conn<P>(pFrom: &P, pTo: &P) -> P where P: HasPosition3D
+{
+    *P::build(
+        pTo.x() - pFrom.x(),
+        pTo.y() - pFrom.y(),
+        pTo.z() - pFrom.z()
+    )
+}
+
+pub fn project_point_on_plane<PL, P>(plane: &PL, point: &P) -> P where PL: IsPlane3D<P>, P: HasPosition3D {
+    let v = conn(&plane.origin(), point);
+    let n = plane.normal();
+    //@todo n should be normalized, or plane should ensure this (maybe add some normalized type)
+    let scale = v.dot(&n);
+    let mut scaledNormal = n.clone();
+    scaledNormal.scale(scale);
+    let mut result = point.clone();
+    result.substract(&scaledNormal);
+    return result;
 }
