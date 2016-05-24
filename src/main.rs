@@ -6,6 +6,7 @@ mod functions;
 mod point2D;
 mod point3D;
 mod plane3D;
+mod pointCloud2D;
 mod pointCloud3D;
 mod compressedPoint3D;
 mod compressedPointCloud3D;
@@ -14,9 +15,9 @@ mod ocNode;
 mod ocTree;
 
 use point3D::{Point3D};
-use pointCloud3D::{Point3DCloud3D};
+use pointCloud3D::{PointCloud3D};
 use compressedPoint3D::{CompressedPoint3D};
-use compressedPointCloud3D::{CompressedPoint3DCloud3D};
+use compressedPointCloud3D::{CompressedPointCloud3D};
 use kdTree::{KdTree};
 use ocTree::{OcTree};
 use traits::{IsMoveable3D, HasPosition3D, IsTree3D, IsOcTree, IsKdTree3D};
@@ -37,7 +38,7 @@ fn main() {
     let mut pCenter = Point3D::new();
     functions::center(&p, &p2, &mut pCenter);
 
-    let mut pc = Point3DCloud3D::new();
+    let mut pc = PointCloud3D::new();
 
     println!("len : {}", pc.len());
     pc.push(p);
@@ -51,7 +52,7 @@ fn main() {
     println!("min : {}", pmin);
     println!("max : {}", pmax);
 
-    let compressed = CompressedPoint3DCloud3D::<u8>::compress(&pc).expect("Could not compress!");
+    let compressed = CompressedPointCloud3D::<u8>::compress(&pc).expect("Could not compress!");
     let decompressed = compressed.decompress::<Point3D>().expect("Could not decompress!");
 
     println!("{}", decompressed.data[0]);
@@ -97,7 +98,7 @@ fn main() {
         Ok(_) => {
             print!("{} contains:\n{}", display, s);
 
-            match Point3DCloud3D::parse(String::from(s)) {
+            match PointCloud3D::parse(String::from(s)) {
                 None => {
                     println!("failed to parse pc data!");
                 },

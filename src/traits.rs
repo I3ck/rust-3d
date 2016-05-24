@@ -1,7 +1,9 @@
 extern crate core;
 
+use point2D::{Point2D};
 use point3D::{Point3D};
-use pointCloud3D::{Point3DCloud3D};
+use pointCloud2D::{PointCloud2D};
+use pointCloud3D::{PointCloud3D};
 
 use self::core::str::FromStr;
 use std::hash::{Hash};
@@ -13,6 +15,16 @@ pub trait IsMoveable2D {
 
 pub trait IsMoveable3D {
     fn move_by(&mut self, x: f64, y: f64, z: f64);
+}
+
+//@todo finish trait and add implementation
+//@todo better method names
+pub trait IsProjectionToPlane<P2,P3> where P2: HasPosition2D, P3: HasPosition3D {
+    fn from_2d<PL>(plane: PL, pc: PointCloud2D<P2>) -> Box<Self> where PL: IsPlane3D<P3>; //places 2d pc on plane, assuming plane 0/0 == pc2d 0/0
+    fn from_3d<PL>(plane: PL, pc: PointCloud3D<P3>) -> Box<Self> where PL: IsPlane3D<P3>; //projects 3d pc onto plane from global coords
+    fn projected_pointcloud_3d_global(&self) -> PointCloud3D<P3>;
+    fn plane<PL>(&self) -> PL where PL: IsPlane3D<P3>;
+    fn projected_pointcloud_2d_local(&self) -> PointCloud2D<P2>;
 }
 
 pub trait IsPlane3D<P> where P: HasPosition3D {
@@ -252,17 +264,17 @@ pub trait HasBoundingBox3D : HasPosition3D {
 pub trait IsTree3D<P> where P: HasPosition3D {
     fn new() -> Self;
     fn size(&self) -> usize;
-    fn to_pointcloud(&self) -> Point3DCloud3D<P>;
-    fn build(&mut self, pc : Point3DCloud3D<P>) -> bool;
+    fn to_pointcloud(&self) -> PointCloud3D<P>;
+    fn build(&mut self, pc : PointCloud3D<P>) -> bool;
 }
 
 pub trait IsOcTree<P> : IsTree3D<P> where P: HasPosition3D {
-    fn collect(&self, maxdepth: i8) -> Point3DCloud3D<P>;
+    fn collect(&self, maxdepth: i8) -> PointCloud3D<P>;
 }
 
 pub trait IsKdTree3D<P> : IsTree3D<P> where P: HasPosition3D {
     fn nearest(&self, search: &P) -> Option<P>;
-    fn knearest(&self, search: &P, n: usize) -> Point3DCloud3D<P>;
-    fn in_sphere(&self, search: &P, radius: f64) -> Point3DCloud3D<P>;
-    fn in_box(&self, search: &P, xSize: f64, ySize: f64, zSize: f64) -> Point3DCloud3D<P>;
+    fn knearest(&self, search: &P, n: usize) -> PointCloud3D<P>;
+    fn in_sphere(&self, search: &P, radius: f64) -> PointCloud3D<P>;
+    fn in_box(&self, search: &P, xSize: f64, ySize: f64, zSize: f64) -> PointCloud3D<P>;
 }

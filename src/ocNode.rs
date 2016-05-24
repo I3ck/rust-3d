@@ -1,6 +1,6 @@
 use traits::HasPosition3D;
 use point3D::{Point3D};
-use pointCloud3D::{Point3DCloud3D};
+use pointCloud3D::{PointCloud3D};
 use functions::{center, calc_sub_min_max, calc_direction, in_bb};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
 
@@ -32,9 +32,9 @@ pub enum Direction { //@todo rename //@todo private?
 }
 
 //@todo define somewhere else
-fn collect_center_or_all<P>(n: &OcNode<P>, onlyCollectCenters: bool, depth: i8, maxdepth: i8, mut pc: &mut Point3DCloud3D<P>) where P: HasPosition3D {
+fn collect_center_or_all<P>(n: &OcNode<P>, onlyCollectCenters: bool, depth: i8, maxdepth: i8, mut pc: &mut PointCloud3D<P>) where P: HasPosition3D {
     if onlyCollectCenters {
-        let mut subPc = Point3DCloud3D::new();
+        let mut subPc = PointCloud3D::new();
         n.collect(depth+1, maxdepth, &mut subPc);
         if let Some(c) = subPc.center() {
             pc.push(c);
@@ -139,7 +139,7 @@ impl<P> OcNode<P> where P: HasPosition3D {
     }
 
 //@todo define helpers here to simplify code (and in other areas)
-    pub fn collect(&self, depth: i8, maxdepth: i8, pc: &mut Point3DCloud3D<P>) {
+    pub fn collect(&self, depth: i8, maxdepth: i8, pc: &mut PointCloud3D<P>) {
         let onlyCollectCenters = maxdepth >= 0 && depth > maxdepth; //@todo make this depend on a setting?
         match self {
             &OcNode::Leaf(ref p) => pc.push(p.clone()),

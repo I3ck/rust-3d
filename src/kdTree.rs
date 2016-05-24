@@ -2,7 +2,7 @@ use std::cmp;
 use std::cmp::Ordering;
 
 use point3D::{Point3D};
-use pointCloud3D::{Point3DCloud3D};
+use pointCloud3D::{PointCloud3D};
 use functions::{dist3D, sqr_dist3D, dimension_compare, dimension_dist, sort_and_limit};
 
 use traits::{HasPosition3D, IsTree3D, IsKdTree3D};
@@ -29,15 +29,15 @@ impl<P> IsTree3D<P> for KdTree<P> where P: HasPosition3D {
         }
     }
 
-    fn to_pointcloud(&self) -> Point3DCloud3D<P>{
-        let mut result = Point3DCloud3D::new();
+    fn to_pointcloud(&self) -> PointCloud3D<P>{
+        let mut result = PointCloud3D::new();
         if let Some(ref node) = self.root {
-            node.toPoint3DCloud3D(&mut result);
+            node.toPointCloud3D(&mut result);
         }
         result
     }
 
-    fn build(&mut self, pc: Point3DCloud3D<P>) -> bool {
+    fn build(&mut self, pc: PointCloud3D<P>) -> bool {
         match pc.len() {
             0 => false,
             _ => {
@@ -50,8 +50,8 @@ impl<P> IsTree3D<P> for KdTree<P> where P: HasPosition3D {
 }
 
 impl<P> IsKdTree3D<P> for KdTree<P> where P: HasPosition3D {
-    fn knearest(&self, search: &P, n: usize) -> Point3DCloud3D<P> {
-        let mut result = Point3DCloud3D::new();
+    fn knearest(&self, search: &P, n: usize) -> PointCloud3D<P> {
+        let mut result = PointCloud3D::new();
         if n < 1 { return result; }
         if let Some(ref node) = self.root {
             node.knearest(search, n, &mut result);
@@ -59,8 +59,8 @@ impl<P> IsKdTree3D<P> for KdTree<P> where P: HasPosition3D {
         return result;
     }
 
-    fn in_sphere(&self, search: &P, radius: f64) -> Point3DCloud3D<P> {
-        let mut result = Point3DCloud3D::new();
+    fn in_sphere(&self, search: &P, radius: f64) -> PointCloud3D<P> {
+        let mut result = PointCloud3D::new();
         if radius <= 0.0 { return result; }
         if let Some(ref node) = self.root {
             node.in_sphere(search, radius, &mut result);
@@ -68,8 +68,8 @@ impl<P> IsKdTree3D<P> for KdTree<P> where P: HasPosition3D {
         return result;
     }
 
-    fn in_box(&self, search: &P, xSize: f64, ySize: f64, zSize: f64) -> Point3DCloud3D<P> {
-        let mut result = Point3DCloud3D::new();
+    fn in_box(&self, search: &P, xSize: f64, ySize: f64, zSize: f64) -> PointCloud3D<P> {
+        let mut result = PointCloud3D::new();
         if xSize <= 0.0 || ySize <= 0.0 || zSize <= 0.0 { return result; }
         if let Some(ref node) = self.root {
             node.in_box(search, xSize, ySize, zSize, &mut result);
@@ -146,13 +146,13 @@ impl<P> KdNode<P> where P: HasPosition3D {
         result
     }
 
-    pub fn toPoint3DCloud3D(&self, pc: &mut Point3DCloud3D<P>) {
-        if let Some(ref n) = (&self).left { n.toPoint3DCloud3D(pc); }
+    pub fn toPointCloud3D(&self, pc: &mut PointCloud3D<P>) {
+        if let Some(ref n) = (&self).left { n.toPointCloud3D(pc); }
         pc.push(self.val.clone());
-        if let Some(ref n) = (&self).right { n.toPoint3DCloud3D(pc); }
+        if let Some(ref n) = (&self).right { n.toPointCloud3D(pc); }
     }
 
-    pub fn knearest(&self, search: &P, n: usize, pc: &mut Point3DCloud3D<P>) {
+    pub fn knearest(&self, search: &P, n: usize, pc: &mut PointCloud3D<P>) {
         if pc.len() < n || sqr_dist3D(search, &self.val) < sqr_dist3D(search, &pc.data[&pc.len() -1 ]) {
             pc.push(self.val.clone());
         }
@@ -199,7 +199,7 @@ impl<P> KdNode<P> where P: HasPosition3D {
         sort_and_limit(pc, search, n);
     }
 
-    pub fn in_sphere(&self, search: &P, radius: f64, pc: &mut Point3DCloud3D<P>) {
+    pub fn in_sphere(&self, search: &P, radius: f64, pc: &mut PointCloud3D<P>) {
         if radius <= 0.0 { return; }
 
         if dist3D(search, &self.val) <= radius {
@@ -247,7 +247,7 @@ impl<P> KdNode<P> where P: HasPosition3D {
         }
     }
 
-    pub fn in_box(&self, search: &P, xSize: f64, ySize: f64, zSize: f64, pc: &mut Point3DCloud3D<P>) {
+    pub fn in_box(&self, search: &P, xSize: f64, ySize: f64, zSize: f64, pc: &mut PointCloud3D<P>) {
         if xSize <= 0.0 || ySize <= 0.0 || zSize <= 0.0 { return; }
 
         if let (Some(distX), Some(distY), Some(distZ)) = (dimension_dist(search, &self.val, 0), dimension_dist(search, &self.val, 1), dimension_dist(search, &self.val, 2)) {
