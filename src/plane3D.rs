@@ -14,9 +14,9 @@ pub struct Plane3D<P> where P: HasPosition3D {
 impl<P> IsPlane3D<P> for Plane3D<P> where P: HasPosition3D {
     fn new() -> Box<Self> {
         Box::new(Plane3D {
-            origin: *P::new(),
-            normal: *P::new(),
-            length_dir: *P::new(),
+            origin: *P::build(0.0, 0.0, 0.0),
+            normal: *P::build(0.0, 0.0, 1.0),
+            length_dir: *P::build(1.0, 0.0, 0.0),
             width: 0.0,
             height: 0.0
         })
