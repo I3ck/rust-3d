@@ -10,7 +10,7 @@ use functions::{sqr_dist2D};
 #[derive (PartialEq, PartialOrd)]
 pub struct Point2D {
     pub x: f64,
-    pub y: f64,
+    pub y: f64
 }
 
 impl Eq for Point2D {}

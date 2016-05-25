@@ -14,13 +14,15 @@ mod kdTree;
 mod ocNode;
 mod ocTree;
 
+use point2D::{Point2D};
 use point3D::{Point3D};
+use pointCloud2D::{PointCloud2D};
 use pointCloud3D::{PointCloud3D};
 use compressedPoint3D::{CompressedPoint3D};
 use compressedPointCloud3D::{CompressedPointCloud3D};
 use kdTree::{KdTree};
 use ocTree::{OcTree};
-use traits::{IsMoveable3D, HasPosition3D, IsTree3D, IsOcTree, IsKdTree3D};
+use traits::{IsMoveable3D, HasPosition2D, HasPosition3D, IsTree3D, IsOcTree, IsKdTree3D};
 
 
 //io
@@ -131,6 +133,34 @@ fn main() {
 
                     let mut f = File::create("collect.xyz").expect("Could not create file");
                     f.write_all(collect.to_str().as_bytes()).expect("Could not write to file");
+                }
+            }
+        }
+    }
+
+    let path2 = Path::new("exampledata.xy");
+    let display2 = path2.display();
+
+    let mut file2 = match File::open(&path2) {
+        Err(why) => panic!("couldn't open {}: {}", display2,
+                                                   Error::description(&why)),
+        Ok(file2) => file2
+    };
+
+    let mut s2 = String::new();
+    match file2.read_to_string(&mut s2) {
+        Err(why) => panic!("couldn't read {}: {}", display2,
+                                                   Error::description(&why)),
+        Ok(_) => {
+            print!("{} contains:\n{}", display2, s2);
+
+            match PointCloud2D::<Point2D>::parse(String::from(s2)) {
+                None => {
+                    println!("failed to parse pc data!");
+                },
+                Some(pc2) => {
+                    println!("parsed len : {}", pc2.len());
+
                 }
             }
         }
