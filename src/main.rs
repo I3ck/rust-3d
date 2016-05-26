@@ -10,6 +10,7 @@ mod pointCloud2D;
 mod pointCloud3D;
 mod compressedPoint3D;
 mod compressedPointCloud3D;
+mod projectionToPlane;
 mod kdTree;
 mod ocNode;
 mod ocTree;
@@ -23,6 +24,7 @@ use compressedPointCloud3D::{CompressedPointCloud3D};
 use kdTree::{KdTree};
 use ocTree::{OcTree};
 use traits::{IsMoveable3D, HasPosition2D, HasPosition3D, IsTree3D, IsOcTree, IsKdTree3D};
+use functions::{extrude};
 
 
 //io
@@ -160,6 +162,12 @@ fn main() {
                 },
                 Some(pc2) => {
                     println!("parsed len : {}", pc2.len());
+
+                    let extrustionDir = *Point3D::build(1.0, 2.0, 7.0);
+                    let (extrusionA, extrusionB) = extrude::<Point2D, Point3D>(&pc2.data, &extrustionDir);
+
+                    println!("extrusionA : {}", extrusionA);
+                    println!("extrusionB : {}", extrusionB);
 
                 }
             }

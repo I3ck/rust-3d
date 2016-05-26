@@ -17,6 +17,7 @@ pub trait IsMoveable3D {
     fn move_by(&mut self, x: f64, y: f64, z: f64);
 }
 
+///@todo split into several files
 //@todo finish trait and add implementation
 //@todo better method names
 //@todo maybe implement projection methods within the pc

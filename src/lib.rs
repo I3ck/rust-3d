@@ -7,6 +7,7 @@ mod pointCloud2D;
 mod pointCloud3D;
 mod compressedPoint3D;
 mod compressedPointCloud3D;
+mod projectionToPlane;
 mod kdTree;
 mod ocNode;
 mod ocTree;

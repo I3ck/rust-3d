@@ -1,9 +1,11 @@
 use std::cmp::Ordering;
 
+use point2D::{Point2D};
 use point3D::{Point3D};
+use pointCloud2D::{PointCloud2D};
 use pointCloud3D::{PointCloud3D};
 use ocNode::{Direction};
-use traits::{HasPosition2D, HasPosition3D, IsPlane3D};
+use traits::{HasPosition2D, HasPosition3D, TransFormableTo3D, IsPlane3D, IsMoveable3D};
 
 pub fn center<P>(p1: &P, p2: &P, res: &mut P) where P: HasPosition3D {
     res.set_x(p1.x() + (p2.x() - p1.x()) / 2.0);
@@ -56,6 +58,20 @@ pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, maxSize: usiz
         pc.data = result;
 
     }
+}
+//@todo move to plane or use there
+pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, PointCloud3D<P3>) where P2: HasPosition2D + TransFormableTo3D, P3: HasPosition3D + IsMoveable3D {
+    let mut pc3dA = PointCloud3D::new();
+    let mut pc3dB = PointCloud3D::new();
+
+    for p in pc2d {
+        let pTransformed = p.transform_to_3D::<P3>(0.0);
+        pc3dA.push(pTransformed.clone());
+        pc3dB.push(pTransformed);
+    }
+
+    pc3dB.move_by(dir.x(), dir.y(), dir.z());
+    (pc3dA, pc3dB)
 }
 
 pub fn calc_direction<P>(reference: &Point3D, p: &Point3D) -> Direction where P: HasPosition3D {
