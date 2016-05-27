@@ -1,3 +1,5 @@
+use std::f64;
+
 pub struct Matrix4 {
     pub data: [[f64; 4]; 4]
 }
@@ -43,6 +45,40 @@ impl Matrix4 {
             ]
         }
     }
+
+
+
+
+    fn rotation(radX: f64, radY: f64, radZ: f64) -> Matrix4 {
+        let (mut mX, mut mY, mut mZ) = (Matrix4::new(), Matrix4::new(), Matrix4::new());
+
+        mX.data[0][0] = 1.0;     mX.data[0][1] = 0.0;           mX.data[0][2] = 0.0;            mX.data[0][3] = 0.0;
+        mX.data[1][0] = 0.0;     mX.data[1][1] = radX.cos();    mX.data[1][2] = -radX.sin();    mX.data[1][3] = 0.0;
+        mX.data[2][0] = 0.0;     mX.data[2][1] = radX.sin();    mX.data[2][2] = radX.cos();     mX.data[2][3] = 0.0;
+        mX.data[3][0] = 0.0;     mX.data[3][1] = 0.0;           mX.data[3][2] = 0.0;            mX.data[3][3] = 1.0;
+
+        mY.data[0][0] = radY.cos();     mY.data[0][1] = 0.0;      mY.data[0][2] = radY.sin();   mY.data[0][3] = 0.0;
+        mY.data[1][0] = 0.0;            mY.data[1][1] = 1.0;      mY.data[1][2] = 0.0;          mY.data[1][3] = 0.0;
+        mY.data[2][0] = -radY.sin();    mY.data[2][1] = 0.0;      mY.data[2][2] = radY.cos();   mY.data[2][3] = 0.0;
+        mY.data[3][0] = 0.0;            mY.data[3][1] = 0.0;      mY.data[3][2] = 0.0;          mY.data[3][3] = 1.0;
+
+        mZ.data[0][0] = radZ.cos(); mZ.data[0][1] = -radZ.sin();    mZ.data[0][2] = 0.0;      mZ.data[0][3] = 0.0;
+        mZ.data[1][0] = radZ.sin(); mZ.data[1][1] = radZ.cos();     mZ.data[1][2] = 0.0;      mZ.data[1][3] = 0.0;
+        mZ.data[2][0] = 0.0;        mZ.data[2][1] = 0.0;            mZ.data[2][2] = 1.0;      mZ.data[2][3] = 0.0;
+        mZ.data[3][0] = 0.0;        mZ.data[3][1] = 0.0;            mZ.data[3][2] = 0.0;      mZ.data[3][3] = 1.0;
+
+        mX.multiplyM(&mY.multiplyM(&mZ))
+    }
+
+
+
+
+
+
+
+
+
+
 
     fn multiplyM(&self, other: &Matrix4) -> Matrix4 {
         let mut result = Matrix4::new();
