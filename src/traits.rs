@@ -250,7 +250,7 @@ pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
             _ => None
         }
     }
-
+    //@todo return new or alter self???
     fn multiplyM(&self, m: &Matrix4) -> Box<Self> {
         let mut result = Self::new();
         for i in 0..4 {
