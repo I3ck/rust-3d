@@ -131,6 +131,11 @@ pub trait HasPosition2D : Eq + PartialEq + Ord + PartialOrd + Hash {
         }
     }
 }
+/*
+pub trait Mesh3D<P> where P: HasPosition3D {
+    fn nFaces
+}
+*/
 
 pub trait TransFormableTo3D : HasPosition2D {
     fn transform_to_3D<P>(&self, z: f64) -> P where P: HasPosition3D;

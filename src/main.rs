@@ -8,6 +8,7 @@ mod point3D;
 mod plane3D;
 mod pointCloud2D;
 mod pointCloud3D;
+mod matrix4;
 mod compressedPoint3D;
 mod compressedPointCloud3D;
 mod projectionToPlane;
@@ -163,7 +164,7 @@ fn main() {
                 Some(pc2) => {
                     println!("parsed len : {}", pc2.len());
 
-                    let extrustionDir = *Point3D::build(1.0, 2.0, 7.0);
+                    let extrustionDir = *Point3D::build(0.0, 0.0, 7.0);
                     let (extrusionA, extrusionB) = extrude::<Point2D, Point3D>(&pc2.data, &extrustionDir);
 
                     println!("extrusionA : {}", extrusionA);
