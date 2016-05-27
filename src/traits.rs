@@ -2,6 +2,7 @@ extern crate core;
 
 use point2D::{Point2D};
 use point3D::{Point3D};
+use matrix4::Matrix4;
 use pointCloud2D::{PointCloud2D};
 use pointCloud3D::{PointCloud3D};
 
@@ -248,6 +249,25 @@ pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
             },
             _ => None
         }
+    }
+
+    fn multiplyM(&self, m: &Matrix4) -> Box<Self> {
+        let mut result = Self::new();
+        for i in 0..4 {
+            for j in 0..4 {
+                let addition = match j {
+                    0 => m.data[i][j] * self.x(),
+                    1 => m.data[i][j] * self.y(),
+                    _ => m.data[i][j] * self.z()
+                };
+                match i {
+                    0 => {let newx = result.x() + addition; result.set_x(newx);},
+                    1 => {let newy = result.y() + addition; result.set_y(newy);},
+                    _ => {let newz = result.z() + addition; result.set_z(newz);},
+                }
+            }
+        }
+        result
     }
 }
 
