@@ -43,4 +43,28 @@ impl Matrix4 {
             ]
         }
     }
+
+    fn multiplyM(&self, other: &Matrix4) -> Matrix4 {
+        let mut result = Matrix4::new();
+        for i in 0..4 {
+            for j in 0..4 {
+                result.data[i][j] =
+                    self.data[i][0] * other.data[0][j] +
+				    self.data[i][1] * other.data[1][j] +
+				    self.data[i][2] * other.data[2][j] +
+				    self.data[i][3] * other.data[3][j];
+            }
+        }
+        result
+    }
+
+    fn multiplyF(&self, other: f64) -> Matrix4 {
+        let mut result = Matrix4::new();
+        for i in 0..4 {
+            for j in 0..4 {
+                result.data[i][j] = other * self.data[i][j];
+            }
+        }
+        result
+    }
 }
