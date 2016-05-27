@@ -4,6 +4,5 @@ target
 Cargo.lock
 *.tmp
 *.swp
-exampledata.xy
-exampledata.xyz
-collect.xyz
+*.xy
+*.xyz

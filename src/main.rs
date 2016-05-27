@@ -169,6 +169,12 @@ fn main() {
                     println!("extrusionA : {}", extrusionA);
                     println!("extrusionB : {}", extrusionB);
 
+                    let mut f = File::create("extrusionA.xyz").expect("Could not create file");
+                    f.write_all(extrusionA.to_str().as_bytes()).expect("Could not write to file");
+
+                    let mut f = File::create("extrusionB.xyz").expect("Could not create file");
+                    f.write_all(extrusionB.to_str().as_bytes()).expect("Could not write to file");
+
                 }
             }
         }
