@@ -41,6 +41,12 @@ impl Matrix4Pipe {
     fn add_rotation(&mut self, radX: f64, radY: f64, radZ: f64) {
         self.mrotation = Matrix4::rotation(radX, radY, radZ);
     }
+    fn add_rotation_axis<P>(&mut self, axis: &P, rad: f64) -> bool where P: HasPosition3D {
+        match Matrix4::rotation_axis(axis, rad) {
+            None => return false,
+            Some(m) => { self.mrotation = m; return true; }
+        }
+    }
     fn remove_rotation(&mut self) {
         self.mrotation = Matrix4::new();
     }
