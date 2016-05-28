@@ -9,6 +9,7 @@ mod plane3D;
 mod pointCloud2D;
 mod pointCloud3D;
 mod matrix4;
+mod matrix4pipe;
 mod compressedPoint3D;
 mod compressedPointCloud3D;
 mod projectionToPlane;

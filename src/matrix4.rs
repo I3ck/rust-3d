@@ -7,7 +7,7 @@ pub struct Matrix4 {
 }
 
 impl Matrix4 {
-    fn new() -> Matrix4 {
+    pub fn new() -> Matrix4 {
         Matrix4{
             data: [
                 [1.0, 0.0, 0.0, 0.0],
@@ -17,7 +17,7 @@ impl Matrix4 {
             ]
         }
     }
-    fn zeroes() -> Matrix4 {
+    pub fn zeroes() -> Matrix4 {
         Matrix4{
             data: [
                 [0.0, 0.0, 0.0, 0.0],
@@ -27,7 +27,7 @@ impl Matrix4 {
             ]
         }
     }
-    fn translation(x: f64, y: f64, z: f64) -> Matrix4 {
+    pub fn translation(x: f64, y: f64, z: f64) -> Matrix4 {
         Matrix4{
             data: [
                 [1.0, 0.0, 0.0, x],
@@ -37,7 +37,7 @@ impl Matrix4 {
             ]
         }
     }
-    fn scale(x: f64, y: f64, z: f64) -> Matrix4 {
+    pub fn scale(x: f64, y: f64, z: f64) -> Matrix4 {
         Matrix4{
             data: [
                 [x,   0.0, 0.0, 0.0],
@@ -47,7 +47,7 @@ impl Matrix4 {
             ]
         }
     }
-    fn rotation(radX: f64, radY: f64, radZ: f64) -> Matrix4 {
+    pub fn rotation(radX: f64, radY: f64, radZ: f64) -> Matrix4 {
         let (mut mX, mut mY, mut mZ) = (Matrix4::new(), Matrix4::new(), Matrix4::new());
 
         mX.data[0][0] = 1.0;     mX.data[0][1] = 0.0;           mX.data[0][2] = 0.0;            mX.data[0][3] = 0.0;
@@ -67,7 +67,7 @@ impl Matrix4 {
 
         mX.multiplyM(&mY.multiplyM(&mZ))
     }
-    fn perspective(width: f64, height: f64, close: f64, away: f64, fovRad: f64) -> Matrix4 {
+    pub fn perspective(width: f64, height: f64, close: f64, away: f64, fovRad: f64) -> Matrix4 {
         let ratio = width/height;
         let range = close - away;
         let tanFovHalf = (fovRad/2.0).tan();
@@ -79,7 +79,7 @@ impl Matrix4 {
         result.data[3][0] = 0.0;                        result.data[3][1] = 0.0;               result.data[3][2] = 1.0;                      result.data[3][3] = 0.0;
         result
     }
-    fn look_at<P>(target: &P, up: &P) -> Option<Matrix4> where P: HasPosition3D { //@todo wont have to be an option once unitvector is defined whis is always l > 0 ( l == 1)
+    pub fn look_at<P>(target: &P, up: &P) -> Option<Matrix4> where P: HasPosition3D { //@todo wont have to be an option once unitvector is defined whis is always l > 0 ( l == 1)
       let N = match target.clone().normalized() {
           None => return None,
           Some(x) => x
@@ -108,7 +108,7 @@ impl Matrix4 {
 
 
 
-    fn multiplyM(&self, other: &Matrix4) -> Matrix4 {
+    pub fn multiplyM(&self, other: &Matrix4) -> Matrix4 {
         let mut result = Matrix4::new();
         for i in 0..4 {
             for j in 0..4 {
@@ -122,7 +122,7 @@ impl Matrix4 {
         result
     }
 
-    fn multiplyF(&self, other: f64) -> Matrix4 {
+    pub fn multiplyF(&self, other: f64) -> Matrix4 {
         let mut result = Matrix4::new();
         for i in 0..4 {
             for j in 0..4 {
