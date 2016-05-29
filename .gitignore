@@ -2,6 +2,9 @@ target
 Cargo.lock
 target
 Cargo.lock
+extrusionMesh.ply
+
+
 *.tmp
 *.swp
 *.xy

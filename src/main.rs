@@ -177,6 +177,44 @@ fn main() {
                     let mut f = File::create("extrusionB.xyz").expect("Could not create file");
                     f.write_all(extrusionB.to_str().as_bytes()).expect("Could not write to file");
 
+
+
+                    //testing .ply
+                    let mut f = File::create("extrusionMesh.ply").expect("Could not create file");
+
+                    let (lenA, lenB) = (extrusionA.len(), extrusionB.len());
+                    let nVertices = lenA + lenB;
+                    let nFaces = lenA + lenB - 2;
+
+                    let nVertexString = "element vertex ".to_string() + &nVertices.to_string() + "\n";
+                    let nFacesString = "element face ".to_string() + &nFaces.to_string() + "\n";
+
+
+                    f.write_all(b"ply\n");
+                    f.write_all(b"format ascii 1.0           { ascii/binary, format version number }\n");
+                    f.write_all(b"comment made by Greg Turk  { comments keyword specified, like all lines }\n");
+                    f.write_all(b"comment this file is a cube\n");
+                    f.write_all(nVertexString.as_bytes());
+                    f.write_all(b"property float x           { vertex contains float \"x\" coordinate }\n");
+                    f.write_all(b"property float y           { y coordinate is also a vertex property }\n");
+                    f.write_all(b"property float z           { z coordinate, too }\n");
+                    f.write_all(nFacesString.as_bytes());
+                    f.write_all(b"property list uchar int vertex_index { \"vertex_indices\" is a list of ints }\n");
+                    f.write_all(b"end_header                 { delimits the end of the header }\n");
+
+                    for p in extrusionA.data {
+                        f.write_all((p.to_str() + "\n").as_bytes());
+                    }
+                    for p in extrusionB.data {
+                        f.write_all((p.to_str() + "\n").as_bytes());
+                    }
+                    for i in 0..lenA-1 {
+                        f.write_all(("3 ".to_string() + &i.to_string() + " " + &(i+1).to_string() + " " + &(lenA+i).to_string() + "\n").as_bytes());
+                    }
+                    for i in 0..lenB-1 {
+                        f.write_all(("3 ".to_string() + &(lenB+i+1).to_string() + " " + &(lenB+i).to_string() + " " + &(i).to_string() + "\n").as_bytes());
+                    }
+
                 }
             }
         }
