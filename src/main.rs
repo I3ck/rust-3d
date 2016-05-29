@@ -183,8 +183,8 @@ fn main() {
                     let mut f = File::create("extrusionMesh.ply").expect("Could not create file");
 
                     let (lenA, lenB) = (extrusionA.len(), extrusionB.len());
-                    let nVertices = lenA + lenB;
-                    let nFaces = lenA + lenB - 2;
+                    let nVertices = lenA + lenB + 1;
+                    let nFaces = 2*(lenA-1) + 2*(lenB-1);
 
                     let nVertexString = "element vertex ".to_string() + &nVertices.to_string() + "\n";
                     let nFacesString = "element face ".to_string() + &nFaces.to_string() + "\n";
@@ -202,18 +202,34 @@ fn main() {
                     f.write_all(b"property list uchar int vertex_index { \"vertex_indices\" is a list of ints }\n");
                     f.write_all(b"end_header                 { delimits the end of the header }\n");
 
+                    //vertices of extrusionA
                     for p in extrusionA.data {
                         f.write_all((p.to_str() + "\n").as_bytes());
                     }
+                    //vertices of extrusionB
                     for p in extrusionB.data {
                         f.write_all((p.to_str() + "\n").as_bytes());
                     }
+                    f.write_all((Point3D::new().to_str() + "\n").as_bytes());
+                    //faces with base on extrusionA
                     for i in 0..lenA-1 {
                         f.write_all(("3 ".to_string() + &i.to_string() + " " + &(i+1).to_string() + " " + &(lenA+i).to_string() + "\n").as_bytes());
                     }
+                    //faces with base on extrusionB
                     for i in 0..lenB-1 {
                         f.write_all(("3 ".to_string() + &(lenB+i+1).to_string() + " " + &(lenB+i).to_string() + " " + &(i+1).to_string() + "\n").as_bytes());
                     }
+
+                    //END GENERAL MESHING PART
+                    //extrusionA to origin
+                    for i in 0..lenA-1 {
+                        f.write_all(("3 ".to_string() + &i.to_string() + " " + &(i+1).to_string() + " " + &(lenA+lenB).to_string() + "\n").as_bytes());
+                    }
+                    //extrusionB to origin
+                    for i in 0..lenB-1 {
+                        f.write_all(("3 ".to_string() + &(lenB+i).to_string() + " " + &(lenB+i+1).to_string() + " " + &(lenA+lenB).to_string() + "\n").as_bytes());
+                    }
+
 
                 }
             }
