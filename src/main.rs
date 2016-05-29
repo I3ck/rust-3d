@@ -29,6 +29,7 @@ use ocTree::{OcTree};
 use traits::{IsMoveable3D, HasPosition2D, HasPosition3D, IsTree3D, IsOcTree, IsKdTree3D};
 use functions::{extrude};
 
+use std::cmp::Ordering;
 
 //io
 use std::error::Error;
@@ -103,38 +104,38 @@ fn main() {
         Err(why) => panic!("couldn't read {}: {}", display,
                                                    Error::description(&why)),
         Ok(_) => {
-            print!("{} contains:\n{}", display, s);
+            //print!("{} contains:\n{}", display, s);
 
             match PointCloud3D::parse(String::from(s)) {
                 None => {
-                    println!("failed to parse pc data!");
+                    //println!("failed to parse pc data!");
                 },
                 Some(pc) => {
-                    println!("parsed len : {}", pc.len());
+                    //println!("parsed len : {}", pc.len());
 
                     let mut kdTree = KdTree::new();
                     kdTree.build(pc.clone());
-                    println!("kdTree.size() : {}", tree.size());
+                    //println!("kdTree.size() : {}", tree.size());
                     let nearestTen = kdTree.knearest(&Point3D{x: 9.0,y: 56.0,z: 0.0}, 10);
-                    println!("nearest ten to 9/56/0 : {}", nearestTen);
+                    //println!("nearest ten to 9/56/0 : {}", nearestTen);
 
                     let mut ocTree = OcTree::new();
                     ocTree.build(pc);
-                    println!("could create octree");
+                    //println!("could create octree");
 
-                    println!("ocTree.size() : {}", ocTree.size());
+                    //println!("ocTree.size() : {}", ocTree.size());
 
                     let collect0 = ocTree.collect(0);
-                    println!("collect 0 : {}", collect0);
+                    //println!("collect 0 : {}", collect0);
 
                     let collect1 = ocTree.collect(1);
-                    println!("collect 1 : {}", collect1);
+                    //println!("collect 1 : {}", collect1);
 
                     let collect2 = ocTree.collect(2);
-                    println!("collect 2 : {}", collect2);
+                    //println!("collect 2 : {}", collect2);
 
                     let collect = ocTree.collect(1);
-                    println!("collect: {}", collect);
+                    //println!("collect: {}", collect);
 
                     let mut f = File::create("collect.xyz").expect("Could not create file");
                     f.write_all(collect.to_str().as_bytes()).expect("Could not write to file");
@@ -157,19 +158,24 @@ fn main() {
         Err(why) => panic!("couldn't read {}: {}", display2,
                                                    Error::description(&why)),
         Ok(_) => {
-            print!("{} contains:\n{}", display2, s2);
+            //print!("{} contains:\n{}", display2, s2);
 
             match PointCloud2D::<Point2D>::parse(String::from(s2)) {
                 None => {
-                    println!("failed to parse pc data!");
+                    //println!("failed to parse pc data!");
                 },
                 Some(mut pc2) => {
-                    println!("parsed len : {}", pc2.len());
+                    //println!("parsed len : {}", pc2.len());
+                    let origin = *Point2D::new();
+                    pc2.data.sort_by(|ref a, ref b| { //@todo improve, really messy this way
+                        let c = (***a).clone();
+                        let d = (***b).clone();
+                    (origin.rad_to(&c)).partial_cmp(&origin.rad_to(&d)).unwrap_or(Ordering::Equal)
+                    });
 
                     let z = 54;
-                    let origin = *Point2D::new();
                     let mut pc3 = PointCloud2D::<Point2D>::new();
-                    let step = -2.0 * consts::PI / (z as f64);
+                    let step = 2.0 * consts::PI / (z as f64);
                     for i in 0..z {
                         let mut pcClone = pc2.clone();
                         for p in pcClone.data {
@@ -183,8 +189,8 @@ fn main() {
                     let extrustionDir = *Point3D::build(0.0, 0.0, 7.0);
                     let (extrusionA, extrusionB) = extrude::<Point2D, Point3D>(&pc2.data, &extrustionDir);
 
-                    println!("extrusionA : {}", extrusionA);
-                    println!("extrusionB : {}", extrusionB);
+                    //println!("extrusionA : {}", extrusionA);
+                    //println!("extrusionB : {}", extrusionB);
 
                     let mut f = File::create("extrusionA.xyz").expect("Could not create file");
                     f.write_all(extrusionA.to_str().as_bytes()).expect("Could not write to file");
@@ -228,21 +234,21 @@ fn main() {
                     f.write_all((Point3D::new().to_str() + "\n").as_bytes());
                     //faces with base on extrusionA
                     for i in 0..lenA-1 {
-                        f.write_all(("3 ".to_string() + &(i+1).to_string() + " " + &(i).to_string() + " " + &(lenA+i).to_string() + "\n").as_bytes());
+                        f.write_all(("3 ".to_string() + &(i).to_string() + " " + &(i+1).to_string() + " " + &(lenA+i).to_string() + "\n").as_bytes());
                     }
                     //faces with base on extrusionB
                     for i in 0..lenB-1 {
-                        f.write_all(("3 ".to_string() + &(lenB+i).to_string() + " " + &(lenB+i+1).to_string() + " " + &(i+1).to_string() + "\n").as_bytes());
+                        f.write_all(("3 ".to_string() + &(lenB+i+1).to_string() + " " + &(lenB+i).to_string() + " " + &(i+1).to_string() + "\n").as_bytes());
                     }
 
                     //END GENERAL MESHING PART
                     //extrusionA to origin
                     for i in 0..lenA-1 {
-                        f.write_all(("3 ".to_string() + &i.to_string() + " " + &(i+1).to_string() + " " + &(lenA+lenB).to_string() + "\n").as_bytes());
+                        f.write_all(("3 ".to_string() + &(i+1).to_string() + " " + &(i).to_string() + " " + &(lenA+lenB).to_string() + "\n").as_bytes());
                     }
                     //extrusionB to origin
                     for i in 0..lenB-1 {
-                        f.write_all(("3 ".to_string() + &(lenB+i+1).to_string() + " " + &(lenB+i).to_string() + " " + &(lenA+lenB).to_string() + "\n").as_bytes());
+                        f.write_all(("3 ".to_string() + &(lenB+i).to_string() + " " + &(lenB+i+1).to_string() + " " + &(lenA+lenB).to_string() + "\n").as_bytes());
                     }
 
 

@@ -113,6 +113,10 @@ pub trait HasPosition2D :  Eq + PartialEq + Ord + PartialOrd + Hash {
         self.set_y(newy);
     }
 
+    fn rad_to<P>(&self, other: &P) -> f64 where P: HasPosition2D {
+        (other.y() - self.y()).atan2(other.x() - self.x())
+    }
+
     fn to_str(&self) -> String {
         let sx: String = self.x().to_string();
         let sy: String = self.y().to_string();
