@@ -213,11 +213,11 @@ fn main() {
                     f.write_all((Point3D::new().to_str() + "\n").as_bytes());
                     //faces with base on extrusionA
                     for i in 0..lenA-1 {
-                        f.write_all(("3 ".to_string() + &i.to_string() + " " + &(i+1).to_string() + " " + &(lenA+i).to_string() + "\n").as_bytes());
+                        f.write_all(("3 ".to_string() + &(i+1).to_string() + " " + &(i).to_string() + " " + &(lenA+i).to_string() + "\n").as_bytes());
                     }
                     //faces with base on extrusionB
                     for i in 0..lenB-1 {
-                        f.write_all(("3 ".to_string() + &(lenB+i+1).to_string() + " " + &(lenB+i).to_string() + " " + &(i+1).to_string() + "\n").as_bytes());
+                        f.write_all(("3 ".to_string() + &(lenB+i).to_string() + " " + &(lenB+i+1).to_string() + " " + &(i+1).to_string() + "\n").as_bytes());
                     }
 
                     //END GENERAL MESHING PART
@@ -227,7 +227,7 @@ fn main() {
                     }
                     //extrusionB to origin
                     for i in 0..lenB-1 {
-                        f.write_all(("3 ".to_string() + &(lenB+i).to_string() + " " + &(lenB+i+1).to_string() + " " + &(lenA+lenB).to_string() + "\n").as_bytes());
+                        f.write_all(("3 ".to_string() + &(lenB+i+1).to_string() + " " + &(lenB+i).to_string() + " " + &(lenA+lenB).to_string() + "\n").as_bytes());
                     }
 
 
