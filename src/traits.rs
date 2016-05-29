@@ -10,11 +10,11 @@ use self::core::str::FromStr;
 use std::hash::{Hash};
 
 //@todo point and pc also as trait
-pub trait IsMoveable2D {
+pub trait IsMoveable2D { //@todo remove trait and impl in HasPosition2D
     fn move_by(&mut self, x: f64, y: f64);
 }
 
-pub trait IsMoveable3D {
+pub trait IsMoveable3D { //@todo remove trait and impl in HasPosition2D
     fn move_by(&mut self, x: f64, y: f64, z: f64);
 }
 
@@ -44,7 +44,7 @@ pub trait IsPlane3D<P> where P: HasPosition3D {
     fn set_length_dir(&mut self, length_dir: P);
 }
 
-pub trait HasPosition2D : Eq + PartialEq + Ord + PartialOrd + Hash {
+pub trait HasPosition2D :  Eq + PartialEq + Ord + PartialOrd + Hash {
     fn new() -> Box<Self>;
     fn build(x: f64, y: f64) -> Box<Self>; //@todo can be implemented here
     fn x(&self) -> f64;
@@ -103,6 +103,14 @@ pub trait HasPosition2D : Eq + PartialEq + Ord + PartialOrd + Hash {
         else {
             Some(Self::build(self.x() / l, self.y() / l))
         }
+    }
+
+    fn rotate<P>(&mut self, rad: f64, center: &P) where P: HasPosition2D {
+        let newx = center.x() + rad.cos() * (self.x() - center.x()) - rad.sin() * (self.y() - center.y());
+        let newy = center.y() + rad.sin() * (self.x() - center.x()) + rad.cos() * (self.y() - center.y());
+
+        self.set_x(newx);
+        self.set_y(newy);
     }
 
     fn to_str(&self) -> String {
