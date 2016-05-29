@@ -212,7 +212,7 @@ fn main() {
                         f.write_all(("3 ".to_string() + &i.to_string() + " " + &(i+1).to_string() + " " + &(lenA+i).to_string() + "\n").as_bytes());
                     }
                     for i in 0..lenB-1 {
-                        f.write_all(("3 ".to_string() + &(lenB+i+1).to_string() + " " + &(lenB+i).to_string() + " " + &(i).to_string() + "\n").as_bytes());
+                        f.write_all(("3 ".to_string() + &(lenB+i+1).to_string() + " " + &(lenB+i).to_string() + " " + &(i+1).to_string() + "\n").as_bytes());
                     }
 
                 }
