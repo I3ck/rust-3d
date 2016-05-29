@@ -1,4 +1,5 @@
 use std::fmt;
+use std::f64::consts;
 
 
 mod traits;
@@ -162,8 +163,22 @@ fn main() {
                 None => {
                     println!("failed to parse pc data!");
                 },
-                Some(pc2) => {
+                Some(mut pc2) => {
                     println!("parsed len : {}", pc2.len());
+
+                    let z = 54;
+                    let origin = *Point2D::new();
+                    let mut pc3 = PointCloud2D::<Point2D>::new();
+                    let step = -2.0 * consts::PI / (z as f64);
+                    for i in 0..z {
+                        let mut pcClone = pc2.clone();
+                        for p in pcClone.data {
+                            let mut clone = p.clone();
+                            clone.rotate((i as f64) * step, &origin);
+                            pc3.push(clone);
+                        }
+                    }
+                    pc2 = pc3;
 
                     let extrustionDir = *Point3D::build(0.0, 0.0, 7.0);
                     let (extrusionA, extrusionB) = extrude::<Point2D, Point3D>(&pc2.data, &extrustionDir);
