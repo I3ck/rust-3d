@@ -35,13 +35,11 @@ pub trait IsProjectionToPlane<P2,P3> where P2: HasPosition2D + TransFormableTo3D
 
 pub trait IsPlane3D<P> where P: HasPosition3D {
     fn new() -> Box<Self>;
-    fn build(origin: P, normal: P, length_dir: P) -> Box<Self>; //@todo can be implemented here
+    fn build(origin: P, u: P, v: P) -> Box<Self>;
     fn origin(&self) -> P;
-    fn set_origin(&mut self, origin: P);
-    fn normal(&self) -> P;
-    fn set_normal(&mut self, normal: P);
-    fn length_dir(&self) -> P;
-    fn set_length_dir(&mut self, length_dir: P);
+    fn u(&self) -> P; //@todo udir
+    fn v(&self) -> P; //@todo udir
+    //@todo implement normal here
 }
 
 pub trait HasPosition2D :  Eq + PartialEq + Ord + PartialOrd + Hash {

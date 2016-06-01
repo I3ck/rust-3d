@@ -5,7 +5,7 @@ use point3D::{Point3D};
 use pointCloud2D::{PointCloud2D};
 use pointCloud3D::{PointCloud3D};
 use ocNode::{Direction};
-use traits::{HasPosition2D, HasPosition3D, TransFormableTo3D, IsPlane3D, IsMoveable3D};
+use traits::{HasPosition2D, HasPosition3D, TransFormableTo2D, TransFormableTo3D, IsPlane3D, IsMoveable3D};
 
 pub fn center<P>(p1: &P, p2: &P, res: &mut P) where P: HasPosition3D {
     res.set_x(p1.x() + (p2.x() - p1.x()) / 2.0);
@@ -138,14 +138,12 @@ pub fn conn<P>(pFrom: &P, pTo: &P) -> P where P: HasPosition3D
     )
 }
 
-pub fn project_point_on_plane<PL, P>(plane: &PL, point: &P) -> P where PL: IsPlane3D<P>, P: HasPosition3D {
-    let v = conn(&plane.origin(), point);
-    let n = plane.normal();
-    //@todo n should be normalized, or plane should ensure this (maybe add some normalized type)
-    let scale = v.dot(&n);
-    let mut scaledNormal = n.clone();
-    scaledNormal.scale(scale);
-    let mut result = point.clone();
-    result.substract(&scaledNormal);
-    return result;
+pub fn project_point_on_plane<PL, P2, P3>(plane: &PL, point: &P3) -> P2 where PL: IsPlane3D<P3>, P2: HasPosition2D, P3: HasPosition3D + TransFormableTo2D {
+    let relative = conn(&plane.origin(), point);
+    let mut p2d = point.transform_to_2D::<P2>();
+
+    p2d.set_x(plane.u().dot(&relative));
+    p2d.set_y(plane.v().dot(&relative));
+
+    p2d
 }
