@@ -6,6 +6,8 @@ mod traits;
 mod functions;
 mod point2D;
 mod point3D;
+mod norm2D;
+mod norm3D;
 mod plane3D;
 mod pointCloud2D;
 mod pointCloud3D;

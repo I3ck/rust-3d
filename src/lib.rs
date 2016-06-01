@@ -5,6 +5,8 @@ mod point3D;
 mod plane3D;
 mod pointCloud2D;
 mod pointCloud3D;
+mod norm2D;
+mod norm3D;
 mod matrix4;
 mod matrix4pipe;
 mod compressedPoint3D;

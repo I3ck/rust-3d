@@ -156,6 +156,19 @@ pub trait TransFormableTo2D : HasPosition3D {
     fn transform_to_2D<P>(&self) -> P where P: HasPosition2D;
 }
 
+pub trait IsNormalized3D {
+    fn new<P>(p: P) -> Option<Box<Self>> where P: HasPosition3D;
+    fn x(&self) -> f64;
+    fn y(&self) -> f64;
+    fn z(&self) -> f64;
+}
+
+pub trait IsNormalized2D {
+    fn new<P>(p: P) -> Option<Box<Self>> where P: HasPosition2D;
+    fn x(&self) -> f64;
+    fn y(&self) -> f64;
+}
+
 pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
     fn new() -> Box<Self>;
     fn build(x: f64, y: f64, z: f64) -> Box<Self>; //@todo can be implemented here
