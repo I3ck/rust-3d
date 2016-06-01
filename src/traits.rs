@@ -23,23 +23,22 @@ pub trait IsMoveable3D { //@todo remove trait and impl in HasPosition2D
 //@todo better method names
 //@todo maybe implement projection methods within the pc
 //@todo transformable traits required later on?
-pub trait IsProjectionToPlane<P2,P3> where P2: HasPosition2D + TransFormableTo3D, P3: HasPosition3D + TransFormableTo2D {
-    fn from_2d<PL>(plane: PL, pc: PointCloud2D<P2>) -> Box<Self> where PL: IsPlane3D<P3>; //places 2d pc on plane, assuming plane 0/0 == pc2d 0/0
-    fn from_3d<PL>(plane: PL, pc: PointCloud3D<P3>) -> Box<Self> where PL: IsPlane3D<P3>; //projects 3d pc onto plane from global coords
+pub trait IsProjectionToPlane<P2,P3,N> where P2: HasPosition2D + TransFormableTo3D, P3: HasPosition3D + TransFormableTo2D, N: IsNormalized3D {
+    fn from_2d<PL>(plane: PL, pc: PointCloud2D<P2>) -> Box<Self> where PL: IsPlane3D<P3,N>; //places 2d pc on plane, assuming plane 0/0 == pc2d 0/0
+    fn from_3d<PL>(plane: PL, pc: PointCloud3D<P3>) -> Box<Self> where PL: IsPlane3D<P3,N>; //projects 3d pc onto plane from global coords
     fn projected_pointcloud_3d_global(&self) -> PointCloud3D<P3>;
-    fn plane<PL>(&self) -> PL where PL: IsPlane3D<P3>;
+    fn plane<PL>(&self) -> PL where PL: IsPlane3D<P3,N>;
     fn projected_pointcloud_2d_local(&self) -> PointCloud2D<P2>;
     //@todo add overload which lets one set the layer count?
     fn extrude(&self, distance: f64) -> (PointCloud3D<P3>, PointCloud3D<P3>); //@todo fst = on plane, snd within dist (maybe add data type for this)
 }
 
-pub trait IsPlane3D<P> where P: HasPosition3D {
+pub trait IsPlane3D<P,N> where P: HasPosition3D, N: IsNormalized3D {
     fn new() -> Box<Self>;
-    fn build(origin: P, u: P, v: P) -> Box<Self>;
+    fn build(origin: P, u: N, v: N) -> Box<Self>;
     fn origin(&self) -> P;
-    fn u(&self) -> P; //@todo udir
-    fn v(&self) -> P; //@todo udir
-    //@todo implement normal here
+    fn u(&self) -> N;
+    fn v(&self) -> N;
 }
 
 pub trait HasPosition2D :  Eq + PartialEq + Ord + PartialOrd + Hash {
@@ -158,6 +157,9 @@ pub trait TransFormableTo2D : HasPosition3D {
 
 pub trait IsNormalized3D {
     fn new<P>(p: P) -> Option<Box<Self>> where P: HasPosition3D;
+    fn norm_x() -> Self;
+    fn norm_y() -> Self;
+    fn norm_z() -> Self;
     fn x(&self) -> f64;
     fn y(&self) -> f64;
     fn z(&self) -> f64;
@@ -165,9 +167,14 @@ pub trait IsNormalized3D {
 
 pub trait IsNormalized2D {
     fn new<P>(p: P) -> Option<Box<Self>> where P: HasPosition2D;
+    fn norm_x() -> Self;
+    fn norm_y() -> Self;
     fn x(&self) -> f64;
     fn y(&self) -> f64;
 }
+//@todo split HasPositionxD into reading and writing parts
+//@todo this way NormalizedxD can be of this type and be used
+//@todo in way more cases
 
 pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
     fn new() -> Box<Self>;

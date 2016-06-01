@@ -17,6 +17,27 @@ impl IsNormalized3D for Norm3D {
             }))
         }
     }
+    fn norm_x() -> Self {
+        Norm3D {
+            x: 1.0,
+            y: 0.0,
+            z: 0.0
+        }
+    }
+    fn norm_y() -> Self {
+        Norm3D {
+            x: 0.0,
+            y: 1.0,
+            z: 0.0
+        }
+    }
+    fn norm_z() -> Self {
+        Norm3D {
+            x: 0.0,
+            y: 0.0,
+            z: 1.0
+        }
+    }
     fn x(&self) -> f64 {
         self.x
     }

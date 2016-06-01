@@ -15,6 +15,18 @@ impl IsNormalized2D for Norm2D {
             }))
         }
     }
+    fn norm_x() -> Self {
+        Norm2D {
+            x: 1.0,
+            y: 0.0
+        }
+    }
+    fn norm_y() -> Self {
+        Norm2D {
+            x: 0.0,
+            y: 1.0
+        }
+    }
     fn x(&self) -> f64 {
         self.x
     }

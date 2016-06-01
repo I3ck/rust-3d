@@ -1,24 +1,24 @@
 use point3D::Point3D;
 
-use traits::{IsPlane3D, HasPosition3D};
+use traits::{IsPlane3D, HasPosition3D, IsNormalized3D};
 
-pub struct Plane3D<P> where P: HasPosition3D {
+pub struct Plane3D<P,N> where P: HasPosition3D, N: IsNormalized3D {
     pub origin: P,
-    pub u: P,
-    pub v: P
+    pub u: N,
+    pub v: N
 }
 
 
-impl<P> IsPlane3D<P> for Plane3D<P> where P: HasPosition3D {
+impl<P,N> IsPlane3D<P,N> for Plane3D<P,N> where P: HasPosition3D, N: IsNormalized3D {
     fn new() -> Box<Self> {
         Box::new(Plane3D {
             origin: *P::build(0.0, 0.0, 0.0),
-            u: *P::build(1.0, 0.0, 0.0),
-            v: *P::build(0.0, 1.0, 0.0)
+            u: N::norm_x(),
+            v: N::norm_y()
         })
     }
 
-    fn build(origin: P, u: P, v: P) -> Box<Self> {
+    fn build(origin: P, u: N, v: N) -> Box<Self> {
         Box::new(Plane3D {
             origin: origin,
             u: u,
@@ -30,11 +30,11 @@ impl<P> IsPlane3D<P> for Plane3D<P> where P: HasPosition3D {
         self.origin.clone()
     }
 
-    fn u(&self) -> P {
+    fn u(&self) -> N {
         self.u.clone()
     }
 
-    fn v(&self) -> P {
+    fn v(&self) -> N {
         self.v.clone()
     }
 }
