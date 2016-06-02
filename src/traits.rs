@@ -18,6 +18,8 @@ pub trait IsMoveable3D { //@todo remove trait and impl in HasPosition2D
     fn move_by(&mut self, x: f64, y: f64, z: f64);
 }
 
+///@todo parse could be moved to non-editable traits, but cant be implemented there?
+
 ///@todo split into several files
 //@todo finish trait and add implementation
 //@todo better method names
@@ -43,16 +45,51 @@ pub trait IsPlane3D<P,N> where P: HasPosition3D, N: IsNormalized3D {
 
 pub trait HasPosition2D :  Eq + PartialEq + Ord + PartialOrd + Hash {
     fn new() -> Box<Self>;
-    fn build(x: f64, y: f64) -> Box<Self>; //@todo can be implemented here
+    fn build(x: f64, y: f64) -> Option<Box<Self>>;
     fn x(&self) -> f64;
     fn y(&self) -> f64;
-    fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable3D? Or remove moveable trait
-    fn set_y(&mut self, val: f64);
     fn clone(&self) -> Self;
 
     fn pos(&self) -> (f64, f64) {
         ( self.x(), self.y() )
     }
+
+    fn dot<P>(&self, other: &P) -> f64 where P: HasPosition2D {
+        self.x() * other.x() + self.y() * other.y()
+    }
+
+    fn cross<P>(&self, other: &P) -> f64 where P: HasPosition2D {
+        self.x() * other.y() - self.y() * other.x()
+    }
+
+    fn abs(&self) -> f64 {
+        (self.x()).powi(2) + (self.y()).powi(2)
+    }
+
+    fn normalized(&self) -> Option<Box<Self>> {
+        let l = self.abs();
+        if l <= 0.0 {
+            None
+        }
+        else {
+            Self::build(self.x() / l, self.y() / l)
+        }
+    }
+
+    fn rad_to<P>(&self, other: &P) -> f64 where P: HasPosition2D {
+        (other.y() - self.y()).atan2(other.x() - self.x())
+    }
+
+    fn to_str(&self) -> String {
+        let sx: String = self.x().to_string();
+        let sy: String = self.y().to_string();
+
+        sx + " " + &sy
+    }
+}
+pub trait HasEditablePosition2D : HasPosition2D {
+    fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable3D? Or remove moveable trait
+    fn set_y(&mut self, val: f64);
 
     fn set_pos(&mut self, x: f64, y: f64) {
         self.set_x(x);
@@ -80,45 +117,12 @@ pub trait HasPosition2D :  Eq + PartialEq + Ord + PartialOrd + Hash {
         self.set_y(y);
     }
 
-    fn dot<P>(&self, other: &P) -> f64 where P: HasPosition2D {
-        self.x() * other.x() + self.y() * other.y()
-    }
-
-    fn cross<P>(&self, other: &P) -> f64 where P: HasPosition2D {
-        self.x() * other.y() - self.y() * other.x()
-    }
-
-    fn abs(&self) -> f64 {
-        (self.x()).powi(2) + (self.y()).powi(2)
-    }
-
-    fn normalized(&self) -> Option<Box<Self>> {
-        let l = self.abs();
-        if l <= 0.0 {
-            None
-        }
-        else {
-            Some(Self::build(self.x() / l, self.y() / l))
-        }
-    }
-
     fn rotate<P>(&mut self, rad: f64, center: &P) where P: HasPosition2D {
         let newx = center.x() + rad.cos() * (self.x() - center.x()) - rad.sin() * (self.y() - center.y());
         let newy = center.y() + rad.sin() * (self.x() - center.x()) + rad.cos() * (self.y() - center.y());
 
         self.set_x(newx);
         self.set_y(newy);
-    }
-
-    fn rad_to<P>(&self, other: &P) -> f64 where P: HasPosition2D {
-        (other.y() - self.y()).atan2(other.x() - self.x())
-    }
-
-    fn to_str(&self) -> String {
-        let sx: String = self.x().to_string();
-        let sy: String = self.y().to_string();
-
-        sx + " " + &sy
     }
 
     fn parse(text: String) -> Option<Box<Self>> {
@@ -155,7 +159,7 @@ pub trait TransFormableTo2D : HasPosition3D {
     fn transform_to_2D<P>(&self) -> P where P: HasPosition2D;
 }
 
-pub trait IsNormalized3D {
+pub trait IsNormalized3D : HasPosition3D {
     fn new<P>(p: P) -> Option<Box<Self>> where P: HasPosition3D;
     fn norm_x() -> Self;
     fn norm_y() -> Self;
@@ -165,7 +169,7 @@ pub trait IsNormalized3D {
     fn z(&self) -> f64;
 }
 
-pub trait IsNormalized2D {
+pub trait IsNormalized2D : HasPosition2D{
     fn new<P>(p: P) -> Option<Box<Self>> where P: HasPosition2D;
     fn norm_x() -> Self;
     fn norm_y() -> Self;
@@ -178,18 +182,74 @@ pub trait IsNormalized2D {
 
 pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
     fn new() -> Box<Self>;
-    fn build(x: f64, y: f64, z: f64) -> Box<Self>; //@todo can be implemented here
+    fn build(x: f64, y: f64, z: f64) -> Option<Box<Self>>;
     fn x(&self) -> f64;
     fn y(&self) -> f64;
     fn z(&self) -> f64;
-    fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable3D? Or remove moveable trait
-    fn set_y(&mut self, val: f64);
-    fn set_z(&mut self, val: f64);
     fn clone(&self) -> Self;
 
     fn pos(&self) -> (f64, f64, f64) {
         ( self.x(), self.y(), self.z() )
     }
+
+    fn dot<P>(&self, other: &P) -> f64 where P: HasPosition3D {
+        self.x() * other.x() + self.y() * other.y() + self.z() * other.z()
+    }
+
+    fn cross<P>(&self, other: &P) -> Box<Self> where P: HasPosition3D {
+        let x = self.y() * other.z() - self.z() * other.y();
+        let y = self.z() * other.x() - self.x() * other.z();
+        let z = self.x() * other.y() - self.y() * other.x();
+        Self::build(x, y, z)
+    }
+
+    fn abs(&self) -> f64 {
+        (self.x()).powi(2) + (self.y()).powi(2) + (self.z()).powi(2)
+    }
+
+    //@todo return new or alter self???
+    fn multiplyM(&self, m: &Matrix4) -> Box<Self> {
+        let mut result = Self::new();
+        for i in 0..4 {
+            for j in 0..4 {
+                let addition = match j {
+                    0 => m.data[i][j] * self.x(),
+                    1 => m.data[i][j] * self.y(),
+                    _ => m.data[i][j] * self.z()
+                };
+                match i {
+                    0 => {let newx = result.x() + addition; result.set_x(newx);},
+                    1 => {let newy = result.y() + addition; result.set_y(newy);},
+                    _ => {let newz = result.z() + addition; result.set_z(newz);},
+                }
+            }
+        }
+        result
+    }
+
+    fn normalized(&self) -> Option<Box<Self>> {
+        let l = self.abs();
+        if l <= 0.0 {
+            None
+        }
+        else {
+            Self::build(self.x() / l, self.y() / l, self.z() / l)
+        }
+    }
+
+    fn to_str(&self) -> String {
+        let sx: String = self.x().to_string();
+        let sy: String = self.y().to_string();
+        let sz: String = self.z().to_string();
+
+        sx + " " + &sy + " " + &sz
+    }
+}
+
+pub trait HasEditablePosition3D : HasPosition3D {
+    fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable3D? Or remove moveable trait
+    fn set_y(&mut self, val: f64);
+    fn set_z(&mut self, val: f64);
 
     fn set_pos(&mut self, x: f64, y: f64, z: f64) {
         self.set_x(x);
@@ -224,39 +284,6 @@ pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
         self.set_z(z);
     }
 
-    fn dot<P>(&self, other: &P) -> f64 where P: HasPosition3D {
-        self.x() * other.x() + self.y() * other.y() + self.z() * other.z()
-    }
-
-    fn cross<P>(&self, other: &P) -> Box<Self> where P: HasPosition3D {
-        let x = self.y() * other.z() - self.z() * other.y();
-        let y = self.z() * other.x() - self.x() * other.z();
-        let z = self.x() * other.y() - self.y() * other.x();
-        Self::build(x, y, z)
-    }
-
-    fn abs(&self) -> f64 {
-        (self.x()).powi(2) + (self.y()).powi(2) + (self.z()).powi(2)
-    }
-
-    fn normalized(&self) -> Option<Box<Self>> {
-        let l = self.abs();
-        if l <= 0.0 {
-            None
-        }
-        else {
-            Some(Self::build(self.x() / l, self.y() / l, self.z() / l))
-        }
-    }
-
-    fn to_str(&self) -> String {
-        let sx: String = self.x().to_string();
-        let sy: String = self.y().to_string();
-        let sz: String = self.z().to_string();
-
-        sx + " " + &sy + " " + &sz
-    }
-
     fn parse(text: String) -> Option<Box<Self>> {
         let split = text.split(" ");
         let words = split.collect::<Vec<&str>>();
@@ -279,25 +306,6 @@ pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
             },
             _ => None
         }
-    }
-    //@todo return new or alter self???
-    fn multiplyM(&self, m: &Matrix4) -> Box<Self> {
-        let mut result = Self::new();
-        for i in 0..4 {
-            for j in 0..4 {
-                let addition = match j {
-                    0 => m.data[i][j] * self.x(),
-                    1 => m.data[i][j] * self.y(),
-                    _ => m.data[i][j] * self.z()
-                };
-                match i {
-                    0 => {let newx = result.x() + addition; result.set_x(newx);},
-                    1 => {let newy = result.y() + addition; result.set_y(newy);},
-                    _ => {let newz = result.z() + addition; result.set_z(newz);},
-                }
-            }
-        }
-        result
     }
 }
 

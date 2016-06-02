@@ -1,8 +1,56 @@
-use traits::{IsNormalized2D, HasPosition2D};
+use std::cmp::{Eq, Ordering};
+use std::hash::{Hash, Hasher};
 
+use point2D::Point2D;
+use traits::{IsNormalized2D, HasPosition2D};
+use functions::{sqr_dist2D};
+
+#[derive (PartialEq, PartialOrd)]
 pub struct Norm2D {
     pub x: f64,
     pub y: f64
+}
+
+impl Eq for Norm2D {}
+impl Ord for Norm2D {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let origin = *Point2D::new();
+        sqr_dist2D(&origin, self).partial_cmp(&sqr_dist2D(&origin, other)).unwrap_or(Ordering::Equal)
+    }
+}
+
+impl Hash for Norm2D { //@todo poor precision this way
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        (self.x as u64).hash(state);
+        (self.y as u64).hash(state);
+    }
+}
+
+impl HasPosition2D for Norm2D {
+    fn new() -> Box<Self> {
+        Box::new(Norm2D {x: 1.0, y: 0.0})
+    }
+
+    fn build(x: f64, y: f64) -> Option<Box<Self>> {
+        let l = (x*x + y*y).sqrt();
+        match l {
+            0.0 => None,
+            l => Some(Box::new(Norm2D {
+                x: x / l,
+                y: y / l,
+            }))
+        }
+    }
+    fn x(&self) -> f64 {
+        self.x
+    }
+    fn y(&self) -> f64 {
+        self.y
+    }
+
+    fn clone(&self) -> Norm2D {
+        Norm2D { x: self.x, y: self.y }
+    }
 }
 
 impl IsNormalized2D for Norm2D {
