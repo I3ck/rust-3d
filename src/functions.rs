@@ -5,7 +5,7 @@ use point3D::{Point3D};
 use pointCloud2D::{PointCloud2D};
 use pointCloud3D::{PointCloud3D};
 use ocNode::{Direction};
-use traits::{HasPosition2D, HasPosition3D, HasEditablePosition2D, HasEditablePosition3D, TransFormableTo2D, TransFormableTo3D, IsPlane3D, IsNormalized3D, IsMoveable3D};
+use traits::{Is2D, Is3D, HasPosition2D, HasPosition3D, HasEditablePosition2D, HasEditablePosition3D, TransFormableTo2D, TransFormableTo3D, IsPlane3D, IsNormalized3D, IsMoveable3D};
 
 pub fn center<P>(p1: &P, p2: &P) -> Box<P> where P: HasPosition3D {
     P::build(
@@ -147,6 +147,6 @@ pub fn project_point_on_plane<PL,P2,P3,N>(plane: &PL, point: &P3) -> P2 where PL
     tmp.set_x(plane.u().dot(&relative));
     tmp.set_y(plane.v().dot(&relative));
 
-    p2transf.from(tmp);
+    p2transf.from(*tmp);
     p2transf
 }

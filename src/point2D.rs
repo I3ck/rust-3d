@@ -4,7 +4,7 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 
-use traits::{IsMoveable2D, HasPosition2D, HasEditablePosition2D, HasPosition3D, TransFormableTo3D};
+use traits::{Is2D, IsMoveable2D, HasPosition2D, HasEditablePosition2D, HasPosition3D, TransFormableTo3D};
 use functions::{sqr_dist2D};
 
 #[derive (PartialEq, PartialOrd)]
@@ -35,6 +35,18 @@ impl IsMoveable2D for Point2D {
     }
 }
 
+impl Is2D for Point2D {
+    fn x(&self) -> f64 {
+        self.x
+    }
+    fn y(&self) -> f64 {
+        self.y
+    }
+    fn clone(&self) -> Point2D {
+        Point2D { x: self.x, y: self.y }
+    }
+}
+
 impl HasPosition2D for Point2D {
     fn new() -> Box<Self> {
         Box::new(Point2D{x: 0.0, y: 0.0})
@@ -42,17 +54,6 @@ impl HasPosition2D for Point2D {
 
     fn build(x: f64, y: f64) -> Box<Self> {
         Box::new(Point2D{x: x, y: y})
-    }
-
-    fn x(&self) -> f64 {
-        self.x
-    }
-    fn y(&self) -> f64 {
-        self.y
-    }
-
-    fn clone(&self) -> Point2D {
-        Point2D { x: self.x, y: self.y }
     }
 
     fn from<P>(&mut self, other: P) where P: HasPosition2D {

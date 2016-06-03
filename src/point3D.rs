@@ -5,7 +5,7 @@ use std::hash::{Hash, Hasher};
 
 
 
-use traits::{IsMoveable3D, HasPosition2D, HasPosition3D, HasEditablePosition3D, TransFormableTo2D};
+use traits::{Is3D, IsMoveable3D, HasPosition2D, HasPosition3D, HasEditablePosition3D, TransFormableTo2D};
 use functions::{sqr_dist3D};
 
 #[derive (PartialEq, PartialOrd)]
@@ -39,15 +39,7 @@ impl IsMoveable3D for Point3D {
     }
 }
 
-impl HasPosition3D for Point3D {
-    fn new() -> Box<Self> {
-        Box::new(Point3D{x: 0.0, y: 0.0, z: 0.0})
-    }
-
-    fn build(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(Point3D{x: x, y: y, z: z})
-    }
-
+impl Is3D for Point3D {
     fn x(&self) -> f64 {
         self.x
     }
@@ -57,9 +49,18 @@ impl HasPosition3D for Point3D {
     fn z(&self) -> f64 {
         self.z
     }
-
     fn clone(&self) -> Point3D {
         Point3D { x: self.x, y: self.y, z: self.z }
+    }
+}
+
+impl HasPosition3D for Point3D {
+    fn new() -> Box<Self> {
+        Box::new(Point3D{x: 0.0, y: 0.0, z: 0.0})
+    }
+
+    fn build(x: f64, y: f64, z: f64) -> Box<Self> {
+        Box::new(Point3D{x: x, y: y, z: z})
     }
 
     fn from<P>(&mut self, other: P) where P: HasPosition3D {

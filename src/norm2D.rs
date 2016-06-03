@@ -2,7 +2,7 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 use point2D::Point2D;
-use traits::{IsNormalized2D, HasPosition2D};
+use traits::{Is2D, IsNormalized2D, HasPosition2D};
 use functions::{sqr_dist2D};
 
 #[derive (PartialEq, PartialOrd)]
@@ -23,6 +23,21 @@ impl Hash for Norm2D { //@todo poor precision this way
     fn hash<H: Hasher>(&self, state: &mut H) {
         (self.x as u64).hash(state);
         (self.y as u64).hash(state);
+    }
+}
+
+impl Is2D for Norm2D {
+    fn x(&self) -> f64 {
+        self.x
+    }
+    fn y(&self) -> f64 {
+        self.y
+    }
+    fn clone(&self) -> Self {
+        Norm2D {
+            x: self.x,
+            y: self.y
+        }
     }
 }
 
@@ -47,11 +62,5 @@ impl IsNormalized2D for Norm2D {
             x: 0.0,
             y: 1.0
         }
-    }
-    fn x(&self) -> f64 {
-        self.x
-    }
-    fn y(&self) -> f64 {
-        self.y
     }
 }

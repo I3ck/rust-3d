@@ -2,7 +2,7 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 use point3D::Point3D;
-use traits::{IsNormalized3D, HasPosition3D};
+use traits::{Is3D, IsNormalized3D, HasPosition3D};
 use functions::{sqr_dist3D};
 
 #[derive (PartialEq, PartialOrd)]
@@ -25,6 +25,25 @@ impl Hash for Norm3D { //@todo poor precision this way
         (self.x as u64).hash(state);
         (self.y as u64).hash(state);
         (self.z as u64).hash(state);
+    }
+}
+
+impl Is3D for Norm3D {
+    fn x(&self) -> f64 {
+        self.x
+    }
+    fn y(&self) -> f64 {
+        self.y
+    }
+    fn z(&self) -> f64 {
+        self.z
+    }
+    fn clone(&self) -> Self {
+        Norm3D {
+            x: self.x,
+            y: self.y,
+            z: self.z
+        }
     }
 }
 
@@ -59,14 +78,5 @@ impl IsNormalized3D for Norm3D {
             y: 0.0,
             z: 1.0
         }
-    }
-    fn x(&self) -> f64 {
-        self.x
-    }
-    fn y(&self) -> f64 {
-        self.y
-    }
-    fn z(&self) -> f64 {
-        self.z
     }
 }
