@@ -26,33 +26,6 @@ impl Hash for Norm2D { //@todo poor precision this way
     }
 }
 
-impl HasPosition2D for Norm2D {
-    fn new() -> Box<Self> {
-        Box::new(Norm2D {x: 1.0, y: 0.0})
-    }
-
-    fn build(x: f64, y: f64) -> Option<Box<Self>> {
-        let l = (x*x + y*y).sqrt();
-        match l {
-            0.0 => None,
-            l => Some(Box::new(Norm2D {
-                x: x / l,
-                y: y / l,
-            }))
-        }
-    }
-    fn x(&self) -> f64 {
-        self.x
-    }
-    fn y(&self) -> f64 {
-        self.y
-    }
-
-    fn clone(&self) -> Norm2D {
-        Norm2D { x: self.x, y: self.y }
-    }
-}
-
 impl IsNormalized2D for Norm2D {
     fn new<P>(p: P) -> Option<Box<Self>> where P: HasPosition2D {
         match p.abs() {

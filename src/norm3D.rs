@@ -28,37 +28,6 @@ impl Hash for Norm3D { //@todo poor precision this way
     }
 }
 
-impl HasPosition3D for Norm3D {
-    fn new() -> Box<Self> {
-        Box::new(Norm3D {x: 1.0, y: 0.0, z: 0.0})
-    }
-    fn build(x: f64, y: f64, z: f64) -> Option<Box<Self>> {
-        let l = (x*x + y*y + z*z).sqrt();
-        match l {
-            0.0 => None,
-            l => Some(Box::new(Norm3D {
-                x: x / l,
-                y: y / l,
-                z: z / l,
-            }))
-        }
-    }
-
-    fn x(&self) -> f64 {
-        self.x
-    }
-    fn y(&self) -> f64 {
-        self.y
-    }
-    fn z(&self) -> f64 {
-        self.z
-    }
-
-    fn clone(&self) -> Norm3D {
-        Norm3D { x: self.x, y: self.y, z: self.z }
-    }
-}
-
 impl IsNormalized3D for Norm3D {
     fn new<P>(p: P) -> Option<Box<Self>> where P: HasPosition3D {
         match p.abs() {

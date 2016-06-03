@@ -5,12 +5,14 @@ use point3D::{Point3D};
 use pointCloud2D::{PointCloud2D};
 use pointCloud3D::{PointCloud3D};
 use ocNode::{Direction};
-use traits::{HasPosition2D, HasPosition3D, TransFormableTo2D, TransFormableTo3D, IsPlane3D, IsNormalized3D, IsMoveable3D};
+use traits::{HasPosition2D, HasPosition3D, HasEditablePosition2D, HasEditablePosition3D, TransFormableTo2D, TransFormableTo3D, IsPlane3D, IsNormalized3D, IsMoveable3D};
 
-pub fn center<P>(p1: &P, p2: &P, res: &mut P) where P: HasPosition3D {
-    res.set_x(p1.x() + (p2.x() - p1.x()) / 2.0);
-    res.set_y(p1.y() + (p2.y() - p1.y()) / 2.0);
-    res.set_z(p1.z() + (p2.z() - p1.z()) / 2.0);
+pub fn center<P>(p1: &P, p2: &P) -> Box<P> where P: HasPosition3D {
+    P::build(
+        p1.x() + (p2.x() - p1.x()) / 2.0,
+        p1.y() + (p2.y() - p1.y()) / 2.0,
+        p1.z() + (p2.z() - p1.z()) / 2.0
+    )
 }
 
 pub fn dist2D<P>(p1: &P, p2: &P) -> f64 where P: HasPosition2D {
@@ -96,8 +98,7 @@ pub fn calc_direction<P>(reference: &Point3D, p: &Point3D) -> Direction where P:
 
 //@todo refactor to work with HasPosition3D?
 pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where P: HasPosition3D { //@todo better name
-    let mut middle = *P::new();
-    center(min, max, &mut middle);
+    let middle = center(min, max);
 
     let px = max.x();
     let py = max.y();
@@ -110,14 +111,14 @@ pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where P: 
     let mz = middle.z();
 
     match dir {
-        Direction::PPP => (middle,                  max.clone()),
+        Direction::PPP => (*middle,                 max.clone()),
         Direction::PPN => (*P::build(mx, my, nz),   *P::build(px, py, mz)),
         Direction::PNP => (*P::build(mx, ny, mz),   *P::build(px, my, pz)),
         Direction::PNN => (*P::build(mx, ny, nz),   *P::build(px, my, mz)),
         Direction::NPP => (*P::build(nx, my, mz),   *P::build(mx, py, pz)),
         Direction::NPN => (*P::build(nx, my, nz),   *P::build(mx, py, mz)),
         Direction::NNP => (*P::build(nx, ny, mz),   *P::build(mx, my, pz)),
-        Direction::NNN => (min.clone(),             middle)
+        Direction::NNN => (min.clone(),             *middle)
     }
 }
 
@@ -140,10 +141,12 @@ pub fn conn<P>(pFrom: &P, pTo: &P) -> P where P: HasPosition3D
 
 pub fn project_point_on_plane<PL,P2,P3,N>(plane: &PL, point: &P3) -> P2 where PL: IsPlane3D<P3,N>, P2: HasPosition2D, P3: HasPosition3D + TransFormableTo2D, N: IsNormalized3D {
     let relative = conn(&plane.origin(), point);
-    let mut p2d = point.transform_to_2D::<P2>();
+    let p2transf = point.transform_to_2D::<P2>();
+    let mut tmp = Point2D::new();
 
-    p2d.set_x(plane.u().dot(&relative));
-    p2d.set_y(plane.v().dot(&relative));
+    tmp.set_x(plane.u().dot(&relative));
+    tmp.set_y(plane.v().dot(&relative));
 
-    p2d
+    p2transf.from(tmp);
+    p2transf
 }

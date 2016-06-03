@@ -40,8 +40,8 @@ impl HasPosition2D for Point2D {
         Box::new(Point2D{x: 0.0, y: 0.0})
     }
 
-    fn build(x: f64, y: f64) -> Option<Box<Self>> {
-        Some(Box::new(Point2D{x: x, y: y}))
+    fn build(x: f64, y: f64) -> Box<Self> {
+        Box::new(Point2D{x: x, y: y})
     }
 
     fn x(&self) -> f64 {
@@ -53,6 +53,11 @@ impl HasPosition2D for Point2D {
 
     fn clone(&self) -> Point2D {
         Point2D { x: self.x, y: self.y }
+    }
+
+    fn from<P>(&mut self, other: P) where P: HasPosition2D {
+        self.x = other.x();
+        self.y = other.y();
     }
 }
 

@@ -45,10 +45,11 @@ pub trait IsPlane3D<P,N> where P: HasPosition3D, N: IsNormalized3D {
 
 pub trait HasPosition2D :  Eq + PartialEq + Ord + PartialOrd + Hash {
     fn new() -> Box<Self>;
-    fn build(x: f64, y: f64) -> Option<Box<Self>>;
+    fn build(x: f64, y: f64) -> Box<Self>;
     fn x(&self) -> f64;
     fn y(&self) -> f64;
     fn clone(&self) -> Self;
+    fn from<P>(&mut self, other: P) where P: HasPosition2D;
 
     fn pos(&self) -> (f64, f64) {
         ( self.x(), self.y() )
@@ -72,7 +73,7 @@ pub trait HasPosition2D :  Eq + PartialEq + Ord + PartialOrd + Hash {
             None
         }
         else {
-            Self::build(self.x() / l, self.y() / l)
+            Some(Self::build(self.x() / l, self.y() / l))
         }
     }
 
@@ -159,7 +160,7 @@ pub trait TransFormableTo2D : HasPosition3D {
     fn transform_to_2D<P>(&self) -> P where P: HasPosition2D;
 }
 
-pub trait IsNormalized3D : HasPosition3D {
+pub trait IsNormalized3D {
     fn new<P>(p: P) -> Option<Box<Self>> where P: HasPosition3D;
     fn norm_x() -> Self;
     fn norm_y() -> Self;
@@ -169,7 +170,7 @@ pub trait IsNormalized3D : HasPosition3D {
     fn z(&self) -> f64;
 }
 
-pub trait IsNormalized2D : HasPosition2D{
+pub trait IsNormalized2D {
     fn new<P>(p: P) -> Option<Box<Self>> where P: HasPosition2D;
     fn norm_x() -> Self;
     fn norm_y() -> Self;
@@ -182,11 +183,12 @@ pub trait IsNormalized2D : HasPosition2D{
 
 pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
     fn new() -> Box<Self>;
-    fn build(x: f64, y: f64, z: f64) -> Option<Box<Self>>;
+    fn build(x: f64, y: f64, z: f64) -> Box<Self>;
     fn x(&self) -> f64;
     fn y(&self) -> f64;
     fn z(&self) -> f64;
     fn clone(&self) -> Self;
+    fn from<P>(&mut self, other: P) where P: HasPosition3D;
 
     fn pos(&self) -> (f64, f64, f64) {
         ( self.x(), self.y(), self.z() )
@@ -209,7 +211,9 @@ pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
 
     //@todo return new or alter self???
     fn multiplyM(&self, m: &Matrix4) -> Box<Self> {
-        let mut result = Self::new();
+        let mut resultX = 0.0;
+        let mut resultY = 0.0;
+        let mut resultZ = 0.0;
         for i in 0..4 {
             for j in 0..4 {
                 let addition = match j {
@@ -217,14 +221,14 @@ pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
                     1 => m.data[i][j] * self.y(),
                     _ => m.data[i][j] * self.z()
                 };
-                match i {
-                    0 => {let newx = result.x() + addition; result.set_x(newx);},
-                    1 => {let newy = result.y() + addition; result.set_y(newy);},
-                    _ => {let newz = result.z() + addition; result.set_z(newz);},
+                match i { //@todo can be simplified
+                    0 => {let newx = resultX + addition; resultX = newx;},
+                    1 => {let newy = resultY + addition; resultY = newy;},
+                    _ => {let newz = resultZ + addition; resultZ = newz;},
                 }
             }
         }
-        result
+        Self::build(resultX, resultY, resultZ)
     }
 
     fn normalized(&self) -> Option<Box<Self>> {
@@ -233,7 +237,7 @@ pub trait HasPosition3D : Eq + PartialEq + Ord + PartialOrd + Hash {
             None
         }
         else {
-            Self::build(self.x() / l, self.y() / l, self.z() / l)
+            Some(Self::build(self.x() / l, self.y() / l, self.z() / l))
         }
     }
 

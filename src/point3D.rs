@@ -44,8 +44,8 @@ impl HasPosition3D for Point3D {
         Box::new(Point3D{x: 0.0, y: 0.0, z: 0.0})
     }
 
-    fn build(x: f64, y: f64, z: f64) -> Option<Box<Self>> {
-        Some(Box::new(Point3D{x: x, y: y, z: z}))
+    fn build(x: f64, y: f64, z: f64) -> Box<Self> {
+        Box::new(Point3D{x: x, y: y, z: z})
     }
 
     fn x(&self) -> f64 {
@@ -60,6 +60,12 @@ impl HasPosition3D for Point3D {
 
     fn clone(&self) -> Point3D {
         Point3D { x: self.x, y: self.y, z: self.z }
+    }
+
+    fn from<P>(&mut self, other: P) where P: HasPosition3D {
+        self.x = other.x();
+        self.y = other.y();
+        self.z = other.z();
     }
 }
 
