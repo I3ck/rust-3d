@@ -141,7 +141,7 @@ pub fn conn<P>(pFrom: &P, pTo: &P) -> P where P: HasPosition3D
 
 pub fn project_point_on_plane<PL,P2,P3,N>(plane: &PL, point: &P3) -> P2 where PL: IsPlane3D<P3,N>, P2: HasPosition2D, P3: HasPosition3D + TransFormableTo2D, N: IsNormalized3D {
     let relative = conn(&plane.origin(), point);
-    let p2transf = point.transform_to_2D::<P2>();
+    let mut p2transf = point.transform_to_2D::<P2>();
     let mut tmp = Point2D::new();
 
     tmp.set_x(plane.u().dot(&relative));

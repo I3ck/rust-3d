@@ -1,7 +1,7 @@
 use std::f64;
 
 use point3D::Point3D;
-use traits::HasPosition3D;
+use traits::{Is3D, HasPosition3D};
 
 pub struct Matrix4 {
     pub data: [[f64; 4]; 4]
@@ -100,11 +100,13 @@ impl Matrix4 {
           None => return None,
           Some(x) => x
       };
-      let U = match up.clone().normalized() {
+      let U: Point3D;
+      U = match up.clone().normalized() {
           None => return None,
           Some(x) => *(x.cross(target))
       };
-      let V = N.cross(&U);
+      let V: Box<Point3D>;
+      V = N.cross(&U);
 
       let mut result = Matrix4::new();
       result.data[0][0] = U.x();  result.data[0][1] = U.y();  result.data[0][2] = U.z();  result.data[0][3] = 0.0;

@@ -28,8 +28,8 @@ use compressedPoint3D::{CompressedPoint3D};
 use compressedPointCloud3D::{CompressedPointCloud3D};
 use kdTree::{KdTree};
 use ocTree::{OcTree};
-use traits::{IsMoveable3D, HasPosition2D, HasPosition3D, IsTree3D, IsOcTree, IsKdTree3D};
-use functions::{extrude};
+use traits::{IsMoveable3D, Is2D, HasPosition2D, HasEditablePosition2D, Is3D, HasPosition3D, HasEditablePosition3D, IsTree3D, IsOcTree, IsKdTree3D};
+use functions::{extrude, center};
 
 use std::cmp::Ordering;
 
@@ -45,8 +45,7 @@ use std::path::Path;
 fn main() {
     let p = *Point3D::new();
     let p2 = *Point3D::build(100.0, 200.0, 400.0);
-    let mut pCenter = Point3D::new();
-    functions::center(&p, &p2, &mut pCenter);
+    let pCenter = center(&p, &p2);
 
     let mut pc = PointCloud3D::new();
 
