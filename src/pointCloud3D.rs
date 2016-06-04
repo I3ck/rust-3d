@@ -5,11 +5,11 @@ use point3D::{Point3D};
 
 
 
-pub struct PointCloud3D<P> where P: HasPosition3D {
+pub struct PointCloud3D<P> where P: HasEditablePosition3D {
     pub data: Vec<Box<P>>
 }
 
-impl<P> PointCloud3D<P> where P: HasPosition3D{
+impl<P> PointCloud3D<P> where P: HasEditablePosition3D{
     pub fn new() -> PointCloud3D<P> {
         PointCloud3D{data: Vec::new()}
     }
@@ -116,7 +116,7 @@ impl<P> PointCloud3D<P> where P: HasPosition3D{
     }
 }
 
-impl<P> IsMoveable3D for PointCloud3D<P> where P: HasPosition3D + IsMoveable3D {
+impl<P> IsMoveable3D for PointCloud3D<P> where P: HasEditablePosition3D + IsMoveable3D {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         for p in &mut self.data {
             p.move_by(x, y, z);
@@ -126,7 +126,7 @@ impl<P> IsMoveable3D for PointCloud3D<P> where P: HasPosition3D + IsMoveable3D {
 
 //------------------------------------------------------------------------------
 
-impl<P> fmt::Display for PointCloud3D<P> where P: HasPosition3D + fmt::Display {
+impl<P> fmt::Display for PointCloud3D<P> where P: HasEditablePosition3D + fmt::Display {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {
             match p.fmt(f) {

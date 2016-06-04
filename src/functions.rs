@@ -49,7 +49,7 @@ pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where P: HasP
     }
 }
 
-pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, maxSize: usize) where P: HasPosition3D {
+pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, maxSize: usize) where P: HasEditablePosition3D {
     if pc.len() > maxSize {
         pc.data.sort_by(|a, b| sqr_dist3D(search, a).partial_cmp(&sqr_dist3D(search, b)).unwrap_or(Ordering::Equal));
         let mut result : Vec<Box<P>>;
@@ -62,7 +62,7 @@ pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, maxSize: usiz
     }
 }
 //@todo move to plane or use there
-pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, PointCloud3D<P3>) where P2: HasPosition2D + TransFormableTo3D, P3: HasPosition3D + IsMoveable3D {
+pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, PointCloud3D<P3>) where P2: HasPosition2D + TransFormableTo3D, P3: HasEditablePosition3D + IsMoveable3D {
     let mut pc3dA = PointCloud3D::new();
     let mut pc3dB = PointCloud3D::new();
 

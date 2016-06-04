@@ -25,7 +25,7 @@ pub trait IsMoveable3D { //@todo remove trait and impl in HasPosition2D
 //@todo better method names
 //@todo maybe implement projection methods within the pc
 //@todo transformable traits required later on?
-pub trait IsProjectionToPlane<P2,P3,N> where P2: HasPosition2D + TransFormableTo3D, P3: HasPosition3D + TransFormableTo2D, N: IsNormalized3D {
+pub trait IsProjectionToPlane<P2,P3,N> where P2: HasEditablePosition2D + TransFormableTo3D, P3: HasEditablePosition3D + TransFormableTo2D, N: IsNormalized3D {
     fn from_2d<PL>(plane: PL, pc: PointCloud2D<P2>) -> Box<Self> where PL: IsPlane3D<P3,N>; //places 2d pc on plane, assuming plane 0/0 == pc2d 0/0
     fn from_3d<PL>(plane: PL, pc: PointCloud3D<P3>) -> Box<Self> where PL: IsPlane3D<P3,N>; //projects 3d pc onto plane from global coords
     fn projected_pointcloud_3d_global(&self) -> PointCloud3D<P3>;
@@ -331,18 +331,18 @@ pub trait HasBoundingBox3D : HasPosition3D {
 //@todo currently it is not possible to create immutable trees because of this
 //@todo add method, which builds from data directly
 //@todo abstract to only use a HasPosition3D trait instead of Point3Ds
-pub trait IsTree3D<P> where P: HasPosition3D {
+pub trait IsTree3D<P> where P: HasEditablePosition3D {
     fn new() -> Self;
     fn size(&self) -> usize;
     fn to_pointcloud(&self) -> PointCloud3D<P>;
     fn build(&mut self, pc : PointCloud3D<P>) -> bool;
 }
 
-pub trait IsOcTree<P> : IsTree3D<P> where P: HasPosition3D {
+pub trait IsOcTree<P> : IsTree3D<P> where P: HasEditablePosition3D {
     fn collect(&self, maxdepth: i8) -> PointCloud3D<P>;
 }
 
-pub trait IsKdTree3D<P> : IsTree3D<P> where P: HasPosition3D {
+pub trait IsKdTree3D<P> : IsTree3D<P> where P: HasEditablePosition3D {
     fn nearest(&self, search: &P) -> Option<P>;
     fn knearest(&self, search: &P, n: usize) -> PointCloud3D<P>;
     fn in_sphere(&self, search: &P, radius: f64) -> PointCloud3D<P>;

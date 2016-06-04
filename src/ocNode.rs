@@ -1,15 +1,15 @@
-use traits::HasPosition3D;
+use traits::{HasPosition3D, HasEditablePosition3D};
 use point3D::{Point3D};
 use pointCloud3D::{PointCloud3D};
 use functions::{center, calc_sub_min_max, calc_direction, in_bb};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
 
-pub enum OcNode<P> where P: HasPosition3D {
+pub enum OcNode<P> where P: HasEditablePosition3D {
     Leaf(P),
     Node(Internal<P>)
 }
 
-struct Internal<P> where P: HasPosition3D { // naming : p == positive, n == negative ||| xyz   => pnp => x positive, y negative, z positive direction from center
+struct Internal<P> where P: HasEditablePosition3D { // naming : p == positive, n == negative ||| xyz   => pnp => x positive, y negative, z positive direction from center
     ppp: Option<Box<OcNode<P>>>,
     ppn: Option<Box<OcNode<P>>>,
     pnp: Option<Box<OcNode<P>>>,
@@ -32,7 +32,7 @@ pub enum Direction { //@todo rename //@todo private?
 }
 
 //@todo define somewhere else
-fn collect_center_or_all<P>(n: &OcNode<P>, onlyCollectCenters: bool, depth: i8, maxdepth: i8, mut pc: &mut PointCloud3D<P>) where P: HasPosition3D {
+fn collect_center_or_all<P>(n: &OcNode<P>, onlyCollectCenters: bool, depth: i8, maxdepth: i8, mut pc: &mut PointCloud3D<P>) where P: HasEditablePosition3D {
     if onlyCollectCenters {
         let mut subPc = PointCloud3D::new();
         n.collect(depth+1, maxdepth, &mut subPc);
@@ -45,7 +45,7 @@ fn collect_center_or_all<P>(n: &OcNode<P>, onlyCollectCenters: bool, depth: i8, 
 }
 
 ///@todo define somewhere else
-fn build_subnode<P>(pc: Vec<P>,bb: (P, P)) -> Option<Box<OcNode<P>>> where P: HasPosition3D {
+fn build_subnode<P>(pc: Vec<P>,bb: (P, P)) -> Option<Box<OcNode<P>>> where P: HasEditablePosition3D {
     match pc.len() {
         0 => None,
         _ => {
@@ -56,7 +56,7 @@ fn build_subnode<P>(pc: Vec<P>,bb: (P, P)) -> Option<Box<OcNode<P>>> where P: Ha
 }
 
 
-impl<P> OcNode<P> where P: HasPosition3D {
+impl<P> OcNode<P> where P: HasEditablePosition3D {
     pub fn new(min: &P, max: &P, mut pc: Vec<P>) -> OcNode<P> {
         if pc.len() == 1 { return OcNode::Leaf(pc[0].clone()); };
         let mut pcppp = Vec::new();

@@ -4,15 +4,15 @@ use std::iter::IntoIterator;
 use point3D::{Point3D};
 use pointCloud3D::{PointCloud3D};
 use ocNode::{OcNode};
-use traits::{HasPosition3D, IsTree3D, IsOcTree};
+use traits::{HasPosition3D, HasEditablePosition3D, IsTree3D, IsOcTree};
 
-pub struct OcTree<P> where P: HasPosition3D {
+pub struct OcTree<P> where P: HasEditablePosition3D {
     pub root: Option<OcNode<P>>,
     pub min: P,
     pub max: P
 }
 
-impl<P> IsTree3D<P> for OcTree<P> where P: HasPosition3D {
+impl<P> IsTree3D<P> for OcTree<P> where P: HasEditablePosition3D {
     fn new() -> OcTree<P> {
         OcTree {
             root: None,
@@ -53,7 +53,7 @@ impl<P> IsTree3D<P> for OcTree<P> where P: HasPosition3D {
     }
 }
 
-impl<P> IsOcTree<P> for OcTree<P> where P: HasPosition3D {
+impl<P> IsOcTree<P> for OcTree<P> where P: HasEditablePosition3D {
     //@todo rewrite or make new method which returns cog instead of stopping recursion
     fn collect(&self,  maxdepth: i8) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();

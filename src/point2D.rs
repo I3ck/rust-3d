@@ -63,7 +63,6 @@ impl HasPosition2D for Point2D {
 }
 
 impl HasEditablePosition2D for Point2D {
-
     fn set_x(&mut self, val: f64) {
         self.x = val;
     }

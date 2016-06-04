@@ -5,11 +5,11 @@ use point2D::{Point2D};
 
 
 
-pub struct PointCloud2D<P> where P: HasPosition2D {
+pub struct PointCloud2D<P> where P: HasEditablePosition2D {
     pub data: Vec<Box<P>>
 }
 
-impl<P> PointCloud2D<P> where P: HasPosition2D{
+impl<P> PointCloud2D<P> where P: HasEditablePosition2D{
     pub fn new() -> PointCloud2D<P> {
         PointCloud2D{data: Vec::new()}
     }
@@ -109,7 +109,7 @@ impl<P> PointCloud2D<P> where P: HasPosition2D{
     }
 }
 
-impl<P> IsMoveable2D for PointCloud2D<P> where P: HasPosition2D + IsMoveable2D {
+impl<P> IsMoveable2D for PointCloud2D<P> where P: HasEditablePosition2D + IsMoveable2D {
     fn move_by(&mut self, x: f64, y: f64) {
         for p in &mut self.data {
             p.move_by(x, y);
@@ -119,7 +119,7 @@ impl<P> IsMoveable2D for PointCloud2D<P> where P: HasPosition2D + IsMoveable2D {
 
 //------------------------------------------------------------------------------
 
-impl<P> fmt::Display for PointCloud2D<P> where P: HasPosition2D + fmt::Display {
+impl<P> fmt::Display for PointCloud2D<P> where P: HasEditablePosition2D + fmt::Display {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {
             match p.fmt(f) {

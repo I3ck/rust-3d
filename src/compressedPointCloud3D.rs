@@ -3,7 +3,7 @@ extern crate num;
 use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
-use traits::{HasPosition3D};
+use traits::{HasPosition3D, HasEditablePosition3D};
 use point3D::{Point3D};
 use pointCloud3D::{PointCloud3D};
 use compressedPoint3D::{CompressedPoint3D};
@@ -18,7 +18,7 @@ pub struct CompressedPointCloud3D<T> where T: Unsigned + PrimInt {
 
 
 impl<T> CompressedPointCloud3D<T> where T: Unsigned + PrimInt {
-    pub fn compress<P>(pc: &PointCloud3D<P>) -> Option<CompressedPointCloud3D<T>> where P: HasPosition3D {
+    pub fn compress<P>(pc: &PointCloud3D<P>) -> Option<CompressedPointCloud3D<T>> where P: HasEditablePosition3D {
         let (pmin, pmax) = match pc.bbox() {
             None        => return None,
             Some(res)   => res,
@@ -70,7 +70,7 @@ impl<T> CompressedPointCloud3D<T> where T: Unsigned + PrimInt {
 
 //------------------------------------------------------------------------------
 
-    pub fn decompress<P>(&self) -> Option<PointCloud3D<P>> where P: HasPosition3D {
+    pub fn decompress<P>(&self) -> Option<PointCloud3D<P>> where P: HasEditablePosition3D {
         let mut pc = PointCloud3D::new();
 
         for p in &self.data {
