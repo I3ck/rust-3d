@@ -153,7 +153,7 @@ impl<P> KdNode<P> where P: HasEditablePosition3D {
     }
 
     pub fn knearest(&self, search: &P, n: usize, pc: &mut PointCloud3D<P>) {
-        if pc.len() < n || sqr_dist3D(search, &self.val) < sqr_dist3D(search, &pc.data[&pc.len() -1 ]) {
+        if pc.len() < n || sqr_dist3D(search, &self.val) < sqr_dist3D(search, &**&pc.data[&pc.len() -1 ]) { //@todo reference weird
             pc.push(self.val.clone());
         }
 
@@ -175,7 +175,7 @@ impl<P> KdNode<P> where P: HasEditablePosition3D {
             _ => (search.z(), self.val.z())
         };
 
-        let distanceBest = dist3D(search, &pc.data[&pc.len() -1 ]);
+        let distanceBest = dist3D(search, &**&pc.data[&pc.len() -1 ]); //@todo reference weird
         let borderLeft = currentSearch - distanceBest;
         let borderRight = currentSearch + distanceBest;
 

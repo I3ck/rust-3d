@@ -15,19 +15,19 @@ pub fn center<P>(p1: &P, p2: &P) -> Box<P> where P: HasPosition3D {
     )
 }
 
-pub fn dist2D<P>(p1: &P, p2: &P) -> f64 where P: HasPosition2D {
+pub fn dist2D<P,U>(p1: &P, p2: &U) -> f64 where P: Is2D, U: Is2D {
     sqr_dist2D(p1,p2).sqrt()
 }
 
-pub fn dist3D<P>(p1: &P, p2: &P) -> f64 where P: HasPosition3D {
+pub fn dist3D<P,U>(p1: &P, p2: &U) -> f64 where P: Is3D, U: Is3D {
     sqr_dist3D(p1,p2).sqrt()
 }
 
-pub fn sqr_dist2D<P>(p1: &P, p2: &P) -> f64 where P: HasPosition2D {
+pub fn sqr_dist2D<P,U>(p1: &P, p2: &U) -> f64 where P: Is2D, U: Is2D {
     (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2)
 }
 
-pub fn sqr_dist3D<P>(p1: &P, p2: &P) -> f64 where P: HasPosition3D {
+pub fn sqr_dist3D<P,U>(p1: &P, p2: &U) -> f64 where P: Is3D, U: Is3D {
     (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2) + (p1.z() - p2.z()).powi(2)
 }
 
@@ -51,7 +51,7 @@ pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where P: HasP
 
 pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, maxSize: usize) where P: HasEditablePosition3D {
     if pc.len() > maxSize {
-        pc.data.sort_by(|a, b| sqr_dist3D(search, a).partial_cmp(&sqr_dist3D(search, b)).unwrap_or(Ordering::Equal));
+        pc.data.sort_by(|a, b| sqr_dist3D(search, &**a).partial_cmp(&sqr_dist3D(search, &**b)).unwrap_or(Ordering::Equal));
         let mut result : Vec<Box<P>>;
         result = Vec::new();
         for i in pc.data.iter().take(maxSize) {
