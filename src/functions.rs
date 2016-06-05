@@ -24,7 +24,6 @@ pub fn center<P>(p1: &P, p2: &P) -> Box<P> where P: HasPosition3D {
     )
 }
 
-#[allow(dead_code)]
 pub fn dist_2d<P,U>(p1: &P, p2: &U) -> f64 where P: Is2D, U: Is2D {
     sqr_dist_2d(p1,p2).sqrt()
 }
@@ -72,7 +71,6 @@ pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, max_size: usi
     }
 }
 //@todo move to plane or use there
-#[allow(dead_code)]
 pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, PointCloud3D<P3>) where P2: HasPosition2D + TransFormableTo3D, P3: HasEditablePosition3D + IsMoveable3D {
     let mut pc_3d_a = PointCloud3D::new();
     let mut pc_3d_b = PointCloud3D::new();
