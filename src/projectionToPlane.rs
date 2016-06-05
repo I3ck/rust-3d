@@ -1,7 +1,7 @@
 use pointCloud2D::{PointCloud2D};
 use plane3D::{Plane3D};
 
-use traits::{IsProjectionToPlane, IsPlane3D, HasPosition2D, HasPosition3D, TransFormableTo2D, TransFormableTo3D};
+//use traits::{IsProjectionToPlane, IsPlane3D, HasPosition2D, HasPosition3D, TransFormableTo2D, TransFormableTo3D};
 /*TODO
 pub struct ProjectionToPlane<P2,P3,PL> where P2: HasPosition2D + TransFormableTo3D, P3: HasPosition3D + TransFormableTo2D, PL: IsPlane3D<P3> {
     pub pc: PointCloud2D<P2>,

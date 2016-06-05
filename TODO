@@ -1,0 +1,36 @@
+extern crate core;
+
+use point2D::{Point2D};
+use point3D::{Point3D};
+use matrix4::Matrix4;
+use pointCloud2D::{PointCloud2D};
+use pointCloud3D::{PointCloud3D};
+
+use self::core::str::FromStr;
+use std::hash::{Hash};
+
+
+///@todo parse could be moved to non-editable traits, but cant be implemented there?
+
+///@todo split into several files
+
+
+/*
+pub trait Mesh3D<P> where P: HasPosition3D {
+    fn nFaces
+}
+*/
+
+
+//@todo split HasPositionxD into reading and writing parts
+//@todo this way NormalizedxD can be of this type and be used
+//@todo in way more cases
+
+
+
+//@todo implement for pointcloud (already has a method for bbox)
+//@todo could be defined for any number of dimensions
+
+//@todo currently it is not possible to create immutable trees because of this
+//@todo add method, which builds from data directly
+//@todo abstract to only use a HasPosition3D trait instead of Point3Ds

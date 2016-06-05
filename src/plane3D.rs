@@ -1,6 +1,8 @@
 use point3D::Point3D;
 
-use traits::{IsPlane3D, HasPosition3D, IsNormalized3D};
+use traits::isPlane3D::IsPlane3D;
+use traits::hasPosition3D::HasPosition3D;
+use traits::isNormalized3D::IsNormalized3D;
 
 pub struct Plane3D<P,N> where P: HasPosition3D, N: IsNormalized3D {
     pub origin: P,

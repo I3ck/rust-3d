@@ -2,7 +2,9 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 use point3D::Point3D;
-use traits::{Is3D, IsNormalized3D, HasPosition3D};
+use traits::is3D::Is3D;
+use traits::isNormalized3D::IsNormalized3D;
+use traits::hasPosition3D::HasPosition3D;
 use functions::{sqr_dist3D};
 
 #[derive (PartialEq, PartialOrd)]

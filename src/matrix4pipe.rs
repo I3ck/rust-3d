@@ -1,5 +1,5 @@
 use matrix4::Matrix4;
-use traits::HasPosition3D;
+use traits::hasPosition3D::HasPosition3D;
 
 pub struct Matrix4Pipe {
     pub mtranslation: Matrix4,

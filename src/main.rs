@@ -28,7 +28,16 @@ use compressedPoint3D::{CompressedPoint3D};
 use compressedPointCloud3D::{CompressedPointCloud3D};
 use kdTree::{KdTree};
 use ocTree::{OcTree};
-use traits::{IsMoveable3D, Is2D, HasPosition2D, HasEditablePosition2D, Is3D, HasPosition3D, HasEditablePosition3D, IsTree3D, IsOcTree, IsKdTree3D};
+use traits::isMoveable3D::IsMoveable3D;
+use traits::is2D::Is2D;
+use traits::is3D::Is3D;
+use traits::hasPosition2D::HasPosition2D;
+use traits::hasPosition3D::HasPosition3D;
+use traits::hasEditablePosition2D::HasEditablePosition2D;
+use traits::hasEditablePosition3D::HasEditablePosition3D;
+use traits::isTree3D::IsTree3D;
+use traits::isOcTree::IsOcTree;
+use traits::isKdTree3D::IsKdTree3D;
 use functions::{extrude, center};
 
 use std::cmp::Ordering;

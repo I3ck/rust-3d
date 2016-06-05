@@ -5,7 +5,10 @@ use point3D::{Point3D};
 use pointCloud3D::{PointCloud3D};
 use functions::{dist3D, sqr_dist3D, dimension_compare, dimension_dist, sort_and_limit};
 
-use traits::{HasPosition3D, HasEditablePosition3D, IsTree3D, IsKdTree3D};
+use traits::hasPosition3D::HasPosition3D;
+use traits::hasEditablePosition3D::HasEditablePosition3D;
+use traits::isTree3D::IsTree3D;
+use traits::isKdTree3D::IsKdTree3D;
 
 pub struct KdTree<P> where P: HasEditablePosition3D {
     pub root: Option<KdNode<P>>

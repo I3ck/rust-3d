@@ -3,7 +3,8 @@ extern crate num;
 use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
-use traits::{HasPosition3D, HasEditablePosition3D};
+use traits::hasPosition3D::HasPosition3D;
+use traits::hasEditablePosition3D::HasEditablePosition3D;
 use point3D::{Point3D};
 use pointCloud3D::{PointCloud3D};
 use compressedPoint3D::{CompressedPoint3D};

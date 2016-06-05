@@ -1,7 +1,8 @@
 use std::f64;
 
 use point3D::Point3D;
-use traits::{Is3D, HasPosition3D};
+use traits::is3D::Is3D;
+use traits::hasPosition3D::HasPosition3D;
 
 pub struct Matrix4 {
     pub data: [[f64; 4]; 4]

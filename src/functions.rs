@@ -5,7 +5,17 @@ use point3D::{Point3D};
 use pointCloud2D::{PointCloud2D};
 use pointCloud3D::{PointCloud3D};
 use ocNode::{Direction};
-use traits::{Is2D, Is3D, HasPosition2D, HasPosition3D, HasEditablePosition2D, HasEditablePosition3D, TransFormableTo2D, TransFormableTo3D, IsPlane3D, IsNormalized3D, IsMoveable3D};
+use traits::is2D::Is2D;
+use traits::is3D::Is3D;
+use traits::hasPosition2D::HasPosition2D;
+use traits::hasPosition3D::HasPosition3D;
+use traits::hasEditablePosition2D::HasEditablePosition2D;
+use traits::hasEditablePosition3D::HasEditablePosition3D;
+use traits::transFormableTo2D::TransFormableTo2D;
+use traits::transFormableTo3D::TransFormableTo3D;
+use traits::isPlane3D::IsPlane3D;
+use traits::isNormalized3D::IsNormalized3D;
+use traits::isMoveable3D::IsMoveable3D;
 
 pub fn center<P>(p1: &P, p2: &P) -> Box<P> where P: HasPosition3D {
     P::build(

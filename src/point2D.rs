@@ -4,7 +4,12 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 
-use traits::{Is2D, IsMoveable2D, HasPosition2D, HasEditablePosition2D, HasPosition3D, TransFormableTo3D};
+use traits::is2D::Is2D;
+use traits::isMoveable2D::IsMoveable2D;
+use traits::hasPosition2D::HasPosition2D;
+use traits::hasEditablePosition2D::HasEditablePosition2D;
+use traits::hasPosition3D::HasPosition3D;
+use traits::transFormableTo3D::TransFormableTo3D;
 use functions::{sqr_dist2D};
 
 #[derive (PartialEq, PartialOrd)]

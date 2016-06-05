@@ -4,7 +4,10 @@ use std::iter::IntoIterator;
 use point3D::{Point3D};
 use pointCloud3D::{PointCloud3D};
 use ocNode::{OcNode};
-use traits::{HasPosition3D, HasEditablePosition3D, IsTree3D, IsOcTree};
+use traits::hasPosition3D::HasPosition3D;
+use traits::hasEditablePosition3D::HasEditablePosition3D;
+use traits::isTree3D::IsTree3D;
+use traits::isOcTree::IsOcTree;
 
 pub struct OcTree<P> where P: HasEditablePosition3D {
     pub root: Option<OcNode<P>>,

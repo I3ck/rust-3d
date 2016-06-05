@@ -5,7 +5,12 @@ use std::hash::{Hash, Hasher};
 
 
 
-use traits::{Is3D, IsMoveable3D, HasPosition2D, HasPosition3D, HasEditablePosition3D, TransFormableTo2D};
+use traits::is3D::Is3D;
+use traits::isMoveable3D::IsMoveable3D;
+use traits::hasPosition2D::HasPosition2D;
+use traits::hasPosition3D::HasPosition3D;
+use traits::hasEditablePosition3D::HasEditablePosition3D;
+use traits::transFormableTo2D::TransFormableTo2D;
 use functions::{sqr_dist3D};
 
 #[derive (PartialEq, PartialOrd)]

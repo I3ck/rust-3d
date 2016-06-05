@@ -2,7 +2,9 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 use point2D::Point2D;
-use traits::{Is2D, IsNormalized2D, HasPosition2D};
+use traits::is2D::Is2D;
+use traits::isNormalized2D::IsNormalized2D;
+use traits::hasPosition2D::HasPosition2D;
 use functions::{sqr_dist2D};
 
 #[derive (PartialEq, PartialOrd)]
