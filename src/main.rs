@@ -4,40 +4,40 @@ use std::f64::consts;
 
 mod traits;
 mod functions;
-mod point2D;
-mod point3D;
-mod norm2D;
-mod norm3D;
-mod plane3D;
-mod pointCloud2D;
-mod pointCloud3D;
+mod point_2d;
+mod point_3d;
+mod norm_2d;
+mod norm_3d;
+mod plane_3d;
+mod point_cloud_2d;
+mod point_cloud_3d;
 mod matrix4;
-mod matrix4pipe;
-mod compressedPoint3D;
-mod compressedPointCloud3D;
-mod projectionToPlane;
-mod kdTree;
-mod ocNode;
-mod ocTree;
+mod matrix4_pipe;
+mod compressed_point_3d;
+mod compressed_point_cloud_3d;
+mod projection_to_plane;
+mod kd_tree;
+mod oc_node;
+mod oc_tree;
 
-use point2D::{Point2D};
-use point3D::{Point3D};
-use pointCloud2D::{PointCloud2D};
-use pointCloud3D::{PointCloud3D};
-use compressedPoint3D::{CompressedPoint3D};
-use compressedPointCloud3D::{CompressedPointCloud3D};
-use kdTree::{KdTree};
-use ocTree::{OcTree};
-use traits::isMoveable3D::IsMoveable3D;
-use traits::is2D::Is2D;
-use traits::is3D::Is3D;
-use traits::hasPosition2D::HasPosition2D;
-use traits::hasPosition3D::HasPosition3D;
-use traits::hasEditablePosition2D::HasEditablePosition2D;
-use traits::hasEditablePosition3D::HasEditablePosition3D;
-use traits::isTree3D::IsTree3D;
-use traits::isOcTree::IsOcTree;
-use traits::isKdTree3D::IsKdTree3D;
+use point_2d::{Point2D};
+use point_3d::{Point3D};
+use point_cloud_2d::{PointCloud2D};
+use point_cloud_3d::{PointCloud3D};
+use compressed_point_3d::{CompressedPoint3D};
+use compressed_point_cloud_3d::{CompressedPointCloud3D};
+use kd_tree::{KdTree};
+use oc_tree::{OcTree};
+use traits::is_moveable_3d::IsMoveable3D;
+use traits::is_2d::Is2D;
+use traits::is_3d::Is3D;
+use traits::has_position_2d::HasPosition2D;
+use traits::has_position_3d::HasPosition3D;
+use traits::has_editable_position_2d::HasEditablePosition2D;
+use traits::has_editable_position_3d::HasEditablePosition3D;
+use traits::is_tree_3d::IsTree3D;
+use traits::is_oc_tree::IsOcTree;
+use traits::is_kd_tree_3d::IsKdTree3D;
 use functions::{extrude, center};
 
 use std::cmp::Ordering;
@@ -123,28 +123,28 @@ fn main() {
                 Some(pc) => {
                     //println!("parsed len : {}", pc.len());
 
-                    let mut kdTree = KdTree::new();
-                    kdTree.build(pc.clone());
-                    //println!("kdTree.size() : {}", tree.size());
-                    let nearestTen = kdTree.knearest(&Point3D{x: 9.0,y: 56.0,z: 0.0}, 10);
+                    let mut kd_tree = KdTree::new();
+                    kd_tree.build(pc.clone());
+                    //println!("kd_tree.size() : {}", tree.size());
+                    let nearestTen = kd_tree.knearest(&Point3D{x: 9.0,y: 56.0,z: 0.0}, 10);
                     //println!("nearest ten to 9/56/0 : {}", nearestTen);
 
-                    let mut ocTree = OcTree::new();
-                    ocTree.build(pc);
+                    let mut oc_tree = OcTree::new();
+                    oc_tree.build(pc);
                     //println!("could create octree");
 
-                    //println!("ocTree.size() : {}", ocTree.size());
+                    //println!("oc_tree.size() : {}", oc_tree.size());
 
-                    let collect0 = ocTree.collect(0);
+                    let collect0 = oc_tree.collect(0);
                     //println!("collect 0 : {}", collect0);
 
-                    let collect1 = ocTree.collect(1);
+                    let collect1 = oc_tree.collect(1);
                     //println!("collect 1 : {}", collect1);
 
-                    let collect2 = ocTree.collect(2);
+                    let collect2 = oc_tree.collect(2);
                     //println!("collect 2 : {}", collect2);
 
-                    let collect = ocTree.collect(1);
+                    let collect = oc_tree.collect(1);
                     //println!("collect: {}", collect);
 
                     let mut f = File::create("collect.xyz").expect("Could not create file");

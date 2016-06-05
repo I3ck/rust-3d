@@ -1,7 +1,7 @@
-use traits::hasPosition3D::HasPosition3D;
-use traits::hasEditablePosition3D::HasEditablePosition3D;
-use point3D::{Point3D};
-use pointCloud3D::{PointCloud3D};
+use traits::has_position_3d::HasPosition3D;
+use traits::has_editable_position_3d::HasEditablePosition3D;
+use point_3d::{Point3D};
+use point_cloud_3d::{PointCloud3D};
 use functions::{center, calc_sub_min_max, calc_direction, in_bb};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
 

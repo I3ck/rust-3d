@@ -1,5 +1,5 @@
-use traits::hasPosition3D::HasPosition3D;
-use point3D::Point3D;
+use traits::has_position_3d::HasPosition3D;
+use point_3d::Point3D;
 
 pub trait HasBoundingBox3D : HasPosition3D {
     fn bounding_box(&self) -> Option<(Point3D, Point3D)>;

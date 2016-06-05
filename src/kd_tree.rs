@@ -1,14 +1,14 @@
 use std::cmp;
 use std::cmp::Ordering;
 
-use point3D::{Point3D};
-use pointCloud3D::{PointCloud3D};
+use point_3d::{Point3D};
+use point_cloud_3d::{PointCloud3D};
 use functions::{dist3D, sqr_dist3D, dimension_compare, dimension_dist, sort_and_limit};
 
-use traits::hasPosition3D::HasPosition3D;
-use traits::hasEditablePosition3D::HasEditablePosition3D;
-use traits::isTree3D::IsTree3D;
-use traits::isKdTree3D::IsKdTree3D;
+use traits::has_position_3d::HasPosition3D;
+use traits::has_editable_position_3d::HasEditablePosition3D;
+use traits::is_tree_3d::IsTree3D;
+use traits::is_kd_tree_3d::IsKdTree3D;
 
 pub struct KdTree<P> where P: HasEditablePosition3D {
     pub root: Option<KdNode<P>>

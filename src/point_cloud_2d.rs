@@ -1,10 +1,10 @@
 use std::fmt;
 
-use traits::is2D::Is2D;
-use traits::isMoveable2D::IsMoveable2D;
-use traits::hasPosition2D::HasPosition2D;
-use traits::hasEditablePosition2D::HasEditablePosition2D;
-use point2D::{Point2D};
+use traits::is_2d::Is2D;
+use traits::is_moveable_2d::IsMoveable2D;
+use traits::has_position_2d::HasPosition2D;
+use traits::has_editable_position_2d::HasEditablePosition2D;
+use point_2d::{Point2D};
 
 
 

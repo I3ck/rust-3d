@@ -1,6 +1,6 @@
-use traits::isTree3D::IsTree3D;
-use traits::hasEditablePosition3D::HasEditablePosition3D;
-use pointCloud3D::PointCloud3D;
+use traits::is_tree_3d::IsTree3D;
+use traits::has_editable_position_3d::HasEditablePosition3D;
+use point_cloud_3d::PointCloud3D;
 
 pub trait IsKdTree3D<P> : IsTree3D<P> where P: HasEditablePosition3D {
     fn nearest(&self, search: &P) -> Option<P>;

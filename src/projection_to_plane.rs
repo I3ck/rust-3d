@@ -1,5 +1,5 @@
-use pointCloud2D::{PointCloud2D};
-use plane3D::{Plane3D};
+use point_cloud_2d::{PointCloud2D};
+use plane_3d::{Plane3D};
 
 //use traits::{IsProjectionToPlane, IsPlane3D, HasPosition2D, HasPosition3D, TransFormableTo2D, TransFormableTo3D};
 /*TODO

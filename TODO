@@ -1,10 +1,10 @@
 extern crate core;
 
-use point2D::{Point2D};
-use point3D::{Point3D};
+use point_2d::{Point2D};
+use point_3d::{Point3D};
 use matrix4::Matrix4;
-use pointCloud2D::{PointCloud2D};
-use pointCloud3D::{PointCloud3D};
+use point_cloud_2d::{PointCloud2D};
+use point_cloud_3d::{PointCloud3D};
 
 use self::core::str::FromStr;
 use std::hash::{Hash};

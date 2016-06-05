@@ -1,5 +1,5 @@
-use traits::hasPosition3D::HasPosition3D;
-use traits::isNormalized3D::IsNormalized3D;
+use traits::has_position_3d::HasPosition3D;
+use traits::is_normalized_3d::IsNormalized3D;
 
 
 pub trait IsPlane3D<P,N> where P: HasPosition3D, N: IsNormalized3D {

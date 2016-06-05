@@ -1,6 +1,6 @@
 use std::hash::{Hash};
 
-use traits::is2D::Is2D;
+use traits::is_2d::Is2D;
 
 pub trait HasPosition2D : Is2D +  Eq + PartialEq + Ord + PartialOrd + Hash {
     fn new() -> Box<Self>;

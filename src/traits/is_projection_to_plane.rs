@@ -1,11 +1,11 @@
-use traits::hasEditablePosition2D::HasEditablePosition2D;
-use traits::hasEditablePosition3D::HasEditablePosition3D;
-use traits::transFormableTo2D::TransFormableTo2D;
-use traits::transFormableTo3D::TransFormableTo3D;
-use traits::isNormalized3D::IsNormalized3D;
-use traits::isPlane3D::IsPlane3D;
-use pointCloud2D::PointCloud2D;
-use pointCloud3D::PointCloud3D;
+use traits::has_editable_position_2d::HasEditablePosition2D;
+use traits::has_editable_position_3d::HasEditablePosition3D;
+use traits::transformable_to_2d::TransFormableTo2D;
+use traits::transformable_to_3d::TransFormableTo3D;
+use traits::is_normalized_3d::IsNormalized3D;
+use traits::is_plane_3d::IsPlane3D;
+use point_cloud_2d::PointCloud2D;
+use point_cloud_3d::PointCloud3D;
 
 
 //@todo finish trait and add implementation

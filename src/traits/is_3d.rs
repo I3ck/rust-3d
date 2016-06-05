@@ -1,4 +1,4 @@
-use traits::hasPosition3D::HasPosition3D;
+use traits::has_position_3d::HasPosition3D;
 
 pub trait Is3D {
     fn x(&self) -> f64;

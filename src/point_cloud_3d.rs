@@ -1,10 +1,10 @@
 use std::fmt;
 
-use traits::is3D::Is3D;
-use traits::isMoveable3D::IsMoveable3D;
-use traits::hasPosition3D::HasPosition3D;
-use traits::hasEditablePosition3D::HasEditablePosition3D;
-use point3D::{Point3D};
+use traits::is_3d::Is3D;
+use traits::is_moveable_3d::IsMoveable3D;
+use traits::has_position_3d::HasPosition3D;
+use traits::has_editable_position_3d::HasEditablePosition3D;
+use point_3d::{Point3D};
 
 
 

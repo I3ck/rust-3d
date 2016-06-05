@@ -3,11 +3,11 @@ extern crate num;
 use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
-use traits::hasPosition3D::HasPosition3D;
-use traits::hasEditablePosition3D::HasEditablePosition3D;
-use point3D::{Point3D};
-use pointCloud3D::{PointCloud3D};
-use compressedPoint3D::{CompressedPoint3D};
+use traits::has_position_3d::HasPosition3D;
+use traits::has_editable_position_3d::HasEditablePosition3D;
+use point_3d::{Point3D};
+use point_cloud_3d::{PointCloud3D};
+use compressed_point_3d::{CompressedPoint3D};
 
 pub struct CompressedPointCloud3D<T> where T: Unsigned + PrimInt {
     pub start: Point3D,

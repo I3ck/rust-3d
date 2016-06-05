@@ -1,21 +1,21 @@
 use std::cmp::Ordering;
 
-use point2D::{Point2D};
-use point3D::{Point3D};
-use pointCloud2D::{PointCloud2D};
-use pointCloud3D::{PointCloud3D};
-use ocNode::{Direction};
-use traits::is2D::Is2D;
-use traits::is3D::Is3D;
-use traits::hasPosition2D::HasPosition2D;
-use traits::hasPosition3D::HasPosition3D;
-use traits::hasEditablePosition2D::HasEditablePosition2D;
-use traits::hasEditablePosition3D::HasEditablePosition3D;
-use traits::transFormableTo2D::TransFormableTo2D;
-use traits::transFormableTo3D::TransFormableTo3D;
-use traits::isPlane3D::IsPlane3D;
-use traits::isNormalized3D::IsNormalized3D;
-use traits::isMoveable3D::IsMoveable3D;
+use point_2d::{Point2D};
+use point_3d::{Point3D};
+use point_cloud_2d::{PointCloud2D};
+use point_cloud_3d::{PointCloud3D};
+use oc_node::{Direction};
+use traits::is_2d::Is2D;
+use traits::is_3d::Is3D;
+use traits::has_position_2d::HasPosition2D;
+use traits::has_position_3d::HasPosition3D;
+use traits::has_editable_position_2d::HasEditablePosition2D;
+use traits::has_editable_position_3d::HasEditablePosition3D;
+use traits::transformable_to_2d::TransFormableTo2D;
+use traits::transformable_to_3d::TransFormableTo3D;
+use traits::is_plane_3d::IsPlane3D;
+use traits::is_normalized_3d::IsNormalized3D;
+use traits::is_moveable_3d::IsMoveable3D;
 
 pub fn center<P>(p1: &P, p2: &P) -> Box<P> where P: HasPosition3D {
     P::build(

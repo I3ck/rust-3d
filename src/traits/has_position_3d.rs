@@ -1,6 +1,6 @@
 use std::hash::{Hash};
 
-use traits::is3D::Is3D;
+use traits::is_3d::Is3D;
 use matrix4::Matrix4;
 
 pub trait HasPosition3D : Is3D + Eq + PartialEq + Ord + PartialOrd + Hash {
