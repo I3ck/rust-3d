@@ -13,6 +13,7 @@ pub mod point_cloud_2d;
 pub mod point_cloud_3d;
 pub mod matrix4;
 pub mod matrix4_pipe;
+pub mod mesh_3d;
 pub mod compressed_point_3d;
 pub mod compressed_point_cloud_3d;
 pub mod projection_to_plane;

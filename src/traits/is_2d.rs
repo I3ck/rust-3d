@@ -1,5 +1,3 @@
-use traits::has_position_2d::HasPosition2D;
-
 pub trait Is2D {
     fn x(&self) -> f64;
 
