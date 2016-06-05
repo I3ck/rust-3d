@@ -9,10 +9,10 @@ pub trait HasPosition3D : Is3D + Eq + PartialEq + Ord + PartialOrd + Hash {
     fn from<P>(&mut self, other: P) where P: HasPosition3D;
 
     //@todo return new or alter self???
-    fn multiplyM(&self, m: &Matrix4) -> Box<Self> {
-        let mut resultX = 0.0;
-        let mut resultY = 0.0;
-        let mut resultZ = 0.0;
+    fn multiply_m(&self, m: &Matrix4) -> Box<Self> {
+        let mut result_x = 0.0;
+        let mut result_y = 0.0;
+        let mut result_z = 0.0;
         for i in 0..4 {
             for j in 0..4 {
                 let addition = match j {
@@ -21,13 +21,13 @@ pub trait HasPosition3D : Is3D + Eq + PartialEq + Ord + PartialOrd + Hash {
                     _ => m.data[i][j] * self.z()
                 };
                 match i { //@todo can be simplified
-                    0 => {let newx = resultX + addition; resultX = newx;},
-                    1 => {let newy = resultY + addition; resultY = newy;},
-                    _ => {let newz = resultZ + addition; resultZ = newz;},
+                    0 => {let newx = result_x + addition; result_x = newx;},
+                    1 => {let newy = result_y + addition; result_y = newy;},
+                    _ => {let newz = result_z + addition; result_z = newz;},
                 }
             }
         }
-        Self::build(resultX, resultY, resultZ)
+        Self::build(result_x, result_y, result_z)
     }
 
     fn normalized(&self) -> Option<Box<Self>> {

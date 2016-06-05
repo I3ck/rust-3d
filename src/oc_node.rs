@@ -1,8 +1,7 @@
 use traits::has_position_3d::HasPosition3D;
 use traits::has_editable_position_3d::HasEditablePosition3D;
-use point_3d::{Point3D};
 use point_cloud_3d::{PointCloud3D};
-use functions::{center, calc_sub_min_max, calc_direction, in_bb};
+use functions::{calc_sub_min_max, in_bb};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
 
 pub enum OcNode<P> where P: HasEditablePosition3D {
@@ -10,7 +9,7 @@ pub enum OcNode<P> where P: HasEditablePosition3D {
     Node(Internal<P>)
 }
 
-struct Internal<P> where P: HasEditablePosition3D { // naming : p == positive, n == negative ||| xyz   => pnp => x positive, y negative, z positive direction from center
+pub struct Internal<P> where P: HasEditablePosition3D { // naming : p == positive, n == negative ||| xyz   => pnp => x positive, y negative, z positive direction from center
     ppp: Option<Box<OcNode<P>>>,
     ppn: Option<Box<OcNode<P>>>,
     pnp: Option<Box<OcNode<P>>>,
@@ -33,11 +32,11 @@ pub enum Direction { //@todo rename //@todo private?
 }
 
 //@todo define somewhere else
-fn collect_center_or_all<P>(n: &OcNode<P>, onlyCollectCenters: bool, depth: i8, maxdepth: i8, mut pc: &mut PointCloud3D<P>) where P: HasEditablePosition3D {
-    if onlyCollectCenters {
-        let mut subPc = PointCloud3D::new();
-        n.collect(depth+1, maxdepth, &mut subPc);
-        if let Some(c) = subPc.center() {
+fn collect_center_or_all<P>(n: &OcNode<P>, only_collect_centers: bool, depth: i8, maxdepth: i8, mut pc: &mut PointCloud3D<P>) where P: HasEditablePosition3D {
+    if only_collect_centers {
+        let mut sub_pc = PointCloud3D::new();
+        n.collect(depth+1, maxdepth, &mut sub_pc);
+        if let Some(c) = sub_pc.center() {
             pc.push(c);
         }
     } else {
@@ -50,15 +49,15 @@ fn build_subnode<P>(pc: Vec<P>,bb: (P, P)) -> Option<Box<OcNode<P>>> where P: Ha
     match pc.len() {
         0 => None,
         _ => {
-            let (newMin, newMax) = bb;
-            Some(Box::new(OcNode::new(&newMin, &newMax, pc)))
+            let (new_min, new_max) = bb;
+            Some(Box::new(OcNode::new(&new_min, &new_max, pc)))
         }
     }
 }
 
 
 impl<P> OcNode<P> where P: HasEditablePosition3D {
-    pub fn new(min: &P, max: &P, mut pc: Vec<P>) -> OcNode<P> {
+    pub fn new(min: &P, max: &P, pc: Vec<P>) -> OcNode<P> {
         if pc.len() == 1 { return OcNode::Leaf(pc[0].clone()); };
         let mut pcppp = Vec::new();
         let mut pcppn = Vec::new();
@@ -107,7 +106,7 @@ impl<P> OcNode<P> where P: HasEditablePosition3D {
         let nnp = build_subnode(pcnnp, bbnnp);
         let nnn = build_subnode(pcnnn, bbnnn);
 
-        let mut result: Internal<P> = Internal {
+        let result: Internal<P> = Internal {
             ppp: ppp,
             ppn: ppn,
             pnp: pnp,
@@ -141,34 +140,34 @@ impl<P> OcNode<P> where P: HasEditablePosition3D {
 
 //@todo define helpers here to simplify code (and in other areas)
     pub fn collect(&self, depth: i8, maxdepth: i8, pc: &mut PointCloud3D<P>) {
-        let onlyCollectCenters = maxdepth >= 0 && depth > maxdepth; //@todo make this depend on a setting?
+        let only_collect_centers = maxdepth >= 0 && depth > maxdepth; //@todo make this depend on a setting?
         match self {
             &OcNode::Leaf(ref p) => pc.push(p.clone()),
 
             &OcNode::Node(ref internal) => {
                 if let Some(ref n) = internal.ppp {
-                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
+                    collect_center_or_all(n, only_collect_centers, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.ppn {
-                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
+                    collect_center_or_all(n, only_collect_centers, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.pnp {
-                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
+                    collect_center_or_all(n, only_collect_centers, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.pnn {
-                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
+                    collect_center_or_all(n, only_collect_centers, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.npp {
-                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
+                    collect_center_or_all(n, only_collect_centers, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.npn {
-                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
+                    collect_center_or_all(n, only_collect_centers, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.nnp {
-                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
+                    collect_center_or_all(n, only_collect_centers, depth, maxdepth, pc);
                 }
                 if let Some(ref n) = internal.nnn {
-                    collect_center_or_all(n, onlyCollectCenters, depth, maxdepth, pc);
+                    collect_center_or_all(n, only_collect_centers, depth, maxdepth, pc);
                 }
             }
         }

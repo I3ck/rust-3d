@@ -1,4 +1,3 @@
-use std::f64;
 use std::fmt;
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
@@ -11,7 +10,7 @@ use traits::has_position_2d::HasPosition2D;
 use traits::has_position_3d::HasPosition3D;
 use traits::has_editable_position_3d::HasEditablePosition3D;
 use traits::transformable_to_2d::TransFormableTo2D;
-use functions::{sqr_dist3D};
+use functions::{sqr_dist_3d};
 
 #[derive (PartialEq, PartialOrd)]
 pub struct Point3D {
@@ -24,7 +23,7 @@ impl Eq for Point3D {}
 impl Ord for Point3D {
     fn cmp(&self, other: &Self) -> Ordering {
         let origin = *Point3D::new();
-        sqr_dist3D(&origin, self).partial_cmp(&sqr_dist3D(&origin, other)).unwrap_or(Ordering::Equal)
+        sqr_dist_3d(&origin, self).partial_cmp(&sqr_dist_3d(&origin, other)).unwrap_or(Ordering::Equal)
     }
 }
 
@@ -90,7 +89,7 @@ impl HasEditablePosition3D for Point3D {
 }
 
 impl TransFormableTo2D for Point3D {
-    fn transform_to_2D<P>(&self) -> P where P: HasPosition2D {
+    fn transform_to_2d<P>(&self) -> P where P: HasPosition2D {
         *P::build(self.x, self.y)
     }
 }

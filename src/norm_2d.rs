@@ -5,7 +5,7 @@ use point_2d::Point2D;
 use traits::is_2d::Is2D;
 use traits::is_normalized_2d::IsNormalized2D;
 use traits::has_position_2d::HasPosition2D;
-use functions::{sqr_dist2D};
+use functions::{sqr_dist_2d};
 
 #[derive (PartialEq, PartialOrd)]
 pub struct Norm2D {
@@ -17,7 +17,7 @@ impl Eq for Norm2D {}
 impl Ord for Norm2D {
     fn cmp(&self, other: &Self) -> Ordering {
         let origin = *Point2D::new();
-        sqr_dist2D(&origin, self).partial_cmp(&sqr_dist2D(&origin, other)).unwrap_or(Ordering::Equal)
+        sqr_dist_2d(&origin, self).partial_cmp(&sqr_dist_2d(&origin, other)).unwrap_or(Ordering::Equal)
     }
 }
 

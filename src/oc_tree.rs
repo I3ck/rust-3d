@@ -1,7 +1,6 @@
 use std::collections::HashSet;
 use std::iter::IntoIterator;
 
-use point_3d::{Point3D};
 use point_cloud_3d::{PointCloud3D};
 use oc_node::{OcNode};
 use traits::has_position_3d::HasPosition3D;
@@ -39,16 +38,16 @@ impl<P> IsTree3D<P> for OcTree<P> where P: HasEditablePosition3D {
         match pc.bbox() {
             None => false,
             Some((min, max)) => {
-                let mut uniqueData = Vec::new();
+                let mut unique_data = Vec::new();
                 let mut set = HashSet::new();
                 for p in pc.data {
                     set.insert(*p);
                 }
                 //let mut set: HashSet<P> = pc.data.into_iter().unbox().collect();
-                uniqueData.extend(set.into_iter());
+                unique_data.extend(set.into_iter());
                 self.min = *P::build(min.x, min.y, min.z);
                 self.max = *P::build(max.x, max.y, max.z);
-                self.root = Some(OcNode::new(&self.min, &self.max, uniqueData));
+                self.root = Some(OcNode::new(&self.min, &self.max, unique_data));
 
                 true
             }

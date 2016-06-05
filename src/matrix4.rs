@@ -1,5 +1,3 @@
-use std::f64;
-
 use point_3d::Point3D;
 use traits::is_3d::Is3D;
 use traits::has_position_3d::HasPosition3D;
@@ -49,25 +47,25 @@ impl Matrix4 {
             ]
         }
     }
-    pub fn rotation(radX: f64, radY: f64, radZ: f64) -> Matrix4 {
-        let (mut mX, mut mY, mut mZ) = (Matrix4::new(), Matrix4::new(), Matrix4::new());
+    pub fn rotation(rad_x: f64, rad_y: f64, rad_z: f64) -> Matrix4 {
+        let (mut mx, mut my, mut mz) = (Matrix4::new(), Matrix4::new(), Matrix4::new());
 
-        mX.data[0][0] = 1.0;     mX.data[0][1] = 0.0;           mX.data[0][2] = 0.0;            mX.data[0][3] = 0.0;
-        mX.data[1][0] = 0.0;     mX.data[1][1] = radX.cos();    mX.data[1][2] = -radX.sin();    mX.data[1][3] = 0.0;
-        mX.data[2][0] = 0.0;     mX.data[2][1] = radX.sin();    mX.data[2][2] = radX.cos();     mX.data[2][3] = 0.0;
-        mX.data[3][0] = 0.0;     mX.data[3][1] = 0.0;           mX.data[3][2] = 0.0;            mX.data[3][3] = 1.0;
+        mx.data[0][0] = 1.0;     mx.data[0][1] = 0.0;           mx.data[0][2] = 0.0;            mx.data[0][3] = 0.0;
+        mx.data[1][0] = 0.0;     mx.data[1][1] = rad_x.cos();    mx.data[1][2] = -rad_x.sin();    mx.data[1][3] = 0.0;
+        mx.data[2][0] = 0.0;     mx.data[2][1] = rad_x.sin();    mx.data[2][2] = rad_x.cos();     mx.data[2][3] = 0.0;
+        mx.data[3][0] = 0.0;     mx.data[3][1] = 0.0;           mx.data[3][2] = 0.0;            mx.data[3][3] = 1.0;
 
-        mY.data[0][0] = radY.cos();     mY.data[0][1] = 0.0;      mY.data[0][2] = radY.sin();   mY.data[0][3] = 0.0;
-        mY.data[1][0] = 0.0;            mY.data[1][1] = 1.0;      mY.data[1][2] = 0.0;          mY.data[1][3] = 0.0;
-        mY.data[2][0] = -radY.sin();    mY.data[2][1] = 0.0;      mY.data[2][2] = radY.cos();   mY.data[2][3] = 0.0;
-        mY.data[3][0] = 0.0;            mY.data[3][1] = 0.0;      mY.data[3][2] = 0.0;          mY.data[3][3] = 1.0;
+        my.data[0][0] = rad_y.cos();     my.data[0][1] = 0.0;      my.data[0][2] = rad_y.sin();   my.data[0][3] = 0.0;
+        my.data[1][0] = 0.0;            my.data[1][1] = 1.0;      my.data[1][2] = 0.0;          my.data[1][3] = 0.0;
+        my.data[2][0] = -rad_y.sin();    my.data[2][1] = 0.0;      my.data[2][2] = rad_y.cos();   my.data[2][3] = 0.0;
+        my.data[3][0] = 0.0;            my.data[3][1] = 0.0;      my.data[3][2] = 0.0;          my.data[3][3] = 1.0;
 
-        mZ.data[0][0] = radZ.cos(); mZ.data[0][1] = -radZ.sin();    mZ.data[0][2] = 0.0;      mZ.data[0][3] = 0.0;
-        mZ.data[1][0] = radZ.sin(); mZ.data[1][1] = radZ.cos();     mZ.data[1][2] = 0.0;      mZ.data[1][3] = 0.0;
-        mZ.data[2][0] = 0.0;        mZ.data[2][1] = 0.0;            mZ.data[2][2] = 1.0;      mZ.data[2][3] = 0.0;
-        mZ.data[3][0] = 0.0;        mZ.data[3][1] = 0.0;            mZ.data[3][2] = 0.0;      mZ.data[3][3] = 1.0;
+        mz.data[0][0] = rad_z.cos(); mz.data[0][1] = -rad_z.sin();    mz.data[0][2] = 0.0;      mz.data[0][3] = 0.0;
+        mz.data[1][0] = rad_z.sin(); mz.data[1][1] = rad_z.cos();     mz.data[1][2] = 0.0;      mz.data[1][3] = 0.0;
+        mz.data[2][0] = 0.0;        mz.data[2][1] = 0.0;            mz.data[2][2] = 1.0;      mz.data[2][3] = 0.0;
+        mz.data[3][0] = 0.0;        mz.data[3][1] = 0.0;            mz.data[3][2] = 0.0;      mz.data[3][3] = 1.0;
 
-        mX.multiplyM(&mY.multiplyM(&mZ))
+        mx.multiply_m(&my.multiply_m(&mz))
     }
     ///@todo wont have to be of type option once uvec implemented
     pub fn rotation_axis<P>(axis: &P, rad: f64) -> Option<Matrix4> where P: HasPosition3D {
@@ -84,35 +82,35 @@ impl Matrix4 {
         result.data[3][0] = 0.0;                                                result.data[3][1] = 0.0;                                                result.data[3][2] = 0.0;                                                result.data[3][3] = 1.0;
         Some(result)
     }
-    pub fn perspective(width: f64, height: f64, close: f64, away: f64, fovRad: f64) -> Matrix4 {
+    pub fn perspective(width: f64, height: f64, close: f64, away: f64, fov_rad: f64) -> Matrix4 {
         let ratio = width/height;
         let range = close - away;
-        let tanFovHalf = (fovRad/2.0).tan();
+        let tan_fov_half = (fov_rad/2.0).tan();
 
         let mut result = Matrix4::new();
-        result.data[0][0] = 1.0 / (tanFovHalf * away);  result.data[0][1] = 0.0;               result.data[0][2] = 0.0;                      result.data[0][3] = 0.0;
-        result.data[1][0] = 0.0;                        result.data[1][1] = 1.0 / tanFovHalf;  result.data[1][2] = 0.0;                      result.data[1][3] = 0.0;
+        result.data[0][0] = 1.0 / (tan_fov_half * away);  result.data[0][1] = 0.0;               result.data[0][2] = 0.0;                      result.data[0][3] = 0.0;
+        result.data[1][0] = 0.0;                        result.data[1][1] = 1.0 / tan_fov_half;  result.data[1][2] = 0.0;                      result.data[1][3] = 0.0;
         result.data[2][0] = 0.0;                        result.data[2][1] = 0.0;               result.data[2][2] = (-close - away) / range;  result.data[2][3] = 2.0 * away * close / range;
         result.data[3][0] = 0.0;                        result.data[3][1] = 0.0;               result.data[3][2] = 1.0;                      result.data[3][3] = 0.0;
         result
     }
     pub fn look_at<P>(target: &P, up: &P) -> Option<Matrix4> where P: HasPosition3D { //@todo wont have to be an option once unitvector is defined whis is always l > 0 ( l == 1)
-      let N = match target.clone().normalized() {
+      let n = match target.clone().normalized() {
           None => return None,
           Some(x) => x
       };
-      let U: Point3D;
-      U = match up.clone().normalized() {
+      let u: Point3D;
+      u = match up.clone().normalized() {
           None => return None,
           Some(x) => *(x.cross(target))
       };
-      let V: Box<Point3D>;
-      V = N.cross(&U);
+      let v: Box<Point3D>;
+      v = n.cross(&u);
 
       let mut result = Matrix4::new();
-      result.data[0][0] = U.x();  result.data[0][1] = U.y();  result.data[0][2] = U.z();  result.data[0][3] = 0.0;
-      result.data[1][0] = V.x();  result.data[1][1] = V.y();  result.data[1][2] = V.z();  result.data[1][3] = 0.0;
-      result.data[2][0] = N.x();  result.data[2][1] = N.y();  result.data[2][2] = N.z();  result.data[2][3] = 0.0;
+      result.data[0][0] = u.x();  result.data[0][1] = u.y();  result.data[0][2] = u.z();  result.data[0][3] = 0.0;
+      result.data[1][0] = v.x();  result.data[1][1] = v.y();  result.data[1][2] = v.z();  result.data[1][3] = 0.0;
+      result.data[2][0] = n.x();  result.data[2][1] = n.y();  result.data[2][2] = n.z();  result.data[2][3] = 0.0;
       result.data[3][0] = 0.0;  result.data[3][1] = 0.0;  result.data[3][2] = 0.0;  result.data[3][3] = 1.0;
       Some(result)
     }
@@ -127,7 +125,7 @@ impl Matrix4 {
 
 
 
-    pub fn multiplyM(&self, other: &Matrix4) -> Matrix4 {
+    pub fn multiply_m(&self, other: &Matrix4) -> Matrix4 {
         let mut result = Matrix4::new();
         for i in 0..4 {
             for j in 0..4 {
@@ -141,7 +139,7 @@ impl Matrix4 {
         result
     }
 
-    pub fn multiplyF(&self, other: f64) -> Matrix4 {
+    pub fn multiply_f(&self, other: f64) -> Matrix4 {
         let mut result = Matrix4::new();
         for i in 0..4 {
             for j in 0..4 {

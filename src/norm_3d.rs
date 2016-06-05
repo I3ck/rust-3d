@@ -5,7 +5,7 @@ use point_3d::Point3D;
 use traits::is_3d::Is3D;
 use traits::is_normalized_3d::IsNormalized3D;
 use traits::has_position_3d::HasPosition3D;
-use functions::{sqr_dist3D};
+use functions::{sqr_dist_3d};
 
 #[derive (PartialEq, PartialOrd)]
 pub struct Norm3D {
@@ -18,7 +18,7 @@ impl Eq for Norm3D{}
 impl Ord for Norm3D {
     fn cmp(&self, other: &Self) -> Ordering {
         let origin = *Point3D::new();
-        sqr_dist3D(&origin, self).partial_cmp(&sqr_dist3D(&origin, other)).unwrap_or(Ordering::Equal)
+        sqr_dist_3d(&origin, self).partial_cmp(&sqr_dist_3d(&origin, other)).unwrap_or(Ordering::Equal)
     }
 }
 

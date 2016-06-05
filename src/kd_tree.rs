@@ -1,9 +1,7 @@
-use std::cmp;
 use std::cmp::Ordering;
 
-use point_3d::{Point3D};
 use point_cloud_3d::{PointCloud3D};
-use functions::{dist3D, sqr_dist3D, dimension_compare, dimension_dist, sort_and_limit};
+use functions::{dist_3d, sqr_dist_3d, dimension_compare, dimension_dist, sort_and_limit};
 
 use traits::has_position_3d::HasPosition3D;
 use traits::has_editable_position_3d::HasEditablePosition3D;
@@ -35,7 +33,7 @@ impl<P> IsTree3D<P> for KdTree<P> where P: HasEditablePosition3D {
     fn to_pointcloud(&self) -> PointCloud3D<P>{
         let mut result = PointCloud3D::new();
         if let Some(ref node) = self.root {
-            node.toPointCloud3D(&mut result);
+            node.to_pointcloud_3d(&mut result);
         }
         result
     }
@@ -71,11 +69,11 @@ impl<P> IsKdTree3D<P> for KdTree<P> where P: HasEditablePosition3D {
         return result;
     }
 
-    fn in_box(&self, search: &P, xSize: f64, ySize: f64, zSize: f64) -> PointCloud3D<P> {
+    fn in_box(&self, search: &P, x_size: f64, y_size: f64, z_size: f64) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();
-        if xSize <= 0.0 || ySize <= 0.0 || zSize <= 0.0 { return result; }
+        if x_size <= 0.0 || y_size <= 0.0 || z_size <= 0.0 { return result; }
         if let Some(ref node) = self.root {
-            node.in_box(search, xSize, ySize, zSize, &mut result);
+            node.in_box(search, x_size, y_size, z_size, &mut result);
         }
         return result;
     }
@@ -95,7 +93,6 @@ impl<P> IsKdTree3D<P> for KdTree<P> where P: HasEditablePosition3D {
 impl<P> KdNode<P> where P: HasEditablePosition3D {
     pub fn new(dim: i8, mut pc: Vec<Box<P>>) -> KdNode<P> {
         let dimension = dim % 2;
-        let mut val = P::new();
         if pc.len() == 1 {
             return KdNode {
                 left: None,
@@ -112,25 +109,25 @@ impl<P> KdNode<P> where P: HasEditablePosition3D {
             _ => Ordering::Equal
         });
         let median = pc.len() / 2;
-        let mut pcLeft = Vec::new();
-        let mut pcRight = Vec::new();
+        let mut pc_left = Vec::new();
+        let mut pc_right = Vec::new();
 
         let mut val = P::new();
 
         for (i, p) in pc.into_iter().enumerate() {
-            if      i < median  { pcLeft.push(p); }
-            else if i > median  { pcRight.push(p); }
+            if      i < median  { pc_left.push(p); }
+            else if i > median  { pc_right.push(p); }
             else                { val = p; }
         }
 
-        let left = match pcLeft.len() {
+        let left = match pc_left.len() {
             0 => None,
-            _ => Some(Box::new(KdNode::new(dimension+1, pcLeft)))
+            _ => Some(Box::new(KdNode::new(dimension+1, pc_left)))
         };
 
-        let right = match pcRight.len() {
+        let right = match pc_right.len() {
             0 => None,
-            _ => Some(Box::new(KdNode::new(dimension+1, pcRight)))
+            _ => Some(Box::new(KdNode::new(dimension+1, pc_right)))
         };
 
         KdNode {
@@ -149,14 +146,14 @@ impl<P> KdNode<P> where P: HasEditablePosition3D {
         result
     }
 
-    pub fn toPointCloud3D(&self, pc: &mut PointCloud3D<P>) {
-        if let Some(ref n) = (&self).left { n.toPointCloud3D(pc); }
+    pub fn to_pointcloud_3d(&self, pc: &mut PointCloud3D<P>) {
+        if let Some(ref n) = (&self).left { n.to_pointcloud_3d(pc); }
         pc.push(self.val.clone());
-        if let Some(ref n) = (&self).right { n.toPointCloud3D(pc); }
+        if let Some(ref n) = (&self).right { n.to_pointcloud_3d(pc); }
     }
 
     pub fn knearest(&self, search: &P, n: usize, pc: &mut PointCloud3D<P>) {
-        if pc.len() < n || sqr_dist3D(search, &self.val) < sqr_dist3D(search, &**&pc.data[&pc.len() -1 ]) { //@todo reference weird
+        if pc.len() < n || sqr_dist_3d(search, &self.val) < sqr_dist_3d(search, &**&pc.data[&pc.len() -1 ]) { //@todo reference weird
             pc.push(self.val.clone());
         }
 
@@ -172,25 +169,25 @@ impl<P> KdNode<P> where P: HasEditablePosition3D {
 
         sort_and_limit(pc, search, n);
 
-        let (currentSearch, currentVal) = match self.dimension {
+        let (current_search, current_val) = match self.dimension {
             0 => (search.x(), self.val.x()),
             1 => (search.y(), self.val.y()),
             _ => (search.z(), self.val.z())
         };
 
-        let distanceBest = dist3D(search, &**&pc.data[&pc.len() -1 ]); //@todo reference weird
-        let borderLeft = currentSearch - distanceBest;
-        let borderRight = currentSearch + distanceBest;
+        let distance_best = dist_3d(search, &**&pc.data[&pc.len() -1 ]); //@todo reference weird
+        let border_left = current_search - distance_best;
+        let border_right = current_search + distance_best;
 
         match comp {
             Some(res) => match res {
                 Ordering::Less => if let Some(ref node) = (&self).right {
-                    if pc.len() < n || borderRight >= currentVal {
+                    if pc.len() < n || border_right >= current_val {
                         node.knearest(search, n, pc);
                     }
                 },
                 Ordering::Greater => if let Some(ref node) = (&self).left {
-                    if pc.len() < n || borderRight <= currentVal {
+                    if pc.len() < n || border_left <= current_val {
                         node.knearest(search, n, pc);
                     }
                 },
@@ -205,7 +202,7 @@ impl<P> KdNode<P> where P: HasEditablePosition3D {
     pub fn in_sphere(&self, search: &P, radius: f64, pc: &mut PointCloud3D<P>) {
         if radius <= 0.0 { return; }
 
-        if dist3D(search, &self.val) <= radius {
+        if dist_3d(search, &self.val) <= radius {
             pc.push(self.val.clone());
         }
 
@@ -221,26 +218,26 @@ impl<P> KdNode<P> where P: HasEditablePosition3D {
             None => {}
         }
 
-        let (currentSearch, currentVal) = match self.dimension {
+        let (current_search, current_val) = match self.dimension {
             0 => (search.x(), self.val.x()),
             1 => (search.y(), self.val.y()),
             _ => (search.z(), self.val.z())
         };
 
-        let borderLeft = currentSearch - radius;
-        let borderRight = currentSearch + radius;
+        let border_left = current_search - radius;
+        let border_right = current_search + radius;
 
 
 
         match comp {
             Some(res) => match res {
                 Ordering::Less => if let Some(ref node) = (&self).right {
-                    if borderRight >= currentVal {
+                    if border_right >= current_val {
                         node.in_sphere(search, radius, pc);
                     }
                 },
                 Ordering::Greater => if let Some(ref node) = (&self).left {
-                    if borderRight <= currentVal {
+                    if border_left <= current_val {
                         node.in_sphere(search, radius, pc);
                     }
                 },
@@ -250,11 +247,11 @@ impl<P> KdNode<P> where P: HasEditablePosition3D {
         }
     }
 
-    pub fn in_box(&self, search: &P, xSize: f64, ySize: f64, zSize: f64, pc: &mut PointCloud3D<P>) {
-        if xSize <= 0.0 || ySize <= 0.0 || zSize <= 0.0 { return; }
+    pub fn in_box(&self, search: &P, x_size: f64, y_size: f64, z_size: f64, pc: &mut PointCloud3D<P>) {
+        if x_size <= 0.0 || y_size <= 0.0 || z_size <= 0.0 { return; }
 
-        if let (Some(distX), Some(distY), Some(distZ)) = (dimension_dist(search, &self.val, 0), dimension_dist(search, &self.val, 1), dimension_dist(search, &self.val, 2)) {
-            if distX <= 0.5 * xSize && distY <= 0.5 * ySize && distZ <= 0.5 * zSize {
+        if let (Some(dist_x), Some(dist_y), Some(dist_z)) = (dimension_dist(search, &self.val, 0), dimension_dist(search, &self.val, 1), dimension_dist(search, &self.val, 2)) {
+            if dist_x <= 0.5 * x_size && dist_y <= 0.5 * y_size && dist_z <= 0.5 * z_size {
                 pc.push(self.val.clone());
             }
 
@@ -264,31 +261,31 @@ impl<P> KdNode<P> where P: HasEditablePosition3D {
 
             match comp {
                 Some(res) => match res {
-                    Ordering::Less  => if let Some(ref node) = (&self).left { node.in_box(search, xSize, ySize, zSize, pc); },
-                    _               => if let Some(ref node) = (&self).right { node.in_box(search, xSize, ySize, zSize, pc); }
+                    Ordering::Less  => if let Some(ref node) = (&self).left { node.in_box(search, x_size, y_size, z_size, pc); },
+                    _               => if let Some(ref node) = (&self).right { node.in_box(search, x_size, y_size, z_size, pc); }
                 },
                 None => {}
             }
 
-            let (currentSearch, currentVal, currentSize) = match self.dimension {
-                0 => (search.x(), self.val.x(), xSize),
-                1 => (search.y(), self.val.y(), ySize),
-                _ => (search.z(), self.val.z(), zSize)
+            let (current_search, current_val, current_size) = match self.dimension {
+                0 => (search.x(), self.val.x(), x_size),
+                1 => (search.y(), self.val.y(), y_size),
+                _ => (search.z(), self.val.z(), z_size)
             };
 
-            let borderLeft = currentSearch - 0.5 * currentSize;
-            let borderRight = currentSearch + 0.5 * currentSize;
+            let border_left = current_search - 0.5 * current_size;
+            let border_right = current_search + 0.5 * current_size;
 
             match comp {
                 Some(res) => match res {
                     Ordering::Less => if let Some(ref node) = (&self).right {
-                        if borderRight >= currentVal {
-                            node.in_box(search, xSize, ySize, zSize, pc);
+                        if border_right >= current_val {
+                            node.in_box(search, x_size, y_size, z_size, pc);
                         }
                     },
                     Ordering::Greater => if let Some(ref node) = (&self).left {
-                        if borderRight <= currentVal {
-                            node.in_box(search, xSize, ySize, zSize, pc);
+                        if border_left <= current_val {
+                            node.in_box(search, x_size, y_size, z_size, pc);
                         }
                     },
                     Ordering::Equal => {}
@@ -298,11 +295,7 @@ impl<P> KdNode<P> where P: HasEditablePosition3D {
         }
     }
 
-
-
     fn is_leaf(&self) -> bool {
         self.left.is_none() && self.right.is_none()
     }
-
-
 }

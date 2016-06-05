@@ -2,7 +2,6 @@ use std::cmp::Ordering;
 
 use point_2d::{Point2D};
 use point_3d::{Point3D};
-use point_cloud_2d::{PointCloud2D};
 use point_cloud_3d::{PointCloud3D};
 use oc_node::{Direction};
 use traits::is_2d::Is2D;
@@ -25,19 +24,20 @@ pub fn center<P>(p1: &P, p2: &P) -> Box<P> where P: HasPosition3D {
     )
 }
 
-pub fn dist2D<P,U>(p1: &P, p2: &U) -> f64 where P: Is2D, U: Is2D {
-    sqr_dist2D(p1,p2).sqrt()
+#[allow(dead_code)]
+pub fn dist_2d<P,U>(p1: &P, p2: &U) -> f64 where P: Is2D, U: Is2D {
+    sqr_dist_2d(p1,p2).sqrt()
 }
 
-pub fn dist3D<P,U>(p1: &P, p2: &U) -> f64 where P: Is3D, U: Is3D {
-    sqr_dist3D(p1,p2).sqrt()
+pub fn dist_3d<P,U>(p1: &P, p2: &U) -> f64 where P: Is3D, U: Is3D {
+    sqr_dist_3d(p1,p2).sqrt()
 }
 
-pub fn sqr_dist2D<P,U>(p1: &P, p2: &U) -> f64 where P: Is2D, U: Is2D {
+pub fn sqr_dist_2d<P,U>(p1: &P, p2: &U) -> f64 where P: Is2D, U: Is2D {
     (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2)
 }
 
-pub fn sqr_dist3D<P,U>(p1: &P, p2: &U) -> f64 where P: Is3D, U: Is3D {
+pub fn sqr_dist_3d<P,U>(p1: &P, p2: &U) -> f64 where P: Is3D, U: Is3D {
     (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2) + (p1.z() - p2.z()).powi(2)
 }
 
@@ -59,12 +59,12 @@ pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where P: HasP
     }
 }
 
-pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, maxSize: usize) where P: HasEditablePosition3D {
-    if pc.len() > maxSize {
-        pc.data.sort_by(|a, b| sqr_dist3D(search, &**a).partial_cmp(&sqr_dist3D(search, &**b)).unwrap_or(Ordering::Equal));
+pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, max_size: usize) where P: HasEditablePosition3D {
+    if pc.len() > max_size {
+        pc.data.sort_by(|a, b| sqr_dist_3d(search, &**a).partial_cmp(&sqr_dist_3d(search, &**b)).unwrap_or(Ordering::Equal));
         let mut result : Vec<Box<P>>;
         result = Vec::new();
-        for i in pc.data.iter().take(maxSize) {
+        for i in pc.data.iter().take(max_size) {
             result.push(Box::new((*i).clone()));
         }
         pc.data = result;
@@ -72,18 +72,19 @@ pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, maxSize: usiz
     }
 }
 //@todo move to plane or use there
+#[allow(dead_code)]
 pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, PointCloud3D<P3>) where P2: HasPosition2D + TransFormableTo3D, P3: HasEditablePosition3D + IsMoveable3D {
-    let mut pc3dA = PointCloud3D::new();
-    let mut pc3dB = PointCloud3D::new();
+    let mut pc_3d_a = PointCloud3D::new();
+    let mut pc_3d_b = PointCloud3D::new();
 
     for p in pc2d {
-        let pTransformed = p.transform_to_3D::<P3>(0.0);
-        pc3dA.push(pTransformed.clone());
-        pc3dB.push(pTransformed);
+        let p_transformed = p.transform_to_3d::<P3>(0.0);
+        pc_3d_a.push(p_transformed.clone());
+        pc_3d_b.push(p_transformed);
     }
 
-    pc3dB.move_by(dir.x(), dir.y(), dir.z());
-    (pc3dA, pc3dB)
+    pc_3d_b.move_by(dir.x(), dir.y(), dir.z());
+    (pc_3d_a, pc_3d_b)
 }
 
 pub fn calc_direction<P>(reference: &Point3D, p: &Point3D) -> Direction where P: HasPosition3D {
@@ -140,18 +141,18 @@ pub fn in_bb<P>(p: &P, min: &P, max: &P) -> bool where P: HasPosition3D {
 
 //@todo rename or overload operators
 //@todo implement for 2D aswell, maybe move to traits
-pub fn conn<P>(pFrom: &P, pTo: &P) -> P where P: HasPosition3D
+pub fn conn<P>(p_from: &P, p_to: &P) -> P where P: HasPosition3D
 {
     *P::build(
-        pTo.x() - pFrom.x(),
-        pTo.y() - pFrom.y(),
-        pTo.z() - pFrom.z()
+        p_to.x() - p_from.x(),
+        p_to.y() - p_from.y(),
+        p_to.z() - p_from.z()
     )
 }
 
 pub fn project_point_on_plane<PL,P2,P3,N>(plane: &PL, point: &P3) -> P2 where PL: IsPlane3D<P3,N>, P2: HasPosition2D, P3: HasPosition3D + TransFormableTo2D, N: IsNormalized3D {
     let relative = conn(&plane.origin(), point);
-    let mut p2transf = point.transform_to_2D::<P2>();
+    let mut p2transf = point.transform_to_2d::<P2>();
     let mut tmp = Point2D::new();
 
     tmp.set_x(plane.u().dot(&relative));
