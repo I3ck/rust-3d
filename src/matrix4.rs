@@ -17,6 +17,7 @@ impl Matrix4 {
             ]
         }
     }
+    
     pub fn zeroes() -> Matrix4 {
         Matrix4{
             data: [
@@ -27,6 +28,7 @@ impl Matrix4 {
             ]
         }
     }
+
     pub fn translation(x: f64, y: f64, z: f64) -> Matrix4 {
         Matrix4{
             data: [
@@ -37,6 +39,7 @@ impl Matrix4 {
             ]
         }
     }
+
     pub fn scale(x: f64, y: f64, z: f64) -> Matrix4 {
         Matrix4{
             data: [
@@ -47,6 +50,7 @@ impl Matrix4 {
             ]
         }
     }
+
     pub fn rotation(rad_x: f64, rad_y: f64, rad_z: f64) -> Matrix4 {
         let (mut mx, mut my, mut mz) = (Matrix4::new(), Matrix4::new(), Matrix4::new());
 
@@ -67,8 +71,11 @@ impl Matrix4 {
 
         mx.multiply_m(&my.multiply_m(&mz))
     }
+
     ///@todo wont have to be of type option once uvec implemented
-    pub fn rotation_axis<P>(axis: &P, rad: f64) -> Option<Matrix4> where P: HasPosition3D {
+    pub fn rotation_axis<P>(axis: &P, rad: f64) -> Option<Matrix4> where
+        P: HasPosition3D {
+
         let u = match axis.clone().normalized() {
           None => return None,
           Some(x) => x
@@ -82,6 +89,7 @@ impl Matrix4 {
         result.data[3][0] = 0.0;                                                result.data[3][1] = 0.0;                                                result.data[3][2] = 0.0;                                                result.data[3][3] = 1.0;
         Some(result)
     }
+
     pub fn perspective(width: f64, height: f64, close: f64, away: f64, fov_rad: f64) -> Matrix4 {
         let ratio = width/height; //@todo possibly bug here, since ratio is unused
         let range = close - away;
@@ -94,36 +102,29 @@ impl Matrix4 {
         result.data[3][0] = 0.0;                        result.data[3][1] = 0.0;               result.data[3][2] = 1.0;                      result.data[3][3] = 0.0;
         result
     }
-    pub fn look_at<P>(target: &P, up: &P) -> Option<Matrix4> where P: HasPosition3D { //@todo wont have to be an option once unitvector is defined whis is always l > 0 ( l == 1)
-      let n = match target.clone().normalized() {
+
+    pub fn look_at<P>(target: &P, up: &P) -> Option<Matrix4> where
+        P: HasPosition3D { //@todo wont have to be an option once unitvector is defined whis is always l > 0 ( l == 1)
+
+        let n = match target.clone().normalized() {
           None => return None,
           Some(x) => x
-      };
-      let u: Point3D;
-      u = match up.clone().normalized() {
+        };
+        let u: Point3D;
+        u = match up.clone().normalized() {
           None => return None,
           Some(x) => *(x.cross(target))
-      };
-      let v: Box<Point3D>;
-      v = n.cross(&u);
+        };
+        let v: Box<Point3D>;
+        v = n.cross(&u);
 
-      let mut result = Matrix4::new();
-      result.data[0][0] = u.x();  result.data[0][1] = u.y();  result.data[0][2] = u.z();  result.data[0][3] = 0.0;
-      result.data[1][0] = v.x();  result.data[1][1] = v.y();  result.data[1][2] = v.z();  result.data[1][3] = 0.0;
-      result.data[2][0] = n.x();  result.data[2][1] = n.y();  result.data[2][2] = n.z();  result.data[2][3] = 0.0;
-      result.data[3][0] = 0.0;  result.data[3][1] = 0.0;  result.data[3][2] = 0.0;  result.data[3][3] = 1.0;
-      Some(result)
+        let mut result = Matrix4::new();
+        result.data[0][0] = u.x();  result.data[0][1] = u.y();  result.data[0][2] = u.z();  result.data[0][3] = 0.0;
+        result.data[1][0] = v.x();  result.data[1][1] = v.y();  result.data[1][2] = v.z();  result.data[1][3] = 0.0;
+        result.data[2][0] = n.x();  result.data[2][1] = n.y();  result.data[2][2] = n.z();  result.data[2][3] = 0.0;
+        result.data[3][0] = 0.0;  result.data[3][1] = 0.0;  result.data[3][2] = 0.0;  result.data[3][3] = 1.0;
+        Some(result)
     }
-
-
-
-
-
-
-
-
-
-
 
     pub fn multiply_m(&self, other: &Matrix4) -> Matrix4 {
         let mut result = Matrix4::new();

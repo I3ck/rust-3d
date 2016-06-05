@@ -20,6 +20,7 @@ pub struct Point3D {
 }
 
 impl Eq for Point3D {}
+
 impl Ord for Point3D {
     fn cmp(&self, other: &Self) -> Ordering {
         let origin = *Point3D::new();
@@ -47,12 +48,15 @@ impl Is3D for Point3D {
     fn x(&self) -> f64 {
         self.x
     }
+
     fn y(&self) -> f64 {
         self.y
     }
+
     fn z(&self) -> f64 {
         self.z
     }
+
     fn clone(&self) -> Point3D {
         Point3D { x: self.x, y: self.y, z: self.z }
     }
@@ -89,7 +93,9 @@ impl HasEditablePosition3D for Point3D {
 }
 
 impl TransFormableTo2D for Point3D {
-    fn transform_to_2d<P>(&self) -> P where P: HasPosition2D {
+    fn transform_to_2d<P>(&self) -> P where
+        P: HasPosition2D {
+            
         *P::build(self.x, self.y)
     }
 }

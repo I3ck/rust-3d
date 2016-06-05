@@ -15,6 +15,7 @@ pub struct Norm3D {
 }
 
 impl Eq for Norm3D{}
+
 impl Ord for Norm3D {
     fn cmp(&self, other: &Self) -> Ordering {
         let origin = *Point3D::new();
@@ -34,12 +35,15 @@ impl Is3D for Norm3D {
     fn x(&self) -> f64 {
         self.x
     }
+
     fn y(&self) -> f64 {
         self.y
     }
+
     fn z(&self) -> f64 {
         self.z
     }
+
     fn clone(&self) -> Self {
         Norm3D {
             x: self.x,
@@ -50,7 +54,9 @@ impl Is3D for Norm3D {
 }
 
 impl IsNormalized3D for Norm3D {
-    fn new<P>(p: P) -> Option<Box<Self>> where P: HasPosition3D {
+    fn new<P>(p: P) -> Option<Box<Self>> where
+        P: HasPosition3D {
+
         match p.abs() {
             0.0 => None,
             l => Some(Box::new(Norm3D {
@@ -60,6 +66,7 @@ impl IsNormalized3D for Norm3D {
             }))
         }
     }
+
     fn norm_x() -> Self {
         Norm3D {
             x: 1.0,
@@ -67,6 +74,7 @@ impl IsNormalized3D for Norm3D {
             z: 0.0
         }
     }
+
     fn norm_y() -> Self {
         Norm3D {
             x: 0.0,
@@ -74,6 +82,7 @@ impl IsNormalized3D for Norm3D {
             z: 0.0
         }
     }
+    
     fn norm_z() -> Self {
         Norm3D {
             x: 0.0,

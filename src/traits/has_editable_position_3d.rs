@@ -5,7 +5,9 @@ use traits::has_position_3d::HasPosition3D;
 
 pub trait HasEditablePosition3D : HasPosition3D {
     fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable3D? Or remove moveable trait
+
     fn set_y(&mut self, val: f64);
+
     fn set_z(&mut self, val: f64);
 
     fn set_pos(&mut self, x: f64, y: f64, z: f64) {
@@ -14,7 +16,9 @@ pub trait HasEditablePosition3D : HasPosition3D {
         self.set_z(z);
     }
 
-    fn add<P>(&mut self, other: &P) where P: HasPosition3D {
+    fn add<P>(&mut self, other: &P) where
+        P: HasPosition3D {
+
         let x = self.x() + other.x();
         let y = self.y() + other.y();
         let z = self.z() + other.z();
@@ -23,7 +27,9 @@ pub trait HasEditablePosition3D : HasPosition3D {
         self.set_z(z);
     }
 
-    fn substract<P>(&mut self, other: &P) where P: HasPosition3D {
+    fn substract<P>(&mut self, other: &P) where
+        P: HasPosition3D {
+            
         let x = self.x() - other.x();
         let y = self.y() - other.y();
         let z = self.z() - other.z();

@@ -8,17 +8,23 @@ use traits::has_editable_position_3d::HasEditablePosition3D;
 use traits::is_tree_3d::IsTree3D;
 use traits::is_kd_tree_3d::IsKdTree3D;
 
-pub struct KdTree<P> where P: HasEditablePosition3D {
+pub struct KdTree<P> where
+    P: HasEditablePosition3D {
+
     pub root: Option<KdNode<P>>
 }
-pub struct KdNode<P> where P: HasEditablePosition3D {
+pub struct KdNode<P> where
+    P: HasEditablePosition3D {
+
     pub left: Option<Box<KdNode<P>>>,
     pub right: Option<Box<KdNode<P>>>,
     pub val: P,
     pub dimension: i8
 }
 
-impl<P> IsTree3D<P> for KdTree<P> where P: HasEditablePosition3D {
+impl<P> IsTree3D<P> for KdTree<P> where
+    P: HasEditablePosition3D {
+
     fn new() -> KdTree<P> {
         KdTree { root: None }
     }
@@ -50,7 +56,9 @@ impl<P> IsTree3D<P> for KdTree<P> where P: HasEditablePosition3D {
 
 }
 
-impl<P> IsKdTree3D<P> for KdTree<P> where P: HasEditablePosition3D {
+impl<P> IsKdTree3D<P> for KdTree<P> where
+    P: HasEditablePosition3D {
+
     fn knearest(&self, search: &P, n: usize) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();
         if n < 1 { return result; }
@@ -90,7 +98,9 @@ impl<P> IsKdTree3D<P> for KdTree<P> where P: HasEditablePosition3D {
     }
 }
 
-impl<P> KdNode<P> where P: HasEditablePosition3D {
+impl<P> KdNode<P> where
+    P: HasEditablePosition3D {
+
     pub fn new(dim: i8, mut pc: Vec<Box<P>>) -> KdNode<P> {
         let dimension = dim % 2;
         if pc.len() == 1 {

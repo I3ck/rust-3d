@@ -3,9 +3,18 @@ use std::hash::{Hash};
 use traits::is_3d::Is3D;
 use matrix4::Matrix4;
 
-pub trait HasPosition3D : Is3D + Eq + PartialEq + Ord + PartialOrd + Hash {
+pub trait HasPosition3D :
+    Is3D +
+    Eq +
+    PartialEq +
+    Ord +
+    PartialOrd +
+    Hash {
+
     fn new() -> Box<Self>;
+
     fn build(x: f64, y: f64, z: f64) -> Box<Self>;
+    
     fn from<P>(&mut self, other: P) where P: HasPosition3D;
 
     //@todo return new or alter self???

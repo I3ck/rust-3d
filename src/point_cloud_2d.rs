@@ -8,11 +8,15 @@ use point_2d::{Point2D};
 
 
 
-pub struct PointCloud2D<P> where P: HasEditablePosition2D {
+pub struct PointCloud2D<P> where
+    P: HasEditablePosition2D {
+
     pub data: Vec<Box<P>>
 }
 
-impl<P> PointCloud2D<P> where P: HasEditablePosition2D{
+impl<P> PointCloud2D<P> where
+    P: HasEditablePosition2D{
+
     pub fn new() -> PointCloud2D<P> {
         PointCloud2D{data: Vec::new()}
     }
@@ -52,19 +56,13 @@ impl<P> PointCloud2D<P> where P: HasEditablePosition2D{
         PointCloud2D { data: data }
     }
 
-//------------------------------------------------------------------------------
-
     pub fn push(&mut self, p: P) {
         self.data.push(Box::new(p));
     }
 
-//------------------------------------------------------------------------------
-
     pub fn len(&self) -> usize {
         self.data.len()
     }
-
-//------------------------------------------------------------------------------
 
     pub fn center(&self) -> Option<P> {
         let size = self.len();
@@ -88,8 +86,6 @@ impl<P> PointCloud2D<P> where P: HasEditablePosition2D{
             (sumy / sizef)
         ))
     }
-
-//------------------------------------------------------------------------------
 
     pub fn bbox(&self) -> Option<(Point2D, Point2D)> { //@todo return P ?
         if self.len() < 2 {
@@ -120,9 +116,9 @@ impl<P> IsMoveable2D for PointCloud2D<P> where P: HasEditablePosition2D + IsMove
     }
 }
 
-//------------------------------------------------------------------------------
+impl<P> fmt::Display for PointCloud2D<P> where
+    P: HasEditablePosition2D + fmt::Display {
 
-impl<P> fmt::Display for PointCloud2D<P> where P: HasEditablePosition2D + fmt::Display {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {
             match p.fmt(f) {

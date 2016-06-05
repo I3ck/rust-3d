@@ -8,13 +8,17 @@ use traits::has_editable_position_3d::HasEditablePosition3D;
 use traits::is_tree_3d::IsTree3D;
 use traits::is_oc_tree::IsOcTree;
 
-pub struct OcTree<P> where P: HasEditablePosition3D {
+pub struct OcTree<P> where
+    P: HasEditablePosition3D {
+
     pub root: Option<OcNode<P>>,
     pub min: P,
     pub max: P
 }
 
-impl<P> IsTree3D<P> for OcTree<P> where P: HasEditablePosition3D {
+impl<P> IsTree3D<P> for OcTree<P> where
+    P: HasEditablePosition3D {
+
     fn new() -> OcTree<P> {
         OcTree {
             root: None,
@@ -55,7 +59,9 @@ impl<P> IsTree3D<P> for OcTree<P> where P: HasEditablePosition3D {
     }
 }
 
-impl<P> IsOcTree<P> for OcTree<P> where P: HasEditablePosition3D {
+impl<P> IsOcTree<P> for OcTree<P> where
+    P: HasEditablePosition3D {
+        
     //@todo rewrite or make new method which returns cog instead of stopping recursion
     fn collect(&self,  maxdepth: i8) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();

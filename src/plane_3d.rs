@@ -2,14 +2,20 @@ use traits::is_plane_3d::IsPlane3D;
 use traits::has_position_3d::HasPosition3D;
 use traits::is_normalized_3d::IsNormalized3D;
 
-pub struct Plane3D<P,N> where P: HasPosition3D, N: IsNormalized3D {
+pub struct Plane3D<P,N> where
+    P: HasPosition3D,
+    N: IsNormalized3D {
+
     pub origin: P,
     pub u: N,
     pub v: N
 }
 
 
-impl<P,N> IsPlane3D<P,N> for Plane3D<P,N> where P: HasPosition3D, N: IsNormalized3D {
+impl<P,N> IsPlane3D<P,N> for Plane3D<P,N> where
+    P: HasPosition3D,
+    N: IsNormalized3D {
+        
     fn new() -> Box<Self> {
         Box::new(Plane3D {
             origin: *P::build(0.0, 0.0, 0.0),

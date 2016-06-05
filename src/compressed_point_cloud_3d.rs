@@ -9,7 +9,9 @@ use point_3d::{Point3D};
 use point_cloud_3d::{PointCloud3D};
 use compressed_point_3d::{CompressedPoint3D};
 
-pub struct CompressedPointCloud3D<T> where T: Unsigned + PrimInt {
+pub struct CompressedPointCloud3D<T> where
+    T: Unsigned + PrimInt {
+
     pub start: Point3D,
     pub unitsizex: f64,
     pub unitsizey: f64,
@@ -18,8 +20,12 @@ pub struct CompressedPointCloud3D<T> where T: Unsigned + PrimInt {
 }
 
 
-impl<T> CompressedPointCloud3D<T> where T: Unsigned + PrimInt {
-    pub fn compress<P>(pc: &PointCloud3D<P>) -> Option<CompressedPointCloud3D<T>> where P: HasEditablePosition3D {
+impl<T> CompressedPointCloud3D<T> where
+    T: Unsigned + PrimInt {
+
+    pub fn compress<P>(pc: &PointCloud3D<P>) -> Option<CompressedPointCloud3D<T>> where
+        P: HasEditablePosition3D {
+
         let (pmin, pmax) = match pc.bbox() {
             None        => return None,
             Some(res)   => res,
@@ -71,7 +77,9 @@ impl<T> CompressedPointCloud3D<T> where T: Unsigned + PrimInt {
 
 //------------------------------------------------------------------------------
 
-    pub fn decompress<P>(&self) -> Option<PointCloud3D<P>> where P: HasEditablePosition3D {
+    pub fn decompress<P>(&self) -> Option<PointCloud3D<P>> where
+        P: HasEditablePosition3D {
+            
         let mut pc = PointCloud3D::new();
 
         for p in &self.data {

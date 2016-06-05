@@ -8,11 +8,15 @@ use point_3d::{Point3D};
 
 
 
-pub struct PointCloud3D<P> where P: HasEditablePosition3D {
+pub struct PointCloud3D<P> where
+    P: HasEditablePosition3D {
+
     pub data: Vec<Box<P>>
 }
 
-impl<P> PointCloud3D<P> where P: HasEditablePosition3D{
+impl<P> PointCloud3D<P> where
+    P: HasEditablePosition3D{
+
     pub fn new() -> PointCloud3D<P> {
         PointCloud3D{data: Vec::new()}
     }
@@ -52,19 +56,13 @@ impl<P> PointCloud3D<P> where P: HasEditablePosition3D{
         PointCloud3D { data: data }
     }
 
-//------------------------------------------------------------------------------
-
     pub fn push(&mut self, p: P) {
         self.data.push(Box::new(p));
     }
 
-//------------------------------------------------------------------------------
-
     pub fn len(&self) -> usize {
         self.data.len()
     }
-
-//------------------------------------------------------------------------------
 
     pub fn center(&self) -> Option<P> {
         let size = self.len();
@@ -92,8 +90,6 @@ impl<P> PointCloud3D<P> where P: HasEditablePosition3D{
         ))
     }
 
-//------------------------------------------------------------------------------
-
     pub fn bbox(&self) -> Option<(Point3D, Point3D)> { //@todo return P ?
         if self.len() < 2 {
             return None;
@@ -119,7 +115,9 @@ impl<P> PointCloud3D<P> where P: HasEditablePosition3D{
     }
 }
 
-impl<P> IsMoveable3D for PointCloud3D<P> where P: HasEditablePosition3D + IsMoveable3D {
+impl<P> IsMoveable3D for PointCloud3D<P> where
+    P: HasEditablePosition3D + IsMoveable3D {
+
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         for p in &mut self.data {
             p.move_by(x, y, z);
@@ -127,9 +125,9 @@ impl<P> IsMoveable3D for PointCloud3D<P> where P: HasEditablePosition3D + IsMove
     }
 }
 
-//------------------------------------------------------------------------------
+impl<P> fmt::Display for PointCloud3D<P> where
+    P: HasEditablePosition3D + fmt::Display {
 
-impl<P> fmt::Display for PointCloud3D<P> where P: HasEditablePosition3D + fmt::Display {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {
             match p.fmt(f) {

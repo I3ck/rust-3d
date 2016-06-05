@@ -5,6 +5,7 @@ use traits::has_position_2d::HasPosition2D;
 
 pub trait HasEditablePosition2D : HasPosition2D {
     fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable3D? Or remove moveable trait
+
     fn set_y(&mut self, val: f64);
 
     fn set_pos(&mut self, x: f64, y: f64) {
@@ -12,14 +13,18 @@ pub trait HasEditablePosition2D : HasPosition2D {
         self.set_y(y);
     }
 
-    fn add<P>(&mut self, other: &P) where P: HasPosition2D {
+    fn add<P>(&mut self, other: &P) where
+        P: HasPosition2D {
+
         let x = self.x() + other.x();
         let y = self.y() + other.y();
         self.set_x(x);
         self.set_y(y);
     }
 
-    fn substract<P>(&mut self, other: &P) where P: HasPosition2D {
+    fn substract<P>(&mut self, other: &P) where
+        P: HasPosition2D {
+
         let x = self.x() - other.x();
         let y = self.y() - other.y();
         self.set_x(x);
@@ -33,7 +38,9 @@ pub trait HasEditablePosition2D : HasPosition2D {
         self.set_y(y);
     }
 
-    fn rotate<P>(&mut self, rad: f64, center: &P) where P: HasPosition2D {
+    fn rotate<P>(&mut self, rad: f64, center: &P) where
+        P: HasPosition2D {
+
         let newx = center.x() + rad.cos() * (self.x() - center.x()) - rad.sin() * (self.y() - center.y());
         let newy = center.y() + rad.sin() * (self.x() - center.x()) + rad.cos() * (self.y() - center.y());
 
