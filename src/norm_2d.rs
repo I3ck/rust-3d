@@ -33,7 +33,7 @@ impl Is2D for Norm2D {
     fn x(&self) -> f64 {
         self.x
     }
-    
+
     fn y(&self) -> f64 {
         self.y
     }
@@ -48,7 +48,7 @@ impl Is2D for Norm2D {
 
 impl IsNormalized2D for Norm2D {
     fn new<P>(p: P) -> Option<Box<Self>> where
-        P: HasPosition2D {
+        P: Is2D {
 
         match p.abs() {
             0.0 => None,

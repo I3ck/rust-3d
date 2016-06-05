@@ -1,6 +1,7 @@
 extern crate core;
 use self::core::str::FromStr;
 
+use traits::is_2d::Is2D;
 use traits::has_position_2d::HasPosition2D;
 
 pub trait HasEditablePosition2D : HasPosition2D {
@@ -14,7 +15,7 @@ pub trait HasEditablePosition2D : HasPosition2D {
     }
 
     fn add<P>(&mut self, other: &P) where
-        P: HasPosition2D {
+        P: Is2D {
 
         let x = self.x() + other.x();
         let y = self.y() + other.y();
@@ -23,7 +24,7 @@ pub trait HasEditablePosition2D : HasPosition2D {
     }
 
     fn substract<P>(&mut self, other: &P) where
-        P: HasPosition2D {
+        P: Is2D {
 
         let x = self.x() - other.x();
         let y = self.y() - other.y();
@@ -39,7 +40,7 @@ pub trait HasEditablePosition2D : HasPosition2D {
     }
 
     fn rotate<P>(&mut self, rad: f64, center: &P) where
-        P: HasPosition2D {
+        P: Is2D {
 
         let newx = center.x() + rad.cos() * (self.x() - center.x()) - rad.sin() * (self.y() - center.y());
         let newy = center.y() + rad.sin() * (self.x() - center.x()) + rad.cos() * (self.y() - center.y());

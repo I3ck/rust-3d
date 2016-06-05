@@ -183,7 +183,7 @@ pub fn project_point_on_plane<PL,P2,P3,N>(plane: &PL, point: &P3) -> P2 where
     P2: HasPosition2D,
     P3: HasPosition3D + TransFormableTo2D,
     N: IsNormalized3D {
-        
+
     let relative = conn(&plane.origin(), point);
     let mut p2transf = point.transform_to_2d::<P2>();
     let mut tmp = Point2D::new();

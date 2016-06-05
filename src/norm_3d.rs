@@ -55,7 +55,7 @@ impl Is3D for Norm3D {
 
 impl IsNormalized3D for Norm3D {
     fn new<P>(p: P) -> Option<Box<Self>> where
-        P: HasPosition3D {
+        P: Is3D {
 
         match p.abs() {
             0.0 => None,
@@ -82,7 +82,7 @@ impl IsNormalized3D for Norm3D {
             z: 0.0
         }
     }
-    
+
     fn norm_z() -> Self {
         Norm3D {
             x: 0.0,

@@ -12,13 +12,13 @@ pub trait Is2D {
     }
 
     fn dot<P>(&self, other: &P) -> f64 where
-        P: HasPosition2D {
+        P: Is2D {
 
         self.x() * other.x() + self.y() * other.y()
     }
 
     fn cross<P>(&self, other: &P) -> f64 where
-        P: HasPosition2D {
+        P: Is2D {
 
         self.x() * other.y() - self.y() * other.x()
     }
@@ -28,7 +28,7 @@ pub trait Is2D {
     }
 
     fn rad_to<P>(&self, other: &P) -> f64 where
-        P: HasPosition2D {
+        P: Is2D {
         (other.y() - self.y()).atan2(other.x() - self.x())
     }
 

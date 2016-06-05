@@ -1,6 +1,7 @@
 extern crate core;
 use self::core::str::FromStr;
 
+use traits::is_3d::Is3D;
 use traits::has_position_3d::HasPosition3D;
 
 pub trait HasEditablePosition3D : HasPosition3D {
@@ -17,7 +18,7 @@ pub trait HasEditablePosition3D : HasPosition3D {
     }
 
     fn add<P>(&mut self, other: &P) where
-        P: HasPosition3D {
+        P: Is3D {
 
         let x = self.x() + other.x();
         let y = self.y() + other.y();
@@ -28,8 +29,8 @@ pub trait HasEditablePosition3D : HasPosition3D {
     }
 
     fn substract<P>(&mut self, other: &P) where
-        P: HasPosition3D {
-            
+        P: Is3D {
+
         let x = self.x() - other.x();
         let y = self.y() - other.y();
         let z = self.z() - other.z();
