@@ -37,6 +37,9 @@ use traits::has_editable_position_3d::HasEditablePosition3D;
 use traits::is_tree_3d::IsTree3D;
 use traits::is_oc_tree::IsOcTree;
 use traits::is_kd_tree_3d::IsKdTree3D;
+use traits::is_mesh_3d::IsMesh3D;
+use traits::is_editable_mesh_3d::IsEditableMesh3D;
+use mesh_3d::Mesh3D;
 use functions::{extrude, center};
 
 use std::cmp::Ordering;
@@ -197,6 +200,7 @@ fn main() {
 
                     let extrustionDir = *Point3D::build(0.0, 0.0, 7.0);
                     let (extrusionA, extrusionB) = extrude::<Point2D, Point3D>(&pc2.data, &extrustionDir);
+                    let (lenA, lenB) = (extrusionA.len(), extrusionB.len());
 
                     //println!("extrusionA : {}", extrusionA);
                     //println!("extrusionB : {}", extrusionB);
@@ -208,60 +212,38 @@ fn main() {
                     f.write_all(extrusionB.to_str().as_bytes()).expect("Could not write to file");
 
 
-
-                    //testing .ply
-                    let mut f = File::create("extrusionMesh.ply").expect("Could not create file");
-
-                    let (lenA, lenB) = (extrusionA.len(), extrusionB.len());
-                    let nVertices = lenA + lenB + 2;
-                    let nFaces = 2*(lenA-1) + 2*(lenB-1);
-
-                    let nVertexString = "element vertex ".to_string() + &nVertices.to_string() + "\n";
-                    let nFacesString = "element face ".to_string() + &nFaces.to_string() + "\n";
-
-
-                    f.write_all(b"ply\n");
-                    f.write_all(b"format ascii 1.0           { ascii/binary, format version number }\n");
-                    f.write_all(b"comment made by Greg Turk  { comments keyword specified, like all lines }\n");
-                    f.write_all(b"comment this file is a cube\n");
-                    f.write_all(nVertexString.as_bytes());
-                    f.write_all(b"property float x           { vertex contains float \"x\" coordinate }\n");
-                    f.write_all(b"property float y           { y coordinate is also a vertex property }\n");
-                    f.write_all(b"property float z           { z coordinate, too }\n");
-                    f.write_all(nFacesString.as_bytes());
-                    f.write_all(b"property list uchar int vertex_index { \"vertex_indices\" is a list of ints }\n");
-                    f.write_all(b"end_header                 { delimits the end of the header }\n");
-
+                    let mut mesh = Mesh3D::<Point3D>::new();
                     //vertices of extrusionA
                     for p in extrusionA.data {
-                        f.write_all((p.to_str() + "\n").as_bytes());
+                        mesh.add_vertex(*p);
                     }
                     //vertices of extrusionB
                     for p in extrusionB.data {
-                        f.write_all((p.to_str() + "\n").as_bytes());
+                        mesh.add_vertex(*p);
                     }
-                    f.write_all((Point3D::new().to_str() + "\n").as_bytes());
-                    f.write_all((extrustionDir.to_str() + "\n").as_bytes());
+                    mesh.add_vertex(*Point3D::new());
+                    mesh.add_vertex(extrustionDir);
+
                     //faces with base on extrusionA
                     for i in 0..lenA-1 {
-                        f.write_all(("3 ".to_string() + &(i).to_string() + " " + &(i+1).to_string() + " " + &(lenA+i).to_string() + "\n").as_bytes());
+                        mesh.try_add_connection(i, i+1, lenA+i).expect("error adding connection in mesh1");
                     }
                     //faces with base on extrusionB
                     for i in 0..lenB-1 {
-                        f.write_all(("3 ".to_string() + &(lenB+i+1).to_string() + " " + &(lenB+i).to_string() + " " + &(i+1).to_string() + "\n").as_bytes());
+                        mesh.try_add_connection(lenB+i+1, lenB+i, i+1).expect("error adding connection in mesh2");
                     }
 
                     //END GENERAL MESHING PART
                     //extrusionA to origin
                     for i in 0..lenA-1 {
-                        f.write_all(("3 ".to_string() + &(i+1).to_string() + " " + &(i).to_string() + " " + &(lenA+lenB).to_string() + "\n").as_bytes());
+                        mesh.try_add_connection(i+1, i, lenA+lenB).expect("error adding connection in mesh3");
                     }
                     //extrusionB to origin
                     for i in 0..lenB-1 {
-                        f.write_all(("3 ".to_string() + &(lenB+i).to_string() + " " + &(lenB+i+1).to_string() + " " + &(lenA+lenB+1).to_string() + "\n").as_bytes());
+                        mesh.try_add_connection(lenB+i, lenB+i+1, lenA+lenB+1).expect("error adding connection in mesh4");
                     }
 
-
+                    mesh.save_ply_ascii("extrusionMesh.ply");
                 }
             }
         }

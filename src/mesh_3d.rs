@@ -30,7 +30,7 @@ impl<P> IsMesh3D<P> for Mesh3D<P> where
             return None;
         }
 
-        Some((id1, id2, id3))
+        Some((self.topology[id1], self.topology[id2], self.topology[id3]))
     }
 
     fn face_vertices(&self, faceid: usize) -> Option<(P, P, P)> {
