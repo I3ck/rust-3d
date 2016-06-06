@@ -59,6 +59,13 @@ impl<P> IsMesh3D<P> for Mesh3D<P> where
 impl<P> IsEditableMesh3D<P> for Mesh3D<P> where
     P: HasEditablePosition3D {
 
+    fn new() -> Self {
+        Mesh3D {
+            pc: PointCloud3D::new(),
+            topology: Vec::new()
+        }
+    }
+
     fn add_vertex(&mut self, vertex: P) -> usize {
         self.pc.push(vertex);
         self.pc.len() - 1
