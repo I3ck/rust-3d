@@ -15,6 +15,33 @@ pub trait IsMesh3D<P> where
 
     fn vertex(&self, vertexid: usize) -> Option<P>;
 
+    fn save_stl_ascii(&self, filepath: &str) -> bool { //@todo .stl cant have negative coordinates, therefore must be offset by BB (or show error)
+
+        let mut f = match File::create(filepath) {
+            Err(_) => return false,
+            Ok(f) => f
+        };
+
+        //@todo precision?
+        f.write_all(b"solid \n");
+
+        for i in 0..self.num_faces() {
+            let (v1, v2, v3) = match self.face_vertices(i) {
+                None => return false,
+                Some((v1, v2, v3)) => (v1, v2, v3)
+            };
+            f.write_all(b"facet normal 0 0 0\n"); //@todo normals missing
+            f.write_all(b"    outer loop\n");
+            f.write_all(("        vertex ".to_string() + &v1.to_str() + "\n").as_bytes());
+            f.write_all(("        vertex ".to_string() + &v2.to_str() + "\n").as_bytes());
+            f.write_all(("        vertex ".to_string() + &v3.to_str() + "\n").as_bytes());
+            f.write_all(b"    end loop\n");
+            f.write_all(b"endfacet\n");
+        }
+        f.write_all(b"solid \n");
+        true
+    }
+
     fn save_ply_ascii(&self, filepath: &str) -> bool {
 
         let mut f = match File::create(filepath) {

@@ -244,6 +244,7 @@ fn main() {
                     }
 
                     mesh.save_ply_ascii("extrusionMesh.ply");
+                    mesh.save_stl_ascii("extrusionMesh.stl");
                 }
             }
         }
