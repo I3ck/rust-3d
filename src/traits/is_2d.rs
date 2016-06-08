@@ -22,7 +22,7 @@ pub trait Is2D {
     }
 
     fn abs(&self) -> f64 {
-        (self.x()).powi(2) + (self.y()).powi(2)
+        ((self.x()).powi(2) + (self.y()).powi(2)).sqrt()
     }
 
     fn rad_to<P>(&self, other: &P) -> f64 where
