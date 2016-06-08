@@ -1,9 +1,14 @@
 use traits::is_3d::Is3D;
+use traits::has_position_3d::HasPosition3D;
+use traits::is_normalized_3d::IsNormalized3D;
+use functions::conn;
+use point_3d::Point3D;
+use norm_3d::Norm3D;
 use std::io::prelude::*;
 use std::fs::File;
 
 pub trait IsMesh3D<P> where
-    P: Is3D {
+    P: HasPosition3D {
 
     fn num_faces(&self) -> usize;
 
@@ -14,6 +19,23 @@ pub trait IsMesh3D<P> where
     fn face_vertices(&self, faceid: usize) -> Option<(P, P, P)>;
 
     fn vertex(&self, vertexid: usize) -> Option<P>;
+
+    fn face_normal(&self, faceid: usize) -> Option<Norm3D> {
+        let (v1, v2, v3) = match self.face_vertices(faceid) {
+            None => return None,
+            Some((v1, v2, v3)) => (v1, v2, v3)
+        };
+
+        let v12 = conn(&v1, &v2);
+        let v23 = conn(&v2, &v3);
+
+        let n = v12.cross::<P, Point3D>(&v23);
+
+        match Norm3D::new(*n) {
+            None => None,
+            Some(b) => Some(*b)
+        }
+    }
 
     fn save_stl_ascii(&self, filepath: &str) -> bool { //@todo .stl cant have negative coordinates, therefore must be offset by BB (or show error)
 
@@ -30,7 +52,11 @@ pub trait IsMesh3D<P> where
                 None => return false,
                 Some((v1, v2, v3)) => (v1, v2, v3)
             };
-            f.write_all(b"facet normal 0 0 0\n"); //@todo normals missing
+            let n = match self.face_normal(i) {
+                None => return false,
+                Some(n) => n
+            };
+            f.write_all(("facet normal ".to_string() + &n.to_str() + "\n").as_bytes()); //@todo normals missing
             f.write_all(b"    outer loop\n");
             f.write_all(("        vertex ".to_string() + &v1.to_str() + "\n").as_bytes());
             f.write_all(("        vertex ".to_string() + &v2.to_str() + "\n").as_bytes());

@@ -4,3 +4,5 @@ iterators for collections
 unittest all the things
 add copyright
 up to github / crates
+rename traits: Is/HasXyz   Is/HasBuildableXyz   Is/HasEditableXyz
+normal can have length != 1

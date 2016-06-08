@@ -1,8 +1,8 @@
-use traits::is_3d::Is3D;
+use traits::has_position_3d::HasPosition3D;
 use traits::is_mesh_3d::IsMesh3D;
 
 pub trait IsEditableMesh3D<P> : IsMesh3D<P> where
-    P: Is3D {
+    P: HasPosition3D {
 
     fn new() -> Self;
 
