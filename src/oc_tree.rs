@@ -3,13 +3,13 @@ use std::iter::IntoIterator;
 
 use point_cloud_3d::{PointCloud3D};
 use oc_node::{OcNode};
-use traits::has_position_3d::HasPosition3D;
-use traits::has_editable_position_3d::HasEditablePosition3D;
+use traits::is_buildable_3d::IsBuildable3D;
+use traits::is_editable_3d::IsEditable3D;
 use traits::is_tree_3d::IsTree3D;
 use traits::is_oc_tree::IsOcTree;
 
 pub struct OcTree<P> where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
 
     pub root: Option<OcNode<P>>,
     pub min: P,
@@ -17,7 +17,7 @@ pub struct OcTree<P> where
 }
 
 impl<P> IsTree3D<P> for OcTree<P> where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
 
     fn new() -> OcTree<P> {
         OcTree {
@@ -60,7 +60,7 @@ impl<P> IsTree3D<P> for OcTree<P> where
 }
 
 impl<P> IsOcTree<P> for OcTree<P> where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
         
     //@todo rewrite or make new method which returns cog instead of stopping recursion
     fn collect(&self,  maxdepth: i8) -> PointCloud3D<P> {

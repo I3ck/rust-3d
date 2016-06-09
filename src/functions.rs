@@ -6,10 +6,10 @@ use point_cloud_3d::{PointCloud3D};
 use oc_node::{Direction};
 use traits::is_2d::Is2D;
 use traits::is_3d::Is3D;
-use traits::has_position_2d::HasPosition2D;
-use traits::has_position_3d::HasPosition3D;
-use traits::has_editable_position_2d::HasEditablePosition2D;
-use traits::has_editable_position_3d::HasEditablePosition3D;
+use traits::is_buildable_2d::IsBuildable2D;
+use traits::is_buildable_3d::IsBuildable3D;
+use traits::is_editable_2d::IsEditable2D;
+use traits::is_editable_3d::IsEditable3D;
 use traits::transformable_to_2d::TransFormableTo2D;
 use traits::transformable_to_3d::TransFormableTo3D;
 use traits::is_plane_3d::IsPlane3D;
@@ -17,7 +17,7 @@ use traits::is_normalized_3d::IsNormalized3D;
 use traits::is_moveable_3d::IsMoveable3D;
 
 pub fn center<P>(p1: &P, p2: &P) -> Box<P> where
-    P: HasPosition3D {
+    P: IsBuildable3D {
 
     P::build(
         p1.x() + (p2.x() - p1.x()) / 2.0,
@@ -55,7 +55,7 @@ pub fn sqr_dist_3d<P,U>(p1: &P, p2: &U) -> f64 where
 }
 
 pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Option<Ordering> where
-    P: HasPosition3D {
+    P: IsBuildable3D {
 
     match dim {
         0 => lhs.x().partial_cmp(&rhs.x()),
@@ -66,7 +66,7 @@ pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Option<Ordering> where
 }
 
 pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where
-    P: HasPosition3D {
+    P: IsBuildable3D {
 
     match dim {
         0 => Some((lhs.x() - rhs.x()).abs()),
@@ -77,7 +77,7 @@ pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where
 }
 
 pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, max_size: usize) where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
 
     if pc.len() > max_size {
         pc.data.sort_by(|a, b| sqr_dist_3d(search, &**a).partial_cmp(&sqr_dist_3d(search, &**b)).unwrap_or(Ordering::Equal));
@@ -92,8 +92,8 @@ pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, max_size: usi
 
 //@todo move to plane or use there
 pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, PointCloud3D<P3>) where
-    P2: HasPosition2D + TransFormableTo3D,
-    P3: HasEditablePosition3D + IsMoveable3D {
+    P2: IsBuildable2D + TransFormableTo3D,
+    P3: IsEditable3D + IsMoveable3D {
 
     let mut pc_3d_a = PointCloud3D::new();
     let mut pc_3d_b = PointCloud3D::new();
@@ -109,7 +109,7 @@ pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, Point
 }
 
 pub fn calc_direction<P>(reference: &Point3D, p: &Point3D) -> Direction where
-    P: HasPosition3D {
+    P: IsBuildable3D {
 
     if p.x() >= reference.x() && p.y() >= reference.y() && p.z() >= reference.z() {
         Direction::PPP
@@ -130,9 +130,9 @@ pub fn calc_direction<P>(reference: &Point3D, p: &Point3D) -> Direction where
     }
 }
 
-//@todo refactor to work with HasPosition3D?
+//@todo refactor to work with IsBuildable3D?
 pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where
-    P: HasPosition3D { //@todo better name
+    P: IsBuildable3D { //@todo better name
 
     let middle = center(min, max);
 
@@ -159,7 +159,7 @@ pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where
 }
 
 pub fn in_bb<P>(p: &P, min: &P, max: &P) -> bool where
-    P: HasPosition3D {
+    P: IsBuildable3D {
 
     p.x() >= min.x() && p.x() <= max.x() &&
     p.y() >= min.y() && p.y() <= max.y() &&
@@ -169,7 +169,7 @@ pub fn in_bb<P>(p: &P, min: &P, max: &P) -> bool where
 //@todo rename or overload operators
 //@todo implement for 2D aswell, maybe move to traits
 pub fn conn<P>(p_from: &P, p_to: &P) -> P where
-    P: HasPosition3D {
+    P: IsBuildable3D {
 
     *P::build(
         p_to.x() - p_from.x(),
@@ -180,8 +180,8 @@ pub fn conn<P>(p_from: &P, p_to: &P) -> P where
 
 pub fn project_point_on_plane<PL,P2,P3,N>(plane: &PL, point: &P3) -> P2 where
     PL: IsPlane3D<P3,N>,
-    P2: HasPosition2D,
-    P3: HasPosition3D + TransFormableTo2D,
+    P2: IsBuildable2D,
+    P3: IsBuildable3D + TransFormableTo2D,
     N: IsNormalized3D {
 
     let relative = conn(&plane.origin(), point);

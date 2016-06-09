@@ -1,5 +1,5 @@
-use traits::has_editable_position_2d::HasEditablePosition2D;
-use traits::has_editable_position_3d::HasEditablePosition3D;
+use traits::is_editable_2d::IsEditable2D;
+use traits::is_editable_3d::IsEditable3D;
 use traits::transformable_to_2d::TransFormableTo2D;
 use traits::transformable_to_3d::TransFormableTo3D;
 use traits::is_normalized_3d::IsNormalized3D;
@@ -13,8 +13,8 @@ use point_cloud_3d::PointCloud3D;
 //@todo maybe implement projection methods within the pc
 //@todo transformable traits required later on?
 pub trait IsProjectionToPlane<P2,P3,N> where
-    P2: HasEditablePosition2D + TransFormableTo3D,
-    P3: HasEditablePosition3D + TransFormableTo2D,
+    P2: IsEditable2D + TransFormableTo3D,
+    P3: IsEditable3D + TransFormableTo2D,
     N: IsNormalized3D {
 
     fn from_2d<PL>(plane: PL, pc: PointCloud2D<P2>) -> Box<Self> where

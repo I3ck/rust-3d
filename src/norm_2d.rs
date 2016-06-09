@@ -4,7 +4,7 @@ use std::hash::{Hash, Hasher};
 use point_2d::Point2D;
 use traits::is_2d::Is2D;
 use traits::is_normalized_2d::IsNormalized2D;
-use traits::has_position_2d::HasPosition2D;
+use traits::is_buildable_2d::IsBuildable2D;
 use functions::{sqr_dist_2d};
 
 #[derive (PartialEq, PartialOrd)]

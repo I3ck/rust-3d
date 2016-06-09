@@ -1,5 +1,5 @@
 use traits::is_3d::Is3D;
-use traits::has_position_3d::HasPosition3D;
+use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_normalized_3d::IsNormalized3D;
 use functions::conn;
 use point_3d::Point3D;
@@ -8,7 +8,7 @@ use std::io::prelude::*;
 use std::fs::File;
 
 pub trait IsMesh3D<P> where
-    P: HasPosition3D {
+    P: IsBuildable3D {
 
     fn num_faces(&self) -> usize;
 

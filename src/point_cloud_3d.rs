@@ -2,20 +2,20 @@ use std::fmt;
 
 use traits::is_3d::Is3D;
 use traits::is_moveable_3d::IsMoveable3D;
-use traits::has_position_3d::HasPosition3D;
-use traits::has_editable_position_3d::HasEditablePosition3D;
+use traits::is_buildable_3d::IsBuildable3D;
+use traits::is_editable_3d::IsEditable3D;
 use point_3d::{Point3D};
 
 
 
 pub struct PointCloud3D<P> where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
 
     pub data: Vec<Box<P>>
 }
 
 impl<P> PointCloud3D<P> where
-    P: HasEditablePosition3D{
+    P: IsEditable3D{
 
     pub fn new() -> PointCloud3D<P> {
         PointCloud3D{data: Vec::new()}
@@ -116,7 +116,7 @@ impl<P> PointCloud3D<P> where
 }
 
 impl<P> IsMoveable3D for PointCloud3D<P> where
-    P: HasEditablePosition3D + IsMoveable3D {
+    P: IsEditable3D + IsMoveable3D {
 
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         for p in &mut self.data {
@@ -126,7 +126,7 @@ impl<P> IsMoveable3D for PointCloud3D<P> where
 }
 
 impl<P> fmt::Display for PointCloud3D<P> where
-    P: HasEditablePosition3D + fmt::Display {
+    P: IsEditable3D + fmt::Display {
 
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {

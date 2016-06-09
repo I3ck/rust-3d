@@ -1,17 +1,17 @@
 use traits::is_mesh_3d::IsMesh3D;
 use traits::is_editable_mesh_3d::IsEditableMesh3D;
-use traits::has_editable_position_3d::HasEditablePosition3D;
+use traits::is_editable_3d::IsEditable3D;
 use point_cloud_3d::PointCloud3D;
 
 pub struct Mesh3D<P> where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
 
     pub pc: PointCloud3D<P>,
     pub topology: Vec<usize>
 }
 
 impl<P> IsMesh3D<P> for Mesh3D<P> where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
 
     fn num_faces(&self) -> usize {
         self.topology.len() / 3
@@ -57,7 +57,7 @@ impl<P> IsMesh3D<P> for Mesh3D<P> where
 }
 
 impl<P> IsEditableMesh3D<P> for Mesh3D<P> where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
 
     fn new() -> Self {
         Mesh3D {

@@ -1,8 +1,8 @@
 pub mod has_bounding_box_3d;
-pub mod has_editable_position_2d;
-pub mod has_editable_position_3d;
-pub mod has_position_2d;
-pub mod has_position_3d;
+pub mod is_editable_2d;
+pub mod is_editable_3d;
+pub mod is_buildable_2d;
+pub mod is_buildable_3d;
 pub mod is_2d;
 pub mod is_3d;
 pub mod is_editable_mesh_3d;

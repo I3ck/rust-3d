@@ -1,6 +1,6 @@
 use point_3d::Point3D;
 use traits::is_3d::Is3D;
-use traits::has_position_3d::HasPosition3D;
+use traits::is_buildable_3d::IsBuildable3D;
 
 pub struct Matrix4 {
     pub data: [[f64; 4]; 4]
@@ -74,7 +74,7 @@ impl Matrix4 {
 
     ///@todo wont have to be of type option once uvec implemented
     pub fn rotation_axis<P>(axis: &P, rad: f64) -> Option<Matrix4> where
-        P: HasPosition3D {
+        P: IsBuildable3D {
 
         let u = match axis.clone().normalized() {
           None => return None,
@@ -104,7 +104,7 @@ impl Matrix4 {
     }
 
     pub fn look_at<P>(target: &P, up: &P) -> Option<Matrix4> where
-        P: HasPosition3D { //@todo wont have to be an option once unitvector is defined whis is always l > 0 ( l == 1)
+        P: IsBuildable3D { //@todo wont have to be an option once unitvector is defined whis is always l > 0 ( l == 1)
 
         let n = match target.clone().normalized() {
           None => return None,

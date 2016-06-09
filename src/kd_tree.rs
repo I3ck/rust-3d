@@ -3,18 +3,18 @@ use std::cmp::Ordering;
 use point_cloud_3d::{PointCloud3D};
 use functions::{dist_3d, sqr_dist_3d, dimension_compare, dimension_dist, sort_and_limit};
 
-use traits::has_position_3d::HasPosition3D;
-use traits::has_editable_position_3d::HasEditablePosition3D;
+use traits::is_buildable_3d::IsBuildable3D;
+use traits::is_editable_3d::IsEditable3D;
 use traits::is_tree_3d::IsTree3D;
 use traits::is_kd_tree_3d::IsKdTree3D;
 
 pub struct KdTree<P> where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
 
     pub root: Option<KdNode<P>>
 }
 pub struct KdNode<P> where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
 
     pub left: Option<Box<KdNode<P>>>,
     pub right: Option<Box<KdNode<P>>>,
@@ -23,7 +23,7 @@ pub struct KdNode<P> where
 }
 
 impl<P> IsTree3D<P> for KdTree<P> where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
 
     fn new() -> KdTree<P> {
         KdTree { root: None }
@@ -57,7 +57,7 @@ impl<P> IsTree3D<P> for KdTree<P> where
 }
 
 impl<P> IsKdTree3D<P> for KdTree<P> where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
 
     fn knearest(&self, search: &P, n: usize) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();
@@ -99,7 +99,7 @@ impl<P> IsKdTree3D<P> for KdTree<P> where
 }
 
 impl<P> KdNode<P> where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
 
     pub fn new(dim: i8, mut pc: Vec<Box<P>>) -> KdNode<P> {
         let dimension = dim % 2;

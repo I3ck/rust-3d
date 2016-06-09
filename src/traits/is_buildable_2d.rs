@@ -2,7 +2,7 @@ use std::hash::{Hash};
 
 use traits::is_2d::Is2D;
 
-pub trait HasPosition2D :
+pub trait IsBuildable2D :
     Is2D +
     Eq +
     PartialEq +
@@ -15,7 +15,7 @@ pub trait HasPosition2D :
     fn build(x: f64, y: f64) -> Box<Self>;
 
     fn from<P>(&mut self, other: P) where
-        P: HasPosition2D;
+        P: IsBuildable2D;
 
     fn normalized(&self) -> Option<Box<Self>> {
         let l = self.abs();

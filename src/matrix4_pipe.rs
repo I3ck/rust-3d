@@ -1,5 +1,5 @@
 use matrix4::Matrix4;
-use traits::has_position_3d::HasPosition3D;
+use traits::is_buildable_3d::IsBuildable3D;
 
 pub struct Matrix4Pipe {
     pub mtranslation: Matrix4,
@@ -41,7 +41,7 @@ impl Matrix4Pipe {
     pub fn add_rotation(&mut self, rad_x: f64, rad_y: f64, rad_z: f64) {
         self.mrotation = Matrix4::rotation(rad_x, rad_y, rad_z);
     }
-    pub fn add_rotation_axis<P>(&mut self, axis: &P, rad: f64) -> bool where P: HasPosition3D {
+    pub fn add_rotation_axis<P>(&mut self, axis: &P, rad: f64) -> bool where P: IsBuildable3D {
         match Matrix4::rotation_axis(axis, rad) {
             None => return false,
             Some(m) => { self.mrotation = m; return true; }
@@ -72,7 +72,7 @@ impl Matrix4Pipe {
         self.mcamtrans = Matrix4::new();
     }
 
-    pub fn add_look_at<P>(&mut self, target: &P, up: &P) -> bool where P: HasPosition3D {
+    pub fn add_look_at<P>(&mut self, target: &P, up: &P) -> bool where P: IsBuildable3D {
         match Matrix4::look_at(target, up) {
             None => return false,
             Some(m) => { self.mcamlook = m; return true; }

@@ -3,7 +3,7 @@ use std::hash::{Hash};
 use traits::is_3d::Is3D;
 use matrix4::Matrix4;
 
-pub trait HasPosition3D :
+pub trait IsBuildable3D :
     Is3D +
     Eq +
     PartialEq +
@@ -15,7 +15,7 @@ pub trait HasPosition3D :
 
     fn build(x: f64, y: f64, z: f64) -> Box<Self>;
     
-    fn from<P>(&mut self, other: P) where P: HasPosition3D;
+    fn from<P>(&mut self, other: P) where P: IsBuildable3D;
 
     //@todo return new or alter self???
     fn multiply_m(&self, m: &Matrix4) -> Box<Self> {

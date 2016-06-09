@@ -2,20 +2,20 @@ use std::fmt;
 
 use traits::is_2d::Is2D;
 use traits::is_moveable_2d::IsMoveable2D;
-use traits::has_position_2d::HasPosition2D;
-use traits::has_editable_position_2d::HasEditablePosition2D;
+use traits::is_buildable_2d::IsBuildable2D;
+use traits::is_editable_2d::IsEditable2D;
 use point_2d::{Point2D};
 
 
 
 pub struct PointCloud2D<P> where
-    P: HasEditablePosition2D {
+    P: IsEditable2D {
 
     pub data: Vec<Box<P>>
 }
 
 impl<P> PointCloud2D<P> where
-    P: HasEditablePosition2D{
+    P: IsEditable2D{
 
     pub fn new() -> PointCloud2D<P> {
         PointCloud2D{data: Vec::new()}
@@ -108,7 +108,7 @@ impl<P> PointCloud2D<P> where
     }
 }
 
-impl<P> IsMoveable2D for PointCloud2D<P> where P: HasEditablePosition2D + IsMoveable2D {
+impl<P> IsMoveable2D for PointCloud2D<P> where P: IsEditable2D + IsMoveable2D {
     fn move_by(&mut self, x: f64, y: f64) {
         for p in &mut self.data {
             p.move_by(x, y);
@@ -117,7 +117,7 @@ impl<P> IsMoveable2D for PointCloud2D<P> where P: HasEditablePosition2D + IsMove
 }
 
 impl<P> fmt::Display for PointCloud2D<P> where
-    P: HasEditablePosition2D + fmt::Display {
+    P: IsEditable2D + fmt::Display {
 
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {

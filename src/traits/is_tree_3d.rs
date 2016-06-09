@@ -1,8 +1,8 @@
-use traits::has_editable_position_3d::HasEditablePosition3D;
+use traits::is_editable_3d::IsEditable3D;
 use point_cloud_3d::PointCloud3D;
 
 pub trait IsTree3D<P> where
-    P: HasEditablePosition3D {
+    P: IsEditable3D {
 
     fn new() -> Self;
 

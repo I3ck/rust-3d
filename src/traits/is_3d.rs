@@ -1,4 +1,4 @@
-use traits::has_position_3d::HasPosition3D;
+use traits::is_buildable_3d::IsBuildable3D;
 
 pub trait Is3D {
     fn x(&self) -> f64;
@@ -21,7 +21,7 @@ pub trait Is3D {
 
     fn cross<P,HP>(&self, other: &P) -> Box<HP> where
         P: Is3D,
-        HP: HasPosition3D {
+        HP: IsBuildable3D {
 
         let x = self.y() * other.z() - self.z() * other.y();
         let y = self.z() * other.x() - self.x() * other.z();

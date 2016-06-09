@@ -6,9 +6,9 @@ use std::hash::{Hash, Hasher};
 
 use traits::is_3d::Is3D;
 use traits::is_moveable_3d::IsMoveable3D;
-use traits::has_position_2d::HasPosition2D;
-use traits::has_position_3d::HasPosition3D;
-use traits::has_editable_position_3d::HasEditablePosition3D;
+use traits::is_buildable_2d::IsBuildable2D;
+use traits::is_buildable_3d::IsBuildable3D;
+use traits::is_editable_3d::IsEditable3D;
 use traits::transformable_to_2d::TransFormableTo2D;
 use functions::{sqr_dist_3d};
 
@@ -62,7 +62,7 @@ impl Is3D for Point3D {
     }
 }
 
-impl HasPosition3D for Point3D {
+impl IsBuildable3D for Point3D {
     fn new() -> Box<Self> {
         Box::new(Point3D{x: 0.0, y: 0.0, z: 0.0})
     }
@@ -71,14 +71,14 @@ impl HasPosition3D for Point3D {
         Box::new(Point3D{x: x, y: y, z: z})
     }
 
-    fn from<P>(&mut self, other: P) where P: HasPosition3D {
+    fn from<P>(&mut self, other: P) where P: IsBuildable3D {
         self.x = other.x();
         self.y = other.y();
         self.z = other.z();
     }
 }
 
-impl HasEditablePosition3D for Point3D {
+impl IsEditable3D for Point3D {
     fn set_x(&mut self, val: f64) {
         self.x = val;
     }
@@ -94,7 +94,7 @@ impl HasEditablePosition3D for Point3D {
 
 impl TransFormableTo2D for Point3D {
     fn transform_to_2d<P>(&self) -> P where
-        P: HasPosition2D {
+        P: IsBuildable2D {
             
         *P::build(self.x, self.y)
     }

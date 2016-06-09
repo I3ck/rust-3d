@@ -1,5 +1,5 @@
 use traits::is_3d::Is3D;
-use traits::has_position_3d::HasPosition3D;
+use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_normalized_3d::IsNormalized3D;
 
 
