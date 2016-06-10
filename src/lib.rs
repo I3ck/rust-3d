@@ -69,7 +69,6 @@ pub mod tests {
         match p3Norm {
             None => {},
             Some(n) => {
-                println!("{}", n.abs());
                 assert!((1.0 - n.abs()).abs() < eps) ;
                 assert!(n.x() == p3.x() / p3.abs());
                 assert!(n.y() == p3.y() / p3.abs());
@@ -98,12 +97,19 @@ pub mod tests {
         assert!(p1.x() == 6.0);
         assert!(p1.y() == 22.0);
 
-        /* rotation test failing
         p1.set_pos(1.0, 0.0);
-        p1.rotate(consts::PI, &origin);
-        assert!(p1.x() == -1.0);
+        p1.rotate(0.0, &origin);
+        assert!(p1.x() == 1.0);
         assert!(p1.y() == 0.0);
-        */
+
+        p1.rotate(2.0 * consts::PI, &origin);
+        assert!((1.0 - p1.x()).abs() < eps);
+        assert!((0.0 - p1.y()).abs() < eps);
+
+
+        p1.rotate(consts::PI, &origin);
+        assert!((-1.0 - p1.x()).abs() < eps);
+        assert!((0.0 - p1.y()).abs() < eps);
 
         match Point2D::parse("1.3 7.9".to_string()) {
             None => assert!(false),
