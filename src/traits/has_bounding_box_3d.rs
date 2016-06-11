@@ -4,20 +4,99 @@ use point_3d::Point3D;
 pub trait HasBoundingBox3D : Is3D {
     fn bounding_box(&self) -> Option<(Point3D, Point3D)>;
 
-    //@todo below methods can be implemented in here
-    fn min_pos(&self) -> Option<(Point3D)>;
+    fn min_pos(&self) -> Option<(Point3D)> {
+        match self.bounding_box() {
+            None => None,
+            Some((min, _)) => Some(min)
+        }
+    }
 
-    fn max_pos(&self) -> Option<(Point3D)>;
+    fn max_pos(&self) -> Option<(Point3D)> {
+        match self.bounding_box() {
+            None => None,
+            Some((_, max)) => Some(max)
+        }
+    }
 
-    fn is_inside<B>(&self, other: &B) -> bool where
-        B: HasBoundingBox3D;
+    fn is_inside<B>(&self, other: &B) -> Option<bool> where
+        B: HasBoundingBox3D {
 
-    fn contains<P>(&self, other: &P) -> bool where
-        P: Is3D;
+        if let (Some(bbthis), Some(bbother)) = (self.bounding_box(), other.bounding_box()) {
+            let (minthis, maxthis) = bbthis;
+            let (minother, maxother) = bbother;
 
-    fn contains_fully<B>(&self, other: &B) -> bool where
-        B: HasBoundingBox3D;
+            return Some(
+                   minthis.x() > minother.x()
+                && minthis.y() > minother.y()
+                && minthis.z() > minother.z()
+                && maxthis.x() < maxother.x()
+                && maxthis.y() < maxother.y()
+                && maxthis.z() < maxother.z()
+            );
+        }
+        None
+    }
 
-    fn collides_with<B>(&self, other: &B) -> bool where
-        B: HasBoundingBox3D;
+    fn contains<P>(&self, other: &P) -> Option<bool> where
+        P: Is3D {
+
+        if let Some(bbthis) = self.bounding_box() {
+            let (minthis, maxthis) = bbthis;
+
+            return Some(
+                   other.x() > minthis.x()
+                && other.x() < maxthis.x()
+                && other.y() > minthis.y()
+                && other.y() < maxthis.y()
+                && other.z() > minthis.z()
+                && other.z() < maxthis.z()
+            );
+        }
+        None
+    }
+
+    fn has_inside<B>(&self, other: &B) -> Option<bool> where
+        B: HasBoundingBox3D {
+
+        if let (Some(bbthis), Some(bbother)) = (self.bounding_box(), other.bounding_box()) {
+            let (minthis, maxthis) = bbthis;
+            let (minother, maxother) = bbother;
+
+            return Some(
+                   minthis.x() < minother.x()
+                && minthis.y() < minother.y()
+                && minthis.z() < minother.z()
+                && maxthis.x() > maxother.x()
+                && maxthis.y() > maxother.y()
+                && maxthis.z() > maxother.z()
+            );
+        }
+        None
+    }
+
+    fn collides_with<B>(&self, other: &B) -> Option<bool> where
+        B: HasBoundingBox3D {
+
+        if let (Some(bbthis), Some(bbother)) = (self.bounding_box(), other.bounding_box()) {
+            let (minthis, maxthis) = bbthis;
+            let (minother, maxother) = bbother;
+
+            let (xsizethis, ysizethis, zsizethis) = (
+                (minthis.x() - maxthis.x()).abs(),
+                (minthis.y() - maxthis.y()).abs(),
+                (minthis.z() - maxthis.z()).abs());
+
+            let (xsizeother, ysizeother, zsizeother) = (
+                (minother.x() - maxother.x()).abs(),
+                (minother.y() - maxother.y()).abs(),
+                (minother.z() - maxother.z()).abs());
+
+            return Some(
+                   2.0 * self.x() - other.x() < (xsizethis + xsizeother)
+                && 2.0 * self.y() - other.y() < (ysizethis + ysizeother)
+                && 2.0 * self.z() - other.z() < (zsizethis + zsizeother)
+            );
+        }
+        None
+    }
 }
