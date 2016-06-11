@@ -34,6 +34,7 @@ use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_2d::IsEditable2D;
 use traits::is_editable_3d::IsEditable3D;
+use traits::has_bounding_box_3d::HasBoundingBox3D;
 use traits::is_tree_3d::IsTree3D;
 use traits::is_oc_tree::IsOcTree;
 use traits::is_kd_tree_3d::IsKdTree3D;
@@ -67,7 +68,7 @@ fn main() {
     pc.push(p2);
     println!("center : {}", pc.center().expect("Can't calculate center of empty path"));
 
-    let (pmin, pmax) = pc.bbox().expect("Can't calculate bounding box with less than two elemts");
+    let (pmin, pmax) = pc.bounding_box().expect("Can't calculate bounding box with less than two elemts");
 
     println!("min : {}", pmin);
     println!("max : {}", pmax);

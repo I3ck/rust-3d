@@ -5,6 +5,7 @@ use point_cloud_3d::{PointCloud3D};
 use oc_node::{OcNode};
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_3d::IsEditable3D;
+use traits::has_bounding_box_3d::HasBoundingBox3D;
 use traits::is_tree_3d::IsTree3D;
 use traits::is_oc_tree::IsOcTree;
 
@@ -39,7 +40,7 @@ impl<P> IsTree3D<P> for OcTree<P> where
     }
 
     fn build(&mut self, pc: PointCloud3D<P>) -> bool {
-        match pc.bbox() {
+        match pc.bounding_box() {
             None => false,
             Some((min, max)) => {
                 let mut unique_data = Vec::new();
@@ -61,7 +62,7 @@ impl<P> IsTree3D<P> for OcTree<P> where
 
 impl<P> IsOcTree<P> for OcTree<P> where
     P: IsEditable3D {
-        
+
     //@todo rewrite or make new method which returns cog instead of stopping recursion
     fn collect(&self,  maxdepth: i8) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();

@@ -5,6 +5,7 @@ use self::num::traits::Unsigned;
 
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_3d::IsEditable3D;
+use traits::has_bounding_box_3d::HasBoundingBox3D;
 use point_3d::{Point3D};
 use point_cloud_3d::{PointCloud3D};
 use compressed_point_3d::{CompressedPoint3D};
@@ -26,7 +27,7 @@ impl<T> CompressedPointCloud3D<T> where
     pub fn compress<P>(pc: &PointCloud3D<P>) -> Option<CompressedPointCloud3D<T>> where
         P: IsEditable3D {
 
-        let (pmin, pmax) = match pc.bbox() {
+        let (pmin, pmax) = match pc.bounding_box() {
             None        => return None,
             Some(res)   => res,
         };
@@ -79,7 +80,7 @@ impl<T> CompressedPointCloud3D<T> where
 
     pub fn decompress<P>(&self) -> Option<PointCloud3D<P>> where
         P: IsEditable3D {
-            
+
         let mut pc = PointCloud3D::new();
 
         for p in &self.data {

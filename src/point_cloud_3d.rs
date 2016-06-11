@@ -4,6 +4,7 @@ use traits::is_3d::Is3D;
 use traits::is_moveable_3d::IsMoveable3D;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_3d::IsEditable3D;
+use traits::has_bounding_box_3d::HasBoundingBox3D;
 use point_3d::{Point3D};
 
 
@@ -89,8 +90,22 @@ impl<P> PointCloud3D<P> where
             (sumz / sizef)
         ))
     }
+}
 
-    pub fn bbox(&self) -> Option<(Point3D, Point3D)> { //@todo return P ?
+impl<P> IsMoveable3D for PointCloud3D<P> where
+    P: IsEditable3D + IsMoveable3D {
+
+    fn move_by(&mut self, x: f64, y: f64, z: f64) {
+        for p in &mut self.data {
+            p.move_by(x, y, z);
+        }
+    }
+}
+
+impl<P> HasBoundingBox3D for PointCloud3D<P> where
+    P: IsEditable3D {
+
+    fn bounding_box(&self) -> Option<(Point3D, Point3D)> {
         if self.len() < 2 {
             return None;
         }
@@ -112,16 +127,6 @@ impl<P> PointCloud3D<P> where
         }
 
         return Some((Point3D{x: minx, y: miny, z: minz}, Point3D{x: maxx, y: maxy, z: maxz}));
-    }
-}
-
-impl<P> IsMoveable3D for PointCloud3D<P> where
-    P: IsEditable3D + IsMoveable3D {
-
-    fn move_by(&mut self, x: f64, y: f64, z: f64) {
-        for p in &mut self.data {
-            p.move_by(x, y, z);
-        }
     }
 }
 

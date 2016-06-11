@@ -4,6 +4,7 @@ use traits::is_2d::Is2D;
 use traits::is_moveable_2d::IsMoveable2D;
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;
+use traits::has_bounding_box_2d::HasBoundingBox2D;
 use point_2d::{Point2D};
 
 
@@ -86,8 +87,18 @@ impl<P> PointCloud2D<P> where
             (sumy / sizef)
         ))
     }
+}
 
-    pub fn bbox(&self) -> Option<(Point2D, Point2D)> { //@todo return P ?
+impl<P> IsMoveable2D for PointCloud2D<P> where P: IsEditable2D + IsMoveable2D {
+    fn move_by(&mut self, x: f64, y: f64) {
+        for p in &mut self.data {
+            p.move_by(x, y);
+        }
+    }
+}
+
+impl<P> HasBoundingBox2D for PointCloud2D<P> where P: IsEditable2D {
+    fn bounding_box(&self) -> Option<(Point2D, Point2D)> {
         if self.len() < 2 {
             return None;
         }
@@ -105,14 +116,6 @@ impl<P> PointCloud2D<P> where
         }
 
         return Some((Point2D{x: minx, y: miny}, Point2D{x: maxx, y: maxy}));
-    }
-}
-
-impl<P> IsMoveable2D for PointCloud2D<P> where P: IsEditable2D + IsMoveable2D {
-    fn move_by(&mut self, x: f64, y: f64) {
-        for p in &mut self.data {
-            p.move_by(x, y);
-        }
     }
 }
 
