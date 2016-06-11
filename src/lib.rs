@@ -20,6 +20,7 @@ pub mod oc_tree;
 #[cfg(test)]
 pub mod tests {
 
+
     #[test]
     fn test_point_2d() {
         use std::f64::consts;
@@ -125,7 +126,6 @@ pub mod tests {
         assert!(p1.x() == 1.1);
         assert!(p1.y() == 2.2);
     }
-
 
 
     #[test]
@@ -239,5 +239,59 @@ pub mod tests {
         assert!(p1.z() == 3.3);
 
         //@todo missing tests for matrix multiplication
+    }
+
+    #[test]
+    fn test_point_cloud_2d() {
+        use std::f64::consts;
+        use traits::is_2d::*;
+        use traits::is_buildable_2d::*;
+        use traits::is_editable_2d::*;
+        use traits::is_moveable_2d::*;
+        use traits::has_bounding_box_2d::*;
+        use point_2d::*;
+        use point_cloud_2d::*;
+
+        let mut pc = PointCloud2D::<Point2D>::new();
+
+        assert!(pc.len() == 0);
+
+        let p = *Point2D::build(0.1, 0.2);
+        pc.push(p);
+
+        assert!(pc.len() == 1);
+        assert!(pc.data[0].x() == 0.1);
+        assert!(pc.data[0].y() == 0.2);
+
+        assert!(pc.bounding_box().is_none());
+
+        let p = *Point2D::build(0.2, 0.3);
+        pc.push(p);
+        assert!(pc.len() == 2);
+
+        assert!(pc.bounding_box().is_some());
+
+        match pc.bounding_box() {
+            None => assert!(false),
+            Some((bbmin, bbmax)) => {
+                assert!(bbmin.x() == 0.1);
+                assert!(bbmin.y() == 0.2);
+                assert!(bbmax.x() == 0.2);
+                assert!(bbmax.y() == 0.3);
+            }
+        }
+        assert!(pc.to_str() == "0.1 0.2\n0.2 0.3\n");
+
+        match PointCloud2D::<Point2D>::parse(pc.to_str()) {
+            None => assert!(false),
+            Some(pcparsed) => assert!(pcparsed.to_str() == "0.1 0.2\n0.2 0.3\n")
+        };
+
+        let pccloned = pc.clone();
+        assert!(pccloned.to_str() == "0.1 0.2\n0.2 0.3\n");
+
+        pc.move_by(1.0, 2.0);
+        println!("pc: {}", pc);
+        assert!(pc.to_str() == "1.1 2.2\n1.2 2.3\n");
     }
 }

@@ -65,7 +65,7 @@ impl<P> PointCloud2D<P> where
         self.data.len()
     }
 
-    pub fn center(&self) -> Option<P> {
+    pub fn center(&self) -> Option<P> { //@todo implement in bb trait
         let size = self.len();
 
         if size < 1 {
