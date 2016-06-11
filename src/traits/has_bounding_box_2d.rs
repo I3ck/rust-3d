@@ -1,7 +1,7 @@
 use traits::is_2d::Is2D;
 use point_2d::Point2D;
 
-pub trait HasBoundingBox2D : Is2D {
+pub trait HasBoundingBox2D {
     fn bounding_box(&self) -> Option<(Point2D, Point2D)>;
 
     fn min_pos(&self) -> Option<(Point2D)> {
@@ -83,9 +83,17 @@ pub trait HasBoundingBox2D : Is2D {
                 (minother.x() - maxother.x()).abs(),
                 (minother.y() - maxother.y()).abs());
 
+            let (xcenterthis, ycenterthis) = (
+                (minthis.x() + maxthis.x() / 2.0),
+                (minthis.y() + maxthis.y() / 2.0));
+
+            let (xcenterother, ycenterother) = (
+                (minother.x() + maxother.x() / 2.0),
+                (minother.y() + maxother.y() / 2.0));
+
             return Some(
-                   2.0 * self.x() - other.x() < (xsizethis + xsizeother)
-                && 2.0 * self.y() - other.y() < (ysizethis + ysizeother)
+                   2.0 * xcenterthis - xcenterother < (xsizethis + xsizeother)
+                && 2.0 * ycenterthis - ycenterother < (ysizethis + ysizeother)
             );
         }
         None

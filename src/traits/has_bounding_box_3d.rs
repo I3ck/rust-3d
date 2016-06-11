@@ -1,7 +1,7 @@
 use traits::is_3d::Is3D;
 use point_3d::Point3D;
 
-pub trait HasBoundingBox3D : Is3D {
+pub trait HasBoundingBox3D  {
     fn bounding_box(&self) -> Option<(Point3D, Point3D)>;
 
     fn min_pos(&self) -> Option<(Point3D)> {
@@ -91,10 +91,20 @@ pub trait HasBoundingBox3D : Is3D {
                 (minother.y() - maxother.y()).abs(),
                 (minother.z() - maxother.z()).abs());
 
+            let (xcenterthis, ycenterthis, zcenterthis) = (
+                (minthis.x() + maxthis.x() / 2.0),
+                (minthis.y() + maxthis.y() / 2.0),
+                (minthis.z() + maxthis.z() / 2.0));
+
+            let (xcenterother, ycenterother, zcenterother) = (
+                (minother.x() + maxother.x() / 2.0),
+                (minother.y() + maxother.y() / 2.0),
+                (minother.z() + maxother.z() / 2.0));
+
             return Some(
-                   2.0 * self.x() - other.x() < (xsizethis + xsizeother)
-                && 2.0 * self.y() - other.y() < (ysizethis + ysizeother)
-                && 2.0 * self.z() - other.z() < (zsizethis + zsizeother)
+                   2.0 * xcenterthis - xcenterother < (xsizethis + xsizeother)
+                && 2.0 * ycenterthis - ycenterother < (ysizethis + ysizeother)
+                && 2.0 * zcenterthis - zcenterother < (zsizethis + zsizeother)
             );
         }
         None
