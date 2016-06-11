@@ -65,7 +65,7 @@ impl<P> PointCloud3D<P> where
         self.data.len()
     }
 
-    pub fn center(&self) -> Option<P> {
+    pub fn center(&self) -> Option<P> { //@todo missing test //@todo rename to center of gravity
         let size = self.len();
 
         if size < 1 {
