@@ -26,6 +26,7 @@ pub mod tests {
         use traits::is_2d::*;
         use traits::is_buildable_2d::*;
         use traits::is_editable_2d::*;
+        use traits::is_moveable_2d::*;
         use point_2d::*;
 
         let eps = 0.0000001;
@@ -118,6 +119,11 @@ pub mod tests {
                 assert!(bp.y() == 7.9);
             }
         }
+
+        p1.set_pos(1.0, 2.0);
+        p1.move_by(0.1, 0.2);
+        assert!(p1.x() == 1.1);
+        assert!(p1.y() == 2.2);
     }
 
 
@@ -128,6 +134,7 @@ pub mod tests {
         use traits::is_3d::*;
         use traits::is_buildable_3d::*;
         use traits::is_editable_3d::*;
+        use traits::is_moveable_3d::*;
         use point_3d::*;
 
         let eps = 0.0000001;
@@ -224,6 +231,12 @@ pub mod tests {
                 assert!(bp.z() == 13.7);
             }
         }
+
+        p1.set_pos(1.0, 2.0, 3.0);
+        p1.move_by(0.1, 0.2, 0.3);
+        assert!(p1.x() == 1.1);
+        assert!(p1.y() == 2.2);
+        assert!(p1.z() == 3.3);
 
         //@todo missing tests for matrix multiplication
     }
