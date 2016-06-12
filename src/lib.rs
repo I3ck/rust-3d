@@ -352,4 +352,55 @@ pub mod tests {
         println!("pc: {}", pc);
         assert!(pc.to_str() == "1.1 2.2 3.3\n1.2 2.3 3.4\n");
     }
+
+
+    #[test]
+    fn test_bounding_box_2d() {
+        use std::f64::consts;
+        use traits::is_2d::*;
+        use traits::is_buildable_2d::*;
+        use traits::is_editable_2d::*;
+        use traits::is_moveable_2d::*;
+        use traits::has_bounding_box_2d::*;
+        use point_2d::*;
+        use point_cloud_2d::*;
+
+        let mut pc1 = PointCloud2D::<Point2D>::new();
+        let mut pc2 = PointCloud2D::<Point2D>::new();
+        let mut pc3 = PointCloud2D::<Point2D>::new();
+        let mut pc4 = PointCloud2D::<Point2D>::new();
+
+        pc1.push(*Point2D::build(0.0, 0.0));
+        pc1.push(*Point2D::build(1.0, 1.0));
+
+        pc2.push(*Point2D::build(0.0, 0.0));
+        pc2.push(*Point2D::build(0.5, 0.5));
+
+        pc3.push(*Point2D::build(-1.0, -1.0));
+        pc3.push(*Point2D::build(2.0, 2.0));
+
+        pc4.push(*Point2D::build(-10.0, -10.0));
+        pc4.push(*Point2D::build(-11.0, -11.0));
+
+        assert!(!pc4.is_inside(&pc1).unwrap());
+        assert!(!pc4.is_inside(&pc2).unwrap());
+        assert!(!pc4.is_inside(&pc3).unwrap());
+
+        assert!(!pc1.is_inside(&pc2).unwrap());
+        assert!(!pc1.has_inside(&pc2).unwrap());
+
+        assert!(!pc2.is_inside(&pc1).unwrap());
+        assert!(!pc2.has_inside(&pc1).unwrap());
+
+        assert!(pc1.collides_with(&pc2).unwrap());
+        assert!(pc2.collides_with(&pc1).unwrap());
+
+        assert!(pc3.has_inside(&pc1).unwrap());
+        assert!(pc3.has_inside(&pc2).unwrap());
+        assert!(pc3.collides_with(&pc1).unwrap());
+        assert!(pc3.collides_with(&pc2).unwrap());
+
+        assert!(!pc1.contains(&*Point2D::build(5.0, 5.0)).unwrap());
+        assert!(pc1.contains(&*Point2D::build(0.5, 0.5)).unwrap());
+    }
 }
