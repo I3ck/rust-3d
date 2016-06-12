@@ -48,7 +48,7 @@ pub mod tests {
         assert!(p1.rad_to(&p2) == 0.0);
         assert!(p2.rad_to(&p1) == consts::PI);
 
-        let mut p3 = *Point2D::build(2.0, 2.0);
+        let p3 = *Point2D::build(2.0, 2.0);
         assert!(p1.cross(&p2) == 0.0);
         assert!(p1.dot(&p2) == 0.0);
         assert!(p2.cross(&p3) == 2.0);
@@ -130,7 +130,6 @@ pub mod tests {
 
     #[test]
     fn test_point_3d() {
-        use std::f64::consts;
         use traits::is_3d::*;
         use traits::is_buildable_3d::*;
         use traits::is_editable_3d::*;
@@ -138,7 +137,6 @@ pub mod tests {
         use point_3d::*;
 
         let eps = 0.0000001;
-        let origin = *Point3D::new();
 
 
         let mut p1 = *Point3D::new();
@@ -154,7 +152,7 @@ pub mod tests {
         assert!(p2.z() == 0.0);
         assert!(p2.abs() == 1.0);
 
-        let mut p3 = *Point3D::build(2.0, 2.0, 2.0);
+        let p3 = *Point3D::build(2.0, 2.0, 2.0);
 
         let cross12: Point3D;
         cross12 = *p1.cross(&p2);
@@ -243,7 +241,6 @@ pub mod tests {
 
     #[test]
     fn test_point_cloud_2d() {
-        use std::f64::consts;
         use traits::is_2d::*;
         use traits::is_buildable_2d::*;
         use traits::is_editable_2d::*;
@@ -298,7 +295,6 @@ pub mod tests {
 
     #[test]
     fn test_point_cloud_3d() {
-        use std::f64::consts;
         use traits::is_3d::*;
         use traits::is_buildable_3d::*;
         use traits::is_editable_3d::*;
@@ -356,11 +352,7 @@ pub mod tests {
 
     #[test]
     fn test_bounding_box_2d() {
-        use std::f64::consts;
-        use traits::is_2d::*;
         use traits::is_buildable_2d::*;
-        use traits::is_editable_2d::*;
-        use traits::is_moveable_2d::*;
         use traits::has_bounding_box_2d::*;
         use point_2d::*;
         use point_cloud_2d::*;
@@ -407,11 +399,7 @@ pub mod tests {
 
     #[test]
     fn test_bounding_box_3d() {
-        use std::f64::consts;
-        use traits::is_3d::*;
         use traits::is_buildable_3d::*;
-        use traits::is_editable_3d::*;
-        use traits::is_moveable_3d::*;
         use traits::has_bounding_box_3d::*;
         use point_3d::*;
         use point_cloud_3d::*;
