@@ -78,7 +78,7 @@ impl<P> IsEditableMesh3D<P> for Mesh3D<P> where
         self.topology.push(vid1);
         self.topology.push(vid2);
         self.topology.push(vid3);
-        self.topology.len() / 3
+        self.topology.len() / 3 - 1
     }
 
     fn try_add_connection(&mut self, vid1: usize, vid2: usize, vid3: usize) -> Option<usize> {
@@ -88,6 +88,6 @@ impl<P> IsEditableMesh3D<P> for Mesh3D<P> where
         self.topology.push(vid1);
         self.topology.push(vid2);
         self.topology.push(vid3);
-        Some(self.topology.len() / 3)
+        Some(self.topology.len() / 3 - 1)
     }
 }

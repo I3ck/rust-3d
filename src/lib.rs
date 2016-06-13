@@ -442,4 +442,79 @@ pub mod tests {
         assert!(!pc1.contains(&*Point3D::build(5.0, 5.0, 5.0)).unwrap());
         assert!(pc1.contains(&*Point3D::build(0.5, 0.5, 0.5)).unwrap());
     }
+
+    #[test]
+    fn test_mesh() {
+        use traits::is_3d::*;
+        use traits::is_buildable_3d::*;
+        use traits::is_mesh_3d::*;
+        use traits::is_editable_mesh_3d::*;
+        use point_3d::*;
+        use point_cloud_3d::*;
+        use mesh_3d::*;
+
+        let mut mesh = Mesh3D::<Point3D>::new();
+
+        assert!(mesh.num_faces() == 0);
+        assert!(mesh.num_vertices() == 0);
+        assert!(mesh.face_vertex_ids(0).is_none());
+        assert!(mesh.face_vertices(0).is_none());
+        assert!(mesh.vertex(0).is_none());
+        assert!(mesh.face_normal(0).is_none());
+
+        mesh.add_vertex(*Point3D::build(0.0, 0.1, 0.2));
+        assert!(mesh.num_vertices() == 1);
+        assert!(mesh.num_faces() == 0);
+
+        mesh.add_vertex(*Point3D::build(0.1, 0.2, 0.3));
+        mesh.add_vertex(*Point3D::build(0.2, 0.3, 0.4));
+        assert!(mesh.num_vertices() == 3);
+        assert!(mesh.num_faces() == 0);
+
+        assert!(mesh.try_add_connection(0, 0, 0).is_none());
+        assert!(mesh.try_add_connection(0, 1, 1).is_none());
+        assert!(mesh.try_add_connection(0, 1, 3).is_none());
+        assert!(mesh.try_add_connection(0, 1, 2).is_some());
+        assert!(mesh.num_vertices() == 3);
+        assert!(mesh.num_faces() == 1);
+
+        assert!(mesh.add_face(
+            *Point3D::build(1.0, 1.0, 1.0),
+            *Point3D::build(2.0, 2.0, 2.0),
+            *Point3D::build(3.0, 3.0, 3.0))
+            == 1);
+        assert!(mesh.num_vertices() == 6);
+        assert!(mesh.num_faces() == 2);
+
+        match mesh.face_vertex_ids(0) {
+            None => assert!(false),
+            Some((id1, id2, id3)) => assert!(id1 == 0 && id2 == 1 && id3 == 2)
+        };
+
+        match mesh.face_vertex_ids(1) {
+            None => assert!(false),
+            Some((id1, id2, id3)) => assert!(id1 == 3 && id2 == 4 && id3 == 5)
+        };
+
+        match mesh.face_vertices(0) {
+            None => assert!(false),
+            Some((p1, p2, p3)) => assert!(
+                   p1.x() == 0.0
+                && p2.x() == 0.1
+                && p3.x() == 0.2
+            )
+        };
+
+        match mesh.face_vertices(1) {
+            None => assert!(false),
+            Some((p1, p2, p3)) => assert!(
+                   p1.x() == 1.0
+                && p2.x() == 2.0
+                && p3.x() == 3.0
+            )
+        };
+
+        //@todo missing tests for fileIO
+
+    }
 }
