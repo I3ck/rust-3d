@@ -17,5 +17,6 @@ pub mod is_oc_tree;
 pub mod is_plane_3d;
 pub mod is_projection_to_plane;
 pub mod is_tree_3d;
+pub mod is_voxel_image;
 pub mod transformable_to_2d;
 pub mod transformable_to_3d;

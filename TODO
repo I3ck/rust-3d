@@ -6,3 +6,6 @@ add copyright
 up to github / crates
 simplify use statements
 rename moveAble
+octree for voxel image
+kdtree for 2d or generic
+quadtree
