@@ -6,6 +6,7 @@ use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;
 use traits::has_bounding_box_2d::HasBoundingBox2D;
 use point_2d::{Point2D};
+use functions::dist_2d;
 
 
 
@@ -63,6 +64,16 @@ impl<P> PointCloud2D<P> where
 
     pub fn len(&self) -> usize {
         self.data.len()
+    }
+
+    pub fn path_length(&self) -> f64 { //@todo also implement for 3d   (could be defined more generic for both)
+        let mut length : f64 = 0.0;
+        if self.data.len() < 2 { return length; }
+
+        for i in 0..self.data.len() {
+            length += dist_2d(&*self.data[i], &*self.data[i-1]);
+        }
+        length
     }
 
     pub fn center(&self) -> Option<P> { //@todo missing test //@todo rename to center of gravity

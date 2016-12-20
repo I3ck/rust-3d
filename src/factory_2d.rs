@@ -4,9 +4,10 @@ use point_2d::Point2D;
 use point_cloud_2d::PointCloud2D;
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;
+use functions::dist_2d;
 
 ///@todo entire file has to be added to tests
-///@todo add some type level checks like diameter > 0 etc., or return Option types
+///@todo add some type level checks like diameter > 0 etc., or return Option types (similar to flaggedT?)
 ///@todo define trait for pc2d factories, later for 3d as well
 ///@todo remove center as param and create all around origin
 ///@todo correct reserving
@@ -115,3 +116,34 @@ pub fn interpolate_bezier<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
     }
     Box::new(pc)
 }
+
+pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Box<PointCloud2D<P>> where
+    P : IsEditable2D + IsBuildable2D {
+
+    let mut pc = PointCloud2D::new();
+    let p_dist = base_points.path_length() / (n_points - 1) as f64;
+
+    for i in 0..n_points {
+        let mut traveled : f64 = 0.0;
+        let mut traveled_before : f64 = 0.0;
+
+        for j in 1..base_points.len() {
+            let ref p_prev = base_points.data[j-1];
+            let ref p_now  = base_points.data[j];
+
+            traveled += ( (p_now.x() - p_prev.x()).powi(2) + (p_now.y() - p_prev.y()).powi(2) ).sqrt();
+
+            if traveled >= p_dist*(i as f64) {
+                let proportion = ((i as f64)*p_dist - traveled_before) / (traveled - traveled_before);
+                let proportion2 = (1.0 - (proportion*PI).cos() ) / 2.0;
+                pc.push(*P::build(p_prev.x() + proportion * (p_now.x() - p_prev.x()),
+                                  p_prev.y() * (1.0 - proportion2) + p_now.y()*proportion2));
+                traveled_before = traveled;
+                break;
+            }
+            traveled_before = traveled;
+        }
+    }
+    Box::new(pc)
+
+    }
