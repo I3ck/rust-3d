@@ -11,6 +11,7 @@ use traits::is_editable_2d::IsEditable2D;
 ///@todo remove center as param and create all around origin
 ///@todo correct reserving
 ///@todo order parameters (e.g. center and n_points always first)
+///@todo some algorithms (e.g. bezier) can be ported to 3d, maybe write them directly generic over the dimension
 
 pub fn origin() -> Box<Point2D> {
     Point2D::build(0.0, 0.0)
@@ -67,6 +68,50 @@ pub fn ellipse<P>(center: &P, a: f64, b: f64, n_points: usize) -> Box<PointCloud
         let radians = (i as f64) * p_dist;
         pc.push(*P::build(center.x() + a * radians.cos() * angle.cos() - b * radians.sin() * angle.sin(),
                           center.y() + a * radians.cos() * angle.sin() + b * radians.sin() * angle.cos()));
+    }
+    Box::new(pc)
+}
+
+fn factorial(number: usize) -> usize {
+    let mut result = 1;
+
+    for i in 1..number+1 {
+        result *= i;
+    }
+    result
+}
+
+fn binominal_coefficient(n: usize, k: usize) -> usize {
+    factorial(n) / (factorial(k) * factorial(n-k))
+}
+
+fn bernstein_polynomial(n: usize, i: usize, t: f64) -> f64 {
+    (binominal_coefficient(n, i) as f64) * t.powi(i as i32) * (1.0 - t).powi((n-i) as i32) //@todo get rid of casts
+}
+
+fn control_polygon<P>(path: &PointCloud2D<P>, n_points: usize, t: f64) -> Box<P> where
+    P: IsEditable2D + IsBuildable2D {
+
+    let mut x : f64 = 0.0;
+    let mut y : f64 = 0.0;
+
+    //@todo possible bug with +1, c++ version had this, tho. Check again
+    for i in 0..n_points+1 {
+        let bp = bernstein_polynomial(n_points, i, t);
+        x += bp * path.data[i].x();
+        y += bp * path.data[i].y();
+    }
+    P::build(x,y)
+}
+
+pub fn interpolate_bezier<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Box<PointCloud2D<P>> where
+    P: IsEditable2D + IsBuildable2D {
+
+    let mut pc = PointCloud2D::new();
+    let p_dist = 1.0 / (n_points as f64);
+
+    for i in 0..n_points {
+        pc.push(*control_polygon(base_points, base_points.len()-1, (i as f64) * p_dist));
     }
     Box::new(pc)
 }
