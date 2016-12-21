@@ -145,5 +145,33 @@ pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
         }
     }
     Box::new(pc)
+}
 
+pub fn interpolation_linear<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Box<PointCloud2D<P>> where
+    P : IsEditable2D + IsBuildable2D {
+
+    let mut pc = PointCloud2D::new();
+    let p_dist = base_points.path_length() / (n_points - 1) as f64;
+
+    for i in 0..n_points {
+        let mut traveled : f64 = 0.0;
+        let mut traveled_before : f64 = 0.0;
+
+        for j in 1..base_points.len() {
+            let ref p_prev = base_points.data[j-1];
+            let ref p_now  = base_points.data[j];
+
+            traveled += ( (p_now.x() - p_prev.x()).powi(2) + (p_now.y() - p_prev.y()).powi(2) ).sqrt();
+
+            if traveled >= p_dist*(i as f64) {
+                let proportion = ((i as f64)*p_dist - traveled_before) / (traveled - traveled_before);
+                pc.push(*P::build(p_prev.x() + proportion * (p_now.x() - p_prev.x()),
+                                  p_prev.y() + proportion * (p_now.y() - p_prev.y())));
+                traveled_before = traveled; //@todo was not in lib_2d code
+                break;
+            }
+            traveled_before = traveled;
+        }
     }
+    Box::new(pc)
+}
