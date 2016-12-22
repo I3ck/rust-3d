@@ -32,6 +32,7 @@ pub mod mesh_3d;
 pub mod oc_node;
 pub mod oc_tree;
 pub mod factory_2d;
+pub mod interpolation_2d;
 
 #[cfg(test)]
 pub mod tests {
