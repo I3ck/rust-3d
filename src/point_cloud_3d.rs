@@ -77,6 +77,12 @@ impl<P> PointCloud3D<P> where
     pub fn push(&mut self, p: P) {
         self.data.push(Box::new(p));
     }
+    
+    pub fn consume(&mut self, other: Self) {
+        for p in other.data {
+            self.data.push(Box::new((*p).clone()));
+        }
+    }
 
     pub fn len(&self) -> usize {
         self.data.len()
