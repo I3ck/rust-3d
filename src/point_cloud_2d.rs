@@ -14,6 +14,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use std::fmt;
+use std::cmp::Ordering;
 
 use traits::is_2d::Is2D;
 use traits::is_moveable_2d::IsMoveable2D;
@@ -112,6 +113,14 @@ impl<P> PointCloud2D<P> where
             (sumx / sizef),
             (sumy / sizef)
         ))
+    }
+
+    pub fn sort_x(&mut self) {
+        self.data.sort_by(|a, b| a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
+    }
+
+    pub fn sort_y(&mut self) {
+        self.data.sort_by(|a, b| a.y().partial_cmp(&b.y()).unwrap_or(Ordering::Equal));
     }
 }
 

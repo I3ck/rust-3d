@@ -15,6 +15,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::fmt;
 
+use std::cmp::Ordering;
+
 use traits::is_3d::Is3D;
 use traits::is_moveable_3d::IsMoveable3D;
 use traits::is_buildable_3d::IsBuildable3D;
@@ -104,6 +106,18 @@ impl<P> PointCloud3D<P> where
             (sumy / sizef),
             (sumz / sizef)
         ))
+    }
+
+    pub fn sort_x(&mut self) {
+        self.data.sort_by(|a, b| a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
+    }
+
+    pub fn sort_y(&mut self) {
+        self.data.sort_by(|a, b| a.y().partial_cmp(&b.y()).unwrap_or(Ordering::Equal));
+    }
+
+    pub fn sort_z(&mut self) {
+        self.data.sort_by(|a, b| a.z().partial_cmp(&b.z()).unwrap_or(Ordering::Equal));
     }
 }
 
