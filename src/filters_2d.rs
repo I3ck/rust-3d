@@ -17,6 +17,7 @@ use std::rc::Rc;
 use std::collections::HashSet;
 
 use point_cloud_2d::PointCloud2D;
+use traits::is_2d::Is2D;
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;
 
@@ -26,6 +27,7 @@ use traits::is_editable_2d::IsEditable2D;
 //@todo might be better to let these work on indices
 //@todo especially the or filter is inefficent without usage of indices
 //@todo filters could be written for any type or at least for n dimensions?
+//@todo rename these to PC filters, and add PointFilters of signature   filter(&Is_2d) -> bool which can then be used in the pc methods
 
 //@todo move
 #[derive(Clone)]
@@ -49,26 +51,60 @@ impl View {
         }
     }
 }
-///@todo move to traits
+
 pub trait IsFilter2D<P> where
+    P: Is2D {
+
+    fn is_allowed(&self, p: &P) -> bool;
+}
+
+
+///@todo move to traits
+pub trait IsFilterPC2D<P> where
     P: IsEditable2D + IsBuildable2D {
 
     fn filter(&self, pc: &PointCloud2D<P>, view: &mut View); //@todo could have optional search structures   also define traits for different search structs e.g. trait solely to search in_box_2d
 }
 
-pub struct FilterAnd2D<P> where
+pub struct FilterPC2D<P> where
     P: IsEditable2D + IsBuildable2D {
 
-    pub filters: Vec<Box<IsFilter2D<P>>>
+    pub filter2D: Box<IsFilter2D<P>>
 }
 
-pub struct FilterOr2D<P> where
+impl<P> IsFilterPC2D<P> for FilterPC2D<P> where
     P: IsEditable2D + IsBuildable2D {
 
-    pub filters: Vec<Box<IsFilter2D<P>>>
+    fn filter(&self, pc: &PointCloud2D<P>, view: &mut View) {
+
+        match view {
+            &mut View::Full => {
+                let mut indices = HashSet::new();
+                for (i, p) in pc.data.iter().enumerate() { //@todo could only iterate the indices within the hashset
+                    if self.filter2D.is_allowed(p) {
+                        indices.insert(i);
+                    }
+                }
+                *view = View::Restricted(indices);
+            } //@todo must still filter
+            &mut View::Restricted(ref mut indices) => {
+                for (i, p) in pc.data.iter().enumerate() { //@todo could only iterate the indices within the hashset
+                    if !self.filter2D.is_allowed(p) {
+                        indices.remove(&i);
+                    }
+                }
+            }
+        }
+    }
 }
 
-impl<P> IsFilter2D<P> for FilterAnd2D<P> where
+pub struct FilterAndPC2D<P> where
+    P: IsEditable2D + IsBuildable2D {
+
+    pub filters: Vec<Box<IsFilterPC2D<P>>>
+}
+
+impl<P> IsFilterPC2D<P> for FilterAndPC2D<P> where
     P: IsEditable2D + IsBuildable2D {
 
     fn filter(&self, pc: &PointCloud2D<P>, mut view: &mut View) {
@@ -78,7 +114,13 @@ impl<P> IsFilter2D<P> for FilterAnd2D<P> where
     }
 }
 
-impl<P> IsFilter2D<P> for FilterOr2D<P> where
+pub struct FilterOrPC2D<P> where
+    P: IsEditable2D + IsBuildable2D {
+
+    pub filters: Vec<Box<IsFilterPC2D<P>>>
+}
+
+impl<P> IsFilterPC2D<P> for FilterOrPC2D<P> where
     P: IsEditable2D + IsBuildable2D {
 
     fn filter(&self, pc: &PointCloud2D<P>, mut view: &mut View) {
