@@ -29,20 +29,19 @@ use traits::is_editable_2d::IsEditable2D;
 
 //@todo move
 #[derive(Clone)]
-pub enum View<T> {
-    Full(Rc<T>),
-    Restricted(Rc<T>, HashSet<usize>)
-} //@todo maybe just drop T altogether, since this might become async anyway
+pub enum View{
+    Full,
+    Restricted(HashSet<usize>)
+}
 
-fn merge_views<T>(target: &mut View<T>, source: View<T>) { //@todo as method? //@todo make sure both use the same object
+fn merge_views(target: &mut View, source: View) {
     match source {
-        View::Full(_) => return,
-        View::Restricted(_, indices_s) => {
+        View::Full => { *target = source }
+        View::Restricted(indices_s) => {
             match target {
-                &mut View::Full(pc) => { target = &mut source; return }
-                &mut View::Restricted(pc, indices_t) => {
-                    indices_t.extend(indices_s);
-                    target = &mut View::Restricted(pc, indices_t)
+                &mut View::Full => {}
+                &mut View::Restricted(ref mut indices_t) => {
+                    *indices_t = indices_t.union(&indices_s).cloned().collect()
                 }
             }
         }
@@ -53,44 +52,40 @@ fn merge_views<T>(target: &mut View<T>, source: View<T>) { //@todo as method? //
 pub trait IsFilter2D<P> where
     P: IsEditable2D + IsBuildable2D {
 
-    fn filter(&self, pc: &View<PointCloud2D<P>>) -> View<PointCloud2D<P>>; //@todo could have optional search structures   also define traits for different search structs e.g. trait solely to search in_box_2d
+    fn filter(&self, pc: &PointCloud2D<P>, view: &mut View); //@todo could have optional search structures   also define traits for different search structs e.g. trait solely to search in_box_2d
 }
 
-pub struct FilterAnd<P> where
+pub struct FilterAnd2D<P> where
     P: IsEditable2D + IsBuildable2D {
 
     pub filters: Vec<Box<IsFilter2D<P>>>
 }
 
-pub struct FilterOr<P> where
+pub struct FilterOr2D<P> where
     P: IsEditable2D + IsBuildable2D {
 
     pub filters: Vec<Box<IsFilter2D<P>>>
 }
 
-impl<P> IsFilter2D<P> for FilterAnd<P> where
+impl<P> IsFilter2D<P> for FilterAnd2D<P> where
     P: IsEditable2D + IsBuildable2D {
 
-    fn filter(&self, pc: &View<PointCloud2D<P>>) -> View<PointCloud2D<P>> {
-        let mut result: View<PointCloud2D<P>>;
-
-        // = Restricted::<PointCloud2D<P>>::new();
+    fn filter(&self, pc: &PointCloud2D<P>, mut view: &mut View) {
         for f in &self.filters {
-            result = *f.filter(&result)
+            f.filter(&pc, &mut view)
         }
-        Box::new(result)
     }
 }
 
-impl<P> IsFilter2D<P> for FilterOr<P> where
+impl<P> IsFilter2D<P> for FilterOr2D<P> where
     P: IsEditable2D + IsBuildable2D {
 
-    fn filter(&self, pc: &View<PointCloud2D<P>>) -> View<PointCloud2D<P>> {
-        let mut result = PointCloud2D::new();
+    fn filter(&self, pc: &PointCloud2D<P>, mut view: &mut View) {
+        let view_initial = view.clone();
         for f in &self.filters {
-            result.consume(*f.filter(pc));
+            let mut view_now = view_initial.clone();
+            f.filter(&pc, &mut view_now);
+            merge_views(&mut view, view_now);
         }
-        //@todo remove duplicates
-        Box::new(result)
     }
 }
