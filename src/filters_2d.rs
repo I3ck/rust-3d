@@ -42,7 +42,7 @@ impl View {
                 match self {
                     &mut View::Full => {}
                     &mut View::Restricted(ref mut indices_source) => {
-                        *indices_source = indices_source.union(&indices_other).cloned().collect()
+                        indices_source.extend(&indices_other);
                     }
                 }
             }
