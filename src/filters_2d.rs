@@ -29,25 +29,26 @@ use traits::is_editable_2d::IsEditable2D;
 
 //@todo move
 #[derive(Clone)]
-pub enum View{
+pub enum View {
     Full,
     Restricted(HashSet<usize>)
 }
 
-fn merge_views(target: &mut View, source: View) {
-    match source {
-        View::Full => { *target = source }
-        View::Restricted(indices_s) => {
-            match target {
-                &mut View::Full => {}
-                &mut View::Restricted(ref mut indices_t) => {
-                    *indices_t = indices_t.union(&indices_s).cloned().collect()
+impl View {
+    fn union(&mut self, other: View) {
+        match other {
+            View::Full => { *self = other }
+            View::Restricted(indices_other) => {
+                match self {
+                    &mut View::Full => {}
+                    &mut View::Restricted(ref mut indices_source) => {
+                        *indices_source = indices_source.union(&indices_other).cloned().collect()
+                    }
                 }
             }
         }
     }
 }
-
 ///@todo move to traits
 pub trait IsFilter2D<P> where
     P: IsEditable2D + IsBuildable2D {
@@ -85,7 +86,7 @@ impl<P> IsFilter2D<P> for FilterOr2D<P> where
         for f in &self.filters {
             let mut view_now = view_initial.clone();
             f.filter(&pc, &mut view_now);
-            merge_views(&mut view, view_now);
+            view.union(view_now);
         }
     }
 }
