@@ -13,29 +13,25 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-pub mod has_bounding_box_2d;
-pub mod has_bounding_box_3d;
-pub mod is_editable_2d;
-pub mod is_editable_3d;
-pub mod is_buildable_2d;
-pub mod is_buildable_3d;
-pub mod is_2d;
-pub mod is_3d;
-pub mod is_editable_mesh_3d;
-pub mod is_kd_tree_3d;
-pub mod is_mesh_3d;
-pub mod is_moveable_2d;
-pub mod is_moveable_3d;
-pub mod is_normalized_2d;
-pub mod is_normalized_3d;
-pub mod is_oc_tree;
-pub mod is_plane_3d;
-pub mod is_projection_to_plane;
-pub mod is_tree_3d;
-pub mod is_voxel_image;
-pub mod transformable_to_2d;
-pub mod transformable_to_3d;
-pub mod is_filter_2d;
-pub mod is_filter_3d;
-pub mod is_filter_pc_2d;
-pub mod is_filter_pc_3d;
+use traits::is_buildable_3d::IsBuildable3D;
+use traits::is_editable_3d::IsEditable3D;
+use traits::is_filter_3d::IsFilter3D;
+use traits::is_filter_pc_3d::IsFilterPC3D;
+use point_cloud_3d::PointCloud3D;
+use view::View;
+
+pub struct FilterAndPC3D<P> where
+    P: IsEditable3D + IsBuildable3D {
+
+    pub filters: Vec<Box<IsFilterPC3D<P>>>
+}
+
+impl<P> IsFilterPC3D<P> for FilterAndPC3D<P> where
+    P: IsEditable3D + IsBuildable3D {
+
+    fn filter(&self, pc: &PointCloud3D<P>, mut view: &mut View) {
+        for f in &self.filters {
+            f.filter(&pc, &mut view)
+        }
+    }
+}
