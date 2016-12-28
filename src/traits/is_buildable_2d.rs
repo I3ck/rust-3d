@@ -13,7 +13,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+extern crate core;
+
 use std::hash::{Hash};
+use self::core::str::FromStr;
 
 use traits::is_2d::Is2D;
 
@@ -39,6 +42,27 @@ pub trait IsBuildable2D :
         }
         else {
             Some(Self::build(self.x() / l, self.y() / l))
+        }
+    }
+
+    fn parse(text: String) -> Option<Box<Self>> {
+        let split = text.split(" ");
+        let words = split.collect::<Vec<&str>>();
+        match words.len() {
+            2 => {
+                let mut x : f64;
+                match f64::from_str(words[0]) {
+                    Err(_) => return None,
+                    Ok(a) => x = a
+                };
+                let mut y : f64;
+                match f64::from_str(words[1]) {
+                    Err(_) => return None,
+                    Ok(b) => y = b
+                };
+                Some(Self::build(x,y))
+            },
+            _ => None
         }
     }
 }

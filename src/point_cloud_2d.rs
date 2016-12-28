@@ -26,14 +26,12 @@ use functions::dist_2d;
 
 
 
-pub struct PointCloud2D<P> where
-    P: IsEditable2D {
-
+pub struct PointCloud2D<P> {
     pub data: Vec<Box<P>>
 }
 
 impl<P> PointCloud2D<P> where
-    P: IsEditable2D{
+    P: IsBuildable2D + IsEditable2D {
 
     pub fn new() -> PointCloud2D<P> {
         PointCloud2D{data: Vec::new()}
@@ -140,7 +138,7 @@ impl<P> IsMoveable2D for PointCloud2D<P> where P: IsEditable2D + IsMoveable2D {
 
 impl<P> HasBoundingBox2D for PointCloud2D<P> where P: IsEditable2D {
     fn bounding_box(&self) -> Option<(Point2D, Point2D)> {
-        if self.len() < 2 {
+        if self.data.len() < 2 {
             return None;
         }
 

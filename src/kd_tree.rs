@@ -38,7 +38,7 @@ pub struct KdNode<P> where
 }
 
 impl<P> IsTree3D<P> for KdTree<P> where
-    P: IsEditable3D {
+    P: IsEditable3D + IsBuildable3D {
 
     fn new() -> KdTree<P> {
         KdTree { root: None }
@@ -72,7 +72,7 @@ impl<P> IsTree3D<P> for KdTree<P> where
 }
 
 impl<P> IsKdTree3D<P> for KdTree<P> where
-    P: IsEditable3D {
+    P: IsEditable3D + IsBuildable3D {
 
     fn knearest(&self, search: &P, n: usize) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();
@@ -114,7 +114,7 @@ impl<P> IsKdTree3D<P> for KdTree<P> where
 }
 
 impl<P> KdNode<P> where
-    P: IsEditable3D {
+    P: IsEditable3D + IsBuildable3D {
 
     pub fn new(dim: i8, mut pc: Vec<Box<P>>) -> KdNode<P> {
         let dimension = dim % 2;

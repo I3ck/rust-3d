@@ -13,6 +13,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+extern crate core;
+
+use self::core::str::FromStr;
 use std::hash::{Hash};
 
 use traits::is_3d::Is3D;
@@ -61,6 +64,32 @@ pub trait IsBuildable3D :
         }
         else {
             Some(Self::build(self.x() / l, self.y() / l, self.z() / l))
+        }
+    }
+
+    fn parse(text: String) -> Option<Box<Self>> {
+        let split = text.split(" ");
+        let words = split.collect::<Vec<&str>>();
+        match words.len() {
+            3 => {
+                let mut x : f64;
+                match f64::from_str(words[0]) {
+                    Err(_) => return None,
+                    Ok(a) => x = a
+                };
+                let mut y : f64;
+                match f64::from_str(words[1]) {
+                    Err(_) => return None,
+                    Ok(b) => y = b
+                };
+                let mut z : f64;
+                match f64::from_str(words[2]) {
+                    Err(_) => return None,
+                    Ok(c) => z = c
+                };
+                Some(Self::build(x,y,z))
+            },
+            _ => None
         }
     }
 }

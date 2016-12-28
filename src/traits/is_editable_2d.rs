@@ -13,13 +13,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-extern crate core;
-use self::core::str::FromStr;
-
 use traits::is_2d::Is2D;
-use traits::is_buildable_2d::IsBuildable2D;
 
-pub trait IsEditable2D : IsBuildable2D { //@todo try to not depent on IsBuildable2D
+pub trait IsEditable2D : Is2D {
     fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable3D? Or remove moveable trait
 
     fn set_y(&mut self, val: f64);
@@ -62,26 +58,5 @@ pub trait IsEditable2D : IsBuildable2D { //@todo try to not depent on IsBuildabl
 
         self.set_x(newx);
         self.set_y(newy);
-    }
-
-    //@todo move to buildable
-    fn parse(text: String) -> Option<Box<Self>> {
-        let split = text.split(" ");
-        let words = split.collect::<Vec<&str>>();
-        match words.len() {
-            2 => {
-                let mut p = Self::new();
-                match f64::from_str(words[0]) {
-                    Err(_) => return None,
-                    Ok(x) => p.set_x(x)
-                };
-                match f64::from_str(words[1]) {
-                    Err(_) => return None,
-                    Ok(y) => p.set_y(y)
-                };
-                Some(p)
-            },
-            _ => None
-        }
     }
 }

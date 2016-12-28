@@ -14,6 +14,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use traits::is_editable_2d::IsEditable2D;
+use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_3d::IsEditable3D;
 use traits::transformable_to_2d::TransFormableTo2D;
 use traits::transformable_to_3d::TransFormableTo3D;
@@ -28,7 +29,7 @@ use point_cloud_3d::PointCloud3D;
 //@todo maybe implement projection methods within the pc
 //@todo transformable traits required later on?
 pub trait IsProjectionToPlane<P2,P3,N> where
-    P2: IsEditable2D + TransFormableTo3D,
+    P2: IsEditable2D + IsBuildable2D + TransFormableTo3D,
     P3: IsEditable3D + TransFormableTo2D,
     N: IsNormalized3D {
 
