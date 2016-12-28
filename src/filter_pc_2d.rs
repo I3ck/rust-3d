@@ -13,13 +13,15 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-use std::rc::Rc;
 use std::collections::HashSet;
 
 use point_cloud_2d::PointCloud2D;
+use view::View;
 use traits::is_2d::Is2D;
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;
+use traits::is_filter_2d::IsFilter2D;
+use traits::is_filter_pc_2d::IsFilterPC2D;
 
 //@todo untested
 //@todo concave hull, convex hull
@@ -28,43 +30,6 @@ use traits::is_editable_2d::IsEditable2D;
 //@todo especially the or filter is inefficent without usage of indices
 //@todo filters could be written for any type or at least for n dimensions?
 //@todo rename these to PC filters, and add PointFilters of signature   filter(&Is_2d) -> bool which can then be used in the pc methods
-
-//@todo move
-#[derive(Clone)]
-pub enum View {
-    Full,
-    Restricted(HashSet<usize>)
-}
-
-impl View {
-    fn union(&mut self, other: View) {
-        match other {
-            View::Full => { *self = other }
-            View::Restricted(indices_other) => {
-                match self {
-                    &mut View::Full => {}
-                    &mut View::Restricted(ref mut indices_source) => {
-                        indices_source.extend(&indices_other);
-                    }
-                }
-            }
-        }
-    }
-}
-
-pub trait IsFilter2D<P> where
-    P: Is2D {
-
-    fn is_allowed(&self, p: &P) -> bool;
-}
-
-
-///@todo move to traits
-pub trait IsFilterPC2D<P> where
-    P: IsEditable2D + IsBuildable2D {
-
-    fn filter(&self, pc: &PointCloud2D<P>, view: &mut View); //@todo could have optional search structures   also define traits for different search structs e.g. trait solely to search in_box_2d
-}
 
 pub struct FilterPC2D<P> where
     P: IsEditable2D + IsBuildable2D {
@@ -76,7 +41,6 @@ impl<P> IsFilterPC2D<P> for FilterPC2D<P> where
     P: IsEditable2D + IsBuildable2D {
 
     fn filter(&self, pc: &PointCloud2D<P>, view: &mut View) {
-
         match view {
             &mut View::Full => {
                 let mut indices = HashSet::new();
@@ -86,7 +50,7 @@ impl<P> IsFilterPC2D<P> for FilterPC2D<P> where
                     }
                 }
                 *view = View::Restricted(indices);
-            } //@todo must still filter
+            }
             &mut View::Restricted(ref mut indices) => {
                 for (i, p) in pc.data.iter().enumerate() { //@todo could only iterate the indices within the hashset
                     if !self.filter2D.is_allowed(p) {
@@ -94,41 +58,6 @@ impl<P> IsFilterPC2D<P> for FilterPC2D<P> where
                     }
                 }
             }
-        }
-    }
-}
-
-pub struct FilterAndPC2D<P> where
-    P: IsEditable2D + IsBuildable2D {
-
-    pub filters: Vec<Box<IsFilterPC2D<P>>>
-}
-
-impl<P> IsFilterPC2D<P> for FilterAndPC2D<P> where
-    P: IsEditable2D + IsBuildable2D {
-
-    fn filter(&self, pc: &PointCloud2D<P>, mut view: &mut View) {
-        for f in &self.filters {
-            f.filter(&pc, &mut view)
-        }
-    }
-}
-
-pub struct FilterOrPC2D<P> where
-    P: IsEditable2D + IsBuildable2D {
-
-    pub filters: Vec<Box<IsFilterPC2D<P>>>
-}
-
-impl<P> IsFilterPC2D<P> for FilterOrPC2D<P> where
-    P: IsEditable2D + IsBuildable2D {
-
-    fn filter(&self, pc: &PointCloud2D<P>, mut view: &mut View) {
-        let view_initial = view.clone();
-        for f in &self.filters {
-            let mut view_now = view_initial.clone();
-            f.filter(&pc, &mut view_now);
-            view.union(view_now);
         }
     }
 }

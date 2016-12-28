@@ -33,7 +33,10 @@ pub mod oc_node;
 pub mod oc_tree;
 pub mod factory_2d;
 pub mod interpolation_2d;
-pub mod filters_2d;
+pub mod filter_pc_2d;
+pub mod filter_and_pc_2d;
+pub mod filter_or_pc_2d;
+pub mod view;
 
 #[cfg(test)]
 pub mod tests {

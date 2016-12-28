@@ -35,6 +35,7 @@ pub mod projection_to_plane;
 pub mod kd_tree;
 pub mod oc_node;
 pub mod oc_tree;
+pub mod view;
 
 use point_2d::{Point2D};
 use point_3d::{Point3D};
