@@ -19,7 +19,7 @@ use self::core::str::FromStr;
 use traits::is_2d::Is2D;
 use traits::is_buildable_2d::IsBuildable2D;
 
-pub trait IsEditable2D : IsBuildable2D {
+pub trait IsEditable2D : IsBuildable2D { //@todo try to not depent on IsBuildable2D
     fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable3D? Or remove moveable trait
 
     fn set_y(&mut self, val: f64);
@@ -64,6 +64,7 @@ pub trait IsEditable2D : IsBuildable2D {
         self.set_y(newy);
     }
 
+    //@todo move to buildable
     fn parse(text: String) -> Option<Box<Self>> {
         let split = text.split(" ");
         let words = split.collect::<Vec<&str>>();
