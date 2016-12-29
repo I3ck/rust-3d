@@ -9,6 +9,10 @@ quadtree
 
 has_position trait which then can implement many other traits by using the provided position (similar for others)
 
+many tests are missing
+
+filters for 3d
+
 update README and tests
 
 make proper crate

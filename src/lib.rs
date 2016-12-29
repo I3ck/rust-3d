@@ -42,6 +42,7 @@ pub mod filter_or_pc_3d;
 pub mod view;
 pub mod filter_box_2d;
 pub mod filter_circle_2d;
+pub mod positive;
 
 #[cfg(test)]
 pub mod tests {

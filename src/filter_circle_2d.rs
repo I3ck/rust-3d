@@ -23,6 +23,7 @@ use traits::is_editable_2d::IsEditable2D;
 use traits::is_filter_2d::IsFilter2D;
 use point_2d::Point2D;
 use functions::{dist_2d, sqr_dist_2d};
+use positive::Positive;
 
 #[derive (PartialEq, PartialOrd)]
 pub struct FilterCircle2D {
@@ -53,8 +54,8 @@ impl FilterCircle2D {
     fn new() -> Self {
         FilterCircle2D {center: *Point2D::new(), radius: 1.0}
     }
-    fn build(center: Point2D, radius: f64) -> Self {
-        FilterCircle2D {center: center, radius: radius} //@todo disallow negative sizes
+    fn build(center: Point2D, p_radius: Positive) -> Self {
+        FilterCircle2D {center: center, radius: p_radius.get()}
     }
 }
 
@@ -94,7 +95,7 @@ impl IsBuildable2D for FilterCircle2D {
     }
 
     fn build(x: f64, y: f64) -> Box<Self> {
-        Box::new(FilterCircle2D::build(*Point2D::build(x, y), 1.0))
+        Box::new(FilterCircle2D::build(*Point2D::build(x, y), Positive::build(1.0).unwrap()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable2D {

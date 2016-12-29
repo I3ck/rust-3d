@@ -23,11 +23,12 @@ use traits::is_editable_2d::IsEditable2D;
 use traits::is_filter_2d::IsFilter2D;
 use point_2d::Point2D;
 use functions::{sqr_dist_2d};
+use positive::Positive;
 
 #[derive (PartialEq, PartialOrd)]
 pub struct FilterBox2D {
     center: Point2D,
-    size_x: f64, //@todo add type for sizes which is > 0 or >= 0
+    size_x: f64,
     size_y: f64
 }
 
@@ -58,8 +59,8 @@ impl FilterBox2D {
     fn new() -> Self {
         FilterBox2D {center: *Point2D::new(), size_x: 1.0, size_y: 1.0}
     }
-    fn build(center: Point2D, size_x: f64, size_y: f64) -> Self {
-        FilterBox2D {center: center, size_x: size_x, size_y: size_y} //@todo disallow negative sizes
+    fn build(center: Point2D, p_size_x: Positive, p_size_y: Positive) -> Self {
+        FilterBox2D {center: center, size_x: p_size_x.get(), size_y: p_size_y.get()}
     }
 }
 
@@ -99,7 +100,7 @@ impl IsBuildable2D for FilterBox2D {
     }
 
     fn build(x: f64, y: f64) -> Box<Self> {
-        Box::new(FilterBox2D::build(*Point2D::build(x, y), 1.0, 1.0))
+        Box::new(FilterBox2D::build(*Point2D::build(x, y), Positive::build(1.0).unwrap(), Positive::build(1.0).unwrap()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable2D {
