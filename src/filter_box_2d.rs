@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
+use traits::is_nd::IsND;
 use traits::is_2d::Is2D;
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;
@@ -59,6 +60,20 @@ impl FilterBox2D {
     }
     fn build(center: Point2D, size_x: f64, size_y: f64) -> Self {
         FilterBox2D {center: center, size_x: size_x, size_y: size_y} //@todo disallow negative sizes
+    }
+}
+
+impl IsND for FilterBox2D {
+    fn n_dimensions(&self) -> usize {
+        2
+    }
+
+    fn get_position(&self, dimension: usize) -> Option<f64> {
+        match dimension {
+            0 => Some(self.center.x()),
+            1 => Some(self.center.y()),
+            _ => None
+        }
     }
 }
 

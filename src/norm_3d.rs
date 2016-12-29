@@ -17,6 +17,7 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 use point_3d::Point3D;
+use traits::is_nd::IsND;
 use traits::is_3d::Is3D;
 use traits::is_normalized_3d::IsNormalized3D;
 use traits::is_buildable_3d::IsBuildable3D;
@@ -43,6 +44,21 @@ impl Hash for Norm3D { //@todo poor precision this way
         (self.x as u64).hash(state);
         (self.y as u64).hash(state);
         (self.z as u64).hash(state);
+    }
+}
+
+impl IsND for Norm3D {
+    fn n_dimensions(&self) -> usize {
+        3
+    }
+
+    fn get_position(&self, dimension: usize) -> Option<f64> {
+        match dimension {
+            0 => Some(self.x),
+            1 => Some(self.y),
+            2 => Some(self.z),
+            _ => None
+        }
     }
 }
 

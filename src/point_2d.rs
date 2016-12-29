@@ -18,6 +18,7 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 
+use traits::is_nd::IsND;
 use traits::is_2d::Is2D;
 use traits::is_moveable_2d::IsMoveable2D;
 use traits::is_buildable_2d::IsBuildable2D;
@@ -52,6 +53,20 @@ impl IsMoveable2D for Point2D {
     fn move_by(&mut self, x: f64, y: f64) {
         self.x += x;
         self.y += y;
+    }
+}
+
+impl IsND for Point2D {
+    fn n_dimensions(&self) -> usize {
+        2
+    }
+
+    fn get_position(&self, dimension: usize) -> Option<f64> {
+        match dimension {
+            0 => Some(self.x),
+            1 => Some(self.y),
+            _ => None
+        }
     }
 }
 

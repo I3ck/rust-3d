@@ -1,9 +1,6 @@
-parse could be moved to non-editable traits, but cant be implemented there?
 implement HasBoundingBox for pointcloud
 iterators for collections
 unittest all the things
-add copyright
-up to github / crates
 simplify use statements
 rename moveAble
 octree for voxel image
@@ -11,3 +8,7 @@ kdtree for 2d or generic
 quadtree
 
 has_position trait which then can implement many other traits by using the provided position (similar for others)
+
+update README and tests
+
+make proper crate

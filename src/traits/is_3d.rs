@@ -13,9 +13,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use traits::is_nd::IsND;
 use traits::is_buildable_3d::IsBuildable3D;
 
-pub trait Is3D {
+pub trait Is3D : IsND {
     fn x(&self) -> f64;
 
     fn y(&self) -> f64;

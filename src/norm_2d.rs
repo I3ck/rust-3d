@@ -17,6 +17,7 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 use point_2d::Point2D;
+use traits::is_nd::IsND;
 use traits::is_2d::Is2D;
 use traits::is_normalized_2d::IsNormalized2D;
 use traits::is_buildable_2d::IsBuildable2D;
@@ -41,6 +42,20 @@ impl Hash for Norm2D { //@todo poor precision this way
     fn hash<H: Hasher>(&self, state: &mut H) {
         (self.x as u64).hash(state);
         (self.y as u64).hash(state);
+    }
+}
+
+impl IsND for Norm2D {
+    fn n_dimensions(&self) -> usize {
+        2
+    }
+
+    fn get_position(&self, dimension: usize) -> Option<f64> {
+        match dimension {
+            0 => Some(self.x),
+            1 => Some(self.y),
+            _ => None
+        }
     }
 }
 

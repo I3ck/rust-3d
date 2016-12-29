@@ -13,7 +13,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-pub trait Is2D {
+use traits::is_nd::IsND;
+
+pub trait Is2D : IsND {
     fn x(&self) -> f64;
 
     fn y(&self) -> f64;

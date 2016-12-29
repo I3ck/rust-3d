@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
+use traits::is_nd::IsND;
 use traits::is_2d::Is2D;
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;
@@ -54,6 +55,20 @@ impl FilterCircle2D {
     }
     fn build(center: Point2D, radius: f64) -> Self {
         FilterCircle2D {center: center, radius: radius} //@todo disallow negative sizes
+    }
+}
+
+impl IsND for FilterCircle2D {
+    fn n_dimensions(&self) -> usize {
+        2
+    }
+
+    fn get_position(&self, dimension: usize) -> Option<f64> {
+        match dimension {
+            0 => Some(self.center.x()),
+            1 => Some(self.center.y()),
+            _ => None
+        }
     }
 }
 
