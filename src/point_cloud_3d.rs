@@ -17,7 +17,6 @@ use std::fmt;
 
 use std::cmp::Ordering;
 
-use traits::is_3d::Is3D;
 use traits::is_moveable_3d::IsMoveable3D;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_3d::IsEditable3D;

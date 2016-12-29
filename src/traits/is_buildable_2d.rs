@@ -50,12 +50,12 @@ pub trait IsBuildable2D :
         let words = split.collect::<Vec<&str>>();
         match words.len() {
             2 => {
-                let mut x : f64;
+                let x : f64;
                 match f64::from_str(words[0]) {
                     Err(_) => return None,
                     Ok(a) => x = a
                 };
-                let mut y : f64;
+                let y : f64;
                 match f64::from_str(words[1]) {
                     Err(_) => return None,
                     Ok(b) => y = b

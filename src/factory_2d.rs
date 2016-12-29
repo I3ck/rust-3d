@@ -19,7 +19,6 @@ use point_2d::Point2D;
 use point_cloud_2d::PointCloud2D;
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;
-use functions::dist_2d;
 
 ///@todo entire file has to be added to tests
 ///@todo add some type level checks like diameter > 0 etc., or return Option types (similar to flaggedT?)
@@ -66,8 +65,8 @@ pub fn arc<P>(center: &P, diameter: f64, n_points: usize, radians_start: f64, ra
 
     for i in 0..n_points {
         let radians = radians_start + (i as f64) * p_dist;
-        pc.push(*P::build(center.x() + diameter/2.0 * radians_start.cos(),
-                          center.y() + diameter/2.0 * radians_start.sin()));
+        pc.push(*P::build(center.x() + diameter/2.0 * radians.cos(),
+                          center.y() + diameter/2.0 * radians.sin()));
     }
     Box::new(pc)
 }

@@ -105,7 +105,7 @@ impl Matrix4 {
         Some(result)
     }
 
-    pub fn perspective(width: f64, height: f64, close: f64, away: f64, fov_rad: f64) -> Matrix4 {
+    pub fn perspective(close: f64, away: f64, fov_rad: f64) -> Matrix4 {
         let range = close - away;
         let tan_fov_half = (fov_rad/2.0).tan();
 

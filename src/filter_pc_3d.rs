@@ -17,7 +17,6 @@ use std::collections::HashSet;
 
 use point_cloud_3d::PointCloud3D;
 use view::View;
-use traits::is_3d::Is3D;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_3d::IsEditable3D;
 use traits::is_filter_3d::IsFilter3D;
@@ -34,7 +33,7 @@ use traits::is_filter_pc_3d::IsFilterPC3D;
 pub struct FilterPC3D<P> where
     P: IsEditable3D + IsBuildable3D {
 
-    pub filter3D: Box<IsFilter3D<P>>
+    pub filter_3d: Box<IsFilter3D<P>>
 }
 
 impl<P> IsFilterPC3D<P> for FilterPC3D<P> where
@@ -45,7 +44,7 @@ impl<P> IsFilterPC3D<P> for FilterPC3D<P> where
             &mut View::Full => {
                 let mut indices = HashSet::new();
                 for (i, p) in pc.data.iter().enumerate() { //@todo could only iterate the indices within the hashset
-                    if self.filter3D.is_allowed(p) {
+                    if self.filter_3d.is_allowed(p) {
                         indices.insert(i);
                     }
                 }
@@ -53,7 +52,7 @@ impl<P> IsFilterPC3D<P> for FilterPC3D<P> where
             }
             &mut View::Restricted(ref mut indices) => {
                 for (i, p) in pc.data.iter().enumerate() { //@todo could only iterate the indices within the hashset
-                    if !self.filter3D.is_allowed(p) {
+                    if !self.filter_3d.is_allowed(p) {
                         indices.remove(&i);
                     }
                 }

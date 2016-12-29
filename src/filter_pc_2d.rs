@@ -17,7 +17,6 @@ use std::collections::HashSet;
 
 use point_cloud_2d::PointCloud2D;
 use view::View;
-use traits::is_2d::Is2D;
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;
 use traits::is_filter_2d::IsFilter2D;
@@ -34,7 +33,7 @@ use traits::is_filter_pc_2d::IsFilterPC2D;
 pub struct FilterPC2D<P> where
     P: IsEditable2D + IsBuildable2D {
 
-    pub filter2D: Box<IsFilter2D<P>>
+    pub filter_2d: Box<IsFilter2D<P>>
 }
 
 impl<P> IsFilterPC2D<P> for FilterPC2D<P> where
@@ -45,7 +44,7 @@ impl<P> IsFilterPC2D<P> for FilterPC2D<P> where
             &mut View::Full => {
                 let mut indices = HashSet::new();
                 for (i, p) in pc.data.iter().enumerate() { //@todo could only iterate the indices within the hashset
-                    if self.filter2D.is_allowed(p) {
+                    if self.filter_2d.is_allowed(p) {
                         indices.insert(i);
                     }
                 }
@@ -53,7 +52,7 @@ impl<P> IsFilterPC2D<P> for FilterPC2D<P> where
             }
             &mut View::Restricted(ref mut indices) => {
                 for (i, p) in pc.data.iter().enumerate() { //@todo could only iterate the indices within the hashset
-                    if !self.filter2D.is_allowed(p) {
+                    if !self.filter_2d.is_allowed(p) {
                         indices.remove(&i);
                     }
                 }

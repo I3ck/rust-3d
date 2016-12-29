@@ -73,8 +73,8 @@ impl Matrix4Pipe {
         self.mscale = Matrix4::new();
     }
 
-    pub fn add_perspective(&mut self, width: f64, height: f64, close: f64, away: f64, fov_rad: f64) {
-        self.mperspective = Matrix4::perspective(width, height, close, away, fov_rad);
+    pub fn add_perspective(&mut self, close: f64, away: f64, fov_rad: f64) {
+        self.mperspective = Matrix4::perspective(close, away, fov_rad);
     }
     pub fn remove_perspective(&mut self) {
         self.mperspective = Matrix4::new();

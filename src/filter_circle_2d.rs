@@ -22,7 +22,7 @@ use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;
 use traits::is_filter_2d::IsFilter2D;
 use point_2d::Point2D;
-use functions::{sqr_dist_2d, dist_2d};
+use functions::{dist_2d, sqr_dist_2d};
 
 #[derive (PartialEq, PartialOrd)]
 pub struct FilterCircle2D {
@@ -116,6 +116,6 @@ impl<P> IsFilter2D<P> for FilterCircle2D where
     P: Is2D {
 
     fn is_allowed(&self, p: &P) -> bool {
-        sqr_dist_2d(p, &self.center) <= self.radius
+        dist_2d(p, &self.center) <= self.radius
     }
 }

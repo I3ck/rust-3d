@@ -16,7 +16,6 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::fmt;
 use std::cmp::Ordering;
 
-use traits::is_2d::Is2D;
 use traits::is_moveable_2d::IsMoveable2D;
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;

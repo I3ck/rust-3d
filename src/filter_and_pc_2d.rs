@@ -15,7 +15,6 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;
-use traits::is_filter_2d::IsFilter2D;
 use traits::is_filter_pc_2d::IsFilterPC2D;
 use point_cloud_2d::PointCloud2D;
 use view::View;
