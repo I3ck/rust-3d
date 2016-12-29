@@ -18,12 +18,17 @@ Once this is fairly well tested, I'll also add it to crates.
 traits
 -----
 ```rust
+IsND //anything defined by a position in n-dimensional space
 Is2D //anything defined by a position in 2D space
 Is3D //anything defined by a position in 3D space
 IsBuildable2D //2D and constructible
 IsBuildable3D //3D and constructible
 IsEditable2D //2D and modifiable
 IsEditable3D //3D and modifiable
+IsFilter2D //A filter for 2D positions
+IsFilter3D //A filter for 3D positions
+IsFilterPC2D //A filter for 2D point clouds
+IsFilterPC3D //A filter for 3D point clouds
 IsNormalized2D //normalized vectors in 2D space
 IsNormalized3D //normalized vectors in 3D space
 IsMoveable2D //anything movable within the 2D space
@@ -60,12 +65,37 @@ Mesh3D //a mesh in 3D space holding a 3d point cloud
 PointCloud2D //a point cloud holding 2d positions
 PointCloud3D //a point cloud holding 3d positions
 ProjectionToPlane //a projection onto a plane
+FilterBox2D //box filter for 2D space
+FilterCircle2D //circle filter for 2D space
+FilterPC2D //filter which can be used for point clouds in 2D space
+FilterPC3D //filter which can be used for point clouds in 3D space
+FilterAndPC2D //filter combinator to get the result of applying many 2D filters in a chain
+FilterAndPC3D //filter combinator to get the result of applying many 3D filters in a chain
+FilterOrPC2D //filter combinator to get the result of applying many 2D filters concurrently
+FilterOrPC3D //filter combinator to get the result of applying many 3D filters concurrently
 ```
+
+factories
+---------
+```rust
+rectangle //a rectangle
+involut_circle //an involut circle (e.g. used for gear generation)
+arc //an arc with start and end angle
+ellipse //an ellipse
+```
+
+interpolations
+--------------
+```rust
+interpolation_bezier // https://en.wikipedia.org/wiki/B%C3%A9zier_curve
+interpolate_cosine
+interpolation_linear
+```
+
 
 examples
 --------
 Please take a look at the tests in src/lib.rs.
-Currently main.rs also holds some example code, but will be fully moved to the tests.
 
 
 contribute
