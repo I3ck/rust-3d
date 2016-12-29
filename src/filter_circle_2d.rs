@@ -101,6 +101,6 @@ impl<P> IsFilter2D<P> for FilterCircle2D where
     P: Is2D {
 
     fn is_allowed(&self, p: &P) -> bool {
-        sqr_dist_2d(&p, &self.center) <= self.radius
+        sqr_dist_2d(p, &self.center) <= self.radius
     }
 }
