@@ -20,6 +20,7 @@ use traits::is_nd::IsND;
 use traits::is_2d::Is2D;
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;
+use traits::has_bounding_box_2d::HasBoundingBox2D;
 use traits::is_filter_2d::IsFilter2D;
 use point_2d::Point2D;
 use functions::{sqr_dist_2d};
@@ -115,6 +116,17 @@ impl IsEditable2D for FilterBox2D {
 
     fn set_y(&mut self, val: f64) {
         self.center.set_y(val);
+    }
+}
+
+impl HasBoundingBox2D for FilterBox2D {
+    fn bounding_box(&self) -> Option<(Point2D, Point2D)> {
+        if self.size_x <= 0.0 || self.size_y <= 0.0 {
+            return None;
+        }
+        let p_min = *Point2D::build(self.center.x() - self.size_x / 2.0, self.center.y() - self.size_y / 2.0);
+        let p_max = *Point2D::build(self.center.x() + self.size_x / 2.0, self.center.y() + self.size_y / 2.0);
+        return Some((p_min, p_max));
     }
 }
 

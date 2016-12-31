@@ -34,7 +34,7 @@ pub trait HasBoundingBox2D {
     }
 
     fn is_inside<B>(&self, other: &B) -> Option<bool> where
-        B: HasBoundingBox2D {
+        Self: Sized, B: HasBoundingBox2D {
 
         if let (Some(bbthis), Some(bbother)) = (self.bounding_box(), other.bounding_box()) {
             let (minthis, maxthis) = bbthis;
@@ -51,7 +51,7 @@ pub trait HasBoundingBox2D {
     }
 
     fn contains<P>(&self, other: &P) -> Option<bool> where
-        P: Is2D {
+        Self: Sized, P: Is2D {
 
         if let Some(bbthis) = self.bounding_box() {
             let (minthis, maxthis) = bbthis;
@@ -67,7 +67,7 @@ pub trait HasBoundingBox2D {
     }
 
     fn has_inside<B>(&self, other: &B) -> Option<bool> where
-        B: HasBoundingBox2D {
+        Self: Sized, B: HasBoundingBox2D {
 
         if let (Some(bbthis), Some(bbother)) = (self.bounding_box(), other.bounding_box()) {
             let (minthis, maxthis) = bbthis;
@@ -84,7 +84,7 @@ pub trait HasBoundingBox2D {
     }
 
     fn collides_with<B>(&self, other: &B) -> Option<bool> where
-        B: HasBoundingBox2D {
+        Self: Sized, B: HasBoundingBox2D {
 
         if let (Some(bbthis), Some(bbother)) = (self.bounding_box(), other.bounding_box()) {
             let (minthis, maxthis) = bbthis;

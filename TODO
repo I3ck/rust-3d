@@ -18,3 +18,7 @@ update README and tests
 make proper crate
 
 make kd-tree n-dimensional   (maybe the octree as well, but might be easier to implement quadtree)
+
+make trees referencing via ids
+
+filters should be directed

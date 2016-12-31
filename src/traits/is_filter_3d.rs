@@ -14,8 +14,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use traits::is_3d::Is3D;
+use traits::has_bounding_box_3d::HasBoundingBox3D;
 
-pub trait IsFilter3D<P> where
+pub trait IsFilter3D<P> : HasBoundingBox3D where
     P: Is3D {
 
     fn is_allowed(&self, p: &P) -> bool;

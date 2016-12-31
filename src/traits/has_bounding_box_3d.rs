@@ -34,7 +34,7 @@ pub trait HasBoundingBox3D  {
     }
 
     fn is_inside<B>(&self, other: &B) -> Option<bool> where
-        B: HasBoundingBox3D {
+        Self: Sized, B: HasBoundingBox3D {
 
         if let (Some(bbthis), Some(bbother)) = (self.bounding_box(), other.bounding_box()) {
             let (minthis, maxthis) = bbthis;
@@ -53,7 +53,7 @@ pub trait HasBoundingBox3D  {
     }
 
     fn contains<P>(&self, other: &P) -> Option<bool> where
-        P: Is3D {
+        Self: Sized, P: Is3D {
 
         if let Some(bbthis) = self.bounding_box() {
             let (minthis, maxthis) = bbthis;
@@ -71,7 +71,7 @@ pub trait HasBoundingBox3D  {
     }
 
     fn has_inside<B>(&self, other: &B) -> Option<bool> where
-        B: HasBoundingBox3D {
+        Self: Sized, B: HasBoundingBox3D {
 
         if let (Some(bbthis), Some(bbother)) = (self.bounding_box(), other.bounding_box()) {
             let (minthis, maxthis) = bbthis;
@@ -90,7 +90,7 @@ pub trait HasBoundingBox3D  {
     }
 
     fn collides_with<B>(&self, other: &B) -> Option<bool> where
-        B: HasBoundingBox3D {
+        Self: Sized, B: HasBoundingBox3D {
 
         if let (Some(bbthis), Some(bbother)) = (self.bounding_box(), other.bounding_box()) {
             let (minthis, maxthis) = bbthis;
