@@ -15,10 +15,12 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::cmp::Ordering;
 
-use point_2d::{Point2D};
-use point_3d::{Point3D};
-use point_cloud_3d::{PointCloud3D};
-use oc_node::{Direction};
+use point_2d::Point2D;
+use point_3d::Point3D;
+use point_cloud_2d::PointCloud2D;
+use point_cloud_3d::PointCloud3D;
+use oc_node::Direction;
+use view::View;
 use traits::is_nd::IsND;
 use traits::is_2d::Is2D;
 use traits::is_3d::Is3D;
@@ -31,6 +33,8 @@ use traits::transformable_to_3d::TransFormableTo3D;
 use traits::is_plane_3d::IsPlane3D;
 use traits::is_normalized_3d::IsNormalized3D;
 use traits::is_moveable_3d::IsMoveable3D;
+
+///@todo move these functions to better fitting files or make them methods of the correct types
 
 pub fn center<P>(p1: &P, p2: &P) -> Box<P> where
     P: IsBuildable3D {
@@ -238,4 +242,46 @@ pub fn project_point_on_plane<PL,P2,P3,N>(plane: &PL, point: &P3) -> P2 where
 
     p2transf.from(*tmp);
     p2transf
+}
+
+pub fn apply_view_2d<P>(view: View, pc: PointCloud2D<P>) -> PointCloud2D<P> where
+    P: IsEditable2D + IsBuildable2D {
+
+    match view {
+        View::Full => { return pc; }
+        View::Restricted(indices) => {
+            let mut result = PointCloud2D::<P>::new();
+            result.data.reserve(indices.len());
+            let max = pc.len() - 1;
+
+            for index in indices.into_iter() {
+                if index > max {
+                    continue;
+                }
+                result.push((*pc.data[index]).clone());
+            }
+            return result;
+        }
+    }
+}
+
+pub fn apply_view_3d<P>(view: View, pc: PointCloud3D<P>) -> PointCloud3D<P> where
+    P: IsEditable3D + IsBuildable3D {
+
+    match view {
+        View::Full => { return pc; }
+        View::Restricted(indices) => {
+            let mut result = PointCloud3D::<P>::new();
+            result.data.reserve(indices.len());
+            let max = pc.len() - 1;
+
+            for index in indices.into_iter() {
+                if index > max {
+                    continue;
+                }
+                result.push((*pc.data[index]).clone());
+            }
+            return result;
+        }
+    }
 }
