@@ -40,10 +40,14 @@ impl<P> IsFilterPC2D<P> for FilterPC2D<P> where
     P: IsEditable2D + IsBuildable2D {
 
     fn filter(&self, pc: &PointCloud2D<P>, view: &mut View) {
+        if pc.len() == 0 {
+            *view = View::Full;
+            return;
+        }
         match view {
             &mut View::Full => {
                 let mut indices = HashSet::new();
-                for (i, p) in pc.data.iter().enumerate() { //@todo could only iterate the indices within the hashset
+                for (i, p) in pc.data.iter().enumerate() {
                     if self.filter_2d.is_allowed(p) {
                         indices.insert(i);
                     }
@@ -51,10 +55,21 @@ impl<P> IsFilterPC2D<P> for FilterPC2D<P> where
                 *view = View::Restricted(indices);
             }
             &mut View::Restricted(ref mut indices) => {
-                for (i, p) in pc.data.iter().enumerate() { //@todo could only iterate the indices within the hashset
-                    if !self.filter_2d.is_allowed(p) {
-                        indices.remove(&i);
+                let mut indices_to_remove = Vec::<usize>::new();
+                let max = pc.len() - 1;
+                for index in indices.iter() {
+                    if *index > max {
+                        indices_to_remove.push(*index);
+                        continue;
                     }
+                    let p = &pc.data[*index];
+                    if !self.filter_2d.is_allowed(p) {
+                        indices_to_remove.push(*index);
+                    }
+                }
+
+                for index_to_remove in indices_to_remove {
+                    indices.remove(&index_to_remove);
                 }
             }
         }
