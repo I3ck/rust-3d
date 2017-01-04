@@ -58,7 +58,7 @@ fn control_polygon<P>(path: &PointCloud2D<P>, n_points: usize, t: f64) -> Box<P>
 }
 
 pub fn interpolate_bezier<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Box<PointCloud2D<P>> where
-    P: IsEditable2D + IsBuildable2D {
+    P: IsEditable2D + IsBuildable2D + Clone {
 
     let mut pc = PointCloud2D::new();
     let p_dist = 1.0 / (n_points as f64);
@@ -70,7 +70,7 @@ pub fn interpolate_bezier<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
 }
 
 pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Box<PointCloud2D<P>> where
-    P : IsEditable2D + IsBuildable2D {
+    P : IsEditable2D + IsBuildable2D + Clone {
 
     let mut pc = PointCloud2D::new();
     let p_dist = base_points.path_length() / (n_points - 1) as f64;
@@ -100,7 +100,7 @@ pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
 }
 
 pub fn interpolation_linear<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Box<PointCloud2D<P>> where
-    P : IsEditable2D + IsBuildable2D {
+    P : IsEditable2D + IsBuildable2D + Clone {
 
     let mut pc = PointCloud2D::new();
     let p_dist = base_points.path_length() / (n_points - 1) as f64;

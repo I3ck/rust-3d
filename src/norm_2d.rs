@@ -45,6 +45,15 @@ impl Hash for Norm2D { //@todo poor precision this way
     }
 }
 
+impl Clone for Norm2D {
+    fn clone(&self) -> Self {
+        Norm2D {
+            x: self.x,
+            y: self.y
+        }
+    }
+}
+
 impl IsND for Norm2D {
     fn n_dimensions(&self) -> usize {
         2
@@ -66,13 +75,6 @@ impl Is2D for Norm2D {
 
     fn y(&self) -> f64 {
         self.y
-    }
-
-    fn clone(&self) -> Self {
-        Norm2D {
-            x: self.x,
-            y: self.y
-        }
     }
 }
 

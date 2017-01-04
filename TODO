@@ -22,3 +22,5 @@ make kd-tree n-dimensional   (maybe the octree as well, but might be easier to i
 make trees referencing via ids
 
 filters should be directed
+
+negating filters which can be used to e.g. create ring filters

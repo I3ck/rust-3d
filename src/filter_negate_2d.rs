@@ -13,11 +13,11 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-use traits::is_3d::Is3D;
-use traits::has_bounding_box_3d::HasBoundingBox3D;
+use traits::is_2d::Is2D;
+use traits::is_filter_2d::IsFilter2D;
 
-pub trait IsFilter3D : HasBoundingBox3D {
-    type P: Is3D;
+struct FilterNegate2D<F> where
+    F: IsFilter2D {
 
-    fn is_allowed(&self, p: &Self::P) -> bool;
+    filter: Box<F>
 }

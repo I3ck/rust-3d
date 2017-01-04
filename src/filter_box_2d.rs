@@ -56,6 +56,12 @@ impl Hash for FilterBox2D { //@todo poor precision this way
     }
 }
 
+impl Clone for FilterBox2D {
+    fn clone(&self) -> FilterBox2D {
+        FilterBox2D { center: self.center.clone(), size_x: self.size_x, size_y: self.size_y }
+    }
+}
+
 impl FilterBox2D {
     fn new() -> Self {
         FilterBox2D {center: *Point2D::new(), size_x: 1.0, size_y: 1.0}
@@ -86,10 +92,6 @@ impl Is2D for FilterBox2D {
 
     fn y(&self) -> f64 {
         self.center.y()
-    }
-
-    fn clone(&self) -> FilterBox2D {
-        FilterBox2D { center: self.center.clone(), size_x: self.size_x, size_y: self.size_y }
     }
 }
 
@@ -130,10 +132,8 @@ impl HasBoundingBox2D for FilterBox2D {
     }
 }
 
-impl<P> IsFilter2D<P> for FilterBox2D where
-    P: Is2D {
-
-    fn is_allowed(&self, p: &P) -> bool {
+impl IsFilter2D for FilterBox2D {
+    fn is_allowed(&self, p: &Is2D) -> bool {
            p.x() >= self.center.x() - self.size_x / 2.0
         && p.x() <= self.center.x() + self.size_x / 2.0
         && p.y() >= self.center.y() - self.size_y / 2.0

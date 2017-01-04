@@ -51,6 +51,12 @@ impl Hash for FilterCircle2D { //@todo poor precision this way
     }
 }
 
+impl Clone for FilterCircle2D {
+    fn clone(&self) -> FilterCircle2D {
+        FilterCircle2D { center: self.center.clone(), radius: self.radius }
+    }
+}
+
 impl FilterCircle2D {
     fn new() -> Self {
         FilterCircle2D {center: *Point2D::new(), radius: 1.0}
@@ -81,10 +87,6 @@ impl Is2D for FilterCircle2D {
 
     fn y(&self) -> f64 {
         self.center.y()
-    }
-
-    fn clone(&self) -> FilterCircle2D {
-        FilterCircle2D { center: self.center.clone(), radius: self.radius }
     }
 }
 
@@ -125,10 +127,8 @@ impl HasBoundingBox2D for FilterCircle2D {
     }
 }
 
-impl<P> IsFilter2D<P> for FilterCircle2D where
-    P: Is2D {
-
-    fn is_allowed(&self, p: &P) -> bool {
+impl IsFilter2D for FilterCircle2D {
+    fn is_allowed(&self, p: &Is2D) -> bool {
         dist_2d(p, &self.center) <= self.radius
     }
 }

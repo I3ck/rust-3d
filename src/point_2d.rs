@@ -49,6 +49,12 @@ impl Hash for Point2D { //@todo poor precision this way
     }
 }
 
+impl Clone for Point2D {
+    fn clone(&self) -> Point2D {
+        Point2D { x: self.x, y: self.y }
+    }
+}
+
 impl IsMoveable2D for Point2D {
     fn move_by(&mut self, x: f64, y: f64) {
         self.x += x;
@@ -77,10 +83,6 @@ impl Is2D for Point2D {
 
     fn y(&self) -> f64 {
         self.y
-    }
-
-    fn clone(&self) -> Point2D {
-        Point2D { x: self.x, y: self.y }
     }
 }
 

@@ -75,10 +75,7 @@ pub fn sqr_dist<P,U>(p1: &P, p2: &U) -> Option<f64> where
     Some(result)
 }
 
-pub fn dist_2d<P,U>(p1: &P, p2: &U) -> f64 where
-    P: Is2D,
-    U: Is2D {
-
+pub fn dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
     sqr_dist_2d(p1,p2).sqrt()
 }
 
@@ -89,10 +86,7 @@ pub fn dist_3d<P,U>(p1: &P, p2: &U) -> f64 where
     sqr_dist_3d(p1,p2).sqrt()
 }
 
-pub fn sqr_dist_2d<P,U>(p1: &P, p2: &U) -> f64 where
-    P: Is2D,
-    U: Is2D {
-
+pub fn sqr_dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
     (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2)
 }
 
@@ -245,7 +239,7 @@ pub fn project_point_on_plane<PL,P2,P3,N>(plane: &PL, point: &P3) -> P2 where
 }
 
 pub fn apply_view_2d<P>(view: View, pc: PointCloud2D<P>) -> PointCloud2D<P> where
-    P: IsEditable2D + IsBuildable2D {
+    P: IsEditable2D + IsBuildable2D + Clone {
 
     match view {
         View::Full => { return pc; }

@@ -30,7 +30,7 @@ pub struct PointCloud2D<P> {
 }
 
 impl<P> PointCloud2D<P> where
-    P: IsBuildable2D + IsEditable2D {
+    P: IsBuildable2D + IsEditable2D + Clone {
 
     pub fn new() -> PointCloud2D<P> {
         PointCloud2D{data: Vec::new()}
@@ -65,7 +65,7 @@ impl<P> PointCloud2D<P> where
         data = Vec::new();
 
         for p in &self.data {
-            data.push(Box::new((*p).clone()));
+            data.push(p.clone());
         }
 
         PointCloud2D { data: data }

@@ -16,8 +16,6 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use traits::is_2d::Is2D;
 use traits::has_bounding_box_2d::HasBoundingBox2D;
 
-pub trait IsFilter2D<P> : HasBoundingBox2D where
-    P: Is2D {
-
-    fn is_allowed(&self, p: &P) -> bool;
+pub trait IsFilter2D : HasBoundingBox2D {
+    fn is_allowed(&self, p: &Is2D) -> bool;
 }

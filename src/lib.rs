@@ -43,6 +43,7 @@ pub mod view;
 pub mod filter_box_2d;
 pub mod filter_circle_2d;
 pub mod positive;
+pub mod filter_negate_2d;
 
 #[cfg(test)]
 pub mod tests {

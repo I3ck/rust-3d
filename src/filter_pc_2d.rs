@@ -30,14 +30,12 @@ use traits::is_filter_pc_2d::IsFilterPC2D;
 //@todo filters could be written for any type or at least for n dimensions?
 //@todo rename these to PC filters, and add PointFilters of signature   filter(&Is_2d) -> bool which can then be used in the pc methods
 
-pub struct FilterPC2D<P> where
-    P: IsEditable2D + IsBuildable2D {
-
-    pub filter_2d: Box<IsFilter2D<P>>
+pub struct FilterPC2D {
+    pub filter_2d: Box<IsFilter2D>
 }
 
-impl<P> IsFilterPC2D<P> for FilterPC2D<P> where
-    P: IsEditable2D + IsBuildable2D {
+impl<P> IsFilterPC2D<P> for FilterPC2D where
+    P: IsEditable2D + IsBuildable2D + Clone {
 
     fn filter(&self, pc: &PointCloud2D<P>, view: &mut View) {
         if pc.len() == 0 {
@@ -48,7 +46,8 @@ impl<P> IsFilterPC2D<P> for FilterPC2D<P> where
             &mut View::Full => {
                 let mut indices = HashSet::new();
                 for (i, p) in pc.data.iter().enumerate() {
-                    if self.filter_2d.is_allowed(p) {
+                    let ref tmp = **p; //@todo get rid of this
+                    if self.filter_2d.is_allowed(tmp) {
                         indices.insert(i);
                     }
                 }
@@ -62,7 +61,7 @@ impl<P> IsFilterPC2D<P> for FilterPC2D<P> where
                         indices_to_remove.push(*index);
                         continue;
                     }
-                    let p = &pc.data[*index];
+                    let ref p = *pc.data[*index];
                     if !self.filter_2d.is_allowed(p) {
                         indices_to_remove.push(*index);
                     }

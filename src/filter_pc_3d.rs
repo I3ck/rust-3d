@@ -33,7 +33,7 @@ use traits::is_filter_pc_3d::IsFilterPC3D;
 pub struct FilterPC3D<P> where
     P: IsEditable3D + IsBuildable3D {
 
-    pub filter_3d: Box<IsFilter3D<P>>
+    pub filter_3d: Box<IsFilter3D<P=P>>
 }
 
 impl<P> IsFilterPC3D<P> for FilterPC3D<P> where
