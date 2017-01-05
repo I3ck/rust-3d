@@ -17,7 +17,5 @@ use traits::is_3d::Is3D;
 use traits::has_bounding_box_3d::HasBoundingBox3D;
 
 pub trait IsFilter3D : HasBoundingBox3D {
-    type P: Is3D;
-
-    fn is_allowed(&self, p: &Self::P) -> bool;
+    fn is_allowed(&self, p: &Is3D) -> bool;
 }

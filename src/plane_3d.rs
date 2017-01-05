@@ -18,8 +18,8 @@ use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_normalized_3d::IsNormalized3D;
 
 pub struct Plane3D<P,N> where
-    P: IsBuildable3D,
-    N: IsNormalized3D {
+    P: IsBuildable3D + Clone,
+    N: IsNormalized3D + Clone {
 
     pub origin: P,
     pub u: N,
@@ -28,8 +28,8 @@ pub struct Plane3D<P,N> where
 
 
 impl<P,N> IsPlane3D<P,N> for Plane3D<P,N> where
-    P: IsBuildable3D,
-    N: IsNormalized3D {
+    P: IsBuildable3D + Clone,
+    N: IsNormalized3D + Clone {
 
     fn new() -> Box<Self> {
         Box::new(Plane3D {

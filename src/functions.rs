@@ -75,6 +75,16 @@ pub fn sqr_dist<P,U>(p1: &P, p2: &U) -> Option<f64> where
     Some(result)
 }
 
+pub fn cross<P,U>(first: &P, other: &U) -> Box<U> where //@todo try to implement in Is3D trait
+    P: Is3D,
+    U: IsBuildable3D {
+
+    let x = first.y() * other.z() - first.z() * other.y();
+    let y = first.z() * other.x() - first.x() * other.z();
+    let z = first.x() * other.y() - first.y() * other.x();
+    U::build(x, y, z)
+}
+
 pub fn dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
     sqr_dist_2d(p1,p2).sqrt()
 }
@@ -120,14 +130,14 @@ pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where
 }
 
 pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, max_size: usize) where
-    P: IsEditable3D + IsBuildable3D {
+    P: IsEditable3D + IsBuildable3D + Clone {
 
     if pc.len() > max_size {
         pc.data.sort_by(|a, b| sqr_dist_3d(search, &**a).partial_cmp(&sqr_dist_3d(search, &**b)).unwrap_or(Ordering::Equal));
         let mut result : Vec<Box<P>>;
         result = Vec::new();
         for i in pc.data.iter().take(max_size) {
-            result.push(Box::new((*i).clone()));
+            result.push(i.clone());
         }
         pc.data = result;
     }
@@ -136,7 +146,7 @@ pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, max_size: usi
 //@todo move to plane or use there
 pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, PointCloud3D<P3>) where
     P2: IsBuildable2D + TransFormableTo3D,
-    P3: IsBuildable3D + IsEditable3D + IsMoveable3D {
+    P3: IsBuildable3D + IsEditable3D + IsMoveable3D + Clone {
 
     let mut pc_3d_a = PointCloud3D::new();
     let mut pc_3d_b = PointCloud3D::new();
@@ -175,7 +185,7 @@ pub fn calc_direction<P>(reference: &Point3D, p: &Point3D) -> Direction where
 
 //@todo refactor to work with IsBuildable3D?
 pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where
-    P: IsBuildable3D { //@todo better name
+    P: IsBuildable3D + Clone { //@todo better name
 
     let middle = center(min, max);
 
@@ -260,7 +270,7 @@ pub fn apply_view_2d<P>(view: View, pc: PointCloud2D<P>) -> PointCloud2D<P> wher
 }
 
 pub fn apply_view_3d<P>(view: View, pc: PointCloud3D<P>) -> PointCloud3D<P> where
-    P: IsEditable3D + IsBuildable3D {
+    P: IsEditable3D + IsBuildable3D + Clone {
 
     match view {
         View::Full => { return pc; }

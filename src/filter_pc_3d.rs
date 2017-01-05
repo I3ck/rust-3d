@@ -30,21 +30,20 @@ use traits::is_filter_pc_3d::IsFilterPC3D;
 //@todo filters could be written for any type or at least for n dimensions?
 //@todo rename these to PC filters, and add PointFilters of signature   filter(&Is_2d) -> bool which can then be used in the pc methods
 
-pub struct FilterPC3D<P> where
-    P: IsEditable3D + IsBuildable3D {
-
-    pub filter_3d: Box<IsFilter3D<P=P>>
+pub struct FilterPC3D {
+    pub filter_3d: Box<IsFilter3D>
 }
 
-impl<P> IsFilterPC3D<P> for FilterPC3D<P> where
-    P: IsEditable3D + IsBuildable3D {
+impl<P> IsFilterPC3D<P> for FilterPC3D where
+    P: IsEditable3D + IsBuildable3D + Clone {
 
     fn filter(&self, pc: &PointCloud3D<P>, view: &mut View) {
         match view {
             &mut View::Full => {
                 let mut indices = HashSet::new();
                 for (i, p) in pc.data.iter().enumerate() { //@todo could only iterate the indices within the hashset
-                    if self.filter_3d.is_allowed(p) {
+                    let ref tmp = **p; //@todo get rid of this
+                    if self.filter_3d.is_allowed(tmp) {
                         indices.insert(i);
                     }
                 }
@@ -52,7 +51,8 @@ impl<P> IsFilterPC3D<P> for FilterPC3D<P> where
             }
             &mut View::Restricted(ref mut indices) => {
                 for (i, p) in pc.data.iter().enumerate() { //@todo could only iterate the indices within the hashset
-                    if !self.filter_3d.is_allowed(p) {
+                    let ref tmp = **p; //@todo get rid of this
+                    if !self.filter_3d.is_allowed(tmp) {
                         indices.remove(&i);
                     }
                 }

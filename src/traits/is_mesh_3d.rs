@@ -16,7 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use traits::is_3d::Is3D;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_normalized_3d::IsNormalized3D;
-use functions::conn;
+use functions::{conn, cross};
 use point_3d::Point3D;
 use norm_3d::Norm3D;
 use std::io::prelude::*;
@@ -44,7 +44,7 @@ pub trait IsMesh3D<P> where
         let v12 = conn(&v1, &v2);
         let v23 = conn(&v2, &v3);
 
-        let n = v12.cross::<P, Point3D>(&v23);
+        let n = cross(&v12, &v23);
 
         match Norm3D::new(*n) {
             None => None,

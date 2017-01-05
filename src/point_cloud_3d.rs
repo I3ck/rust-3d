@@ -30,7 +30,7 @@ pub struct PointCloud3D<P> {
 }
 
 impl<P> PointCloud3D<P> where
-    P: IsEditable3D + IsBuildable3D {
+    P: IsEditable3D + IsBuildable3D + Clone {
 
     pub fn new() -> PointCloud3D<P> {
         PointCloud3D{data: Vec::new()}
@@ -65,7 +65,7 @@ impl<P> PointCloud3D<P> where
         data = Vec::new();
 
         for p in &self.data {
-            data.push(Box::new((*p).clone()));
+            data.push(p.clone());
         }
 
         PointCloud3D { data: data }
@@ -135,7 +135,7 @@ impl<P> IsMoveable3D for PointCloud3D<P> where
 }
 
 impl<P> HasBoundingBox3D for PointCloud3D<P> where
-    P: IsEditable3D + IsBuildable3D {
+    P: IsEditable3D + IsBuildable3D + Clone {
 
     fn bounding_box(&self) -> Option<(Point3D, Point3D)> {
         if self.len() < 2 {

@@ -40,7 +40,7 @@ impl<T> CompressedPointCloud3D<T> where
     T: Unsigned + PrimInt {
 
     pub fn compress<P>(pc: &PointCloud3D<P>) -> Option<CompressedPointCloud3D<T>> where
-        P: IsEditable3D + IsBuildable3D {
+        P: IsEditable3D + IsBuildable3D + Clone {
 
         let (pmin, pmax) = match pc.bounding_box() {
             None        => return None,
@@ -94,7 +94,7 @@ impl<T> CompressedPointCloud3D<T> where
 //------------------------------------------------------------------------------
 
     pub fn decompress<P>(&self) -> Option<PointCloud3D<P>> where
-        P: IsEditable3D + IsBuildable3D {
+        P: IsEditable3D + IsBuildable3D + Clone {
 
         let mut pc = PointCloud3D::new();
 

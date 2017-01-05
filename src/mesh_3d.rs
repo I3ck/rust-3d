@@ -27,7 +27,7 @@ pub struct Mesh3D<P> where
 }
 
 impl<P> IsMesh3D<P> for Mesh3D<P> where
-    P: IsEditable3D + IsBuildable3D {
+    P: IsEditable3D + IsBuildable3D + Clone {
 
     fn num_faces(&self) -> usize {
         self.topology.len() / 3
@@ -68,12 +68,12 @@ impl<P> IsMesh3D<P> for Mesh3D<P> where
         if vertexid >= self.pc.len() {
             return None;
         }
-        return Some(self.pc.data[vertexid].clone())
+        return Some(*self.pc.data[vertexid].clone())
     }
 }
 
 impl<P> IsEditableMesh3D<P> for Mesh3D<P> where
-    P: IsEditable3D + IsBuildable3D {
+    P: IsEditable3D + IsBuildable3D + Clone {
 
     fn new() -> Self {
         Mesh3D {

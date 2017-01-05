@@ -47,6 +47,16 @@ impl Hash for Norm3D { //@todo poor precision this way
     }
 }
 
+impl Clone for Norm3D {
+    fn clone(&self) -> Self {
+        Norm3D {
+            x: self.x,
+            y: self.y,
+            z: self.z
+        }
+    }
+}
+
 impl IsND for Norm3D {
     fn n_dimensions(&self) -> usize {
         3
@@ -73,14 +83,6 @@ impl Is3D for Norm3D {
 
     fn z(&self) -> f64 {
         self.z
-    }
-
-    fn clone(&self) -> Self {
-        Norm3D {
-            x: self.x,
-            y: self.y,
-            z: self.z
-        }
     }
 }
 

@@ -50,6 +50,12 @@ impl Hash for Point3D { //@todo poor precision this way
     }
 }
 
+impl Clone for Point3D {
+    fn clone(&self) -> Point3D {
+        Point3D { x: self.x, y: self.y, z: self.z }
+    }
+}
+
 impl IsMoveable3D for Point3D {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         self.x += x;
@@ -84,10 +90,6 @@ impl Is3D for Point3D {
 
     fn z(&self) -> f64 {
         self.z
-    }
-
-    fn clone(&self) -> Point3D {
-        Point3D { x: self.x, y: self.y, z: self.z }
     }
 }
 

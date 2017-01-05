@@ -28,6 +28,7 @@ pub struct KdTree<P> where
 
     pub root: Option<KdNode<P>>
 }
+
 pub struct KdNode<P> where
     P: IsEditable3D {
 
@@ -38,7 +39,7 @@ pub struct KdNode<P> where
 }
 
 impl<P> IsTree3D<P> for KdTree<P> where
-    P: IsEditable3D + IsBuildable3D {
+    P: IsEditable3D + IsBuildable3D + Clone {
 
     fn new() -> KdTree<P> {
         KdTree { root: None }
@@ -72,7 +73,7 @@ impl<P> IsTree3D<P> for KdTree<P> where
 }
 
 impl<P> IsKdTree3D<P> for KdTree<P> where
-    P: IsEditable3D + IsBuildable3D {
+    P: IsEditable3D + IsBuildable3D + Clone {
 
     fn knearest(&self, search: &P, n: usize) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();
@@ -106,7 +107,7 @@ impl<P> IsKdTree3D<P> for KdTree<P> where
         match result.len() {
             0 => None,
             _ => {
-                let p = result.data[0].clone();
+                let p = *result.data[0].clone();
                 Some(p)
             }
         }
@@ -114,7 +115,7 @@ impl<P> IsKdTree3D<P> for KdTree<P> where
 }
 
 impl<P> KdNode<P> where
-    P: IsEditable3D + IsBuildable3D {
+    P: IsEditable3D + IsBuildable3D + Clone {
 
     pub fn new(dim: i8, mut pc: Vec<Box<P>>) -> KdNode<P> {
         let dimension = dim % 2;
@@ -122,7 +123,7 @@ impl<P> KdNode<P> where
             return KdNode {
                 left: None,
                 right: None,
-                val: pc[0].clone(),
+                val: *pc[0].clone(),
                 dimension: dimension
             }
         }

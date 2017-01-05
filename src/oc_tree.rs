@@ -33,7 +33,7 @@ pub struct OcTree<P> where
 }
 
 impl<P> IsTree3D<P> for OcTree<P> where
-    P: IsEditable3D + IsBuildable3D {
+    P: IsEditable3D + IsBuildable3D + Clone {
 
     fn new() -> OcTree<P> {
         OcTree {
@@ -76,7 +76,7 @@ impl<P> IsTree3D<P> for OcTree<P> where
 }
 
 impl<P> IsOcTree<P> for OcTree<P> where
-    P: IsEditable3D + IsBuildable3D {
+    P: IsEditable3D + IsBuildable3D + Clone {
 
     //@todo rewrite or make new method which returns cog instead of stopping recursion
     fn collect(&self,  maxdepth: i8) -> PointCloud3D<P> {

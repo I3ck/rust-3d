@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use point_3d::Point3D;
 use traits::is_3d::Is3D;
 use traits::is_buildable_3d::IsBuildable3D;
+use functions::cross;
 
 pub struct Matrix4 {
     pub data: [[f64; 4]; 4]
@@ -127,10 +128,13 @@ impl Matrix4 {
         let u: Point3D;
         u = match up.clone().normalized() {
           None => return None,
-          Some(x) => *(x.cross(target))
+          Some(x) => {
+              let mut result = *Point3D::new(); //@todo can be dropped?
+              result.from(*(cross(&*x, target)));
+              result
+          }
         };
-        let v: Box<Point3D>;
-        v = n.cross(&u);
+        let v = cross(&*n, &u);
 
         let mut result = Matrix4::new();
         result.data[0][0] = u.x();  result.data[0][1] = u.y();  result.data[0][2] = u.z();  result.data[0][3] = 0.0;

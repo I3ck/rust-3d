@@ -23,26 +23,12 @@ pub trait Is3D : IsND {
 
     fn z(&self) -> f64;
 
-    fn clone(&self) -> Self;
-
     fn pos(&self) -> (f64, f64, f64) {
         ( self.x(), self.y(), self.z() )
     }
 
-    fn dot<P>(&self, other: &P) -> f64 where
-        P: Is3D {
-
+    fn dot(&self, other: &Is3D) -> f64 {
         self.x() * other.x() + self.y() * other.y() + self.z() * other.z()
-    }
-
-    fn cross<P,HP>(&self, other: &P) -> Box<HP> where
-        P: Is3D,
-        HP: IsBuildable3D {
-
-        let x = self.y() * other.z() - self.z() * other.y();
-        let y = self.z() * other.x() - self.x() * other.z();
-        let z = self.x() * other.y() - self.y() * other.x();
-        HP::build(x, y, z)
     }
 
     fn abs(&self) -> f64 {
