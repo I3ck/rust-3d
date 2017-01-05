@@ -14,6 +14,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use traits::is_filter_3d::IsFilter3D;
+use traits::is_3d::Is3D;
 
 pub struct FilterNegate3D<F> where
     F: IsFilter3D {
@@ -21,4 +22,10 @@ pub struct FilterNegate3D<F> where
     filter: Box<F>
 }
 
-//@todo algorithms
+impl<F> IsFilter3D for FilterNegate3D<F> where
+    F: IsFilter3D {
+
+    fn is_allowed(&self, p: &Is3D) -> bool {
+        !self.filter.is_allowed(p)
+    }
+}
