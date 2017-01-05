@@ -162,6 +162,7 @@ pub mod tests {
         use traits::is_buildable_3d::*;
         use traits::is_editable_3d::*;
         use traits::is_moveable_3d::*;
+        use functions::cross;
         use point_3d::*;
 
         let eps = 0.0000001;
@@ -182,16 +183,14 @@ pub mod tests {
 
         let p3 = *Point3D::build(2.0, 2.0, 2.0);
 
-        let cross12: Point3D;
-        cross12 = *p1.cross(&p2);
+        let cross12 = cross(&p1, &p2);
         assert!(cross12.x() == 0.0);
         assert!(cross12.y() == 0.0);
         assert!(cross12.z() == 0.0);
 
         assert!(p1.dot(&p2) == 0.0);
 
-        let cross23: Point3D;
-        cross23 = *p2.cross(&p3);
+        let cross23 = cross(&p2, &p3);
         assert!(cross23.x() == 0.0 * 2.0 - 0.0 * 2.0);
         assert!(cross23.y() == 0.0 * 2.0 - 1.0 * 2.0);
         assert!(cross23.z() == 1.0 * 2.0 - 0.0 * 2.0);
