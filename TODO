@@ -26,3 +26,5 @@ filters should be directed
 negating filters which can be used to e.g. create ring filters
 
 for impls and structs only require as few traits as possible
+
+own error enum
