@@ -38,10 +38,14 @@ impl<P> IsFilterPC3D<P> for FilterPC3D where
     P: IsEditable3D + IsBuildable3D + Clone {
 
     fn filter(&self, pc: &PointCloud3D<P>, view: &mut View) {
+        if pc.len() == 0 {
+            *view = View::Full;
+            return;
+        }
         match view {
             &mut View::Full => {
                 let mut indices = HashSet::new();
-                for (i, p) in pc.data.iter().enumerate() { //@todo could only iterate the indices within the hashset
+                for (i, p) in pc.data.iter().enumerate() {
                     let ref tmp = **p; //@todo get rid of this
                     if self.filter_3d.is_allowed(tmp) {
                         indices.insert(i);
@@ -50,11 +54,21 @@ impl<P> IsFilterPC3D<P> for FilterPC3D where
                 *view = View::Restricted(indices);
             }
             &mut View::Restricted(ref mut indices) => {
-                for (i, p) in pc.data.iter().enumerate() { //@todo could only iterate the indices within the hashset
-                    let ref tmp = **p; //@todo get rid of this
-                    if !self.filter_3d.is_allowed(tmp) {
-                        indices.remove(&i);
+                let mut indices_to_remove = Vec::<usize>::new();
+                let max = pc.len() - 1;
+                for index in indices.iter() {
+                    if *index > max {
+                        indices_to_remove.push(*index);
+                        continue;
                     }
+                    let ref p = *pc.data[*index];
+                    if !self.filter_3d.is_allowed(p) {
+                        indices_to_remove.push(*index);
+                    }
+                }
+
+                for index_to_remove in indices_to_remove {
+                    indices.remove(&index_to_remove);
                 }
             }
         }
