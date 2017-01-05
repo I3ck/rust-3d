@@ -13,11 +13,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-use traits::is_2d::Is2D;
 use traits::is_filter_2d::IsFilter2D;
 
-struct FilterNegate2D<F> where
+pub struct FilterNegate2D<F> where
     F: IsFilter2D {
 
     filter: Box<F>
 }
+
+//@todo algorithms

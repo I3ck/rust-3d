@@ -44,6 +44,7 @@ pub mod filter_box_2d;
 pub mod filter_circle_2d;
 pub mod positive;
 pub mod filter_negate_2d;
+pub mod filter_negate_3d;
 
 #[cfg(test)]
 pub mod tests {
@@ -83,20 +84,20 @@ pub mod tests {
         assert!(p2.dot(&p3) == 2.0);
 
         assert!(p2.pos() == (p2.x(), p2.y()));
-        let mut p2Clone = p2.clone();
-        assert!(p2Clone.pos() == p2.pos());
+        let mut p2_clone = p2.clone();
+        assert!(p2_clone.pos() == p2.pos());
         assert!(p2.to_str() == "1 0");
 
-        p2Clone.from(p1.clone());
-        assert!(p2Clone.pos() == p1.pos());
+        p2_clone.from(p1.clone());
+        assert!(p2_clone.pos() == p1.pos());
 
-        let p1Norm = p1.normalized();
-        assert!(p1Norm.is_none());
+        let p1_norm = p1.normalized();
+        assert!(p1_norm.is_none());
 
-        let p3Norm = p3.normalized();
-        assert!(p3Norm.is_some());
+        let p3_norm = p3.normalized();
+        assert!(p3_norm.is_some());
 
-        match p3Norm {
+        match p3_norm {
             None => {},
             Some(n) => {
                 assert!((1.0 - n.abs()).abs() < eps) ;
@@ -197,20 +198,20 @@ pub mod tests {
 
 
         assert!(p2.pos() == (p2.x(), p2.y(), p2.z()));
-        let mut p2Clone = p2.clone();
-        assert!(p2Clone.pos() == p2.pos());
+        let mut p2_clone = p2.clone();
+        assert!(p2_clone.pos() == p2.pos());
         assert!(p2.to_str() == "1 0 0");
 
-        p2Clone.from(p1.clone());
-        assert!(p2Clone.pos() == p1.pos());
+        p2_clone.from(p1.clone());
+        assert!(p2_clone.pos() == p1.pos());
 
-        let p1Norm = p1.normalized();
-        assert!(p1Norm.is_none());
+        let p1_norm = p1.normalized();
+        assert!(p1_norm.is_none());
 
-        let p3Norm = p3.normalized();
-        assert!(p3Norm.is_some());
+        let p3_norm = p3.normalized();
+        assert!(p3_norm.is_some());
 
-        match p3Norm {
+        match p3_norm {
             None => {},
             Some(n) => {
                 assert!((1.0 - n.abs()).abs() < eps) ;
@@ -270,7 +271,6 @@ pub mod tests {
     fn test_point_cloud_2d() {
         use traits::is_2d::*;
         use traits::is_buildable_2d::*;
-        use traits::is_editable_2d::*;
         use traits::is_moveable_2d::*;
         use traits::has_bounding_box_2d::*;
         use point_2d::*;
@@ -324,7 +324,6 @@ pub mod tests {
     fn test_point_cloud_3d() {
         use traits::is_3d::*;
         use traits::is_buildable_3d::*;
-        use traits::is_editable_3d::*;
         use traits::is_moveable_3d::*;
         use traits::has_bounding_box_3d::*;
         use point_3d::*;
@@ -477,7 +476,6 @@ pub mod tests {
         use traits::is_mesh_3d::*;
         use traits::is_editable_mesh_3d::*;
         use point_3d::*;
-        use point_cloud_3d::*;
         use mesh_3d::*;
 
         let mut mesh = Mesh3D::<Point3D>::new();

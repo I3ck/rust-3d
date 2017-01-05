@@ -17,7 +17,6 @@ use traits::is_3d::Is3D;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_normalized_3d::IsNormalized3D;
 use functions::{conn, cross};
-use point_3d::Point3D;
 use norm_3d::Norm3D;
 use std::io::prelude::*;
 use std::fs::File;
@@ -52,6 +51,7 @@ pub trait IsMesh3D<P> where
         }
     }
 
+    //@todo change signatures of these methods to return Result instead of bool and use try! for write_all
     fn save_stl_ascii(&self, filepath: &str) -> bool { //@todo .stl cant have negative coordinates, therefore must be offset by BB (or show error)
 
         let mut f = match File::create(filepath) {
@@ -90,19 +90,19 @@ pub trait IsMesh3D<P> where
             Ok(f) => f
         };
 
-        let nVertexString = "element vertex ".to_string() + &self.num_vertices().to_string() + "\n";
-        let nFacesString = "element face ".to_string() + &self.num_faces().to_string() + "\n";
+        let n_vertex_str = "element vertex ".to_string() + &self.num_vertices().to_string() + "\n";
+        let n_faces_str = "element face ".to_string() + &self.num_faces().to_string() + "\n";
 
         //@todo better header, or let caller decide
         f.write_all(b"ply\n");
         f.write_all(b"format ascii 1.0           { ascii/binary, format version number }\n");
         f.write_all(b"comment made by Greg Turk  { comments keyword specified, like all lines }\n");
         f.write_all(b"comment this file is a cube\n");
-        f.write_all(nVertexString.as_bytes());
+        f.write_all(n_vertex_str.as_bytes());
         f.write_all(b"property float x           { vertex contains float \"x\" coordinate }\n");
         f.write_all(b"property float y           { y coordinate is also a vertex property }\n");
         f.write_all(b"property float z           { z coordinate, too }\n");
-        f.write_all(nFacesString.as_bytes());
+        f.write_all(n_faces_str.as_bytes());
         f.write_all(b"property list uchar int vertex_index { \"vertex_indices\" is a list of ints }\n");
         f.write_all(b"end_header                 { delimits the end of the header }\n");
 
