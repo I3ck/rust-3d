@@ -30,3 +30,5 @@ for impls and structs only require as few traits as possible
 own error enum
 
 use get methods of Vec to have safer code
+
+IO methods split from the impls / traits as algorithms on them

@@ -14,6 +14,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 pub mod traits;
+pub mod io;
 pub mod functions;
 pub mod point_2d;
 pub mod point_3d;
