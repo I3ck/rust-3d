@@ -22,6 +22,14 @@ pub struct FilterNegate2D<F> where
     filter: Box<F>
 }
 
+impl<F> FilterNegate2D<F> where
+    F: IsFilter2D {
+
+    pub fn build(filter: F) -> Self {
+        FilterNegate2D {filter: Box::new(filter)}
+    }
+}
+
 impl<F> IsFilter2D for FilterNegate2D<F> where
     F: IsFilter2D {
 

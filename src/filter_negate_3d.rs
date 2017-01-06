@@ -22,6 +22,14 @@ pub struct FilterNegate3D<F> where
     filter: Box<F>
 }
 
+impl<F> FilterNegate3D<F> where
+    F: IsFilter3D {
+
+    pub fn build(filter: F) -> Self {
+        FilterNegate3D {filter: Box::new(filter)}
+    }
+}
+
 impl<F> IsFilter3D for FilterNegate3D<F> where
     F: IsFilter3D {
 
