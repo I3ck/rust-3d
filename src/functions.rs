@@ -89,10 +89,7 @@ pub fn dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
     sqr_dist_2d(p1,p2).sqrt()
 }
 
-pub fn dist_3d<P,U>(p1: &P, p2: &U) -> f64 where
-    P: Is3D,
-    U: Is3D {
-
+pub fn dist_3d(p1: &Is3D, p2: &Is3D) -> f64 {
     sqr_dist_3d(p1,p2).sqrt()
 }
 
@@ -100,10 +97,7 @@ pub fn sqr_dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
     (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2)
 }
 
-pub fn sqr_dist_3d<P,U>(p1: &P, p2: &U) -> f64 where
-    P: Is3D,
-    U: Is3D {
-
+pub fn sqr_dist_3d(p1: &Is3D, p2: &Is3D) -> f64 {
     (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2) + (p1.z() - p2.z()).powi(2)
 }
 

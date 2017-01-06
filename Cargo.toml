@@ -1,6 +1,6 @@
 [package]
 name = "rust-3d"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["Martin Buck <buckmartin@buckmartin.de>"]
 
 [dependencies]

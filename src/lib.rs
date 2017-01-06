@@ -44,6 +44,7 @@ pub mod view;
 pub mod filter_box_2d;
 pub mod filter_box_3d;
 pub mod filter_circle;
+pub mod filter_sphere;
 pub mod positive;
 pub mod filter_negate_2d;
 pub mod filter_negate_3d;
