@@ -27,14 +27,14 @@ use functions::{dist_2d, sqr_dist_2d};
 use positive::Positive;
 
 #[derive (PartialEq, PartialOrd)]
-pub struct FilterCircle2D {
+pub struct FilterCircle {
     center: Point2D,
     radius: f64
 }
 
-impl Eq for FilterCircle2D {}
+impl Eq for FilterCircle {}
 
-impl Ord for FilterCircle2D {
+impl Ord for FilterCircle {
     fn cmp(&self, other: &Self) -> Ordering {
         let origin = *Point2D::new();
         match sqr_dist_2d(&origin, &self.center).partial_cmp(&sqr_dist_2d(&origin, &other.center)) {
@@ -44,29 +44,29 @@ impl Ord for FilterCircle2D {
     }
 }
 
-impl Hash for FilterCircle2D { //@todo poor precision this way
+impl Hash for FilterCircle { //@todo poor precision this way
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.center.hash(state);
         (self.radius as u64).hash(state);
     }
 }
 
-impl Clone for FilterCircle2D {
-    fn clone(&self) -> FilterCircle2D {
-        FilterCircle2D { center: self.center.clone(), radius: self.radius }
+impl Clone for FilterCircle {
+    fn clone(&self) -> FilterCircle {
+        FilterCircle { center: self.center.clone(), radius: self.radius }
     }
 }
 
-impl FilterCircle2D {
+impl FilterCircle {
     pub fn new() -> Self {
-        FilterCircle2D {center: *Point2D::new(), radius: 1.0}
+        FilterCircle {center: *Point2D::new(), radius: 1.0}
     }
     pub fn build(center: Point2D, p_radius: Positive) -> Self {
-        FilterCircle2D {center: center, radius: p_radius.get()}
+        FilterCircle {center: center, radius: p_radius.get()}
     }
 }
 
-impl IsND for FilterCircle2D {
+impl IsND for FilterCircle {
     fn n_dimensions(&self) -> usize {
         2
     }
@@ -80,7 +80,7 @@ impl IsND for FilterCircle2D {
     }
 }
 
-impl Is2D for FilterCircle2D {
+impl Is2D for FilterCircle {
     fn x(&self) -> f64 {
         self.center.x()
     }
@@ -92,13 +92,13 @@ impl Is2D for FilterCircle2D {
 
 //@todo drop this impl once not required anymore for editable?
 //@todo or always set sizes to 1
-impl IsBuildable2D for FilterCircle2D {
+impl IsBuildable2D for FilterCircle {
     fn new() -> Box<Self> {
-        Box::new(FilterCircle2D::new())
+        Box::new(FilterCircle::new())
     }
 
     fn build(x: f64, y: f64) -> Box<Self> {
-        Box::new(FilterCircle2D::build(*Point2D::build(x, y), Positive::build(1.0).unwrap()))
+        Box::new(FilterCircle::build(*Point2D::build(x, y), Positive::build(1.0).unwrap()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable2D {
@@ -106,7 +106,7 @@ impl IsBuildable2D for FilterCircle2D {
     }
 }
 
-impl IsEditable2D for FilterCircle2D {
+impl IsEditable2D for FilterCircle {
     fn set_x(&mut self, val: f64) {
         self.center.set_x(val);
     }
@@ -116,7 +116,7 @@ impl IsEditable2D for FilterCircle2D {
     }
 }
 
-impl HasBoundingBox2D for FilterCircle2D {
+impl HasBoundingBox2D for FilterCircle {
     fn bounding_box(&self) -> Option<(Point2D, Point2D)> {
         if self.radius <= 0.0 {
             return None;
@@ -127,7 +127,7 @@ impl HasBoundingBox2D for FilterCircle2D {
     }
 }
 
-impl IsFilter2D for FilterCircle2D {
+impl IsFilter2D for FilterCircle {
     fn is_allowed(&self, p: &Is2D) -> bool {
         dist_2d(p, &self.center) <= self.radius
     }

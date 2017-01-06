@@ -66,7 +66,7 @@ PointCloud2D //a point cloud holding 2d positions
 PointCloud3D //a point cloud holding 3d positions
 ProjectionToPlane //a projection onto a plane
 FilterBox2D //box filter for 2D space
-FilterCircle2D //circle filter for 2D space
+FilterCircle //circle filter for 2D space
 FilterPC2D //filter which can be used for point clouds in 2D space
 FilterPC3D //filter which can be used for point clouds in 3D space
 FilterAndPC2D //filter combinator to get the result of applying many 2D filters in a chain

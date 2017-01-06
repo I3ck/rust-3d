@@ -19,13 +19,13 @@ use rust_3d::traits::is_buildable_2d::*;
 use rust_3d::traits::is_filter_2d::*;
 use rust_3d::point_2d::*;
 use rust_3d::positive::*;
-use rust_3d::filter_circle_2d::*;
+use rust_3d::filter_circle::*;
 
 #[test]
-fn filter_circle_2d_test() {
+fn filter_circle_test() {
     let center = *Point2D::build(10.0, -5.0);
     let radius = Positive::build(3.0).unwrap();
-    let filter = FilterCircle2D::build(center, radius);
+    let filter = FilterCircle::build(center, radius);
 
     assert!( filter.is_allowed(&*Point2D::build(10.0, -5.0)));
     assert!( filter.is_allowed(&*Point2D::build(9.0, -5.0)));
