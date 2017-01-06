@@ -30,12 +30,23 @@ use traits::is_filter_pc_3d::IsFilterPC3D;
 //@todo filters could be written for any type or at least for n dimensions?
 //@todo rename these to PC filters, and add PointFilters of signature   filter(&Is_2d) -> bool which can then be used in the pc methods
 
-pub struct FilterPC3D {
-    pub filter_3d: Box<IsFilter3D>
+pub struct FilterPC3D<F> where
+    F: IsFilter3D {
+
+    filter_3d: Box<F>
 }
 
-impl<P> IsFilterPC3D<P> for FilterPC3D where
-    P: IsEditable3D + IsBuildable3D + Clone {
+impl<F> FilterPC3D<F> where
+    F: IsFilter3D {
+
+    pub fn build(filter_3d: F) -> Self {
+        FilterPC3D {filter_3d: Box::new(filter_3d)}
+    }
+}
+
+impl<P,F> IsFilterPC3D<P> for FilterPC3D<F> where
+    P: IsEditable3D + IsBuildable3D + Clone,
+    F: IsFilter3D {
 
     fn filter(&self, pc: &PointCloud3D<P>, view: &mut View) {
         if pc.len() == 0 {
