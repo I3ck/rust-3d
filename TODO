@@ -32,3 +32,5 @@ own error enum
 use get methods of Vec to have safer code
 
 IO methods split from the impls / traits as algorithms on them
+
+some structs / traits have 2d/3d specification even if they can only exist in one of the spaces. e.g. filter_circle_2d can't have a 3d version, rename accordingly

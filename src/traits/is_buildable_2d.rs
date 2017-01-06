@@ -30,7 +30,7 @@ pub trait IsBuildable2D :
 
     fn new() -> Box<Self>;
 
-    fn build(x: f64, y: f64) -> Box<Self>;
+    fn build(x: f64, y: f64) -> Box<Self>; //@todo rename both here and in 3d, also possibly rename the trait
 
     fn from<P>(&mut self, other: P) where
         P: IsBuildable2D;

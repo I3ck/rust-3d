@@ -63,10 +63,10 @@ impl Clone for FilterBox2D {
 }
 
 impl FilterBox2D {
-    fn new() -> Self {
+    pub fn new() -> Self {
         FilterBox2D {center: *Point2D::new(), size_x: 1.0, size_y: 1.0}
     }
-    fn build(center: Point2D, p_size_x: Positive, p_size_y: Positive) -> Self {
+    pub fn build(center: Point2D, p_size_x: Positive, p_size_y: Positive) -> Self {
         FilterBox2D {center: center, size_x: p_size_x.get(), size_y: p_size_y.get()}
     }
 }

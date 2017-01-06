@@ -58,10 +58,10 @@ impl Clone for FilterCircle2D {
 }
 
 impl FilterCircle2D {
-    fn new() -> Self {
+    pub fn new() -> Self {
         FilterCircle2D {center: *Point2D::new(), radius: 1.0}
     }
-    fn build(center: Point2D, p_radius: Positive) -> Self {
+    pub fn build(center: Point2D, p_radius: Positive) -> Self {
         FilterCircle2D {center: center, radius: p_radius.get()}
     }
 }
