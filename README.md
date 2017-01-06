@@ -9,7 +9,6 @@ notes
 rust-3d is still in really early stages, and is likely to change A LOT over time.
 Feel free to open an issue in case you're missing something or found a bug.
 Also some code might be untested, I am working on 100% test coverage, tho.
-All classes / algorithms of https://github.com/I3ck/lib_2d will be ported into the 2d part.
 Once this is fairly well tested, I'll also add it to crates.
 
 
@@ -66,7 +65,11 @@ PointCloud2D //a point cloud holding 2d positions
 PointCloud3D //a point cloud holding 3d positions
 ProjectionToPlane //a projection onto a plane
 FilterBox2D //box filter for 2D space
+FilterBox3D //box filter for 3D space
 FilterCircle //circle filter for 2D space
+FilterSphere //sphere filter for 3D space
+FilterNegate2D //filter not negate any other 2D filter
+FilterNegate3D //filter not negate any other 3D filter
 FilterPC2D //filter which can be used for point clouds in 2D space
 FilterPC3D //filter which can be used for point clouds in 3D space
 FilterAndPC2D //filter combinator to get the result of applying many 2D filters in a chain
