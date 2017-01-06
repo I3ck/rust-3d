@@ -15,6 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 extern crate rust_3d;
 
+use rust_3d::traits::is_2d::*;
 use rust_3d::traits::is_buildable_2d::*;
 use rust_3d::traits::has_bounding_box_2d::*;
 use rust_3d::point_2d::*;
@@ -39,6 +40,16 @@ fn bounding_box_2d_test() {
 
     pc4.push(*Point2D::build(-10.0, -10.0));
     pc4.push(*Point2D::build(-11.0, -11.0));
+
+    assert!(pc1.min_pos().unwrap().x() == 0.0);
+    assert!(pc1.min_pos().unwrap().y() == 0.0);
+    assert!(pc1.max_pos().unwrap().x() == 1.0);
+    assert!(pc1.max_pos().unwrap().y() == 1.0);
+
+    assert!(pc3.min_pos().unwrap().x() == -1.0);
+    assert!(pc3.min_pos().unwrap().y() == -1.0);
+    assert!(pc3.max_pos().unwrap().x() == 2.0);
+    assert!(pc3.max_pos().unwrap().y() == 2.0);
 
     assert!(!pc4.is_inside(&pc1).unwrap());
     assert!(!pc4.is_inside(&pc2).unwrap());
