@@ -40,3 +40,5 @@ some structs / traits have 2d/3d specification even if they can only exist in on
 update README (especially filters are missing now)
 
 write tutorial / examples withing the README
+
+trait for pointcloud?
