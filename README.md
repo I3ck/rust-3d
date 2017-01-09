@@ -98,7 +98,12 @@ interpolation_linear
 
 examples
 --------
-Please take a look at the tests in src/lib.rs.
+Please take a look at the tests in tests/
+
+links
+-----
+[crates.io](https://crates.io/crates/rust-3d)  
+[github.com](https://github.com/I3ck/rust-3d)  
 
 
 contribute
