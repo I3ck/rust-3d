@@ -21,6 +21,7 @@ use rust_3d::traits::is_moveable_2d::*;
 use rust_3d::point_2d::*;
 use rust_3d::point_cloud_2d::*;
 use rust_3d::io::pointcloud_2d_io::*;
+use rust_3d::test_helper::*;
 
 use std::io::prelude::*;
 use std::fs::File;
@@ -44,15 +45,5 @@ fn point_cloud_2d_io_test() {
 
     save_xy(&pc, &path_tmp, ";", "\n");
 
-    //@todo below as helper which can be reused for many other io functions
-    let mut f_expected = File::open(path_expected).unwrap();
-    let mut f_tmp = File::open(path_tmp).unwrap();
-
-    let mut s_expected = String::new();
-    f_expected.read_to_string(&mut s_expected).unwrap();
-
-    let mut s_tmp = String::new();
-    f_tmp.read_to_string(&mut s_tmp).unwrap();
-
-    assert!(s_tmp == s_expected);
+    assert_files_equal(path_expected, path_tmp);
 }
