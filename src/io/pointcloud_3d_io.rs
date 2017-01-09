@@ -33,7 +33,7 @@ pub fn save_xyz<P>(pc: &PointCloud3D<P>, filepath: &str, delim_coord: &str, deli
     for p in &pc.data {
         let buffer = p.x().to_string()  + delim_coord
                    + &p.y().to_string() + delim_coord
-                   + &p.z().to_string() + delim_coord
+                   + &p.z().to_string()
                    + delim_pos;
         match f.write_all(buffer.as_bytes()) {
             Err(_) => return false,

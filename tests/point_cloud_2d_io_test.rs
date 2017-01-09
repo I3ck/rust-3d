@@ -13,6 +13,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+extern crate rust_3d;
+
 use rust_3d::traits::is_2d::*;
 use rust_3d::traits::is_buildable_2d::*;
 use rust_3d::traits::is_moveable_2d::*;
@@ -22,8 +24,6 @@ use rust_3d::io::pointcloud_2d_io::*;
 
 use std::io::prelude::*;
 use std::fs::File;
-
-extern crate rust_3d;
 
 static GENERATE_EXCEPTED_RESULT_FILES: bool = false;
 
