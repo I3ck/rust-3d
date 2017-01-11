@@ -89,7 +89,7 @@ impl<P> PointCloud2D<P> where
         let mut length : f64 = 0.0;
         if self.data.len() < 2 { return length; }
 
-        for i in 0..self.data.len() {
+        for i in 1..self.data.len() {
             length += dist_2d(&*self.data[i], &*self.data[i-1]);
         }
         length
