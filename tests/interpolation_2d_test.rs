@@ -54,6 +54,30 @@ fn interpolate_bezier_test() {
 }
 
 #[test]
+fn interpolate_cosine_test() {
+    let path_expected = "tests/data/expected_interpolate_cosine_save1.csv";
+    let path_tmp = "tests/tmp/interpolate_cosine_save1.tmp";
+    let mut pc = PointCloud2D::<Point2D>::new();
+
+    pc.push(*Point2D::build(0.0, 0.2));
+    pc.push(*Point2D::build(1.0, 0.7));
+    pc.push(*Point2D::build(1.3, 1.0));
+    pc.push(*Point2D::build(0.5, 6.0));
+
+    let result = *interpolate_cosine(&pc, 50);
+
+    if GENERATE_EXCEPTED_RESULT_FILES {
+        save_xy(&result, &path_expected, ";", "\n");
+    }
+
+    save_xy(&result, &path_tmp, ";", "\n");
+
+    assert!(result.len() == 50);
+
+    assert_files_equal(path_expected, path_tmp);
+}
+
+#[test]
 fn interpolate_linear_test() {
     let path_expected = "tests/data/expected_interpolate_linear_save1.csv";
     let path_tmp = "tests/tmp/interpolate_linear_save1.tmp";
