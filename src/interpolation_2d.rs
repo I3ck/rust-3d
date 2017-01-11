@@ -69,6 +69,7 @@ pub fn interpolate_bezier<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
     Box::new(pc)
 }
 
+//@todo function names dont match interpolate vs interpolation...
 pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Box<PointCloud2D<P>> where
     P : IsEditable2D + IsBuildable2D + Clone {
 
@@ -90,7 +91,6 @@ pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
                 let proportion2 = (1.0 - (proportion*PI).cos() ) / 2.0;
                 pc.push(*P::build(p_prev.x() + proportion * (p_now.x() - p_prev.x()),
                                   p_prev.y() * (1.0 - proportion2) + p_now.y()*proportion2));
-                traveled_before = traveled;
                 break;
             }
             traveled_before = traveled;
@@ -109,7 +109,7 @@ pub fn interpolation_linear<P>(base_points: &PointCloud2D<P>, n_points: usize) -
         let mut traveled : f64 = 0.0;
         let mut traveled_before : f64 = 0.0;
 
-        for j in 1..base_points.len() {
+        for j in 1..base_points.len() { //@todo fails if path too small, handle this
             let ref p_prev = base_points.data[j-1];
             let ref p_now  = base_points.data[j];
 
@@ -119,7 +119,6 @@ pub fn interpolation_linear<P>(base_points: &PointCloud2D<P>, n_points: usize) -
                 let proportion = ((i as f64)*p_dist - traveled_before) / (traveled - traveled_before);
                 pc.push(*P::build(p_prev.x() + proportion * (p_now.x() - p_prev.x()),
                                   p_prev.y() + proportion * (p_now.y() - p_prev.y())));
-                traveled_before = traveled; //@todo was not in lib_2d code
                 break;
             }
             traveled_before = traveled;
