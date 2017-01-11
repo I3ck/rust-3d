@@ -85,7 +85,7 @@ impl<P> PointCloud2D<P> where
         self.data.len()
     }
 
-    pub fn path_length(&self) -> f64 { //@todo also implement for 3d   (could be defined more generic for both)
+    pub fn path_length(&self) -> f64 { //@todo define trait for this WithLength or similar
         let mut length : f64 = 0.0;
         if self.data.len() < 2 { return length; }
 

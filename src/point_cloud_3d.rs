@@ -22,6 +22,7 @@ use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_3d::IsEditable3D;
 use traits::has_bounding_box_3d::HasBoundingBox3D;
 use point_3d::{Point3D};
+use functions::dist_3d;
 
 
 
@@ -83,6 +84,16 @@ impl<P> PointCloud3D<P> where
 
     pub fn len(&self) -> usize {
         self.data.len()
+    }
+
+    pub fn path_length(&self) -> f64 { //@todo define trait for this WithLength or similar
+        let mut length : f64 = 0.0;
+        if self.data.len() < 2 { return length; }
+
+        for i in 1..self.data.len() {
+            length += dist_3d(&*self.data[i], &*self.data[i-1]);
+        }
+        length
     }
 
     pub fn center(&self) -> Option<P> { //@todo missing test //@todo rename to center of gravity
