@@ -69,6 +69,16 @@ impl FilterBox2D {
     pub fn build(center: Point2D, p_size_x: Positive, p_size_y: Positive) -> Self {
         FilterBox2D {center: center, size_x: p_size_x.get(), size_y: p_size_y.get()}
     }
+    pub fn from_bb(hbb: &HasBoundingBox2D) -> Option<Self> {
+        match (hbb.center_bb(), hbb.size_x(), hbb.size_y()) {
+            (Some(center), Some(sx), Some(sy)) => if sx > 0.0 && sy > 0.0 {
+                    Some(Self::build(center, Positive::build(sx).unwrap(), Positive::build(sy).unwrap()))
+                } else {
+                    None
+                },
+            _ => None,
+        }
+    }
 }
 
 impl IsND for FilterBox2D {

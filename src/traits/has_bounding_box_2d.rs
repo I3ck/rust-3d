@@ -14,6 +14,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use traits::is_2d::Is2D;
+use traits::is_buildable_2d::IsBuildable2D;
 use point_2d::Point2D;
 
 pub trait HasBoundingBox2D {
@@ -30,6 +31,28 @@ pub trait HasBoundingBox2D {
         match self.bounding_box() {
             None => None,
             Some((_, max)) => Some(max)
+        }
+    }
+
+    fn size_x(&self) -> Option<f64> {
+        match self.bounding_box() {
+            None => None,
+            Some((min, max)) => Some((max.x() - min.x()).abs())
+        }
+    }
+
+    fn size_y(&self) -> Option<f64> {
+        match self.bounding_box() {
+            None => None,
+            Some((min, max)) => Some((max.y() - min.y()).abs())
+        }
+    }
+
+    fn center_bb(&self) -> Option<Point2D> {
+        match self.bounding_box() {
+            None => None,
+            Some((min, max)) => Some(*Point2D::build(min.x() + (max.x() - min.x()) / 2.0,
+                                                     min.y() + (max.y() - min.y()) / 2.0))
         }
     }
 

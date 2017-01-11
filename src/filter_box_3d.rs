@@ -74,6 +74,16 @@ impl FilterBox3D {
     pub fn build(center: Point3D, p_size_x: Positive, p_size_y: Positive, p_size_z: Positive) -> Self {
         FilterBox3D {center: center, size_x: p_size_x.get(), size_y: p_size_y.get(), size_z: p_size_z.get()}
     }
+    pub fn from_bb(hbb: &HasBoundingBox3D) -> Option<Self> {
+        match (hbb.center_bb(), hbb.size_x(), hbb.size_y(), hbb.size_z()) {
+            (Some(center), Some(sx), Some(sy), Some(sz)) => if sx > 0.0 && sy > 0.0 && sz > 0.0 {
+                    Some(Self::build(center, Positive::build(sx).unwrap(), Positive::build(sy).unwrap(), Positive::build(sz).unwrap()))
+                } else {
+                    None
+                },
+            _ => None,
+        }
+    }
 }
 
 impl IsND for FilterBox3D {

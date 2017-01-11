@@ -14,6 +14,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use traits::is_3d::Is3D;
+use traits::is_buildable_3d::IsBuildable3D;
 use point_3d::Point3D;
 
 pub trait HasBoundingBox3D  {
@@ -32,6 +33,37 @@ pub trait HasBoundingBox3D  {
             Some((_, max)) => Some(max)
         }
     }
+
+    fn size_x(&self) -> Option<f64> {
+        match self.bounding_box() {
+            None => None,
+            Some((min, max)) => Some((max.x() - min.x()).abs())
+        }
+    }
+
+    fn size_y(&self) -> Option<f64> {
+        match self.bounding_box() {
+            None => None,
+            Some((min, max)) => Some((max.y() - min.y()).abs())
+        }
+    }
+
+    fn size_z(&self) -> Option<f64> {
+        match self.bounding_box() {
+            None => None,
+            Some((min, max)) => Some((max.z() - min.z()).abs())
+        }
+    }
+
+    fn center_bb(&self) -> Option<Point3D> {
+        match self.bounding_box() {
+            None => None,
+            Some((min, max)) => Some(*Point3D::build(min.x() + (max.x() - min.x()) / 2.0,
+                                                     min.y() + (max.y() - min.y()) / 2.0,
+                                                     min.z() + (max.z() - min.z()) / 2.0))
+        }
+    }
+
 
     fn is_inside<B>(&self, other: &B) -> Option<bool> where
         Self: Sized, B: HasBoundingBox3D {
