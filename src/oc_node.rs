@@ -57,7 +57,7 @@ fn collect_center_or_all<P>(n: &OcNode<P>, only_collect_centers: bool, depth: i8
     if only_collect_centers {
         let mut sub_pc = PointCloud3D::new();
         n.collect(depth+1, maxdepth, &mut sub_pc);
-        if let Some(c) = sub_pc.center() {
+        if let Some(c) = sub_pc.center_of_gravity() {
             pc.push(c);
         }
     } else {

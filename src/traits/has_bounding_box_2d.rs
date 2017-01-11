@@ -34,7 +34,7 @@ pub trait HasBoundingBox2D {
         }
     }
 
-    fn size_x(&self) -> Option<f64> {
+    fn size_x(&self) -> Option<f64> { //@todo change signature to return a Positive
         match self.bounding_box() {
             None => None,
             Some((min, max)) => Some((max.x() - min.x()).abs())
