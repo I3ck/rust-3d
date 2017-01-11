@@ -8,7 +8,6 @@ homepage = "https://github.com/I3ck/rust-3d"
 repository = "https://github.com/I3ck/rust-3d"
 readme = "README.md"
 keywords = ["2d", "3d", "pointcloud", "mesh", "filters"]
-license = "LGPL-3.0"
 license-file = "LICENSE"
 
 [dependencies]
