@@ -125,6 +125,14 @@ impl<P> PointCloud2D<P> where
     pub fn sort_y(&mut self) {
         self.data.sort_by(|a, b| a.y().partial_cmp(&b.y()).unwrap_or(Ordering::Equal));
     }
+
+    pub fn for_each_point<F>(&mut self, mut f: F) where
+        F: FnMut(&mut P) {
+
+        for p in &mut self.data {
+            f(&mut **p);
+        }
+    }
 }
 
 impl<P> IsMoveable2D for PointCloud2D<P> where P: IsEditable2D + IsMoveable2D {

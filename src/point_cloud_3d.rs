@@ -133,6 +133,14 @@ impl<P> PointCloud3D<P> where
     pub fn sort_z(&mut self) {
         self.data.sort_by(|a, b| a.z().partial_cmp(&b.z()).unwrap_or(Ordering::Equal));
     }
+
+    pub fn for_each_point<F>(&mut self, mut f: F) where
+        F: FnMut(&mut P) {
+
+        for p in &mut self.data {
+            f(&mut **p);
+        }
+    }
 }
 
 impl<P> IsMoveable3D for PointCloud3D<P> where
