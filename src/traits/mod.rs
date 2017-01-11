@@ -15,6 +15,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 pub mod has_bounding_box_2d;
 pub mod has_bounding_box_3d;
+pub mod has_center_of_gravity_2d;
+pub mod has_center_of_gravity_3d;
 pub mod is_editable_2d;
 pub mod is_editable_3d;
 pub mod is_buildable_2d;

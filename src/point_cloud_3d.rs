@@ -17,10 +17,11 @@ use std::fmt;
 
 use std::cmp::Ordering;
 
-use traits::is_moveable_3d::IsMoveable3D;
-use traits::is_buildable_3d::IsBuildable3D;
-use traits::is_editable_3d::IsEditable3D;
-use traits::has_bounding_box_3d::HasBoundingBox3D;
+use traits::is_moveable_3d::*;
+use traits::is_buildable_3d::*;
+use traits::is_editable_3d::*;
+use traits::has_bounding_box_3d::*;
+use traits::has_center_of_gravity_3d::*;
 use point_3d::{Point3D};
 use functions::dist_3d;
 
@@ -96,32 +97,6 @@ impl<P> PointCloud3D<P> where
         length
     }
 
-    pub fn center_of_gravity(&self) -> Option<P> {
-        let size = self.len();
-
-        if size < 1 {
-            return None;
-        }
-
-        let sizef = size as f64;
-
-        let mut sumx: f64 = 0.0;
-        let mut sumy: f64 = 0.0;
-        let mut sumz: f64 = 0.0;
-
-        for p in &self.data {
-            sumx += p.x();
-            sumy += p.y();
-            sumz += p.z();
-        }
-
-        return Some(*P::build(
-            (sumx / sizef),
-            (sumy / sizef),
-            (sumz / sizef)
-        ))
-    }
-
     pub fn sort_x(&mut self) {
         self.data.sort_by(|a, b| a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
     }
@@ -178,6 +153,34 @@ impl<P> HasBoundingBox3D for PointCloud3D<P> where
         }
 
         return Some((Point3D{x: minx, y: miny, z: minz}, Point3D{x: maxx, y: maxy, z: maxz}));
+    }
+}
+
+impl<P> HasCenterOfGravity3D for PointCloud3D<P> where P: IsBuildable3D + IsEditable3D + Clone {
+    fn center_of_gravity(&self) -> Option<Point3D> {
+        let size = self.len();
+
+        if size < 1 {
+            return None;
+        }
+
+        let sizef = size as f64;
+
+        let mut sumx: f64 = 0.0;
+        let mut sumy: f64 = 0.0;
+        let mut sumz: f64 = 0.0;
+
+        for p in &self.data {
+            sumx += p.x();
+            sumy += p.y();
+            sumz += p.z();
+        }
+
+        return Some(*Point3D::build(
+            (sumx / sizef),
+            (sumy / sizef),
+            (sumz / sizef)
+        ))
     }
 }
 

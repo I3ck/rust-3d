@@ -16,11 +16,12 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::fmt;
 use std::cmp::Ordering;
 
-use traits::is_moveable_2d::IsMoveable2D;
-use traits::is_buildable_2d::IsBuildable2D;
-use traits::is_editable_2d::IsEditable2D;
-use traits::has_bounding_box_2d::HasBoundingBox2D;
-use point_2d::{Point2D};
+use traits::is_moveable_2d::*;
+use traits::is_buildable_2d::*;
+use traits::is_editable_2d::*;
+use traits::has_bounding_box_2d::*;
+use traits::has_center_of_gravity_2d::*;
+use point_2d::*;
 use functions::dist_2d;
 
 
@@ -95,29 +96,6 @@ impl<P> PointCloud2D<P> where
         length
     }
 
-    pub fn center_of_gravity(&self) -> Option<P> {
-        let size = self.len();
-
-        if size < 1 {
-            return None;
-        }
-
-        let sizef = size as f64;
-
-        let mut sumx: f64 = 0.0;
-        let mut sumy: f64 = 0.0;
-
-        for p in &self.data {
-            sumx += p.x();
-            sumy += p.y();
-        }
-
-        return Some(*P::build(
-            (sumx / sizef),
-            (sumy / sizef)
-        ))
-    }
-
     pub fn sort_x(&mut self) {
         self.data.sort_by(|a, b| a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
     }
@@ -162,6 +140,31 @@ impl<P> HasBoundingBox2D for PointCloud2D<P> where P: IsEditable2D {
         }
 
         return Some((Point2D{x: minx, y: miny}, Point2D{x: maxx, y: maxy}));
+    }
+}
+
+impl<P> HasCenterOfGravity2D for PointCloud2D<P> where P: IsBuildable2D + IsEditable2D + Clone {
+    fn center_of_gravity(&self) -> Option<Point2D> {
+        let size = self.len();
+
+        if size < 1 {
+            return None;
+        }
+
+        let sizef = size as f64;
+
+        let mut sumx: f64 = 0.0;
+        let mut sumy: f64 = 0.0;
+
+        for p in &self.data {
+            sumx += p.x();
+            sumy += p.y();
+        }
+
+        return Some(*Point2D::build(
+            (sumx / sizef),
+            (sumy / sizef)
+        ))
     }
 }
 

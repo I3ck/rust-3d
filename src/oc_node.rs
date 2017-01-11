@@ -15,6 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_3d::IsEditable3D;
+use traits::has_center_of_gravity_3d::*;
 use point_cloud_3d::{PointCloud3D};
 use functions::{calc_sub_min_max, in_bb};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
@@ -58,7 +59,9 @@ fn collect_center_or_all<P>(n: &OcNode<P>, only_collect_centers: bool, depth: i8
         let mut sub_pc = PointCloud3D::new();
         n.collect(depth+1, maxdepth, &mut sub_pc);
         if let Some(c) = sub_pc.center_of_gravity() {
-            pc.push(c);
+            let mut p = *P::new();
+            p.from(c);
+            pc.push(p);
         }
     } else {
         n.collect(depth+1, maxdepth, pc);
