@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::fmt;
 use std::cmp::Ordering;
 
+use traits::is_2d::*;
 use traits::is_moveable_2d::*;
 use traits::is_buildable_2d::*;
 use traits::is_editable_2d::*;
@@ -24,76 +25,33 @@ use traits::has_center_of_gravity_2d::*;
 use point_2d::*;
 use functions::dist_2d;
 
+pub struct PointCloud2D<P> where
+    P: Is2D {
 
-
-pub struct PointCloud2D<P> {
     pub data: Vec<Box<P>>
 }
 
 impl<P> PointCloud2D<P> where
-    P: IsBuildable2D + IsEditable2D + Clone {
+    P: Is2D {
 
     pub fn new() -> PointCloud2D<P> {
         PointCloud2D{data: Vec::new()}
     }
 
-    pub fn parse(text: String) -> Option<PointCloud2D<P>> {
-        let lines = text.split("\n");
-
-        let mut pc = PointCloud2D::new();
-        for line in lines {
-            match P::parse(String::from(line)) { //@todo must be templated too
-                Some(p) => pc.push(*p),
-                None => {}
-            }
-        }
-        if pc.len() == 0 { return None; }
-        Some(pc)
-    }
-
     pub fn to_str(&self) -> String {
         let mut result = String::new();
-
         for p in &self.data {
             result = result + &p.to_str() + "\n";
         }
-
         result
-    }
-
-    pub fn clone(&self) -> PointCloud2D<P> {
-        let mut data: Vec<Box<P>>;
-        data = Vec::new();
-
-        for p in &self.data {
-            data.push(p.clone());
-        }
-
-        PointCloud2D { data: data }
     }
 
     pub fn push(&mut self, p: P) {
         self.data.push(Box::new(p));
     }
 
-    pub fn consume(&mut self, other: Self) {
-        for p in other.data {
-            self.data.push(Box::new((*p).clone()));
-        }
-    }
-
     pub fn len(&self) -> usize {
         self.data.len()
-    }
-
-    pub fn path_length(&self) -> f64 { //@todo define trait for this WithLength or similar
-        let mut length : f64 = 0.0;
-        if self.data.len() < 2 { return length; }
-
-        for i in 1..self.data.len() {
-            length += dist_2d(&*self.data[i], &*self.data[i-1]);
-        }
-        length
     }
 
     pub fn sort_x(&mut self) {
@@ -111,9 +69,60 @@ impl<P> PointCloud2D<P> where
             f(&mut **p);
         }
     }
+
+    pub fn path_length(&self) -> f64 { //@todo define trait for this WithLength or similar
+        let mut length : f64 = 0.0;
+        if self.data.len() < 2 { return length; }
+
+        for i in 1..self.data.len() {
+            length += dist_2d(&*self.data[i], &*self.data[i-1]);
+        }
+        length
+    }
 }
 
-impl<P> IsMoveable2D for PointCloud2D<P> where P: IsEditable2D + IsMoveable2D {
+impl<P> PointCloud2D<P> where
+    P: Is2D + Clone {
+
+    pub fn clone(&self) -> PointCloud2D<P> {
+        let mut data: Vec<Box<P>>;
+        data = Vec::new();
+
+        for p in &self.data {
+            data.push(p.clone());
+        }
+
+        PointCloud2D { data: data }
+    }
+
+    pub fn consume(&mut self, other: Self) {
+        for p in other.data {
+            self.data.push(Box::new((*p).clone()));
+        }
+    }
+}
+
+impl<P> PointCloud2D<P> where
+    P: IsBuildable2D + Clone {
+
+    pub fn parse(text: String) -> Option<PointCloud2D<P>> {
+        let lines = text.split("\n");
+
+        let mut pc = PointCloud2D::new();
+        for line in lines {
+            match P::parse(String::from(line)) { //@todo must be templated too
+                Some(p) => pc.push(*p),
+                None => {}
+            }
+        }
+        if pc.len() == 0 { return None; }
+        Some(pc)
+    }
+}
+
+impl<P> IsMoveable2D for PointCloud2D<P> where
+    P: Is2D + IsMoveable2D {
+
     fn move_by(&mut self, x: f64, y: f64) {
         for p in &mut self.data {
             p.move_by(x, y);
@@ -121,7 +130,9 @@ impl<P> IsMoveable2D for PointCloud2D<P> where P: IsEditable2D + IsMoveable2D {
     }
 }
 
-impl<P> HasBoundingBox2D for PointCloud2D<P> where P: IsEditable2D {
+impl<P> HasBoundingBox2D for PointCloud2D<P>
+    where P: Is2D {
+
     fn bounding_box(&self) -> Option<(Point2D, Point2D)> {
         if self.data.len() < 2 {
             return None;
@@ -143,7 +154,9 @@ impl<P> HasBoundingBox2D for PointCloud2D<P> where P: IsEditable2D {
     }
 }
 
-impl<P> HasCenterOfGravity2D for PointCloud2D<P> where P: IsBuildable2D + IsEditable2D + Clone {
+impl<P> HasCenterOfGravity2D for PointCloud2D<P>
+    where P: Is2D {
+
     fn center_of_gravity(&self) -> Option<Point2D> {
         let size = self.len();
 
@@ -169,7 +182,7 @@ impl<P> HasCenterOfGravity2D for PointCloud2D<P> where P: IsBuildable2D + IsEdit
 }
 
 impl<P> fmt::Display for PointCloud2D<P> where
-    P: IsEditable2D + fmt::Display {
+    P: Is2D + fmt::Display {
 
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {

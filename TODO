@@ -44,3 +44,5 @@ write tutorial / examples withing the README
 trait for pointcloud?
 
 method to directly add points to pc via coordinates
+
+try to avoid dynamic traits

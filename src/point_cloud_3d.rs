@@ -17,6 +17,7 @@ use std::fmt;
 
 use std::cmp::Ordering;
 
+use traits::is_3d::*;
 use traits::is_moveable_3d::*;
 use traits::is_buildable_3d::*;
 use traits::is_editable_3d::*;
@@ -25,76 +26,33 @@ use traits::has_center_of_gravity_3d::*;
 use point_3d::{Point3D};
 use functions::dist_3d;
 
+pub struct PointCloud3D<P> where
+    P: Is3D {
 
-
-pub struct PointCloud3D<P> {
     pub data: Vec<Box<P>>
 }
 
 impl<P> PointCloud3D<P> where
-    P: IsEditable3D + IsBuildable3D + Clone {
+    P: Is3D {
 
     pub fn new() -> PointCloud3D<P> {
         PointCloud3D{data: Vec::new()}
     }
 
-    pub fn parse(text: String) -> Option<PointCloud3D<P>> {
-        let lines = text.split("\n");
-
-        let mut pc = PointCloud3D::new();
-        for line in lines {
-            match P::parse(String::from(line)) { //@todo must be templated too
-                Some(p) => pc.push(*p),
-                None => {}
-            }
-        }
-        if pc.len() == 0 { return None; }
-        Some(pc)
-    }
-
     pub fn to_str(&self) -> String {
         let mut result = String::new();
-
         for p in &self.data {
             result = result + &p.to_str() + "\n";
         }
-
         result
-    }
-
-    pub fn clone(&self) -> PointCloud3D<P> {
-        let mut data: Vec<Box<P>>;
-        data = Vec::new();
-
-        for p in &self.data {
-            data.push(p.clone());
-        }
-
-        PointCloud3D { data: data }
     }
 
     pub fn push(&mut self, p: P) {
         self.data.push(Box::new(p));
     }
 
-    pub fn consume(&mut self, other: Self) {
-        for p in other.data {
-            self.data.push(Box::new((*p).clone()));
-        }
-    }
-
     pub fn len(&self) -> usize {
         self.data.len()
-    }
-
-    pub fn path_length(&self) -> f64 { //@todo define trait for this WithLength or similar
-        let mut length : f64 = 0.0;
-        if self.data.len() < 2 { return length; }
-
-        for i in 1..self.data.len() {
-            length += dist_3d(&*self.data[i], &*self.data[i-1]);
-        }
-        length
     }
 
     pub fn sort_x(&mut self) {
@@ -118,8 +76,57 @@ impl<P> PointCloud3D<P> where
     }
 }
 
+impl<P> PointCloud3D<P> where
+    P: Is3D + Clone {
+
+    pub fn clone(&self) -> PointCloud3D<P> {
+        let mut data: Vec<Box<P>>;
+        data = Vec::new();
+
+        for p in &self.data {
+            data.push(p.clone());
+        }
+
+        PointCloud3D { data: data }
+    }
+
+    pub fn consume(&mut self, other: Self) {
+        for p in other.data {
+            self.data.push(Box::new((*p).clone()));
+        }
+    }
+
+    pub fn path_length(&self) -> f64 { //@todo define trait for this WithLength or similar
+        let mut length : f64 = 0.0;
+        if self.data.len() < 2 { return length; }
+
+        for i in 1..self.data.len() {
+            length += dist_3d(&*self.data[i], &*self.data[i-1]);
+        }
+        length
+    }
+}
+
+impl<P> PointCloud3D<P> where
+    P: IsBuildable3D + Clone {
+
+    pub fn parse(text: String) -> Option<PointCloud3D<P>> {
+        let lines = text.split("\n");
+
+        let mut pc = PointCloud3D::new();
+        for line in lines {
+            match P::parse(String::from(line)) { //@todo must be templated too
+                Some(p) => pc.push(*p),
+                None => {}
+            }
+        }
+        if pc.len() == 0 { return None; }
+        Some(pc)
+    }
+}
+
 impl<P> IsMoveable3D for PointCloud3D<P> where
-    P: IsEditable3D + IsMoveable3D {
+    P: Is3D + IsMoveable3D {
 
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         for p in &mut self.data {
@@ -129,7 +136,7 @@ impl<P> IsMoveable3D for PointCloud3D<P> where
 }
 
 impl<P> HasBoundingBox3D for PointCloud3D<P> where
-    P: IsEditable3D + IsBuildable3D + Clone {
+    P: Is3D {
 
     fn bounding_box(&self) -> Option<(Point3D, Point3D)> {
         if self.len() < 2 {
@@ -156,7 +163,9 @@ impl<P> HasBoundingBox3D for PointCloud3D<P> where
     }
 }
 
-impl<P> HasCenterOfGravity3D for PointCloud3D<P> where P: IsBuildable3D + IsEditable3D + Clone {
+impl<P> HasCenterOfGravity3D for PointCloud3D<P>
+    where P: Is3D {
+
     fn center_of_gravity(&self) -> Option<Point3D> {
         let size = self.len();
 
@@ -185,7 +194,7 @@ impl<P> HasCenterOfGravity3D for PointCloud3D<P> where P: IsBuildable3D + IsEdit
 }
 
 impl<P> fmt::Display for PointCloud3D<P> where
-    P: IsEditable3D + fmt::Display {
+    P: Is3D + fmt::Display {
 
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {
