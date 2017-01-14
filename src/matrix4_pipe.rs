@@ -96,6 +96,4 @@ impl Matrix4Pipe {
     pub fn remove_look_at(&mut self) {
         self.mcamlook = Matrix4::new();
     }
-
-
 }

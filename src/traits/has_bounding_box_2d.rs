@@ -20,14 +20,14 @@ use point_2d::Point2D;
 pub trait HasBoundingBox2D {
     fn bounding_box(&self) -> Option<(Point2D, Point2D)>;
 
-    fn min_pos(&self) -> Option<(Point2D)> {
+    fn min_pos(&self) -> Option<Point2D> {
         match self.bounding_box() {
             None => None,
             Some((min, _)) => Some(min)
         }
     }
 
-    fn max_pos(&self) -> Option<(Point2D)> {
+    fn max_pos(&self) -> Option<Point2D> {
         match self.bounding_box() {
             None => None,
             Some((_, max)) => Some(max)

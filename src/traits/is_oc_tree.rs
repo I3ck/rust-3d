@@ -14,11 +14,11 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use traits::is_tree_3d::IsTree3D;
-use traits::is_editable_3d::IsEditable3D;
+use traits::is_3d::Is3D;
 use point_cloud_3d::PointCloud3D;
 
 pub trait IsOcTree<P> : IsTree3D<P> where
-    P: IsEditable3D {
+    P: Is3D {
 
     fn collect(&self, maxdepth: i8) -> PointCloud3D<P>;
 }

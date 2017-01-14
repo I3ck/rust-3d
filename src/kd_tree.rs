@@ -13,24 +13,27 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//@todo clean up traits like done with the pcs
+
 use std::cmp::Ordering;
 
 use point_cloud_3d::{PointCloud3D};
 use functions::{dist_3d, sqr_dist_3d, dimension_compare, dimension_dist, sort_and_limit};
 
+use traits::is_3d::Is3D;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_3d::IsEditable3D;
 use traits::is_tree_3d::IsTree3D;
 use traits::is_kd_tree_3d::IsKdTree3D;
 
 pub struct KdTree<P> where
-    P: IsEditable3D {
+    P: Is3D {
 
     pub root: Option<KdNode<P>>
 }
 
 pub struct KdNode<P> where
-    P: IsEditable3D {
+    P: Is3D {
 
     pub left: Option<Box<KdNode<P>>>,
     pub right: Option<Box<KdNode<P>>>,
@@ -39,7 +42,7 @@ pub struct KdNode<P> where
 }
 
 impl<P> IsTree3D<P> for KdTree<P> where
-    P: IsEditable3D + IsBuildable3D + Clone {
+    P: IsBuildable3D + Clone {
 
     fn new() -> KdTree<P> {
         KdTree { root: None }
@@ -69,7 +72,6 @@ impl<P> IsTree3D<P> for KdTree<P> where
             }
         }
     }
-
 }
 
 impl<P> IsKdTree3D<P> for KdTree<P> where
@@ -115,7 +117,7 @@ impl<P> IsKdTree3D<P> for KdTree<P> where
 }
 
 impl<P> KdNode<P> where
-    P: IsEditable3D + IsBuildable3D + Clone {
+    P: IsBuildable3D + Clone {
 
     pub fn new(dim: i8, mut pc: Vec<Box<P>>) -> KdNode<P> {
         let dimension = dim % 2;

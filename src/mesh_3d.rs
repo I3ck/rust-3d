@@ -15,19 +15,20 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use traits::is_mesh_3d::IsMesh3D;
 use traits::is_editable_mesh_3d::IsEditableMesh3D;
+use traits::is_3d::Is3D;
 use traits::is_editable_3d::IsEditable3D;
 use traits::is_buildable_3d::IsBuildable3D;
 use point_cloud_3d::PointCloud3D;
 
 pub struct Mesh3D<P> where
-    P: IsEditable3D {
+    P: Is3D {
 
     pub pc: PointCloud3D<P>,
     pub topology: Vec<usize>
 }
 
 impl<P> IsMesh3D<P> for Mesh3D<P> where
-    P: IsEditable3D + IsBuildable3D + Clone {
+    P: IsBuildable3D + Clone {
 
     fn num_faces(&self) -> usize {
         self.topology.len() / 3

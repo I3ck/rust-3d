@@ -13,6 +13,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//@todo clean up similar to pc code
+
 use std::collections::HashSet;
 use std::iter::IntoIterator;
 

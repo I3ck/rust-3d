@@ -18,7 +18,6 @@ use std::f64::consts::PI;
 use point_2d::Point2D;
 use point_cloud_2d::PointCloud2D;
 use traits::is_buildable_2d::IsBuildable2D;
-use traits::is_editable_2d::IsEditable2D;
 
 ///@todo entire file has to be added to tests
 ///@todo add some type level checks like diameter > 0 etc., or return Option types (similar to flaggedT?)
@@ -32,7 +31,7 @@ pub fn origin() -> Box<Point2D> {
 }
 
 pub fn rectangle<P>(center: &P, width: f64, height: f64) -> Box<PointCloud2D<P>> where
-    P: IsEditable2D + IsBuildable2D + Clone {
+    P: IsBuildable2D {
 
     let mut pc = PointCloud2D::new();
     pc.push(*P::build(center.x() - width / 2.0, center.y() - height / 2.0));
@@ -43,7 +42,7 @@ pub fn rectangle<P>(center: &P, width: f64, height: f64) -> Box<PointCloud2D<P>>
 }
 
 pub fn involut_circle<P>(center: &P, diameter: f64, n_points: usize, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
-    P: IsEditable2D + IsBuildable2D + Clone {
+    P: IsBuildable2D {
 
     //@todo reserve
     let mut pc = PointCloud2D::new();
@@ -58,7 +57,7 @@ pub fn involut_circle<P>(center: &P, diameter: f64, n_points: usize, radians_sta
 }
 
 pub fn arc<P>(center: &P, diameter: f64, n_points: usize, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
-    P: IsEditable2D + IsBuildable2D + Clone {
+    P: IsBuildable2D {
 
     let mut pc = PointCloud2D::new();
     let p_dist = (radians_end - radians_start).abs() / (n_points - 1) as f64;
@@ -72,7 +71,7 @@ pub fn arc<P>(center: &P, diameter: f64, n_points: usize, radians_start: f64, ra
 }
 
 pub fn ellipse<P>(center: &P, a: f64, b: f64, n_points: usize) -> Box<PointCloud2D<P>> where
-    P: IsEditable2D + IsBuildable2D + Clone {
+    P: IsBuildable2D {
 
     let mut pc = PointCloud2D::new();
     let p_dist = PI / (n_points - 1) as f64;

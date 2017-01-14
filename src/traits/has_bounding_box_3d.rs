@@ -20,14 +20,14 @@ use point_3d::Point3D;
 pub trait HasBoundingBox3D  {
     fn bounding_box(&self) -> Option<(Point3D, Point3D)>;
 
-    fn min_pos(&self) -> Option<(Point3D)> {
+    fn min_pos(&self) -> Option<Point3D> {
         match self.bounding_box() {
             None => None,
             Some((min, _)) => Some(min)
         }
     }
 
-    fn max_pos(&self) -> Option<(Point3D)> {
+    fn max_pos(&self) -> Option<Point3D> {
         match self.bounding_box() {
             None => None,
             Some((_, max)) => Some(max)

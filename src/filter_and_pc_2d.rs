@@ -13,20 +13,19 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-use traits::is_buildable_2d::IsBuildable2D;
-use traits::is_editable_2d::IsEditable2D;
+use traits::is_2d::Is2D;
 use traits::is_filter_pc_2d::IsFilterPC2D;
 use point_cloud_2d::PointCloud2D;
 use view::View;
 
 pub struct FilterAndPC2D<P> where
-    P: IsEditable2D + IsBuildable2D {
+    P: Is2D {
 
     pub filters: Vec<Box<IsFilterPC2D<P>>>
 }
 
 impl<P> IsFilterPC2D<P> for FilterAndPC2D<P> where
-    P: IsEditable2D + IsBuildable2D {
+    P: Is2D {
 
     fn filter(&self, pc: &PointCloud2D<P>, mut view: &mut View) {
         for f in &self.filters {

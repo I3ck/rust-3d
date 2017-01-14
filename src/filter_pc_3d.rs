@@ -17,8 +17,7 @@ use std::collections::HashSet;
 
 use point_cloud_3d::PointCloud3D;
 use view::View;
-use traits::is_buildable_3d::IsBuildable3D;
-use traits::is_editable_3d::IsEditable3D;
+use traits::is_3d::Is3D;
 use traits::is_filter_3d::IsFilter3D;
 use traits::is_filter_pc_3d::IsFilterPC3D;
 
@@ -45,7 +44,7 @@ impl<F> FilterPC3D<F> where
 }
 
 impl<P,F> IsFilterPC3D<P> for FilterPC3D<F> where
-    P: IsEditable3D + IsBuildable3D + Clone,
+    P: Is3D,
     F: IsFilter3D {
 
     fn filter(&self, pc: &PointCloud3D<P>, view: &mut View) {

@@ -13,13 +13,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-use traits::is_buildable_2d::IsBuildable2D;
-use traits::is_editable_2d::IsEditable2D;
+use traits::is_2d::Is2D;
 use point_cloud_2d::PointCloud2D;
 use view::View;
 
 pub trait IsFilterPC2D<P> where
-    P: IsEditable2D + IsBuildable2D {
+    P: Is2D {
 
     fn filter(&self, pc: &PointCloud2D<P>, view: &mut View); //@todo could have optional search structures   also define traits for different search structs e.g. trait solely to search in_box_2d
 }
