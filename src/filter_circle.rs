@@ -118,9 +118,6 @@ impl IsEditable2D for FilterCircle {
 
 impl HasBoundingBox2D for FilterCircle {
     fn bounding_box(&self) -> Option<(Point2D, Point2D)> {
-        if self.radius <= 0.0 {
-            return None;
-        }
         let p_min = *Point2D::build(self.center.x() - self.radius, self.center.y() - self.radius);
         let p_max = *Point2D::build(self.center.x() + self.radius, self.center.y() + self.radius);
         return Some((p_min, p_max));

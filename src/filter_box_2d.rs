@@ -133,9 +133,6 @@ impl IsEditable2D for FilterBox2D {
 
 impl HasBoundingBox2D for FilterBox2D {
     fn bounding_box(&self) -> Option<(Point2D, Point2D)> {
-        if self.size_x <= 0.0 || self.size_y <= 0.0 {
-            return None;
-        }
         let p_min = *Point2D::build(self.center.x() - self.size_x / 2.0, self.center.y() - self.size_y / 2.0);
         let p_max = *Point2D::build(self.center.x() + self.size_x / 2.0, self.center.y() + self.size_y / 2.0);
         return Some((p_min, p_max));

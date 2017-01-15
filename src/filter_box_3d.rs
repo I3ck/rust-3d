@@ -147,9 +147,6 @@ impl IsEditable3D for FilterBox3D {
 
 impl HasBoundingBox3D for FilterBox3D {
     fn bounding_box(&self) -> Option<(Point3D, Point3D)> {
-        if self.size_x <= 0.0 || self.size_y <= 0.0 || self.size_z <= 0.0 { //@todo can be dropped here and in 2D version, since size is now a positive
-            return None;
-        }
         let p_min = *Point3D::build(self.center.x() - self.size_x / 2.0, self.center.y() - self.size_y / 2.0, self.center.z() - self.size_z / 2.0);
         let p_max = *Point3D::build(self.center.x() + self.size_x / 2.0, self.center.y() + self.size_y / 2.0, self.center.z() + self.size_z / 2.0);
         return Some((p_min, p_max));

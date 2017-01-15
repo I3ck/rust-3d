@@ -127,9 +127,6 @@ impl IsEditable3D for FilterSphere {
 
 impl HasBoundingBox3D for FilterSphere {
     fn bounding_box(&self) -> Option<(Point3D, Point3D)> {
-        if self.radius <= 0.0 { //@todo can be removed
-            return None;
-        }
         let p_min = *Point3D::build(self.center.x() - self.radius, self.center.y() - self.radius, self.center.z() - self.radius);
         let p_max = *Point3D::build(self.center.x() + self.radius, self.center.y() + self.radius, self.center.z() + self.radius);
         return Some((p_min, p_max));
