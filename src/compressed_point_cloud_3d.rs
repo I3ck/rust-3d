@@ -18,6 +18,7 @@ extern crate num;
 use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
+use result::*;
 use traits::is_3d::Is3D;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::has_bounding_box_3d::HasBoundingBox3D;
@@ -39,11 +40,11 @@ pub struct CompressedPointCloud3D<T> where
 impl<T> CompressedPointCloud3D<T> where
     T: Unsigned + PrimInt {
 
-    pub fn compress<P>(pc: &PointCloud3D<P>) -> Option<CompressedPointCloud3D<T>> where
+    pub fn compress<P>(pc: &PointCloud3D<P>) -> Result<CompressedPointCloud3D<T>> where
         P: Is3D {
 
         let (pmin, pmax) = match pc.bounding_box() {
-            Err(_)      => return None,
+            Err(x)      => return Err(x),
             Ok(res)     => res,
         };
 
@@ -52,7 +53,7 @@ impl<T> CompressedPointCloud3D<T> where
         let rangez = (pmax.z - pmin.z).abs();
 
         let maxval = match T::max_value().to_f64() {
-            None        => return None,
+            None        => return Err(ErrorKind::NumberConversionError),
             Some(res)   => res,
         };
 
@@ -68,17 +69,17 @@ impl<T> CompressedPointCloud3D<T> where
             let distz = p.z() - pmin.z;
 
             let unitsx = match T::from(distx / unitsizex) {
-                None        => return None,
+                None        => return Err(ErrorKind::NumberConversionError),
                 Some(res)   => res
             };
 
             let unitsy = match T::from(disty / unitsizey) {
-                None        => return None,
+                None        => return Err(ErrorKind::NumberConversionError),
                 Some(res)   => res
             };
 
             let unitsz = match T::from(distz / unitsizez) {
-                None        => return None,
+                None        => return Err(ErrorKind::NumberConversionError),
                 Some(res)   => res
             };
 
@@ -88,12 +89,12 @@ impl<T> CompressedPointCloud3D<T> where
                 unitsz: unitsz
             })
         }
-        return Some(CompressedPointCloud3D::<T>{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data});
+        return Ok(CompressedPointCloud3D::<T>{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data});
     }
 
 //------------------------------------------------------------------------------
 
-    pub fn decompress<P>(&self) -> Option<PointCloud3D<P>> where
+    pub fn decompress<P>(&self) -> PointCloud3D<P> where
         P: Is3D + IsBuildable3D {
 
         let mut pc = PointCloud3D::new();
@@ -107,6 +108,6 @@ impl<T> CompressedPointCloud3D<T> where
                 ));
             }
         }
-        return Some(pc);
+        pc
     }
 }

@@ -58,8 +58,8 @@ fn test_point_cloud_3d() {
     assert!(pc.to_str() == "0.1 0.2 0.3\n0.2 0.3 0.4\n");
 
     match PointCloud3D::<Point3D>::parse(pc.to_str()) {
-        None => assert!(false),
-        Some(pcparsed) => assert!(pcparsed.to_str() == "0.1 0.2 0.3\n0.2 0.3 0.4\n")
+        Err(_) => assert!(false),
+        Ok(pcparsed) => assert!(pcparsed.to_str() == "0.1 0.2 0.3\n0.2 0.3 0.4\n")
     };
 
     let pccloned = pc.clone();

@@ -20,16 +20,36 @@ pub enum ErrorKind {
     MinMaxSwapped,
     MinMaxEqual,
     TooFewPoints,
-    BoundingBoxMissing
+    BoundingBoxMissing,
+    NormalizeVecWithoutLength,
+    IOError,
+    ParseError,
+    IncorrectFaceID,
+    IncorrectVertexID,
+    IncorrectVoxelID,
+    IncorrectDimension,
+    DimensionsDontMatch,
+    NumberConversionError,
+    NumberInWrongRange
 }
 
 impl ErrorKind {
     fn as_str(&self) -> &'static str {
         match *self {
-            ErrorKind::MinMaxSwapped      => "Passed min/max values are swapped (min > max)",
-            ErrorKind::MinMaxEqual        => "Passed min/max values are equal",
-            ErrorKind::TooFewPoints       => "Container had too few points for the operation",
-            ErrorKind::BoundingBoxMissing => "Bounding box is missing for the operation"
+            ErrorKind::MinMaxSwapped             => "Passed min/max values are swapped (min > max)",
+            ErrorKind::MinMaxEqual               => "Passed min/max values are equal",
+            ErrorKind::TooFewPoints              => "Container had too few points for the operation",
+            ErrorKind::BoundingBoxMissing        => "Bounding box is missing for the operation",
+            ErrorKind::NormalizeVecWithoutLength => "Can't normalize a vector of length 0",
+            ErrorKind::IOError                   => "Can't read or write a file",
+            ErrorKind::ParseError                => "Can't parse data",
+            ErrorKind::IncorrectFaceID           => "Used an incorrect face id",
+            ErrorKind::IncorrectVertexID         => "Used an incorrect vertex id",
+            ErrorKind::IncorrectVoxelID          => "Used an incorrect voxel id",
+            ErrorKind::IncorrectDimension        => "Trying to access an incorrect dimension",
+            ErrorKind::DimensionsDontMatch       => "Trying to mix types with different dimensions",
+            ErrorKind::NumberConversionError     => "Failed converting one number type to another",
+            ErrorKind::NumberInWrongRange        => "Passed number is within the wrong range"
         }
     }
 }

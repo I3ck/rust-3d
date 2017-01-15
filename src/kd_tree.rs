@@ -17,9 +17,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::cmp::Ordering;
 
+use result::*;
 use point_cloud_3d::{PointCloud3D};
 use functions::{dist_3d, sqr_dist_3d, dimension_compare, dimension_dist, sort_and_limit};
-
 use traits::is_3d::Is3D;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_3d::IsEditable3D;
@@ -104,13 +104,13 @@ impl<P> IsKdTree3D<P> for KdTree<P> where
         return result;
     }
 
-    fn nearest(&self, search: &P) -> Option<P> { //@todo implemented on its own, since the code can be faster without vecs
+    fn nearest(&self, search: &P) -> Result<P> { //@todo implemented on its own, since the code can be faster without vecs
         let result = self.knearest(search, 1);
         match result.len() {
-            0 => None,
+            0 => Err(ErrorKind::TooFewPoints),
             _ => {
                 let p = *result.data[0].clone();
-                Some(p)
+                Ok(p)
             }
         }
     }

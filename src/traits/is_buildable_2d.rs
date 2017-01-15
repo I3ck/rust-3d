@@ -18,6 +18,7 @@ extern crate core;
 use std::hash::{Hash};
 use self::core::str::FromStr;
 
+use result::*;
 use traits::is_2d::Is2D;
 
 pub trait IsBuildable2D :
@@ -35,34 +36,34 @@ pub trait IsBuildable2D :
     fn from<P>(&mut self, other: P) where
         P: IsBuildable2D;
 
-    fn normalized(&self) -> Option<Box<Self>> {
+    fn normalized(&self) -> Result<Box<Self>> {
         let l = self.abs();
         if l <= 0.0 {
-            None
+            Err(ErrorKind::NormalizeVecWithoutLength)
         }
         else {
-            Some(Self::build(self.x() / l, self.y() / l))
+            Ok(Self::build(self.x() / l, self.y() / l))
         }
     }
 
-    fn parse(text: String) -> Option<Box<Self>> {
+    fn parse(text: String) -> Result<Box<Self>> {
         let split = text.split(" ");
         let words = split.collect::<Vec<&str>>();
         match words.len() {
             2 => {
                 let x : f64;
                 match f64::from_str(words[0]) {
-                    Err(_) => return None,
+                    Err(_) => return Err(ErrorKind::ParseError),
                     Ok(a) => x = a
                 };
                 let y : f64;
                 match f64::from_str(words[1]) {
-                    Err(_) => return None,
+                    Err(_) => return Err(ErrorKind::ParseError),
                     Ok(b) => y = b
                 };
-                Some(Self::build(x,y))
+                Ok(Self::build(x,y))
             },
-            _ => None
+            _ => Err(ErrorKind::ParseError)
         }
     }
 }

@@ -15,6 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::cmp::Ordering;
 
+use result::*;
 use point_2d::Point2D;
 use point_3d::Point3D;
 use point_cloud_2d::PointCloud2D;
@@ -46,33 +47,33 @@ pub fn center<P>(p1: &P, p2: &P) -> Box<P> where
     )
 }
 
-pub fn dist<P,U>(p1: &P, p2: &U) -> Option<f64> where
+pub fn dist<P,U>(p1: &P, p2: &U) -> Result<f64> where
     P: IsND,
     U: IsND {
 
     match sqr_dist(p1,p2) { //@todo use proper chaining
-        Some(x) => Some(x.sqrt()),
-        None => None
+        Err(x) => Err(x),
+        Ok(x) => Ok(x.sqrt())
     }
 }
 
-pub fn sqr_dist<P,U>(p1: &P, p2: &U) -> Option<f64> where
+pub fn sqr_dist<P,U>(p1: &P, p2: &U) -> Result<f64> where
     P: IsND,
     U: IsND {
 
     if p1.n_dimensions() != p2.n_dimensions() {
-        return None;
+        return Err(ErrorKind::DimensionsDontMatch);
     }
 
     let mut result : f64 = 0.0;
     for i in 0..p1.n_dimensions() {
-        if let (Some(val1), Some(val2)) = (p1.get_position(i), p2.get_position(i)) {
+        if let (Ok(val1), Ok(val2)) = (p1.get_position(i), p2.get_position(i)) {
             result += (val1 - val2).powi(2);
         } else {
-            return None;
+            return Err(ErrorKind::IncorrectDimension);
         }
     }
-    Some(result)
+    Ok(result)
 }
 
 pub fn cross<P,U>(first: &P, other: &U) -> Box<U> where //@todo try to implement in Is3D trait

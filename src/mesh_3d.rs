@@ -13,6 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use result::*;
 use traits::is_mesh_3d::IsMesh3D;
 use traits::is_editable_mesh_3d::IsEditableMesh3D;
 use traits::is_3d::Is3D;
@@ -38,38 +39,35 @@ impl<P> IsMesh3D<P> for Mesh3D<P> where
         self.pc.len()
     }
 
-    fn face_vertex_ids(&self, faceid: usize) -> Option<(usize, usize, usize)> {
+    fn face_vertex_ids(&self, faceid: usize) -> Result<(usize, usize, usize)> {
         let id1 = 3*faceid + 0;
         let id2 = 3*faceid + 1;
         let id3 = 3*faceid + 2;
 
         if id3 >= self.topology.len() {
-            return None;
+            return Err(ErrorKind::IncorrectFaceID);
         }
 
-        Some((self.topology[id1], self.topology[id2], self.topology[id3]))
+        Ok((self.topology[id1], self.topology[id2], self.topology[id3]))
     }
 
-    fn face_vertices(&self, faceid: usize) -> Option<(P, P, P)> {
+    fn face_vertices(&self, faceid: usize) -> Result<(P, P, P)> {
         match self.face_vertex_ids(faceid) {
-            None => None,
-            Some((id1, id2, id3)) => {
-                if id1 >= self.pc.len() || id2 >= self.pc.len() || id3 >= self.pc.len() {
-                    return None;
+            Err(x) => Err(x),
+            Ok((id1, id2, id3)) => {
+                if let (Ok(v1), Ok(v2), Ok(v3)) = (self.vertex(id1), self.vertex(id2), self.vertex(id3)) {
+                    return Ok((v1, v2, v3));
                 }
-                if let (Some(v1), Some(v2), Some(v3)) = (self.vertex(id1), self.vertex(id2), self.vertex(id3)) {
-                    return Some((v1, v2, v3));
-                }
-                return None;
+                return Err(ErrorKind::IncorrectVertexID);
             }
         }
     }
 
-    fn vertex(&self, vertexid: usize) -> Option<P> {
+    fn vertex(&self, vertexid: usize) -> Result<P> {
         if vertexid >= self.pc.len() {
-            return None;
+            return Err(ErrorKind::IncorrectVertexID);
         }
-        return Some(*self.pc.data[vertexid].clone())
+        return Ok(*self.pc.data[vertexid].clone())
     }
 }
 
@@ -98,13 +96,13 @@ impl<P> IsEditableMesh3D<P> for Mesh3D<P> where
         self.topology.len() / 3 - 1
     }
 
-    fn try_add_connection(&mut self, vid1: usize, vid2: usize, vid3: usize) -> Option<usize> {
+    fn try_add_connection(&mut self, vid1: usize, vid2: usize, vid3: usize) -> Result<usize> {
         if vid1 >= self.pc.len() || vid2 >= self.pc.len() || vid3 >= self.pc.len() || vid1 == vid2 || vid1 == vid3 || vid2 == vid3 {
-            return None;
+            return Err(ErrorKind::IncorrectVertexID);
         }
         self.topology.push(vid1);
         self.topology.push(vid2);
         self.topology.push(vid3);
-        Some(self.topology.len() / 3 - 1)
+        Ok(self.topology.len() / 3 - 1)
     }
 }

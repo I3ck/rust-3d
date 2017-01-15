@@ -13,6 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use result::*;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_mesh_3d::IsMesh3D;
 
@@ -25,5 +26,5 @@ pub trait IsEditableMesh3D<P> : IsMesh3D<P> where
 
     fn add_face(&mut self, v1: P, v2: P, v3: P) -> usize;
 
-    fn try_add_connection(&mut self, vid1: usize, vid2: usize, vid3: usize) -> Option<usize>;
+    fn try_add_connection(&mut self, vid1: usize, vid2: usize, vid3: usize) -> Result<usize>;
 }

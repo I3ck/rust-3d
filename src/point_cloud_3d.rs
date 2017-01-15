@@ -111,18 +111,18 @@ impl<P> PointCloud3D<P> where
 impl<P> PointCloud3D<P> where
     P: IsBuildable3D + Clone {
 
-    pub fn parse(text: String) -> Option<PointCloud3D<P>> {
+    pub fn parse(text: String) -> Result<PointCloud3D<P>> {
         let lines = text.split("\n");
 
         let mut pc = PointCloud3D::new();
         for line in lines {
             match P::parse(String::from(line)) { //@todo must be templated too
-                Some(p) => pc.push(*p),
-                None => {}
+                Err(_) => {} //@todo maybe make entire parsing fail
+                Ok(p) => pc.push(*p),
             }
         }
-        if pc.len() == 0 { return None; }
-        Some(pc)
+        if pc.len() == 0 { return Err(ErrorKind::ParseError); }
+        Ok(pc)
     }
 }
 

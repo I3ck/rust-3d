@@ -56,8 +56,8 @@ fn point_cloud_2d_test() {
     assert!(pc.to_str() == "0.1 0.2\n0.2 0.3\n");
 
     match PointCloud2D::<Point2D>::parse(pc.to_str()) {
-        None => assert!(false),
-        Some(pcparsed) => assert!(pcparsed.to_str() == "0.1 0.2\n0.2 0.3\n")
+        Err(_) => assert!(false),
+        Ok(pcparsed) => assert!(pcparsed.to_str() == "0.1 0.2\n0.2 0.3\n")
     };
 
     let pccloned = pc.clone();

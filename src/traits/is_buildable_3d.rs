@@ -18,6 +18,7 @@ extern crate core;
 use self::core::str::FromStr;
 use std::hash::{Hash};
 
+use result::*;
 use traits::is_3d::Is3D;
 use matrix4::Matrix4;
 
@@ -57,39 +58,39 @@ pub trait IsBuildable3D :
         Self::build(result_x, result_y, result_z)
     }
 
-    fn normalized(&self) -> Option<Box<Self>> {
+    fn normalized(&self) -> Result<Box<Self>> {
         let l = self.abs();
         if l <= 0.0 {
-            None
+            Err(ErrorKind::NormalizeVecWithoutLength)
         }
         else {
-            Some(Self::build(self.x() / l, self.y() / l, self.z() / l))
+            Ok(Self::build(self.x() / l, self.y() / l, self.z() / l))
         }
     }
 
-    fn parse(text: String) -> Option<Box<Self>> {
+    fn parse(text: String) -> Result<Box<Self>> {
         let split = text.split(" ");
         let words = split.collect::<Vec<&str>>();
         match words.len() {
             3 => {
                 let x : f64;
                 match f64::from_str(words[0]) {
-                    Err(_) => return None,
+                    Err(_) => return Err(ErrorKind::ParseError),
                     Ok(a) => x = a
                 };
                 let y : f64;
                 match f64::from_str(words[1]) {
-                    Err(_) => return None,
+                    Err(_) => return Err(ErrorKind::ParseError),
                     Ok(b) => y = b
                 };
                 let z : f64;
                 match f64::from_str(words[2]) {
-                    Err(_) => return None,
+                    Err(_) => return Err(ErrorKind::ParseError),
                     Ok(c) => z = c
                 };
-                Some(Self::build(x,y,z))
+                Ok(Self::build(x,y,z))
             },
-            _ => None
+            _ => Err(ErrorKind::ParseError)
         }
     }
 }

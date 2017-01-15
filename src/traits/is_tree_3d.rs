@@ -23,7 +23,7 @@ pub trait IsTree3D<P> where
 
     fn size(&self) -> usize;
 
-    fn to_pointcloud(&self) -> PointCloud3D<P>;
+    fn to_pointcloud(&self) -> PointCloud3D<P>; //@todo as trait
 
     fn build(&mut self, pc : PointCloud3D<P>) -> bool;
 }

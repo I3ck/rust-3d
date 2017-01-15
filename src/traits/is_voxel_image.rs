@@ -13,10 +13,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use result::*;
+
 pub trait IsVoxelImage<T> {
     fn size_x(&self) -> usize;
     fn size_y(&self) -> usize;
     fn size_z(&self) -> usize;
 
-    fn voxel(&self, x: usize, y: usize, z: usize) -> Option<T>;
+    fn voxel(&self, x: usize, y: usize, z: usize) -> Result<T>;
 }

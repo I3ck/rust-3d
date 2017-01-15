@@ -92,12 +92,12 @@ impl IsND for FilterBox3D {
         3
     }
 
-    fn get_position(&self, dimension: usize) -> Option<f64> {
+    fn get_position(&self, dimension: usize) -> Result<f64> {
         match dimension {
-            0 => Some(self.center.x()),
-            1 => Some(self.center.y()),
-            2 => Some(self.center.z()),
-            _ => None
+            0 => Ok(self.center.x()),
+            1 => Ok(self.center.y()),
+            2 => Ok(self.center.z()),
+            _ => Err(ErrorKind::IncorrectDimension)
         }
     }
 }

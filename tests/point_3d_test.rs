@@ -63,14 +63,14 @@ fn point_3d_test() {
     assert!(p2_clone.pos() == p1.pos());
 
     let p1_norm = p1.normalized();
-    assert!(p1_norm.is_none());
+    assert!(p1_norm.is_err());
 
     let p3_norm = p3.normalized();
-    assert!(p3_norm.is_some());
+    assert!(p3_norm.is_ok());
 
     match p3_norm {
-        None => {},
-        Some(n) => {
+        Err(_) => {},
+        Ok(n) => {
             assert!((1.0 - n.abs()).abs() < eps) ;
             assert!(n.x() == p3.x() / p3.abs());
             assert!(n.y() == p3.y() / p3.abs());
@@ -107,8 +107,8 @@ fn point_3d_test() {
     assert!(p1.z() == 28.0);
 
     match Point3D::parse("1.3 7.9 13.7".to_string()) {
-        None => assert!(false),
-        Some(bp) => {
+        Err(_) => assert!(false),
+        Ok(bp) => {
             assert!(bp.x() == 1.3);
             assert!(bp.y() == 7.9);
             assert!(bp.z() == 13.7);

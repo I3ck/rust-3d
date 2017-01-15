@@ -13,6 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use result::*;
 use traits::is_tree_3d::IsTree3D;
 use traits::is_3d::Is3D;
 use point_cloud_3d::PointCloud3D;
@@ -20,7 +21,7 @@ use point_cloud_3d::PointCloud3D;
 pub trait IsKdTree3D<P> : IsTree3D<P> where
     P: Is3D {
 
-    fn nearest(&self, search: &P) -> Option<P>;
+    fn nearest(&self, search: &P) -> Result<P>;
 
     fn knearest(&self, search: &P, n: usize) -> PointCloud3D<P>;
 

@@ -106,18 +106,18 @@ impl<P> PointCloud2D<P> where
 impl<P> PointCloud2D<P> where
     P: IsBuildable2D + Clone {
 
-    pub fn parse(text: String) -> Option<PointCloud2D<P>> {
+    pub fn parse(text: String) -> Result<PointCloud2D<P>> {
         let lines = text.split("\n");
 
         let mut pc = PointCloud2D::new();
         for line in lines {
             match P::parse(String::from(line)) { //@todo must be templated too
-                Some(p) => pc.push(*p),
-                None => {}
+                Err(_) => {}
+                Ok(p) => pc.push(*p),
             }
         }
-        if pc.len() == 0 { return None; }
-        Some(pc)
+        if pc.len() == 0 { return Err(ErrorKind::ParseError); }
+        Ok(pc)
     }
 }
 

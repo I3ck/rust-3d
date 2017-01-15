@@ -15,6 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::f64::consts::PI;
 
+use positive::*;
 use point_2d::Point2D;
 use point_cloud_2d::PointCloud2D;
 use traits::is_buildable_2d::IsBuildable2D;
@@ -30,51 +31,57 @@ pub fn origin() -> Box<Point2D> {
     Point2D::build(0.0, 0.0)
 }
 
-pub fn rectangle<P>(center: &P, width: f64, height: f64) -> Box<PointCloud2D<P>> where
+pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
     let mut pc = PointCloud2D::new();
-    pc.push(*P::build(center.x() - width / 2.0, center.y() - height / 2.0));
-    pc.push(*P::build(center.x() + width / 2.0, center.y() - height / 2.0));
-    pc.push(*P::build(center.x() + width / 2.0, center.y() + height / 2.0));
-    pc.push(*P::build(center.x() - width / 2.0, center.y() + height / 2.0));
+    let w = width.get();
+    let h = height.get();
+    pc.push(*P::build(center.x() - w / 2.0, center.y() - h / 2.0));
+    pc.push(*P::build(center.x() + w / 2.0, center.y() - h / 2.0));
+    pc.push(*P::build(center.x() + w / 2.0, center.y() + h / 2.0));
+    pc.push(*P::build(center.x() - w / 2.0, center.y() + h / 2.0));
     Box::new(pc)
 }
 
-pub fn involut_circle<P>(center: &P, diameter: f64, n_points: usize, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
+pub fn involut_circle<P>(center: &P, diameter: Positive, n_points: usize, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
     //@todo reserve
     let mut pc = PointCloud2D::new();
+    let d = diameter.get();
     let p_dist = (radians_end - radians_start).abs() / (n_points - 1) as f64;
 
     for i in 0..n_points {
         let current = (i as f64) * p_dist;
-        pc.push(*P::build(center.x() + diameter/2.0 * (current.cos() + current * current.sin()),
-                          center.y() + diameter/2.0 * (current.sin() - current * current.cos())));
+        pc.push(*P::build(center.x() + d/2.0 * (current.cos() + current * current.sin()),
+                          center.y() + d/2.0 * (current.sin() - current * current.cos())));
     }
     Box::new(pc)
 }
 
-pub fn arc<P>(center: &P, diameter: f64, n_points: usize, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
+pub fn arc<P>(center: &P, diameter: Positive, n_points: usize, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
     let mut pc = PointCloud2D::new();
+    let d = diameter.get();
     let p_dist = (radians_end - radians_start).abs() / (n_points - 1) as f64;
 
     for i in 0..n_points {
         let radians = radians_start + (i as f64) * p_dist;
-        pc.push(*P::build(center.x() + diameter/2.0 * radians.cos(),
-                          center.y() + diameter/2.0 * radians.sin()));
+        pc.push(*P::build(center.x() + d/2.0 * radians.cos(),
+                          center.y() + d/2.0 * radians.sin()));
     }
     Box::new(pc)
 }
 
-pub fn ellipse<P>(center: &P, a: f64, b: f64, n_points: usize) -> Box<PointCloud2D<P>> where
+pub fn ellipse<P>(center: &P, ap: Positive, bp: Positive, n_points: usize) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
     let mut pc = PointCloud2D::new();
     let p_dist = PI / (n_points - 1) as f64;
+    let a = ap.get();
+    let b = bp.get();
     let angle: f64 = 0.0; //@todo as parameter? or just drop from formulas?
 
     for i in 0..n_points {

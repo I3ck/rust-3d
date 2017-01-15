@@ -36,12 +36,12 @@ pub fn save_stl_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> bool where
 
     for i in 0..mesh.num_faces() {
         let (v1, v2, v3) = match mesh.face_vertices(i) {
-            None => return false,
-            Some((v1, v2, v3)) => (v1, v2, v3)
+            Err(_) => return false,
+            Ok((v1, v2, v3)) => (v1, v2, v3)
         };
         let n = match mesh.face_normal(i) {
-            None => return false,
-            Some(n) => n
+            Err(_) => return false,
+            Ok(n) => n
         };
         let buffer = "facet normal ".to_string() + &n.to_str() + "\n"
                        + "    outer loop\n"
@@ -89,8 +89,8 @@ pub fn save_ply_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> bool where
 
     for i in 0..mesh.num_vertices() {
         let vertex = match mesh.vertex(i) {
-            None => return false,
-            Some(v) => v
+            Err(_) => return false,
+            Ok(v) => v
         };
         match f.write_all((vertex.to_str() + "\n").as_bytes()) {
             Err(_) => return false,
@@ -100,8 +100,8 @@ pub fn save_ply_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> bool where
 
     for i in 0..mesh.num_faces() {
         let (vid1, vid2, vid3) = match mesh.face_vertex_ids(i) {
-            None => return false,
-            Some((vid1, vid2, vid3)) => (vid1, vid2, vid3)
+            Err(_) => return false,
+            Ok((vid1, vid2, vid3)) => (vid1, vid2, vid3)
         };
         match f.write_all(("3 ".to_string() + &vid1.to_string() + " " + &vid2.to_string() + " " + &vid3.to_string() + "\n").as_bytes()) {
             Err(_) => return false,

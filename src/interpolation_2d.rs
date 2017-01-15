@@ -15,13 +15,12 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::f64::consts::PI;
 
+use result::*;
 use point_cloud_2d::PointCloud2D;
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_editable_2d::IsEditable2D;
 
 
-///@todo entire file has to be added to tests
-///@todo add some type level checks like diameter > 0 etc., or return Option types (similar to flaggedT?)
 ///@todo correct reserving
 ///@todo some algorithms (e.g. bezier) can be ported to 3d, maybe write them directly generic over the dimension
 
@@ -57,8 +56,12 @@ fn control_polygon<P>(path: &PointCloud2D<P>, n_points: usize, t: f64) -> Box<P>
     P::build(x,y)
 }
 
-pub fn interpolate_bezier<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Box<PointCloud2D<P>> where
+pub fn interpolate_bezier<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Result<Box<PointCloud2D<P>>> where
     P: IsBuildable2D {
+
+    if base_points.len() < 2 {
+        return Err(ErrorKind::TooFewPoints);
+    }
 
     let mut pc = PointCloud2D::new();
     let p_dist = 1.0 / (n_points as f64);
@@ -66,12 +69,16 @@ pub fn interpolate_bezier<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
     for i in 0..n_points {
         pc.push(*control_polygon(base_points, base_points.len()-1, (i as f64) * p_dist));
     }
-    Box::new(pc)
+    Ok(Box::new(pc))
 }
 
 //@todo function names dont match interpolate vs interpolation...
-pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Box<PointCloud2D<P>> where
+pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Result<Box<PointCloud2D<P>>> where
     P : IsBuildable2D {
+
+    if base_points.len() < 2 {
+        return Err(ErrorKind::TooFewPoints);
+    }
 
     let mut pc = PointCloud2D::new();
     let p_dist = base_points.path_length() / (n_points - 1) as f64;
@@ -96,11 +103,15 @@ pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
             traveled_before = traveled;
         }
     }
-    Box::new(pc)
+    Ok(Box::new(pc))
 }
 
-pub fn interpolation_linear<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Box<PointCloud2D<P>> where
+pub fn interpolation_linear<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Result<Box<PointCloud2D<P>>> where
     P : IsBuildable2D {
+
+    if base_points.len() < 2 {
+        return Err(ErrorKind::TooFewPoints);
+    }
 
     let mut pc = PointCloud2D::new();
     let p_dist = base_points.path_length() / (n_points - 1) as f64;
@@ -124,5 +135,5 @@ pub fn interpolation_linear<P>(base_points: &PointCloud2D<P>, n_points: usize) -
             traveled_before = traveled;
         }
     }
-    Box::new(pc)
+    Ok(Box::new(pc))
 }

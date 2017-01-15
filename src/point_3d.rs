@@ -17,6 +17,7 @@ use std::fmt;
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
+use result::*;
 use traits::is_nd::IsND;
 use traits::is_3d::Is3D;
 use traits::is_moveable_3d::IsMoveable3D;
@@ -69,12 +70,12 @@ impl IsND for Point3D {
         3
     }
 
-    fn get_position(&self, dimension: usize) -> Option<f64> {
+    fn get_position(&self, dimension: usize) -> Result<f64> {
         match dimension {
-            0 => Some(self.x),
-            1 => Some(self.y),
-            2 => Some(self.z),
-            _ => None
+            0 => Ok(self.x),
+            1 => Ok(self.y),
+            2 => Ok(self.z),
+            _ => Err(ErrorKind::IncorrectDimension)
         }
     }
 }

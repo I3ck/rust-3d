@@ -13,6 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use result::*;
 use matrix4::Matrix4;
 use traits::is_buildable_3d::IsBuildable3D;
 
@@ -58,8 +59,8 @@ impl Matrix4Pipe {
     }
     pub fn add_rotation_axis<P>(&mut self, axis: &P, rad: f64) -> bool where P: IsBuildable3D {
         match Matrix4::rotation_axis(axis, rad) {
-            None => return false,
-            Some(m) => { self.mrotation = m; return true; }
+            Err(_) => return false,
+            Ok(m) => { self.mrotation = m; return true; }
         }
     }
     pub fn remove_rotation(&mut self) {
@@ -89,8 +90,8 @@ impl Matrix4Pipe {
 
     pub fn add_look_at<P>(&mut self, target: &P, up: &P) -> bool where P: IsBuildable3D {
         match Matrix4::look_at(target, up) {
-            None => return false,
-            Some(m) => { self.mcamlook = m; return true; }
+            Err(_) => return false,
+            Ok(m) => { self.mcamlook = m; return true; }
         }
     }
     pub fn remove_look_at(&mut self) {

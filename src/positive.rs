@@ -13,16 +13,18 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use result::*;
+
 pub struct Positive {
     val: f64
 }
 
 impl Positive {
-    pub fn new(val: f64) -> Option<Positive> {
+    pub fn new(val: f64) -> Result<Positive> {
         if val > 0.0 {
-            return Some(Positive {val: val});
+            return Ok(Positive {val: val});
         }
-        None
+        Err(ErrorKind::NumberInWrongRange)
     }
 
     pub fn get(&self) -> f64 {

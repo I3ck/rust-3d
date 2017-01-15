@@ -70,6 +70,7 @@ impl FilterBox2D {
     pub fn build(center: Point2D, p_size_x: Positive, p_size_y: Positive) -> Self {
         FilterBox2D {center: center, size_x: p_size_x.get(), size_y: p_size_y.get()}
     }
+    //@todo make this a trait
     pub fn from_bb(hbb: &HasBoundingBox2D) -> Option<Self> {
         match (hbb.center_bb(), hbb.size_x(), hbb.size_y()) {
             (Ok(center), Ok(sx), Ok(sy)) => if sx > 0.0 && sy > 0.0 {
@@ -87,11 +88,11 @@ impl IsND for FilterBox2D {
         2
     }
 
-    fn get_position(&self, dimension: usize) -> Option<f64> {
+    fn get_position(&self, dimension: usize) -> Result<f64> {
         match dimension {
-            0 => Some(self.center.x()),
-            1 => Some(self.center.y()),
-            _ => None
+            0 => Ok(self.center.x()),
+            1 => Ok(self.center.y()),
+            _ => Err(ErrorKind::IncorrectDimension)
         }
     }
 }

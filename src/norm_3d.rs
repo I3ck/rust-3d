@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
+use result::*;
 use point_3d::Point3D;
 use traits::is_nd::IsND;
 use traits::is_3d::Is3D;
@@ -62,12 +63,12 @@ impl IsND for Norm3D {
         3
     }
 
-    fn get_position(&self, dimension: usize) -> Option<f64> {
+    fn get_position(&self, dimension: usize) -> Result<f64> {
         match dimension {
-            0 => Some(self.x),
-            1 => Some(self.y),
-            2 => Some(self.z),
-            _ => None
+            0 => Ok(self.x),
+            1 => Ok(self.y),
+            2 => Ok(self.z),
+            _ => Err(ErrorKind::IncorrectDimension)
         }
     }
 }
@@ -87,12 +88,12 @@ impl Is3D for Norm3D {
 }
 
 impl IsNormalized3D for Norm3D {
-    fn new<P>(p: P) -> Option<Box<Self>> where
+    fn new<P>(p: P) -> Result<Box<Self>> where
         P: Is3D {
 
         match p.abs() {
-            0.0 => None,
-            l => Some(Box::new(Norm3D {
+            0.0 => Err(ErrorKind::NormalizeVecWithoutLength),
+            l => Ok(Box::new(Norm3D {
                 x: p.x() / l,
                 y: p.y() / l,
                 z: p.z() / l,

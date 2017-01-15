@@ -13,6 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use result::*;
 use point_3d::Point3D;
 use traits::is_3d::Is3D;
 use traits::is_buildable_3d::IsBuildable3D;
@@ -89,12 +90,12 @@ impl Matrix4 {
     }
 
     ///@todo wont have to be of type option once uvec implemented
-    pub fn rotation_axis<P>(axis: &P, rad: f64) -> Option<Matrix4> where
+    pub fn rotation_axis<P>(axis: &P, rad: f64) -> Result<Matrix4> where
         P: IsBuildable3D {
 
         let u = match axis.clone().normalized() {
-          None => return None,
-          Some(x) => x
+          Err(x) => return Err(x),
+          Ok(x) => x
         };
 
         let mut result = Matrix4::new();
@@ -103,7 +104,7 @@ impl Matrix4 {
         result.data[1][0] = u.y()*u.x()*(1.0 - rad.cos()) + u.z()*rad.sin();    result.data[1][1] = rad.cos() + u.y()*u.y()*(1.0 - rad.cos());          result.data[1][2] = u.y()*u.z()*(1.0 - rad.cos()) - u.x()*rad.sin();    result.data[1][3] = 0.0;
         result.data[2][0] = u.z()*u.x()*(1.0 - rad.cos()) - u.y()*rad.sin();    result.data[2][1] = u.z()*u.y()*(1.0 - rad.cos()) + u.x()*rad.sin();    result.data[2][2] = rad.cos() + u.z()*u.z()*(1.0 - rad.cos());          result.data[2][3] = 0.0;
         result.data[3][0] = 0.0;                                                result.data[3][1] = 0.0;                                                result.data[3][2] = 0.0;                                                result.data[3][3] = 1.0;
-        Some(result)
+        Ok(result)
     }
 
     pub fn perspective(close: f64, away: f64, fov_rad: f64) -> Matrix4 {
@@ -118,17 +119,18 @@ impl Matrix4 {
         result
     }
 
-    pub fn look_at<P>(target: &P, up: &P) -> Option<Matrix4> where
+    //@todo require normalized vectors in these functions
+    pub fn look_at<P>(target: &P, up: &P) -> Result<Matrix4> where
         P: IsBuildable3D { //@todo wont have to be an option once unitvector is defined whis is always l > 0 ( l == 1)
 
         let n = match target.clone().normalized() {
-          None => return None,
-          Some(x) => x
+          Err(x) => return Err(x),
+          Ok(x) => x
         };
         let u: Point3D;
         u = match up.clone().normalized() {
-          None => return None,
-          Some(x) => {
+          Err(x) => return Err(x),
+          Ok(x) => {
               let mut result = *Point3D::new(); //@todo can be dropped?
               result.from(*(cross(&*x, target)));
               result
@@ -141,7 +143,7 @@ impl Matrix4 {
         result.data[1][0] = v.x();  result.data[1][1] = v.y();  result.data[1][2] = v.z();  result.data[1][3] = 0.0;
         result.data[2][0] = n.x();  result.data[2][1] = n.y();  result.data[2][2] = n.z();  result.data[2][3] = 0.0;
         result.data[3][0] = 0.0;  result.data[3][1] = 0.0;  result.data[3][2] = 0.0;  result.data[3][3] = 1.0;
-        Some(result)
+        Ok(result)
     }
 
     pub fn multiply_m(&self, other: &Matrix4) -> Matrix4 {

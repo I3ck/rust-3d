@@ -18,6 +18,7 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 
+use result::*;
 use traits::is_nd::IsND;
 use traits::is_2d::Is2D;
 use traits::is_moveable_2d::IsMoveable2D;
@@ -67,11 +68,11 @@ impl IsND for Point2D {
         2
     }
 
-    fn get_position(&self, dimension: usize) -> Option<f64> {
+    fn get_position(&self, dimension: usize) -> Result<f64> {
         match dimension {
-            0 => Some(self.x),
-            1 => Some(self.y),
-            _ => None
+            0 => Ok(self.x),
+            1 => Ok(self.y),
+            _ => Err(ErrorKind::IncorrectDimension)
         }
     }
 }

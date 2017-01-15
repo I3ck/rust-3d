@@ -72,12 +72,12 @@ impl IsND for FilterSphere {
         3
     }
 
-    fn get_position(&self, dimension: usize) -> Option<f64> { //@todo here and for many others could be reworked to simply return get_position of center
+    fn get_position(&self, dimension: usize) -> Result<f64> { //@todo here and for many others could be reworked to simply return get_position of center
         match dimension {
-            0 => Some(self.center.x()),
-            1 => Some(self.center.y()),
-            2 => Some(self.center.z()),
-            _ => None
+            0 => Ok(self.center.x()),
+            1 => Ok(self.center.y()),
+            2 => Ok(self.center.z()),
+            _ => Err(ErrorKind::IncorrectDimension)
         }
     }
 }

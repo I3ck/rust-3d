@@ -13,10 +13,11 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use result::*;
 use traits::is_2d::Is2D;
 
 pub trait IsNormalized2D : Is2D {
-    fn new<P>(p: P) -> Option<Box<Self>> where
+    fn new<P>(p: P) -> Result<Box<Self>> where
         P: Is2D;
 
     fn norm_x() -> Self;

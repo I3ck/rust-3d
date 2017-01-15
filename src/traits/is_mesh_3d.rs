@@ -13,6 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use result::*;
 use traits::is_3d::Is3D;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_normalized_3d::IsNormalized3D;
@@ -26,16 +27,16 @@ pub trait IsMesh3D<P> where
 
     fn num_vertices(&self) -> usize;
 
-    fn face_vertex_ids(&self, faceid: usize) -> Option<(usize, usize, usize)>;
+    fn face_vertex_ids(&self, faceid: usize) -> Result<(usize, usize, usize)>;
 
-    fn face_vertices(&self, faceid: usize) -> Option<(P, P, P)>;
+    fn face_vertices(&self, faceid: usize) -> Result<(P, P, P)>;
 
-    fn vertex(&self, vertexid: usize) -> Option<P>;
+    fn vertex(&self, vertexid: usize) -> Result<P>;
 
-    fn face_normal(&self, faceid: usize) -> Option<Norm3D> {
+    fn face_normal(&self, faceid: usize) -> Result<Norm3D> {
         let (v1, v2, v3) = match self.face_vertices(faceid) {
-            None => return None,
-            Some((v1, v2, v3)) => (v1, v2, v3)
+            Err(x) => return Err(x),
+            Ok((v1, v2, v3)) => (v1, v2, v3)
         };
 
         let v12 = conn(&v1, &v2);
@@ -44,8 +45,8 @@ pub trait IsMesh3D<P> where
         let n = cross(&v12, &v23);
 
         match Norm3D::new(*n) {
-            None => None,
-            Some(b) => Some(*b)
+            Err(x) => Err(x),
+            Ok(b) => Ok(*b)
         }
     }
 }
