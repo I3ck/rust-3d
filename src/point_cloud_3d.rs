@@ -167,11 +167,11 @@ impl<P> HasBoundingBox3D for PointCloud3D<P> where
 impl<P> HasCenterOfGravity3D for PointCloud3D<P>
     where P: Is3D {
 
-    fn center_of_gravity(&self) -> Option<Point3D> {
+    fn center_of_gravity(&self) -> Result<Point3D> {
         let size = self.len();
 
         if size < 1 {
-            return None;
+            return Err(ErrorKind::TooFewPoints);
         }
 
         let sizef = size as f64;
@@ -186,7 +186,7 @@ impl<P> HasCenterOfGravity3D for PointCloud3D<P>
             sumz += p.z();
         }
 
-        return Some(*Point3D::build(
+        return Ok(*Point3D::build(
             (sumx / sizef),
             (sumy / sizef),
             (sumz / sizef)

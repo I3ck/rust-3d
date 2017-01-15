@@ -158,11 +158,11 @@ impl<P> HasBoundingBox2D for PointCloud2D<P>
 impl<P> HasCenterOfGravity2D for PointCloud2D<P>
     where P: Is2D {
 
-    fn center_of_gravity(&self) -> Option<Point2D> {
+    fn center_of_gravity(&self) -> Result<Point2D> {
         let size = self.len();
 
         if size < 1 {
-            return None;
+            return Err(ErrorKind::TooFewPoints);
         }
 
         let sizef = size as f64;
@@ -175,7 +175,7 @@ impl<P> HasCenterOfGravity2D for PointCloud2D<P>
             sumy += p.y();
         }
 
-        return Some(*Point2D::build(
+        return Ok(*Point2D::build(
             (sumx / sizef),
             (sumy / sizef)
         ))
