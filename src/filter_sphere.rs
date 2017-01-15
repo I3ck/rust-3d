@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
+use result::*;
 use traits::is_nd::IsND;
 use traits::is_3d::Is3D;
 use traits::is_buildable_3d::IsBuildable3D;
@@ -126,10 +127,10 @@ impl IsEditable3D for FilterSphere {
 }
 
 impl HasBoundingBox3D for FilterSphere {
-    fn bounding_box(&self) -> Option<(Point3D, Point3D)> {
+    fn bounding_box(&self) -> Result<(Point3D, Point3D)> {
         let p_min = *Point3D::build(self.center.x() - self.radius, self.center.y() - self.radius, self.center.z() - self.radius);
         let p_max = *Point3D::build(self.center.x() + self.radius, self.center.y() + self.radius, self.center.z() + self.radius);
-        return Some((p_min, p_max));
+        return Ok((p_min, p_max));
     }
 }
 

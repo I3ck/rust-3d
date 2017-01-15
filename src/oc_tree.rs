@@ -58,8 +58,8 @@ impl<P> IsTree3D<P> for OcTree<P> where
 
     fn build(&mut self, pc: PointCloud3D<P>) -> bool {
         match pc.bounding_box() {
-            None => false,
-            Some((min, max)) => {
+            Err(_) => false,
+            Ok((min, max)) => {
                 let mut unique_data = Vec::new();
                 let mut set = HashSet::new();
                 for p in pc.data {

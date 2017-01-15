@@ -43,8 +43,8 @@ impl<T> CompressedPointCloud3D<T> where
         P: Is3D {
 
         let (pmin, pmax) = match pc.bounding_box() {
-            None        => return None,
-            Some(res)   => res,
+            Err(_)      => return None,
+            Ok(res)     => res,
         };
 
         let rangex = (pmax.x - pmin.x).abs();

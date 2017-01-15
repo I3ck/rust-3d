@@ -17,6 +17,7 @@ use std::fmt;
 
 use std::cmp::Ordering;
 
+use result::*;
 use traits::is_3d::*;
 use traits::is_moveable_3d::*;
 use traits::is_buildable_3d::*;
@@ -138,9 +139,9 @@ impl<P> IsMoveable3D for PointCloud3D<P> where
 impl<P> HasBoundingBox3D for PointCloud3D<P> where
     P: Is3D {
 
-    fn bounding_box(&self) -> Option<(Point3D, Point3D)> {
+    fn bounding_box(&self) -> Result<(Point3D, Point3D)> {
         if self.len() < 2 {
-            return None;
+            return Err(ErrorKind::TooFewPoints);
         }
 
         let mut minx = self.data[0].x();
@@ -159,7 +160,7 @@ impl<P> HasBoundingBox3D for PointCloud3D<P> where
             if p.z() > maxz { maxz = p.z(); }
         }
 
-        return Some((Point3D{x: minx, y: miny, z: minz}, Point3D{x: maxx, y: maxy, z: maxz}));
+        return Ok((Point3D{x: minx, y: miny, z: minz}, Point3D{x: maxx, y: maxy, z: maxz}));
     }
 }
 

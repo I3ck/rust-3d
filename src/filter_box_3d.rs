@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
+use result::*;
 use traits::is_nd::IsND;
 use traits::is_3d::Is3D;
 use traits::is_buildable_3d::IsBuildable3D;
@@ -76,7 +77,7 @@ impl FilterBox3D {
     }
     pub fn from_bb(hbb: &HasBoundingBox3D) -> Option<Self> {
         match (hbb.center_bb(), hbb.size_x(), hbb.size_y(), hbb.size_z()) {
-            (Some(center), Some(sx), Some(sy), Some(sz)) => if sx > 0.0 && sy > 0.0 && sz > 0.0 {
+            (Ok(center), Ok(sx), Ok(sy), Ok(sz)) => if sx > 0.0 && sy > 0.0 && sz > 0.0 {
                     Some(Self::build(center, Positive::new(sx).unwrap(), Positive::new(sy).unwrap(), Positive::new(sz).unwrap()))
                 } else {
                     None
@@ -146,10 +147,10 @@ impl IsEditable3D for FilterBox3D {
 }
 
 impl HasBoundingBox3D for FilterBox3D {
-    fn bounding_box(&self) -> Option<(Point3D, Point3D)> {
+    fn bounding_box(&self) -> Result<(Point3D, Point3D)> {
         let p_min = *Point3D::build(self.center.x() - self.size_x / 2.0, self.center.y() - self.size_y / 2.0, self.center.z() - self.size_z / 2.0);
         let p_max = *Point3D::build(self.center.x() + self.size_x / 2.0, self.center.y() + self.size_y / 2.0, self.center.z() + self.size_z / 2.0);
-        return Some((p_min, p_max));
+        return Ok((p_min, p_max));
     }
 }
 

@@ -13,66 +13,66 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use result::*;
 use traits::is_3d::Is3D;
 use traits::is_buildable_3d::IsBuildable3D;
 use point_3d::Point3D;
 
 pub trait HasBoundingBox3D  {
-    fn bounding_box(&self) -> Option<(Point3D, Point3D)>;
+    fn bounding_box(&self) -> Result<(Point3D, Point3D)>;
 
-    fn min_pos(&self) -> Option<Point3D> {
+    fn min_pos(&self) -> Result<Point3D> {
         match self.bounding_box() {
-            None => None,
-            Some((min, _)) => Some(min)
+            Err(x) => Err(x),
+            Ok((min, _)) => Ok(min)
         }
     }
 
-    fn max_pos(&self) -> Option<Point3D> {
+    fn max_pos(&self) -> Result<Point3D> {
         match self.bounding_box() {
-            None => None,
-            Some((_, max)) => Some(max)
+            Err(x) => Err(x),
+            Ok((_, max)) => Ok(max)
         }
     }
 
-    fn size_x(&self) -> Option<f64> {
+    fn size_x(&self) -> Result<f64> {
         match self.bounding_box() {
-            None => None,
-            Some((min, max)) => Some((max.x() - min.x()).abs())
+            Err(x) => Err(x),
+            Ok((min, max)) => Ok((max.x() - min.x()).abs())
         }
     }
 
-    fn size_y(&self) -> Option<f64> {
+    fn size_y(&self) -> Result<f64> {
         match self.bounding_box() {
-            None => None,
-            Some((min, max)) => Some((max.y() - min.y()).abs())
+            Err(x) => Err(x),
+            Ok((min, max)) => Ok((max.y() - min.y()).abs())
         }
     }
 
-    fn size_z(&self) -> Option<f64> {
+    fn size_z(&self) -> Result<f64> {
         match self.bounding_box() {
-            None => None,
-            Some((min, max)) => Some((max.z() - min.z()).abs())
+            Err(x) => Err(x),
+            Ok((min, max)) => Ok((max.z() - min.z()).abs())
         }
     }
 
-    fn center_bb(&self) -> Option<Point3D> {
+    fn center_bb(&self) -> Result<Point3D> {
         match self.bounding_box() {
-            None => None,
-            Some((min, max)) => Some(*Point3D::build(min.x() + (max.x() - min.x()) / 2.0,
-                                                     min.y() + (max.y() - min.y()) / 2.0,
-                                                     min.z() + (max.z() - min.z()) / 2.0))
+            Err(x) => Err(x),
+            Ok((min, max)) => Ok(*Point3D::build(min.x() + (max.x() - min.x()) / 2.0,
+                                                 min.y() + (max.y() - min.y()) / 2.0,
+                                                 min.z() + (max.z() - min.z()) / 2.0))
         }
     }
 
-
-    fn is_inside<B>(&self, other: &B) -> Option<bool> where
+    fn is_inside<B>(&self, other: &B) -> Result<bool> where
         Self: Sized, B: HasBoundingBox3D {
 
-        if let (Some(bbthis), Some(bbother)) = (self.bounding_box(), other.bounding_box()) {
+        if let (Ok(bbthis), Ok(bbother)) = (self.bounding_box(), other.bounding_box()) {
             let (minthis, maxthis) = bbthis;
             let (minother, maxother) = bbother;
 
-            return Some(
+            return Ok(
                    minthis.x() > minother.x()
                 && minthis.y() > minother.y()
                 && minthis.z() > minother.z()
@@ -81,16 +81,16 @@ pub trait HasBoundingBox3D  {
                 && maxthis.z() < maxother.z()
             );
         }
-        None
+        Err(ErrorKind::BoundingBoxMissing)
     }
 
-    fn contains<P>(&self, other: &P) -> Option<bool> where
+    fn contains<P>(&self, other: &P) -> Result<bool> where
         Self: Sized, P: Is3D {
 
-        if let Some(bbthis) = self.bounding_box() {
+        if let Ok(bbthis) = self.bounding_box() {
             let (minthis, maxthis) = bbthis;
 
-            return Some(
+            return Ok(
                    other.x() > minthis.x()
                 && other.x() < maxthis.x()
                 && other.y() > minthis.y()
@@ -99,17 +99,17 @@ pub trait HasBoundingBox3D  {
                 && other.z() < maxthis.z()
             );
         }
-        None
+        Err(ErrorKind::BoundingBoxMissing)
     }
 
-    fn has_inside<B>(&self, other: &B) -> Option<bool> where
+    fn has_inside<B>(&self, other: &B) -> Result<bool> where
         Self: Sized, B: HasBoundingBox3D {
 
-        if let (Some(bbthis), Some(bbother)) = (self.bounding_box(), other.bounding_box()) {
+        if let (Ok(bbthis), Ok(bbother)) = (self.bounding_box(), other.bounding_box()) {
             let (minthis, maxthis) = bbthis;
             let (minother, maxother) = bbother;
 
-            return Some(
+            return Ok(
                    minthis.x() < minother.x()
                 && minthis.y() < minother.y()
                 && minthis.z() < minother.z()
@@ -118,13 +118,13 @@ pub trait HasBoundingBox3D  {
                 && maxthis.z() > maxother.z()
             );
         }
-        None
+        Err(ErrorKind::BoundingBoxMissing)
     }
 
-    fn collides_with<B>(&self, other: &B) -> Option<bool> where
+    fn collides_with<B>(&self, other: &B) -> Result<bool> where
         Self: Sized, B: HasBoundingBox3D {
 
-        if let (Some(bbthis), Some(bbother)) = (self.bounding_box(), other.bounding_box()) {
+        if let (Ok(bbthis), Ok(bbother)) = (self.bounding_box(), other.bounding_box()) {
             let (minthis, maxthis) = bbthis;
             let (minother, maxother) = bbother;
 
@@ -148,12 +148,12 @@ pub trait HasBoundingBox3D  {
                 (minother.y() + maxother.y() / 2.0),
                 (minother.z() + maxother.z() / 2.0));
 
-            return Some(
+            return Ok(
                    2.0 * xcenterthis - xcenterother < (xsizethis + xsizeother)
                 && 2.0 * ycenterthis - ycenterother < (ysizethis + ysizeother)
                 && 2.0 * zcenterthis - zcenterother < (zsizethis + zsizeother)
             );
         }
-        None
+        Err(ErrorKind::BoundingBoxMissing)
     }
 }
