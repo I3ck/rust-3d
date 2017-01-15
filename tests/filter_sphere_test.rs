@@ -24,7 +24,7 @@ use rust_3d::filter_sphere::*;
 #[test]
 fn filter_sphere_test() {
     let center = *Point3D::build(10.0, -5.0, 1.0);
-    let radius = Positive::build(3.0).unwrap();
+    let radius = Positive::new(3.0).unwrap();
     let filter = FilterSphere::build(center, radius);
 
     assert!( filter.is_allowed(&*Point3D::build(10.0, -5.0, 1.0)));

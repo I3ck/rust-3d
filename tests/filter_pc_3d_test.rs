@@ -28,9 +28,9 @@ use rust_3d::filter_pc_3d::*;
 #[test]
 fn filter_pc_3d_test() {
     let center = *Point3D::build(10.0, -5.0, 1.0);
-    let size_x = Positive::build(3.0).unwrap();
-    let size_y = Positive::build(5.0).unwrap();
-    let size_z = Positive::build(10.0).unwrap();
+    let size_x = Positive::new(3.0).unwrap();
+    let size_y = Positive::new(5.0).unwrap();
+    let size_z = Positive::new(10.0).unwrap();
     let filter = FilterBox3D::build(center, size_x, size_y, size_z);
 
     let mut pc = PointCloud3D::<Point3D>::new();

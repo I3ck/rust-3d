@@ -14,12 +14,30 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use std::result;
+use std::fmt;
 
 pub enum ErrorKind {
     MinMaxSwapped,
     MinMaxEqual,
     TooFewPoints,
     BoundingBoxMissing
+}
+
+impl ErrorKind {
+    fn as_str(&self) -> &'static str {
+        match *self {
+            ErrorKind::MinMaxSwapped      => "Passed min/max values are swapped (min > max)",
+            ErrorKind::MinMaxEqual        => "Passed min/max values are equal",
+            ErrorKind::TooFewPoints       => "Container had too few points for the operation",
+            ErrorKind::BoundingBoxMissing => "Bounding box is missing for the operation"
+        }
+    }
+}
+
+impl fmt::Debug for ErrorKind {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
 }
 
 pub type Result<T> = result::Result<T, ErrorKind>;

@@ -24,7 +24,7 @@ use rust_3d::filter_circle::*;
 #[test]
 fn filter_circle_test() {
     let center = *Point2D::build(10.0, -5.0);
-    let radius = Positive::build(3.0).unwrap();
+    let radius = Positive::new(3.0).unwrap();
     let filter = FilterCircle::build(center, radius);
 
     assert!( filter.is_allowed(&*Point2D::build(10.0, -5.0)));

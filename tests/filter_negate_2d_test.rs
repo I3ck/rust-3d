@@ -25,8 +25,8 @@ use rust_3d::filter_negate_2d::*;
 #[test]
 fn filter_negate_2d_test() { //same as box test, just negated
     let center = *Point2D::build(10.0, -5.0);
-    let size_x = Positive::build(3.0).unwrap();
-    let size_y = Positive::build(5.0).unwrap();
+    let size_x = Positive::new(3.0).unwrap();
+    let size_y = Positive::new(5.0).unwrap();
     let filter_box = FilterBox2D::build(center, size_x, size_y);
     let filter = FilterNegate2D::build(filter_box);
 
