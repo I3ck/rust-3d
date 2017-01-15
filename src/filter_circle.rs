@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
+use result::*;
 use traits::is_nd::IsND;
 use traits::is_2d::Is2D;
 use traits::is_buildable_2d::IsBuildable2D;
@@ -117,10 +118,10 @@ impl IsEditable2D for FilterCircle {
 }
 
 impl HasBoundingBox2D for FilterCircle {
-    fn bounding_box(&self) -> Option<(Point2D, Point2D)> {
+    fn bounding_box(&self) -> Result<(Point2D, Point2D)> {
         let p_min = *Point2D::build(self.center.x() - self.radius, self.center.y() - self.radius);
         let p_max = *Point2D::build(self.center.x() + self.radius, self.center.y() + self.radius);
-        return Some((p_min, p_max));
+        return Ok((p_min, p_max));
     }
 }
 

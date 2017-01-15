@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
+use result::*;
 use traits::is_nd::IsND;
 use traits::is_2d::Is2D;
 use traits::is_buildable_2d::IsBuildable2D;
@@ -71,7 +72,7 @@ impl FilterBox2D {
     }
     pub fn from_bb(hbb: &HasBoundingBox2D) -> Option<Self> {
         match (hbb.center_bb(), hbb.size_x(), hbb.size_y()) {
-            (Some(center), Some(sx), Some(sy)) => if sx > 0.0 && sy > 0.0 {
+            (Ok(center), Ok(sx), Ok(sy)) => if sx > 0.0 && sy > 0.0 {
                     Some(Self::build(center, Positive::new(sx).unwrap(), Positive::new(sy).unwrap()))
                 } else {
                     None
@@ -132,10 +133,10 @@ impl IsEditable2D for FilterBox2D {
 }
 
 impl HasBoundingBox2D for FilterBox2D {
-    fn bounding_box(&self) -> Option<(Point2D, Point2D)> {
+    fn bounding_box(&self) -> Result<(Point2D, Point2D)> {
         let p_min = *Point2D::build(self.center.x() - self.size_x / 2.0, self.center.y() - self.size_y / 2.0);
         let p_max = *Point2D::build(self.center.x() + self.size_x / 2.0, self.center.y() + self.size_y / 2.0);
-        return Some((p_min, p_max));
+        return Ok((p_min, p_max));
     }
 }
 

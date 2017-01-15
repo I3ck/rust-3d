@@ -49,3 +49,4 @@ pub mod positive;
 pub mod filter_negate_2d;
 pub mod filter_negate_3d;
 pub mod test_helper;
+pub mod result;

@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::fmt;
 use std::cmp::Ordering;
 
+use result::*;
 use traits::is_2d::*;
 use traits::is_moveable_2d::*;
 use traits::is_buildable_2d::*;
@@ -133,9 +134,9 @@ impl<P> IsMoveable2D for PointCloud2D<P> where
 impl<P> HasBoundingBox2D for PointCloud2D<P>
     where P: Is2D {
 
-    fn bounding_box(&self) -> Option<(Point2D, Point2D)> {
+    fn bounding_box(&self) -> Result<(Point2D, Point2D)> {
         if self.data.len() < 2 {
-            return None;
+            return Err(ErrorKind::TooFewPoints);
         }
 
         let mut minx = self.data[0].x();
@@ -150,7 +151,7 @@ impl<P> HasBoundingBox2D for PointCloud2D<P>
             if p.y() > maxy { maxy = p.y(); }
         }
 
-        return Some((Point2D{x: minx, y: miny}, Point2D{x: maxx, y: maxy}));
+        return Ok((Point2D{x: minx, y: miny}, Point2D{x: maxx, y: maxy}));
     }
 }
 
