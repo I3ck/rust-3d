@@ -103,7 +103,7 @@ impl IsBuildable3D for FilterSphere {
     }
 
     fn build(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(FilterSphere::build(*Point3D::build(x, y, z), Positive::build(1.0).unwrap()))
+        Box::new(FilterSphere::build(*Point3D::build(x, y, z), Positive::new(1.0).unwrap()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable3D {

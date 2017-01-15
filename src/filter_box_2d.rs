@@ -72,7 +72,7 @@ impl FilterBox2D {
     pub fn from_bb(hbb: &HasBoundingBox2D) -> Option<Self> {
         match (hbb.center_bb(), hbb.size_x(), hbb.size_y()) {
             (Some(center), Some(sx), Some(sy)) => if sx > 0.0 && sy > 0.0 {
-                    Some(Self::build(center, Positive::build(sx).unwrap(), Positive::build(sy).unwrap()))
+                    Some(Self::build(center, Positive::new(sx).unwrap(), Positive::new(sy).unwrap()))
                 } else {
                     None
                 },
@@ -113,7 +113,7 @@ impl IsBuildable2D for FilterBox2D {
     }
 
     fn build(x: f64, y: f64) -> Box<Self> {
-        Box::new(FilterBox2D::build(*Point2D::build(x, y), Positive::build(1.0).unwrap(), Positive::build(1.0).unwrap()))
+        Box::new(FilterBox2D::build(*Point2D::build(x, y), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable2D {

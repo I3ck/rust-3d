@@ -18,7 +18,7 @@ pub struct Positive {
 }
 
 impl Positive {
-    pub fn build(val: f64) -> Option<Positive> {
+    pub fn new(val: f64) -> Option<Positive> {
         if val > 0.0 {
             return Some(Positive {val: val});
         }

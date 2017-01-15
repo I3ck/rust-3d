@@ -98,7 +98,7 @@ impl IsBuildable2D for FilterCircle {
     }
 
     fn build(x: f64, y: f64) -> Box<Self> {
-        Box::new(FilterCircle::build(*Point2D::build(x, y), Positive::build(1.0).unwrap()))
+        Box::new(FilterCircle::build(*Point2D::build(x, y), Positive::new(1.0).unwrap()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable2D {

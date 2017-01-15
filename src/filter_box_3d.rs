@@ -77,7 +77,7 @@ impl FilterBox3D {
     pub fn from_bb(hbb: &HasBoundingBox3D) -> Option<Self> {
         match (hbb.center_bb(), hbb.size_x(), hbb.size_y(), hbb.size_z()) {
             (Some(center), Some(sx), Some(sy), Some(sz)) => if sx > 0.0 && sy > 0.0 && sz > 0.0 {
-                    Some(Self::build(center, Positive::build(sx).unwrap(), Positive::build(sy).unwrap(), Positive::build(sz).unwrap()))
+                    Some(Self::build(center, Positive::new(sx).unwrap(), Positive::new(sy).unwrap(), Positive::new(sz).unwrap()))
                 } else {
                     None
                 },
@@ -123,7 +123,7 @@ impl IsBuildable3D for FilterBox3D {
     }
 
     fn build(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(FilterBox3D::build(*Point3D::build(x, y, z), Positive::build(1.0).unwrap(), Positive::build(1.0).unwrap(), Positive::build(1.0).unwrap()))
+        Box::new(FilterBox3D::build(*Point3D::build(x, y, z), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable3D {
