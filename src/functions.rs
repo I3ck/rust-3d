@@ -51,10 +51,7 @@ pub fn dist<P,U>(p1: &P, p2: &U) -> Result<f64> where
     P: IsND,
     U: IsND {
 
-    match sqr_dist(p1,p2) { //@todo use proper chaining
-        Err(x) => Err(x),
-        Ok(x) => Ok(x.sqrt())
-    }
+    sqr_dist(p1,p2).map(|x| x.sqrt())
 }
 
 pub fn sqr_dist<P,U>(p1: &P, p2: &U) -> Result<f64> where

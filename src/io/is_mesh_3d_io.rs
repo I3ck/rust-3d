@@ -20,7 +20,7 @@ use traits::is_mesh_3d::IsMesh3D;
 use std::io::prelude::*;
 use std::fs::File;
 
-pub fn save_stl_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> bool where
+pub fn save_stl_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> bool where //@todo use Result
     P: IsBuildable3D { //@todo .stl cant have negative coordinates, therefore must be offset by BB (or show error)
 
     let mut f = match File::create(filepath) {

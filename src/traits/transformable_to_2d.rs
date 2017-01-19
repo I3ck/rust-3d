@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_3d::Is3D;
 
+//@todo rename to Is... (maybe other traits as well)
 pub trait TransFormableTo2D : Is3D {
     fn transform_to_2d<P>(&self) -> P where
         P: IsBuildable2D;

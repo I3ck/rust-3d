@@ -56,7 +56,7 @@ impl<P> IsTree3D<P> for OcTree<P> where
         self.collect(-1)
     }
 
-    fn build(&mut self, pc: PointCloud3D<P>) -> bool {
+    fn build(&mut self, pc: PointCloud3D<P>) -> bool { //@todo change to result
         match pc.bounding_box() {
             Err(_) => false,
             Ok((min, max)) => {
@@ -86,6 +86,6 @@ impl<P> IsOcTree<P> for OcTree<P> where
         if let Some(ref node) = self.root {
             node.collect(0, maxdepth, &mut result);
         }
-        return result;
+        result
     }
 }

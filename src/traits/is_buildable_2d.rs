@@ -39,11 +39,9 @@ pub trait IsBuildable2D :
     fn normalized(&self) -> Result<Box<Self>> {
         let l = self.abs();
         if l <= 0.0 {
-            Err(ErrorKind::NormalizeVecWithoutLength)
+            return Err(ErrorKind::NormalizeVecWithoutLength);
         }
-        else {
-            Ok(Self::build(self.x() / l, self.y() / l))
-        }
+        Ok(Self::build(self.x() / l, self.y() / l))
     }
 
     fn parse(text: String) -> Result<Box<Self>> {
@@ -51,16 +49,8 @@ pub trait IsBuildable2D :
         let words = split.collect::<Vec<&str>>();
         match words.len() {
             2 => {
-                let x : f64;
-                match f64::from_str(words[0]) {
-                    Err(_) => return Err(ErrorKind::ParseError),
-                    Ok(a) => x = a
-                };
-                let y : f64;
-                match f64::from_str(words[1]) {
-                    Err(_) => return Err(ErrorKind::ParseError),
-                    Ok(b) => y = b
-                };
+                let x = try!(f64::from_str(words[0]).map_err(|e| e.to_error_kind()));
+                let y = try!(f64::from_str(words[1]).map_err(|e| e.to_error_kind()));
                 Ok(Self::build(x,y))
             },
             _ => Err(ErrorKind::ParseError)

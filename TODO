@@ -46,3 +46,5 @@ trait for pointcloud?
 method to directly add points to pc via coordinates
 
 try to avoid dynamic traits
+
+also implement is_buildable_nd etc. and make is_buildable_2d also is_buildable_nd 

@@ -111,10 +111,7 @@ impl<P> PointCloud2D<P> where
 
         let mut pc = PointCloud2D::new();
         for line in lines {
-            match P::parse(String::from(line)) { //@todo must be templated too
-                Err(_) => {}
-                Ok(p) => pc.push(*p),
-            }
+            P::parse(String::from(line)).map(|p| pc.push(*p));
         }
         if pc.len() == 0 { return Err(ErrorKind::ParseError); }
         Ok(pc)
@@ -151,7 +148,7 @@ impl<P> HasBoundingBox2D for PointCloud2D<P>
             if p.y() > maxy { maxy = p.y(); }
         }
 
-        return Ok((Point2D{x: minx, y: miny}, Point2D{x: maxx, y: maxy}));
+        Ok((Point2D{x: minx, y: miny}, Point2D{x: maxx, y: maxy}))
     }
 }
 
@@ -175,7 +172,7 @@ impl<P> HasCenterOfGravity2D for PointCloud2D<P>
             sumy += p.y();
         }
 
-        return Ok(*Point2D::build(
+        Ok(*Point2D::build(
             (sumx / sizef),
             (sumy / sizef)
         ))
@@ -187,15 +184,9 @@ impl<P> fmt::Display for PointCloud2D<P> where
 
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {
-            match p.fmt(f) {
-                Ok(_) => (),
-                Err(err) => return Err(err)
-            }
-            match f.write_str("\n") {
-                Ok(_) => (),
-                Err(err) => return Err(err)
-            }
+            try!(p.fmt(f));
+            try!(f.write_str("\n"));
         }
-        return Ok(());
+        Ok(())
     }
 }

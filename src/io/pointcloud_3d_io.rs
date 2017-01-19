@@ -21,6 +21,7 @@ use std::io::prelude::*;
 use std::fs::File;
 
 //@todo better name for params
+//@todo use result
 //@todo "where" less specific?
 pub fn save_xyz<P>(pc: &PointCloud3D<P>, filepath: &str, delim_coord: &str, delim_pos: &str) -> bool where
     P: IsEditable3D + IsBuildable3D {

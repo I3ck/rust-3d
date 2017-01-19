@@ -43,20 +43,13 @@ impl<T> CompressedPointCloud3D<T> where
     pub fn compress<P>(pc: &PointCloud3D<P>) -> Result<CompressedPointCloud3D<T>> where
         P: Is3D {
 
-        let (pmin, pmax) = match pc.bounding_box() {
-            Err(x)      => return Err(x),
-            Ok(res)     => res,
-        };
+        let (pmin, pmax) = try!(pc.bounding_box());
 
         let rangex = (pmax.x - pmin.x).abs();
         let rangey = (pmax.y - pmin.y).abs();
         let rangez = (pmax.z - pmin.z).abs();
 
-        let maxval = match T::max_value().to_f64() {
-            None        => return Err(ErrorKind::NumberConversionError),
-            Some(res)   => res,
-        };
-
+        let maxval = try!(T::max_value().to_f64().ok_or(ErrorKind::NumberConversionError));
         let unitsizex = rangex / maxval;
         let unitsizey = rangey / maxval;
         let unitsizez = rangez / maxval;
@@ -68,20 +61,9 @@ impl<T> CompressedPointCloud3D<T> where
             let disty = p.y() - pmin.y;
             let distz = p.z() - pmin.z;
 
-            let unitsx = match T::from(distx / unitsizex) {
-                None        => return Err(ErrorKind::NumberConversionError),
-                Some(res)   => res
-            };
-
-            let unitsy = match T::from(disty / unitsizey) {
-                None        => return Err(ErrorKind::NumberConversionError),
-                Some(res)   => res
-            };
-
-            let unitsz = match T::from(distz / unitsizez) {
-                None        => return Err(ErrorKind::NumberConversionError),
-                Some(res)   => res
-            };
+            let unitsx = try!(T::from(distx / unitsizex).ok_or(ErrorKind::NumberConversionError));
+            let unitsy = try!(T::from(disty / unitsizey).ok_or(ErrorKind::NumberConversionError));
+            let unitsz = try!(T::from(distz / unitsizez).ok_or(ErrorKind::NumberConversionError));
 
             data.push(CompressedPoint3D{
                 unitsx: unitsx,
@@ -89,7 +71,7 @@ impl<T> CompressedPointCloud3D<T> where
                 unitsz: unitsz
             })
         }
-        return Ok(CompressedPointCloud3D::<T>{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data});
+        Ok(CompressedPointCloud3D::<T>{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data})
     }
 
 //------------------------------------------------------------------------------

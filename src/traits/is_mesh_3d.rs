@@ -34,19 +34,13 @@ pub trait IsMesh3D<P> where
     fn vertex(&self, vertexid: usize) -> Result<P>;
 
     fn face_normal(&self, faceid: usize) -> Result<Norm3D> {
-        let (v1, v2, v3) = match self.face_vertices(faceid) {
-            Err(x) => return Err(x),
-            Ok((v1, v2, v3)) => (v1, v2, v3)
-        };
+        let (v1, v2, v3) = try!(self.face_vertices(faceid));
 
         let v12 = conn(&v1, &v2);
         let v23 = conn(&v2, &v3);
 
         let n = cross(&v12, &v23);
 
-        match Norm3D::new(*n) {
-            Err(x) => Err(x),
-            Ok(b) => Ok(*b)
-        }
+        Norm3D::new(*n).and_then(|x| Ok(*x))
     }
 }

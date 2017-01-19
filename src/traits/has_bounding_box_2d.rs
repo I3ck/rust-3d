@@ -22,39 +22,29 @@ pub trait HasBoundingBox2D {
     fn bounding_box(&self) -> Result<(Point2D, Point2D)>;
 
     fn min_pos(&self) -> Result<Point2D> {
-        match self.bounding_box() {
-            Err(x) => Err(x),
-            Ok((min, _)) => Ok(min)
-        }
+        let (min,_) = try!(self.bounding_box());
+        Ok(min)
     }
 
     fn max_pos(&self) -> Result<Point2D> {
-        match self.bounding_box() {
-            Err(x) => Err(x),
-            Ok((_, max)) => Ok(max)
-        }
+        let (_,max) = try!(self.bounding_box());
+        Ok(max)
     }
 
     fn size_x(&self) -> Result<f64> { //@todo change signature to return a Positive
-        match self.bounding_box() {
-            Err(x) => Err(x),
-            Ok((min, max)) => Ok((max.x() - min.x()).abs())
-        }
+        let (min, max) = try!(self.bounding_box());
+        Ok((max.x() - min.x()).abs())
     }
 
     fn size_y(&self) -> Result<f64> {
-        match self.bounding_box() {
-            Err(x) => Err(x),
-            Ok((min, max)) => Ok((max.y() - min.y()).abs())
-        }
+        let (min, max) = try!(self.bounding_box());
+        Ok((max.y() - min.y()).abs())
     }
 
     fn center_bb(&self) -> Result<Point2D> {
-        match self.bounding_box() {
-            Err(x) => Err(x),
-            Ok((min, max)) => Ok(*Point2D::build(min.x() + (max.x() - min.x()) / 2.0,
-                                                 min.y() + (max.y() - min.y()) / 2.0))
-        }
+        let (min, max) = try!(self.bounding_box());
+        Ok(*Point2D::build(min.x() + (max.x() - min.x()) / 2.0,
+                           min.y() + (max.y() - min.y()) / 2.0))
     }
 
     fn is_inside<B>(&self, other: &B) -> Result<bool> where

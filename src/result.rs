@@ -15,6 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::result;
 use std::fmt;
+use std::num::ParseFloatError;
 
 pub enum ErrorKind {
     MinMaxSwapped,
@@ -61,3 +62,13 @@ impl fmt::Debug for ErrorKind {
 }
 
 pub type Result<T> = result::Result<T, ErrorKind>;
+
+pub trait ToErrorKind {
+    fn to_error_kind(&self) -> ErrorKind;
+}
+
+impl ToErrorKind for ParseFloatError {
+    fn to_error_kind(&self) -> ErrorKind {
+        ErrorKind::ParseError //@todo use new float conversion error instead?
+    }
+}

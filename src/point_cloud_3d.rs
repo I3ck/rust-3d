@@ -116,10 +116,7 @@ impl<P> PointCloud3D<P> where
 
         let mut pc = PointCloud3D::new();
         for line in lines {
-            match P::parse(String::from(line)) { //@todo must be templated too
-                Err(_) => {} //@todo maybe make entire parsing fail
-                Ok(p) => pc.push(*p),
-            }
+            P::parse(String::from(line)).map(|p| pc.push(*p));
         }
         if pc.len() == 0 { return Err(ErrorKind::ParseError); }
         Ok(pc)
@@ -160,7 +157,7 @@ impl<P> HasBoundingBox3D for PointCloud3D<P> where
             if p.z() > maxz { maxz = p.z(); }
         }
 
-        return Ok((Point3D{x: minx, y: miny, z: minz}, Point3D{x: maxx, y: maxy, z: maxz}));
+        Ok((Point3D{x: minx, y: miny, z: minz}, Point3D{x: maxx, y: maxy, z: maxz}))
     }
 }
 
@@ -186,7 +183,7 @@ impl<P> HasCenterOfGravity3D for PointCloud3D<P>
             sumz += p.z();
         }
 
-        return Ok(*Point3D::build(
+        Ok(*Point3D::build(
             (sumx / sizef),
             (sumy / sizef),
             (sumz / sizef)
@@ -199,15 +196,9 @@ impl<P> fmt::Display for PointCloud3D<P> where
 
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {
-            match p.fmt(f) {
-                Ok(_) => (),
-                Err(err) => return Err(err)
-            }
-            match f.write_str("\n") {
-                Ok(_) => (),
-                Err(err) => return Err(err)
-            }
+            try!(p.fmt(f));
+            try!(f.write_str("\n"));
         }
-        return Ok(());
+        Ok(())
     }
 }
