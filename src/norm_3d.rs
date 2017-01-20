@@ -21,6 +21,7 @@ use point_3d::Point3D;
 use traits::is_nd::IsND;
 use traits::is_3d::Is3D;
 use traits::is_normalized_3d::IsNormalized3D;
+use traits::is_buildable_nd::IsBuildableND;
 use traits::is_buildable_3d::IsBuildable3D;
 use functions::{sqr_dist_3d};
 
@@ -59,7 +60,7 @@ impl Clone for Norm3D {
 }
 
 impl IsND for Norm3D {
-    fn n_dimensions(&self) -> usize {
+    fn n_dimensions() -> usize {
         3
     }
 

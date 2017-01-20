@@ -21,6 +21,7 @@ use result::*;
 use point_cloud_3d::{PointCloud3D};
 use functions::{dist_3d, sqr_dist_3d, dimension_compare, dimension_dist, sort_and_limit};
 use traits::is_3d::Is3D;
+use traits::is_buildable_nd::IsBuildableND;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_3d::IsEditable3D;
 use traits::is_tree_3d::IsTree3D;
@@ -42,7 +43,7 @@ pub struct KdNode<P> where
 }
 
 impl<P> IsTree3D<P> for KdTree<P> where
-    P: IsBuildable3D + Clone {
+    P: IsBuildableND + IsBuildable3D + Clone {
 
     fn new() -> KdTree<P> {
         KdTree { root: None }
@@ -75,7 +76,7 @@ impl<P> IsTree3D<P> for KdTree<P> where
 }
 
 impl<P> IsKdTree3D<P> for KdTree<P> where
-    P: IsEditable3D + IsBuildable3D + Clone {
+    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
 
     fn knearest(&self, search: &P, n: usize) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();
@@ -117,7 +118,7 @@ impl<P> IsKdTree3D<P> for KdTree<P> where
 }
 
 impl<P> KdNode<P> where
-    P: IsBuildable3D + Clone {
+    P: IsBuildableND + IsBuildable3D + Clone {
 
     pub fn new(dim: i8, mut pc: Vec<Box<P>>) -> KdNode<P> {
         let dimension = dim % 2;

@@ -20,6 +20,7 @@ use std::hash::{Hash};
 
 use result::*;
 use traits::is_3d::Is3D;
+use traits::is_buildable_nd::IsBuildableND;
 use matrix4::Matrix4;
 
 pub trait IsBuildable3D :
@@ -29,8 +30,6 @@ pub trait IsBuildable3D :
     Ord +
     PartialOrd +
     Hash {
-
-    fn new() -> Box<Self>;
 
     fn build(x: f64, y: f64, z: f64) -> Box<Self>;
 

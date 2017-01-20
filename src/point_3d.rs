@@ -21,8 +21,10 @@ use result::*;
 use traits::is_nd::IsND;
 use traits::is_3d::Is3D;
 use traits::is_moveable_3d::IsMoveable3D;
+use traits::is_buildable_nd::IsBuildableND;
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_buildable_3d::IsBuildable3D;
+use traits::is_editable_nd::IsEditableND;
 use traits::is_editable_3d::IsEditable3D;
 use traits::transformable_to_2d::TransFormableTo2D;
 use functions::{sqr_dist_3d};
@@ -66,7 +68,7 @@ impl IsMoveable3D for Point3D {
 }
 
 impl IsND for Point3D {
-    fn n_dimensions(&self) -> usize {
+    fn n_dimensions() -> usize {
         3
     }
 
@@ -94,11 +96,33 @@ impl Is3D for Point3D {
     }
 }
 
-impl IsBuildable3D for Point3D {
+impl IsBuildableND for Point3D {
     fn new() -> Box<Self> {
         Box::new(Point3D{x: 0.0, y: 0.0, z: 0.0})
     }
 
+    fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
+        if coords.len() != 3 {
+            return Err(ErrorKind::DimensionsDontMatch);
+        }
+        Ok(Box::new(Point3D{x: coords[0], y: coords[1], z: coords[2]}))
+    }
+
+    fn from_nd<P>(&mut self, other: P) -> Result<()> where
+        P: IsBuildableND {
+
+        if P::n_dimensions() != 3 {
+            return Err(ErrorKind::DimensionsDontMatch);
+        }
+
+        self.x = try!(other.get_position(0));
+        self.y = try!(other.get_position(1));
+        self.z = try!(other.get_position(2));
+        Ok(())
+    }
+}
+
+impl IsBuildable3D for Point3D {
     fn build(x: f64, y: f64, z: f64) -> Box<Self> {
         Box::new(Point3D{x: x, y: y, z: z})
     }
@@ -107,6 +131,18 @@ impl IsBuildable3D for Point3D {
         self.x = other.x();
         self.y = other.y();
         self.z = other.z();
+    }
+}
+
+impl IsEditableND for Point3D {
+    fn set_position(&mut self, dimension: usize, val: f64) -> Result<()> {
+        match dimension {
+            0 => self.x = val,
+            1 => self.y = val,
+            2 => self.z = val,
+            _ => return Err(ErrorKind::DimensionsDontMatch),
+        }
+        Ok(())
     }
 }
 

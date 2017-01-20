@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Martin Buck
+Copyright 2017 Martin Buck
 This file is part of rust-3d.
 rust-3d is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -14,9 +14,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use result::*;
+use traits::is_nd::IsND;
 
-//@todo description
-pub trait IsND {
-    fn n_dimensions() -> usize where Self: Sized;
-    fn get_position(&self, dimension: usize) -> Result<f64>; //@todo rename
+pub trait IsEditableND : IsND {
+    fn set_position(&mut self, dimension: usize, val: f64) -> Result<()>; //@todo rename
 }

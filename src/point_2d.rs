@@ -22,7 +22,9 @@ use result::*;
 use traits::is_nd::IsND;
 use traits::is_2d::Is2D;
 use traits::is_moveable_2d::IsMoveable2D;
+use traits::is_buildable_nd::IsBuildableND;
 use traits::is_buildable_2d::IsBuildable2D;
+use traits::is_editable_nd::IsEditableND;
 use traits::is_editable_2d::IsEditable2D;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::transformable_to_3d::TransFormableTo3D;
@@ -64,7 +66,7 @@ impl IsMoveable2D for Point2D {
 }
 
 impl IsND for Point2D {
-    fn n_dimensions(&self) -> usize {
+    fn n_dimensions() -> usize {
         2
     }
 
@@ -87,11 +89,32 @@ impl Is2D for Point2D {
     }
 }
 
-impl IsBuildable2D for Point2D {
+impl IsBuildableND for Point2D {
     fn new() -> Box<Self> {
         Box::new(Point2D{x: 0.0, y: 0.0})
     }
 
+    fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
+        if coords.len() != 2 {
+            return Err(ErrorKind::DimensionsDontMatch);
+        }
+        Ok(Box::new(Point2D{x: coords[0], y: coords[1]}))
+    }
+
+    fn from_nd<P>(&mut self, other: P) -> Result<()> where
+        P: IsBuildableND {
+
+        if P::n_dimensions() != 2 {
+            return Err(ErrorKind::DimensionsDontMatch);
+        }
+
+        self.x = try!(other.get_position(0));
+        self.y = try!(other.get_position(1));
+        Ok(())
+    }
+}
+
+impl IsBuildable2D for Point2D {
     fn build(x: f64, y: f64) -> Box<Self> {
         Box::new(Point2D{x: x, y: y})
     }
@@ -99,6 +122,17 @@ impl IsBuildable2D for Point2D {
     fn from<P>(&mut self, other: P) where P: IsBuildable2D {
         self.x = other.x();
         self.y = other.y();
+    }
+}
+
+impl IsEditableND for Point2D {
+    fn set_position(&mut self, dimension: usize, val: f64) -> Result<()> {
+        match dimension {
+            0 => self.x = val,
+            1 => self.y = val,
+            _ => return Err(ErrorKind::DimensionsDontMatch),
+        }
+        Ok(())
     }
 }
 

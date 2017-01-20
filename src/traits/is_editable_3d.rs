@@ -14,8 +14,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use traits::is_3d::Is3D;
+use traits::is_editable_nd::IsEditableND;
 
-pub trait IsEditable3D : Is3D {
+pub trait IsEditable3D : Is3D + IsEditableND {
     fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable3D? Or remove moveable trait
 
     fn set_y(&mut self, val: f64);

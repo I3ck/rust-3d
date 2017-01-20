@@ -19,7 +19,9 @@ use std::hash::{Hash, Hasher};
 use result::*;
 use traits::is_nd::IsND;
 use traits::is_2d::Is2D;
+use traits::is_buildable_nd::IsBuildableND;
 use traits::is_buildable_2d::IsBuildable2D;
+use traits::is_editable_nd::IsEditableND;
 use traits::is_editable_2d::IsEditable2D;
 use traits::has_bounding_box_2d::HasBoundingBox2D;
 use traits::is_filter_2d::IsFilter2D;
@@ -84,7 +86,7 @@ impl FilterBox2D {
 }
 
 impl IsND for FilterBox2D {
-    fn n_dimensions(&self) -> usize {
+    fn n_dimensions() -> usize {
         2
     }
 
@@ -107,19 +109,51 @@ impl Is2D for FilterBox2D {
     }
 }
 
-//@todo drop this impl once not required anymore for editable?
-//@todo or always set sizes to 1
-impl IsBuildable2D for FilterBox2D {
+impl IsBuildableND for FilterBox2D {
     fn new() -> Box<Self> {
         Box::new(FilterBox2D::new())
     }
 
+    fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
+        if coords.len() != 2 {
+            return Err(ErrorKind::DimensionsDontMatch);
+        }
+        Ok(Box::new(FilterBox2D::build(*Point2D::build(coords[0], coords[1]), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap())))
+    }
+
+    fn from_nd<P>(&mut self, other: P) -> Result<()> where
+        P: IsBuildableND {
+
+        if other.n_dimensions() != 2 {
+            return Err(ErrorKind::DimensionsDontMatch);
+        }
+
+        self.center.set_x(try!(other.get_position(0)));
+        self.center.set_y(try!(other.get_position(1)));
+        Ok()
+    }
+}
+
+//@todo drop this impl once not required anymore for editable?
+//@todo or always set sizes to 1
+impl IsBuildable2D for FilterBox2D {
     fn build(x: f64, y: f64) -> Box<Self> {
         Box::new(FilterBox2D::build(*Point2D::build(x, y), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable2D {
         self.center.from(other)
+    }
+}
+
+impl IsEditableND for FilterBox2D {
+    fn set_position(&mut self, dimension: usize, val: f64) -> Result<()> {
+        match dimension {
+            0 => self.center.set_x(val),
+            1 => self.center.set_y(val),
+            _ => return Err(ErrorKind::DimensionsDontMatch),
+        }
+        Ok()
     }
 }
 

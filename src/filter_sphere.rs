@@ -19,7 +19,9 @@ use std::hash::{Hash, Hasher};
 use result::*;
 use traits::is_nd::IsND;
 use traits::is_3d::Is3D;
+use traits::is_buildable_nd::IsBuildableND;
 use traits::is_buildable_3d::IsBuildable3D;
+use traits::is_editable_nd::IsEditableND;
 use traits::is_editable_3d::IsEditable3D;
 use traits::has_bounding_box_3d::HasBoundingBox3D;
 use traits::is_filter_3d::IsFilter3D;
@@ -68,7 +70,7 @@ impl FilterSphere {
 }
 
 impl IsND for FilterSphere {
-    fn n_dimensions(&self) -> usize {
+    fn n_dimensions() -> usize {
         3
     }
 
@@ -96,19 +98,53 @@ impl Is3D for FilterSphere {
     }
 }
 
-//@todo drop this impl once not required anymore for editable?
-//@todo or always set sizes to 1
-impl IsBuildable3D for FilterSphere {
+impl IsBuildableND for FilterSphere {
     fn new() -> Box<Self> {
         Box::new(FilterSphere::new())
     }
 
+    fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
+        if coords.len() != 3 {
+            return Err(ErrorKind::DimensionsDontMatch);
+        }
+        Ok(Box::new(FilterSphere::build(*Point3D::build(coords[0], coords[1], coords[2]), Positive::new(1.0).unwrap())))
+    }
+
+    fn from_nd<P>(&mut self, other: P) -> Result<()> where
+        P: IsBuildableND {
+
+        if other.n_dimensions() != 3 {
+            return Err(ErrorKind::DimensionsDontMatch);
+        }
+
+        self.center.set_x(try!(other.get_position(0)));
+        self.center.set_y(try!(other.get_position(1)));
+        self.center.set_z(try!(other.get_position(2)));
+        Ok()
+    }
+}
+
+//@todo drop this impl once not required anymore for editable?
+//@todo or always set sizes to 1
+impl IsBuildable3D for FilterSphere {
     fn build(x: f64, y: f64, z: f64) -> Box<Self> {
         Box::new(FilterSphere::build(*Point3D::build(x, y, z), Positive::new(1.0).unwrap()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable3D {
         self.center.from(other)
+    }
+}
+
+impl IsEditableND for FilterSphere {
+    fn set_position(&mut self, dimension: usize, val: f64) -> Result<()> {
+        match dimension {
+            0 => self.center.set_x(val),
+            1 => self.center.set_y(val),
+            2 => self.center.set_z(val),
+            _ => return Err(ErrorKind::DimensionsDontMatch),
+        }
+        Ok()
     }
 }
 

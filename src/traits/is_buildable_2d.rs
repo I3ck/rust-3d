@@ -20,16 +20,17 @@ use self::core::str::FromStr;
 
 use result::*;
 use traits::is_2d::Is2D;
+use traits::is_buildable_nd::IsBuildableND;
+use traits::is_nd::IsND;
 
 pub trait IsBuildable2D :
     Is2D +
+    IsBuildableND +
     Eq +
     PartialEq +
     Ord +
     PartialOrd +
     Hash {
-
-    fn new() -> Box<Self>;
 
     fn build(x: f64, y: f64) -> Box<Self>; //@todo rename both here and in 3d, also possibly rename the trait
 

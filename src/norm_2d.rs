@@ -21,6 +21,7 @@ use point_2d::Point2D;
 use traits::is_nd::IsND;
 use traits::is_2d::Is2D;
 use traits::is_normalized_2d::IsNormalized2D;
+use traits::is_buildable_nd::IsBuildableND;
 use traits::is_buildable_2d::IsBuildable2D;
 use functions::{sqr_dist_2d};
 
@@ -56,7 +57,7 @@ impl Clone for Norm2D {
 }
 
 impl IsND for Norm2D {
-    fn n_dimensions(&self) -> usize {
+    fn n_dimensions() -> usize {
         2
     }
 

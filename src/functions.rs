@@ -25,6 +25,7 @@ use view::View;
 use traits::is_nd::IsND;
 use traits::is_2d::Is2D;
 use traits::is_3d::Is3D;
+use traits::is_buildable_nd::IsBuildableND;
 use traits::is_buildable_2d::IsBuildable2D;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_2d::IsEditable2D;
@@ -58,12 +59,12 @@ pub fn sqr_dist<P,U>(p1: &P, p2: &U) -> Result<f64> where
     P: IsND,
     U: IsND {
 
-    if p1.n_dimensions() != p2.n_dimensions() {
+    if P::n_dimensions() != U::n_dimensions() {
         return Err(ErrorKind::DimensionsDontMatch);
     }
 
     let mut result : f64 = 0.0;
-    for i in 0..p1.n_dimensions() {
+    for i in 0..P::n_dimensions() {
         if let (Ok(val1), Ok(val2)) = (p1.get_position(i), p2.get_position(i)) {
             result += (val1 - val2).powi(2);
         } else {
