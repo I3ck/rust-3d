@@ -84,12 +84,33 @@ pub fn cross<P,U>(first: &P, other: &U) -> Box<U> where //@todo try to implement
     U::build(x, y, z)
 }
 
+pub fn dist_nd<P, U>(p1: &Is2D, p2: &Is2D) -> f64 where
+    P: IsND,
+    U: IsND {
+
+    sqr_dist_nd(p1,p2).sqrt()
+}
+
 pub fn dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
     sqr_dist_2d(p1,p2).sqrt()
 }
 
 pub fn dist_3d(p1: &Is3D, p2: &Is3D) -> f64 {
     sqr_dist_3d(p1,p2).sqrt()
+}
+
+pub fn sqr_dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where
+    P: IsND,
+    U: IsND {
+
+    if P::n_dimensions() != U::n_dimensions() {
+        return Err(ErrorKind::DimensionsDontMatch);
+    }
+    let mut result : f64 = 0.0;
+    for i in 0..P::n_dimensions() {
+        result += (try!(p1.get_position(i)) - try!(p2.get_position(i))).powi(2);
+    }
+    Ok(result)
 }
 
 pub fn sqr_dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
