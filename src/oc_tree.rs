@@ -20,6 +20,7 @@ use std::iter::IntoIterator;
 
 use point_cloud_3d::{PointCloud3D};
 use oc_node::{OcNode};
+use traits::is_buildable_nd::IsBuildableND;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_3d::IsEditable3D;
 use traits::has_bounding_box_3d::HasBoundingBox3D;
@@ -35,7 +36,7 @@ pub struct OcTree<P> where
 }
 
 impl<P> IsTree3D<P> for OcTree<P> where
-    P: IsEditable3D + IsBuildable3D + Clone {
+    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
 
     fn new() -> OcTree<P> {
         OcTree {
@@ -78,7 +79,7 @@ impl<P> IsTree3D<P> for OcTree<P> where
 }
 
 impl<P> IsOcTree<P> for OcTree<P> where
-    P: IsEditable3D + IsBuildable3D + Clone {
+    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
 
     //@todo rewrite or make new method which returns cog instead of stopping recursion
     fn collect(&self,  maxdepth: i8) -> PointCloud3D<P> {

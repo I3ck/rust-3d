@@ -124,13 +124,13 @@ impl IsBuildableND for FilterBox2D {
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
         P: IsBuildableND {
 
-        if other.n_dimensions() != 2 {
+        if P::n_dimensions() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
 
         self.center.set_x(try!(other.get_position(0)));
         self.center.set_y(try!(other.get_position(1)));
-        Ok()
+        Ok(())
     }
 }
 
@@ -153,7 +153,7 @@ impl IsEditableND for FilterBox2D {
             1 => self.center.set_y(val),
             _ => return Err(ErrorKind::DimensionsDontMatch),
         }
-        Ok()
+        Ok(())
     }
 }
 

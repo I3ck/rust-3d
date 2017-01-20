@@ -127,20 +127,20 @@ impl IsBuildableND for FilterBox3D {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterBox3D::build(*Point3D::build(coords[0], coords[1], coords[2]), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap())))
+        Ok(Box::new(FilterBox3D::build(*Point3D::build(coords[0], coords[1], coords[2]), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap())))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
         P: IsBuildableND {
 
-        if other.n_dimensions() != 3 {
+        if P::n_dimensions() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
 
         self.center.set_x(try!(other.get_position(0)));
         self.center.set_y(try!(other.get_position(1)));
         self.center.set_z(try!(other.get_position(2)));
-        Ok()
+        Ok(())
     }
 }
 
@@ -164,7 +164,7 @@ impl IsEditableND for FilterBox3D {
             2 => self.center.set_z(val),
             _ => return Err(ErrorKind::DimensionsDontMatch),
         }
-        Ok()
+        Ok(())
     }
 }
 

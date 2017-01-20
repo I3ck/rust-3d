@@ -15,6 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //@todo clean up similar to pc code
 
+use traits::is_buildable_nd::IsBuildableND;
 use traits::is_buildable_3d::IsBuildable3D;
 use traits::is_editable_3d::IsEditable3D;
 use traits::has_center_of_gravity_3d::*;
@@ -55,7 +56,7 @@ pub enum Direction { //@todo rename //@todo private?
 
 //@todo define somewhere else
 fn collect_center_or_all<P>(n: &OcNode<P>, only_collect_centers: bool, depth: i8, maxdepth: i8, mut pc: &mut PointCloud3D<P>) where
-    P: IsEditable3D + IsBuildable3D + Clone {
+    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
 
     if only_collect_centers {
         let mut sub_pc = PointCloud3D::new();
@@ -72,7 +73,7 @@ fn collect_center_or_all<P>(n: &OcNode<P>, only_collect_centers: bool, depth: i8
 
 ///@todo define somewhere else
 fn build_subnode<P>(pc: Vec<P>,bb: (P, P)) -> Option<Box<OcNode<P>>> where
-    P: IsEditable3D + IsBuildable3D + Clone {
+    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
 
     match pc.len() {
         0 => None,
@@ -85,7 +86,7 @@ fn build_subnode<P>(pc: Vec<P>,bb: (P, P)) -> Option<Box<OcNode<P>>> where
 
 
 impl<P> OcNode<P> where
-    P: IsEditable3D + IsBuildable3D + Clone {
+    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
 
     pub fn new(min: &P, max: &P, pc: Vec<P>) -> OcNode<P> {
         if pc.len() == 1 { return OcNode::Leaf(pc[0].clone()); };
