@@ -84,11 +84,11 @@ pub fn cross<P,U>(first: &P, other: &U) -> Box<U> where //@todo try to implement
     U::build(x, y, z)
 }
 
-pub fn dist_nd<P, U>(p1: &Is2D, p2: &Is2D) -> f64 where
+pub fn dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where
     P: IsND,
     U: IsND {
 
-    sqr_dist_nd(p1,p2).sqrt()
+    sqr_dist_nd(p1,p2).map(|x| x.sqrt())
 }
 
 pub fn dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
