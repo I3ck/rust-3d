@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 extern crate rust_3d;
 
 use rust_3d::traits::is_3d::*;
+use rust_3d::traits::is_buildable_nd::*;
 use rust_3d::traits::is_buildable_3d::*;
 use rust_3d::traits::is_editable_3d::*;
 use rust_3d::traits::is_moveable_3d::*;
