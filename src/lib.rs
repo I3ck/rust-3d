@@ -23,6 +23,8 @@ pub mod point_cloud_2d;
 pub mod point_cloud_3d;
 pub mod norm_2d;
 pub mod norm_3d;
+pub mod bounding_box_2d;
+pub mod bounding_box_3d;
 pub mod matrix4;
 pub mod matrix4_pipe;
 pub mod compressed_point_3d;
