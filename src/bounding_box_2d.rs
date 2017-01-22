@@ -18,7 +18,7 @@ use point_2d::*;
 use traits::is_2d::*;
 use traits::has_bounding_box_2d::*;
 
-struct BoundingBox2D {
+pub struct BoundingBox2D {
     pub min: Point2D,
     pub max: Point2D
 }
@@ -27,9 +27,9 @@ impl BoundingBox2D {
     pub fn new(min: Point2D, max: Point2D) -> BoundingBox2D { //@todo return result and check for correctness within min max, or fix it //@todo also offer other constructor with concrete values (or build from Is2D)
         BoundingBox2D{min: min, max: max}
     }
-    pub fn from_iterator<It2D,P>(source: It2D) -> Result<BoundingBox2D> where //@todo make trait?
-        It2D: Iterator<Item=P>,
-        P: Is2D + Sized {
+    pub fn from_iterator<'a, It2D,P>(source: It2D) -> Result<BoundingBox2D> where
+        It2D: IntoIterator<Item=&'a Box<P>>,
+        P: 'a + Is2D + Sized {
 
         let mut count = 0;
 

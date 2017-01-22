@@ -24,6 +24,7 @@ use traits::is_editable_2d::*;
 use traits::has_bounding_box_2d::*;
 use traits::has_center_of_gravity_2d::*;
 use point_2d::*;
+use bounding_box_2d::*;
 use functions::dist_2d;
 
 pub struct PointCloud2D<P> where
@@ -132,23 +133,8 @@ impl<P> HasBoundingBox2D for PointCloud2D<P>
     where P: Is2D {
 
     fn bounding_box(&self) -> Result<(Point2D, Point2D)> {
-        if self.data.len() < 2 {
-            return Err(ErrorKind::TooFewPoints);
-        }
-
-        let mut minx = self.data[0].x();
-        let mut miny = self.data[0].y();
-        let mut maxx = self.data[0].x();
-        let mut maxy = self.data[0].y();
-
-        for p in &self.data {
-            if p.x() < minx { minx = p.x(); }
-            if p.y() < miny { miny = p.y(); }
-            if p.x() > maxx { maxx = p.x(); }
-            if p.y() > maxy { maxy = p.y(); }
-        }
-
-        Ok((Point2D{x: minx, y: miny}, Point2D{x: maxx, y: maxy}))
+        let bb = try!(BoundingBox2D::from_iterator(&self.data));
+        bb.bounding_box()
     }
 }
 

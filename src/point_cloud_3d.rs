@@ -25,6 +25,7 @@ use traits::is_editable_3d::*;
 use traits::has_bounding_box_3d::*;
 use traits::has_center_of_gravity_3d::*;
 use point_3d::{Point3D};
+use bounding_box_3d::*;
 use functions::dist_3d;
 
 pub struct PointCloud3D<P> where
@@ -137,27 +138,8 @@ impl<P> HasBoundingBox3D for PointCloud3D<P> where
     P: Is3D {
 
     fn bounding_box(&self) -> Result<(Point3D, Point3D)> {
-        if self.len() < 2 {
-            return Err(ErrorKind::TooFewPoints);
-        }
-
-        let mut minx = self.data[0].x();
-        let mut miny = self.data[0].y();
-        let mut minz = self.data[0].z();
-        let mut maxx = self.data[0].x();
-        let mut maxy = self.data[0].y();
-        let mut maxz = self.data[0].z();
-
-        for p in &self.data {
-            if p.x() < minx { minx = p.x(); }
-            if p.y() < miny { miny = p.y(); }
-            if p.z() < minz { minz = p.z(); }
-            if p.x() > maxx { maxx = p.x(); }
-            if p.y() > maxy { maxy = p.y(); }
-            if p.z() > maxz { maxz = p.z(); }
-        }
-
-        Ok((Point3D{x: minx, y: miny, z: minz}, Point3D{x: maxx, y: maxy, z: maxz}))
+        let bb = try!(BoundingBox3D::from_iterator(&self.data));
+        bb.bounding_box()
     }
 }
 
