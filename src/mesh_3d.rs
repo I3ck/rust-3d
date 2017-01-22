@@ -19,6 +19,8 @@ use traits::is_editable_mesh_3d::IsEditableMesh3D;
 use traits::is_3d::Is3D;
 use traits::is_editable_3d::IsEditable3D;
 use traits::is_buildable_3d::IsBuildable3D;
+use traits::has_bounding_box_3d::*;
+use point_3d::*;
 use point_cloud_3d::PointCloud3D;
 
 pub struct Mesh3D<P> where
@@ -101,4 +103,13 @@ impl<P> IsEditableMesh3D<P> for Mesh3D<P> where
         self.topology.push(vid3);
         Ok(self.topology.len() / 3 - 1)
     }
+}
+
+impl<P> HasBoundingBox3D for Mesh3D<P> where
+    P: Is3D {
+
+    fn bounding_box(&self) -> Result<(Point3D, Point3D)> {
+        self.pc.bounding_box()
+    }
+
 }
