@@ -19,15 +19,15 @@ use std::hash::{Hash, Hasher};
 
 
 use result::*;
-use traits::is_nd::IsND;
-use traits::is_2d::Is2D;
-use traits::is_moveable_2d::IsMoveable2D;
-use traits::is_buildable_nd::IsBuildableND;
-use traits::is_buildable_2d::IsBuildable2D;
-use traits::is_editable_nd::IsEditableND;
-use traits::is_editable_2d::IsEditable2D;
-use traits::is_buildable_3d::IsBuildable3D;
-use traits::transformable_to_3d::TransFormableTo3D;
+use traits::is_nd::*;
+use traits::is_2d::*;
+use traits::is_moveable_2d::*;
+use traits::is_buildable_nd::*;
+use traits::is_buildable_2d::*;
+use traits::is_editable_nd::*;
+use traits::is_editable_2d::*;
+use traits::is_buildable_3d::*;
+use traits::transformable_to_3d::*;
 use functions::{sqr_dist_2d};
 
 #[derive (PartialEq, PartialOrd)]

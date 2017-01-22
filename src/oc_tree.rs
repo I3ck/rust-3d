@@ -20,12 +20,12 @@ use std::iter::IntoIterator;
 
 use point_cloud_3d::{PointCloud3D};
 use oc_node::{OcNode};
-use traits::is_buildable_nd::IsBuildableND;
-use traits::is_buildable_3d::IsBuildable3D;
-use traits::is_editable_3d::IsEditable3D;
-use traits::has_bounding_box_3d::HasBoundingBox3D;
-use traits::is_tree_3d::IsTree3D;
-use traits::is_oc_tree::IsOcTree;
+use traits::is_buildable_nd::*;
+use traits::is_buildable_3d::*;
+use traits::is_editable_3d::*;
+use traits::has_bounding_box_3d::*;
+use traits::is_tree_3d::*;
+use traits::is_oc_tree::*;
 
 pub struct OcTree<P> where
     P: IsEditable3D + IsBuildable3D {

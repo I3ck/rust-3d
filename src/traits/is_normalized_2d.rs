@@ -14,7 +14,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use result::*;
-use traits::is_2d::Is2D;
+use traits::is_2d::*;
 
 pub trait IsNormalized2D : Is2D {
     fn new<P>(p: P) -> Result<Box<Self>> where

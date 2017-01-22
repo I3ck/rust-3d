@@ -14,7 +14,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use result::*;
-use traits::is_nd::IsND;
+use traits::is_nd::*;
 
 pub trait IsEditableND : IsND {
     fn set_position(&mut self, dimension: usize, val: f64) -> Result<()>; //@todo rename

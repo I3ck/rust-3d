@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-use traits::is_2d::Is2D;
+use traits::is_2d::*;
 
 pub trait IsFilter2D {
     fn is_allowed(&self, p: &Is2D) -> bool;

@@ -14,8 +14,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use result::*;
-use matrix4::Matrix4;
-use traits::is_buildable_3d::IsBuildable3D;
+use matrix4::*;
+use traits::is_buildable_3d::*;
 
 pub struct Matrix4Pipe {
     pub mtranslation: Matrix4,

@@ -14,9 +14,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use result::*;
-use traits::is_tree_3d::IsTree3D;
-use traits::is_3d::Is3D;
-use point_cloud_3d::PointCloud3D;
+use traits::is_tree_3d::*;
+use traits::is_3d::*;
+use point_cloud_3d::*;
 
 pub trait IsKdTree3D<P> : IsTree3D<P> where
     P: Is3D {

@@ -19,9 +19,9 @@ use self::core::str::FromStr;
 use std::hash::{Hash};
 
 use result::*;
-use traits::is_3d::Is3D;
-use traits::is_buildable_nd::IsBuildableND;
-use matrix4::Matrix4;
+use traits::is_3d::*;
+use traits::is_buildable_nd::*;
+use matrix4::*;
 
 pub trait IsBuildable3D :
     Is3D +

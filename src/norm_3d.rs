@@ -17,12 +17,12 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 use result::*;
-use point_3d::Point3D;
-use traits::is_nd::IsND;
-use traits::is_3d::Is3D;
-use traits::is_normalized_3d::IsNormalized3D;
-use traits::is_buildable_nd::IsBuildableND;
-use traits::is_buildable_3d::IsBuildable3D;
+use point_3d::*;
+use traits::is_nd::*;
+use traits::is_3d::*;
+use traits::is_normalized_3d::*;
+use traits::is_buildable_nd::*;
+use traits::is_buildable_3d::*;
 use functions::{sqr_dist_3d};
 
 #[derive (PartialEq, PartialOrd)]

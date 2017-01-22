@@ -16,9 +16,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::f64::consts::PI;
 
 use result::*;
-use point_cloud_2d::PointCloud2D;
-use traits::is_buildable_2d::IsBuildable2D;
-use traits::is_editable_2d::IsEditable2D;
+use point_cloud_2d::*;
+use traits::is_buildable_2d::*;
+use traits::is_editable_2d::*;
 
 
 ///@todo correct reserving

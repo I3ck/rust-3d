@@ -15,11 +15,11 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::collections::HashSet;
 
-use point_cloud_3d::PointCloud3D;
-use view::View;
-use traits::is_3d::Is3D;
-use traits::is_filter_3d::IsFilter3D;
-use traits::is_filter_pc_3d::IsFilterPC3D;
+use point_cloud_3d::*;
+use view::*;
+use traits::is_3d::*;
+use traits::is_filter_3d::*;
+use traits::is_filter_pc_3d::*;
 
 //@todo untested
 //@todo concave hull, convex hull

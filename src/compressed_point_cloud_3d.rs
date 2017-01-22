@@ -19,12 +19,12 @@ use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
 use result::*;
-use traits::is_3d::Is3D;
-use traits::is_buildable_3d::IsBuildable3D;
-use traits::has_bounding_box_3d::HasBoundingBox3D;
-use point_3d::{Point3D};
-use point_cloud_3d::{PointCloud3D};
-use compressed_point_3d::{CompressedPoint3D};
+use traits::is_3d::*;
+use traits::is_buildable_3d::*;
+use traits::has_bounding_box_3d::*;
+use point_3d::*;
+use point_cloud_3d::*;
+use compressed_point_3d::*;
 
 pub struct CompressedPointCloud3D<T> where
     T: Unsigned + PrimInt {

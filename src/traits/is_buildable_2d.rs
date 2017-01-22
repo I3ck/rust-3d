@@ -19,9 +19,9 @@ use std::hash::{Hash};
 use self::core::str::FromStr;
 
 use result::*;
-use traits::is_2d::Is2D;
-use traits::is_buildable_nd::IsBuildableND;
-use traits::is_nd::IsND;
+use traits::is_2d::*;
+use traits::is_buildable_nd::*;
+use traits::is_nd::*;
 
 pub trait IsBuildable2D :
     Is2D +

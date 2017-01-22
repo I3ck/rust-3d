@@ -14,7 +14,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use result::*;
-use point_3d::Point3D;
+use point_3d::*;
 
 pub trait HasCenterOfGravity3D {
     fn center_of_gravity(&self) -> Result<Point3D>;

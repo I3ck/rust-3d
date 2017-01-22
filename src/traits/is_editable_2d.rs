@@ -13,8 +13,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-use traits::is_2d::Is2D;
-use traits::is_editable_nd::IsEditableND;
+use traits::is_2d::*;
+use traits::is_editable_nd::*;
 
 pub trait IsEditable2D : Is2D + IsEditableND{
     fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable3D? Or remove moveable trait

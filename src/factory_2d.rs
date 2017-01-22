@@ -16,9 +16,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::f64::consts::PI;
 
 use positive::*;
-use point_2d::Point2D;
-use point_cloud_2d::PointCloud2D;
-use traits::is_buildable_2d::IsBuildable2D;
+use point_2d::*;
+use point_cloud_2d::*;
+use traits::is_buildable_2d::*;
 
 ///@todo entire file has to be added to tests
 ///@todo add some type level checks like diameter > 0 etc., or return Option types (similar to flaggedT?)

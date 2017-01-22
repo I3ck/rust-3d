@@ -13,10 +13,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-use traits::is_plane_3d::IsPlane3D;
-use traits::is_3d::Is3D;
-use traits::is_buildable_3d::IsBuildable3D;
-use traits::is_normalized_3d::IsNormalized3D;
+use traits::is_plane_3d::*;
+use traits::is_3d::*;
+use traits::is_buildable_3d::*;
+use traits::is_normalized_3d::*;
 
 pub struct Plane3D<P,N> where
     P: Is3D,

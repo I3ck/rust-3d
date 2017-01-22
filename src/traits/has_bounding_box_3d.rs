@@ -14,9 +14,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use result::*;
-use traits::is_3d::Is3D;
-use traits::is_buildable_3d::IsBuildable3D;
-use point_3d::Point3D;
+use traits::is_3d::*;
+use traits::is_buildable_3d::*;
+use point_3d::*;
 
 pub trait HasBoundingBox3D  {
     fn bounding_box(&self) -> Result<(Point3D, Point3D)>;

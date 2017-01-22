@@ -14,7 +14,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use result::*;
-use traits::is_3d::Is3D;
+use traits::is_3d::*;
 
 pub trait IsNormalized3D : Is3D {
     fn new<P>(p: P) -> Result<Box<Self>> where

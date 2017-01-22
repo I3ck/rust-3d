@@ -15,9 +15,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //@todo clean up similar to pc code
 
-use traits::is_buildable_nd::IsBuildableND;
-use traits::is_buildable_3d::IsBuildable3D;
-use traits::is_editable_3d::IsEditable3D;
+use traits::is_buildable_nd::*;
+use traits::is_buildable_3d::*;
+use traits::is_editable_3d::*;
 use traits::has_center_of_gravity_3d::*;
 use point_cloud_3d::{PointCloud3D};
 use functions::{calc_sub_min_max, in_bb};

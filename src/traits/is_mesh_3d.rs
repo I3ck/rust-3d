@@ -14,11 +14,11 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use result::*;
-use traits::is_3d::Is3D;
-use traits::is_buildable_3d::IsBuildable3D;
-use traits::is_normalized_3d::IsNormalized3D;
+use traits::is_3d::*;
+use traits::is_buildable_3d::*;
+use traits::is_normalized_3d::*;
 use functions::{conn, cross};
-use norm_3d::Norm3D;
+use norm_3d::*;
 
 pub trait IsMesh3D<P> where
     P: IsBuildable3D {

@@ -17,17 +17,17 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 use result::*;
-use traits::is_nd::IsND;
-use traits::is_2d::Is2D;
-use traits::is_buildable_nd::IsBuildableND;
-use traits::is_buildable_2d::IsBuildable2D;
-use traits::is_editable_nd::IsEditableND;
-use traits::is_editable_2d::IsEditable2D;
-use traits::has_bounding_box_2d::HasBoundingBox2D;
-use traits::is_filter_2d::IsFilter2D;
-use point_2d::Point2D;
+use traits::is_nd::*;
+use traits::is_2d::*;
+use traits::is_buildable_nd::*;
+use traits::is_buildable_2d::*;
+use traits::is_editable_nd::*;
+use traits::is_editable_2d::*;
+use traits::has_bounding_box_2d::*;
+use traits::is_filter_2d::*;
+use point_2d::*;
 use functions::{sqr_dist_2d};
-use positive::Positive;
+use positive::*;
 
 #[derive (PartialEq, PartialOrd)]
 pub struct FilterBox2D {

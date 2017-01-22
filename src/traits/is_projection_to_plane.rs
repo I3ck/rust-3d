@@ -13,15 +13,15 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-use traits::is_2d::Is2D;
-use traits::is_buildable_2d::IsBuildable2D;
-use traits::is_3d::Is3D;
-use traits::transformable_to_2d::TransFormableTo2D;
-use traits::transformable_to_3d::TransFormableTo3D;
-use traits::is_normalized_3d::IsNormalized3D;
-use traits::is_plane_3d::IsPlane3D;
-use point_cloud_2d::PointCloud2D;
-use point_cloud_3d::PointCloud3D;
+use traits::is_2d::*;
+use traits::is_buildable_2d::*;
+use traits::is_3d::*;
+use traits::transformable_to_2d::*;
+use traits::transformable_to_3d::*;
+use traits::is_normalized_3d::*;
+use traits::is_plane_3d::*;
+use point_cloud_2d::*;
+use point_cloud_3d::*;
 
 
 //@todo finish trait and add implementation

@@ -17,17 +17,17 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 use result::*;
-use traits::is_nd::IsND;
-use traits::is_3d::Is3D;
-use traits::is_buildable_nd::IsBuildableND;
-use traits::is_buildable_3d::IsBuildable3D;
-use traits::is_editable_nd::IsEditableND;
-use traits::is_editable_3d::IsEditable3D;
-use traits::has_bounding_box_3d::HasBoundingBox3D;
-use traits::is_filter_3d::IsFilter3D;
-use point_3d::Point3D;
+use traits::is_nd::*;
+use traits::is_3d::*;
+use traits::is_buildable_nd::*;
+use traits::is_buildable_3d::*;
+use traits::is_editable_nd::*;
+use traits::is_editable_3d::*;
+use traits::has_bounding_box_3d::*;
+use traits::is_filter_3d::*;
+use point_3d::*;
 use functions::{dist_3d, sqr_dist_3d};
-use positive::Positive;
+use positive::*;
 
 #[derive (PartialEq, PartialOrd)]
 pub struct FilterSphere {

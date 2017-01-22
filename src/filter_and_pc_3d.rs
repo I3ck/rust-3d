@@ -13,10 +13,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-use traits::is_3d::Is3D;
-use traits::is_filter_pc_3d::IsFilterPC3D;
-use point_cloud_3d::PointCloud3D;
-use view::View;
+use traits::is_3d::*;
+use traits::is_filter_pc_3d::*;
+use point_cloud_3d::*;
+use view::*;
 
 pub struct FilterAndPC3D<P> where
     P: Is3D {

@@ -14,7 +14,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use result::*;
-use traits::is_nd::IsND;
+use traits::is_nd::*;
 
 pub trait IsBuildableND : IsND {
     fn new() -> Box<Self>;

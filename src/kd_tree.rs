@@ -20,12 +20,12 @@ use std::cmp::Ordering;
 use result::*;
 use point_cloud_3d::{PointCloud3D};
 use functions::{dist_3d, sqr_dist_3d, dimension_compare, dimension_dist, sort_and_limit};
-use traits::is_3d::Is3D;
-use traits::is_buildable_nd::IsBuildableND;
-use traits::is_buildable_3d::IsBuildable3D;
-use traits::is_editable_3d::IsEditable3D;
-use traits::is_tree_3d::IsTree3D;
-use traits::is_kd_tree_3d::IsKdTree3D;
+use traits::is_3d::*;
+use traits::is_buildable_nd::*;
+use traits::is_buildable_3d::*;
+use traits::is_editable_3d::*;
+use traits::is_tree_3d::*;
+use traits::is_kd_tree_3d::*;
 
 pub struct KdTree<P> where
     P: Is3D {

@@ -18,15 +18,15 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
 use result::*;
-use traits::is_nd::IsND;
-use traits::is_3d::Is3D;
-use traits::is_moveable_3d::IsMoveable3D;
-use traits::is_buildable_nd::IsBuildableND;
-use traits::is_buildable_2d::IsBuildable2D;
-use traits::is_buildable_3d::IsBuildable3D;
-use traits::is_editable_nd::IsEditableND;
-use traits::is_editable_3d::IsEditable3D;
-use traits::transformable_to_2d::TransFormableTo2D;
+use traits::is_nd::*;
+use traits::is_3d::*;
+use traits::is_moveable_3d::*;
+use traits::is_buildable_nd::*;
+use traits::is_buildable_2d::*;
+use traits::is_buildable_3d::*;
+use traits::is_editable_nd::*;
+use traits::is_editable_3d::*;
+use traits::transformable_to_2d::*;
 use functions::{sqr_dist_3d};
 
 #[derive (PartialEq, PartialOrd)]

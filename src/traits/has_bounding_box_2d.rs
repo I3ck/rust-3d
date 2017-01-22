@@ -14,9 +14,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use result::*;
-use traits::is_2d::Is2D;
-use traits::is_buildable_2d::IsBuildable2D;
-use point_2d::Point2D;
+use traits::is_2d::*;
+use traits::is_buildable_2d::*;
+use point_2d::*;
 
 pub trait HasBoundingBox2D {
     fn bounding_box(&self) -> Result<(Point2D, Point2D)>;

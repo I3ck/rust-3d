@@ -16,25 +16,25 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::cmp::Ordering;
 
 use result::*;
-use point_2d::Point2D;
-use point_3d::Point3D;
-use point_cloud_2d::PointCloud2D;
-use point_cloud_3d::PointCloud3D;
-use oc_node::Direction;
-use view::View;
-use traits::is_nd::IsND;
-use traits::is_2d::Is2D;
-use traits::is_3d::Is3D;
-use traits::is_buildable_nd::IsBuildableND;
-use traits::is_buildable_2d::IsBuildable2D;
-use traits::is_buildable_3d::IsBuildable3D;
-use traits::is_editable_2d::IsEditable2D;
-use traits::is_editable_3d::IsEditable3D;
-use traits::transformable_to_2d::TransFormableTo2D;
-use traits::transformable_to_3d::TransFormableTo3D;
-use traits::is_plane_3d::IsPlane3D;
-use traits::is_normalized_3d::IsNormalized3D;
-use traits::is_moveable_3d::IsMoveable3D;
+use point_2d::*;
+use point_3d::*;
+use point_cloud_2d::*;
+use point_cloud_3d::*;
+use oc_node::*;
+use view::*;
+use traits::is_nd::*;
+use traits::is_2d::*;
+use traits::is_3d::*;
+use traits::is_buildable_nd::*;
+use traits::is_buildable_2d::*;
+use traits::is_buildable_3d::*;
+use traits::is_editable_2d::*;
+use traits::is_editable_3d::*;
+use traits::transformable_to_2d::*;
+use traits::transformable_to_3d::*;
+use traits::is_plane_3d::*;
+use traits::is_normalized_3d::*;
+use traits::is_moveable_3d::*;
 
 ///@todo move these functions to better fitting files or make them methods of the correct types
 

@@ -14,14 +14,14 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use result::*;
-use traits::is_mesh_3d::IsMesh3D;
-use traits::is_editable_mesh_3d::IsEditableMesh3D;
-use traits::is_3d::Is3D;
-use traits::is_editable_3d::IsEditable3D;
-use traits::is_buildable_3d::IsBuildable3D;
+use traits::is_mesh_3d::*;
+use traits::is_editable_mesh_3d::*;
+use traits::is_3d::*;
+use traits::is_editable_3d::*;
+use traits::is_buildable_3d::*;
 use traits::has_bounding_box_3d::*;
 use point_3d::*;
-use point_cloud_3d::PointCloud3D;
+use point_cloud_3d::*;
 
 pub struct Mesh3D<P> where
     P: Is3D {
