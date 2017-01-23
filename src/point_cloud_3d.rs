@@ -153,9 +153,7 @@ impl<P> IsRandomAccessible3D<P> for PointCloud3D<P> where
         }
     }
 
-    fn map_point<F>(&mut self, index: usize, mut f: F) -> Result<()> where
-        F: FnMut(&mut P) {
-
+    fn map_point(&mut self, index: usize, mut f: FnMut(&mut P)) -> Result<()> {
         if index >= self.len() {
             Err(ErrorKind::IncorrectVertexID)
         } else {
