@@ -18,6 +18,7 @@ use std::cmp::Ordering;
 
 use result::*;
 use traits::is_2d::*;
+use traits::is_random_accessible_2d::*;
 use traits::is_moveable_2d::*;
 use traits::is_buildable_2d::*;
 use traits::is_editable_2d::*;
@@ -116,6 +117,47 @@ impl<P> PointCloud2D<P> where
         }
         if pc.len() == 0 { return Err(ErrorKind::ParseError); }
         Ok(pc)
+    }
+}
+
+impl<P> IsRandomAccessible2D<P> for PointCloud2D<P> where
+    P: Is2D + Clone {
+
+    fn n_points(&self) -> usize {
+        self.len()
+    }
+
+    fn get_point(&self, index: usize) -> Result<P> {
+        if index >= self.len() {
+            Err(ErrorKind::IncorrectVertexID)
+        } else {
+            Ok((*self.data[index]).clone())
+        }
+    }
+
+    fn append_point(&mut self, point: P) { //@todo rename to push
+        self.data.push(Box::new(point))
+    }
+
+    fn insert_point(&mut self, index: usize, point: P) -> Result<()> {
+        if index > self.len() {
+            Err(ErrorKind::IncorrectVertexID)
+        } else {
+            self.data.insert(index, Box::new(point));
+            Ok(())
+        }
+    }
+
+    fn map_point<F>(&mut self, index: usize, mut f: F) -> Result<()> where
+        F: FnMut(&mut P) {
+
+        if index >= self.len() {
+            Err(ErrorKind::IncorrectVertexID)
+        } else {
+            let ref mut p = self.data[index];
+            f(&mut **p);
+            Ok(())
+        }
     }
 }
 

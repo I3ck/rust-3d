@@ -23,6 +23,10 @@ pub trait IsRandomAccessible3D<P> where
 
     fn get_point(&self, index: usize) -> Result<P>;
 
+    fn append_point(&mut self, point: P);
+
+    fn insert_point(&mut self, index: usize, point: P) -> Result<()>;
+
     fn map_point<F>(&mut self, index: usize, mut f: F) -> Result<()> where
         F: FnMut(&mut P);
 }
