@@ -104,6 +104,7 @@ links
 -----
 [crates.io](https://crates.io/crates/rust-3d)  
 [github.com](https://github.com/I3ck/rust-3d)  
+[docs.rs](https://docs.rs/rust-3d/)
 
 
 contribute
