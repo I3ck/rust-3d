@@ -30,6 +30,7 @@ use point_2d::*;
 use bounding_box_2d::*;
 use functions::dist_2d;
 
+/// PointCloud2D, a collection of positions within 2D space
 pub struct PointCloud2D<P> where
     P: Is2D {
 
@@ -38,11 +39,12 @@ pub struct PointCloud2D<P> where
 
 impl<P> PointCloud2D<P> where
     P: Is2D {
-
+    /// Creates a new, empty point cloud
     pub fn new() -> PointCloud2D<P> {
         PointCloud2D{data: Vec::new()}
     }
 
+    /// Serializes the point cloud
     pub fn to_str(&self) -> String {
         let mut result = String::new();
         for p in &self.data {
@@ -51,22 +53,27 @@ impl<P> PointCloud2D<P> where
         result
     }
 
+    /// Pushes a new position to the end of the point cloud
     pub fn push(&mut self, p: P) {
         self.data.push(Box::new(p));
     }
 
+    /// Returns the length / number of elements
     pub fn len(&self) -> usize {
         self.data.len()
     }
 
+    /// Sorts all positions within the point cloud by x
     pub fn sort_x(&mut self) {
         self.data.sort_by(|a, b| a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
     }
 
+    /// Sorts all positions within the point cloud by y
     pub fn sort_y(&mut self) {
         self.data.sort_by(|a, b| a.y().partial_cmp(&b.y()).unwrap_or(Ordering::Equal));
     }
 
+    /// Applies a function to each position
     pub fn for_each_point<F>(&mut self, mut f: F) where
         F: FnMut(&mut P) {
 
@@ -75,6 +82,7 @@ impl<P> PointCloud2D<P> where
         }
     }
 
+    /// Returns the length / path between all positions within the point cloud
     pub fn path_length(&self) -> f64 { //@todo define trait for this WithLength or similar
         let mut length : f64 = 0.0;
         if self.data.len() < 2 { return length; }
@@ -89,6 +97,7 @@ impl<P> PointCloud2D<P> where
 impl<P> PointCloud2D<P> where
     P: Is2D + Clone {
 
+    /// Creates a copy of the point cloud
     pub fn clone(&self) -> PointCloud2D<P> {
         let mut data: Vec<Box<P>>;
         data = Vec::new();
@@ -100,6 +109,7 @@ impl<P> PointCloud2D<P> where
         PointCloud2D { data: data }
     }
 
+    /// Appends all values of other behind this
     pub fn consume(&mut self, other: Self) {
         for p in other.data {
             self.data.push(Box::new((*p).clone()));
@@ -110,6 +120,7 @@ impl<P> PointCloud2D<P> where
 impl<P> PointCloud2D<P> where
     P: IsBuildable2D + Clone {
 
+    /// Creates a new point cloud from an input string
     pub fn parse(text: String) -> Result<PointCloud2D<P>> {
         let lines = text.split("\n");
 

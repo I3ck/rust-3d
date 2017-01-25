@@ -17,6 +17,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use traits::is_3d::*;
 
+/// IsFilter3D is a trait used for filters for 3D positions
 pub trait IsFilter3D {
+    /// Should return true if a position passes the filter, otherwise false
     fn is_allowed(&self, p: &Is3D) -> bool;
 }

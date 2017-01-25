@@ -19,8 +19,9 @@ use traits::is_tree_3d::*;
 use traits::is_3d::*;
 use point_cloud_3d::*;
 
+/// IsOcTree is a trait used for OcTrees
 pub trait IsOcTree<P> : IsTree3D<P> where
     P: Is3D {
-
+    /// Should return all positions up the given depth
     fn collect(&self, maxdepth: i8) -> PointCloud3D<P>;
 }

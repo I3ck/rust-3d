@@ -18,6 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use traits::is_filter_3d::*;
 use traits::is_3d::*;
 
+/// FilterNegate3D, a filter within 3D space which negates another filter
 pub struct FilterNegate3D<F> where
     F: IsFilter3D {
 
@@ -26,7 +27,7 @@ pub struct FilterNegate3D<F> where
 
 impl<F> FilterNegate3D<F> where
     F: IsFilter3D {
-
+    /// Creates a new FilterNegate3D from another IsFilter3D which will be negated
     pub fn build(filter: F) -> Self {
         FilterNegate3D {filter: Box::new(filter)}
     }

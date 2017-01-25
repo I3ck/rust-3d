@@ -19,17 +19,18 @@ use traits::is_3d::*;
 use traits::is_normalized_3d::*;
 
 
+/// IsPlane3D is a trait used for planes within 3D space
 pub trait IsPlane3D<P,N> where
     P: Is3D,
     N: IsNormalized3D {
-
+    /// Should return a new plane
     fn new() -> Box<Self>;
-
+    /// Should return a new plane with the given origin, u and v vectors
     fn build(origin: P, u: N, v: N) -> Box<Self>;
-
+    /// Should return the origin of the plane
     fn origin(&self) -> P;
-
+    /// Should return the u vector of the plane
     fn u(&self) -> N;
-
+    /// Should return the v vector of the plane
     fn v(&self) -> N;
 }

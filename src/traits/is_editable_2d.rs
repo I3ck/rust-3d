@@ -18,16 +18,20 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use traits::is_2d::*;
 use traits::is_editable_nd::*;
 
-pub trait IsEditable2D : Is2D + IsEditableND{
+/// IsEditable2D is a trait used for types which are positioned in 2D space and their position can be changed
+pub trait IsEditable2D : Is2D + IsEditableND {
+    /// Should set the position in x
     fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable3D? Or remove moveable trait
-
+    /// Should set the position in y
     fn set_y(&mut self, val: f64);
 
+    /// Sets the position from a x and y values
     fn set_pos(&mut self, x: f64, y: f64) {
         self.set_x(x);
         self.set_y(y);
     }
 
+    /// Adds the coordinates of other onto this. x = x + other.x ...
     fn add<P>(&mut self, other: &P) where
         P: Is2D {
 
@@ -37,6 +41,7 @@ pub trait IsEditable2D : Is2D + IsEditableND{
         self.set_y(y);
     }
 
+    /// Substracts the coordinates of other from this. x = x - other.x ...
     fn substract<P>(&mut self, other: &P) where
         P: Is2D {
 
@@ -46,6 +51,7 @@ pub trait IsEditable2D : Is2D + IsEditableND{
         self.set_y(y);
     }
 
+    /// Scales the coordinates by applying a factor to all of them
     fn scale(&mut self, val: f64) {
         let x = val * self.x();
         let y = val * self.y();
@@ -53,6 +59,7 @@ pub trait IsEditable2D : Is2D + IsEditableND{
         self.set_y(y);
     }
 
+    /// Rotates the position around a center ccw for rad radians
     fn rotate<P>(&mut self, rad: f64, center: &P) where
         P: Is2D {
 

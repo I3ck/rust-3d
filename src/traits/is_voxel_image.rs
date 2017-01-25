@@ -17,10 +17,14 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use result::*;
 
+/// IsVoxelImage is a trait used for any type of voxel image
 pub trait IsVoxelImage<T> {
+    /// Should return the number of voxels in x-direction
     fn size_x(&self) -> usize;
+    /// Should return the number of voxels in y-direction
     fn size_y(&self) -> usize;
+    /// Should return the number of voxels in z-direction
     fn size_z(&self) -> usize;
-
+    /// Should return the voxel at a given x y z coordinate
     fn voxel(&self, x: usize, y: usize, z: usize) -> Result<T>;
 }

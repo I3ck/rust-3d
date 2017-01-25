@@ -28,6 +28,7 @@ use traits::is_buildable_3d::*;
 use functions::{sqr_dist_3d};
 
 #[derive (PartialEq, PartialOrd)]
+/// Norm3D, a normalized vector within 3D space
 pub struct Norm3D {
     pub x: f64,
     pub y: f64,

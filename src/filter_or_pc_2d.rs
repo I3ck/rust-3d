@@ -20,6 +20,7 @@ use traits::is_filter_pc_2d::*;
 use point_cloud_2d::*;
 use view::*;
 
+/// FilterOrPC2D, a filter to chain multiple 2D filters with the or condition => must pass any filter to pass this filter
 pub struct FilterOrPC2D<P> where
     P: Is2D {
 

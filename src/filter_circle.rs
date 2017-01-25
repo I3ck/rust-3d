@@ -32,6 +32,7 @@ use functions::{dist_2d, sqr_dist_2d};
 use positive::*;
 
 #[derive (PartialEq, PartialOrd)]
+/// FilterCircle, a circle filter within 2D space
 pub struct FilterCircle {
     center: Point2D,
     radius: f64
@@ -63,9 +64,11 @@ impl Clone for FilterCircle {
 }
 
 impl FilterCircle {
+    /// Creates a new FilterCircle at origin with a radius of 1
     pub fn new() -> Self {
         FilterCircle {center: *Point2D::new(), radius: 1.0}
     }
+    /// Creates a new FilterCircle with the given parameters
     pub fn build(center: Point2D, p_radius: Positive) -> Self {
         FilterCircle {center: center, radius: p_radius.get()}
     }

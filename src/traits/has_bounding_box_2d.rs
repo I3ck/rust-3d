@@ -13,42 +13,50 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing the HasBoundingBox2D trait for types which might have a bounding box
+//! Modulecontaining the HasBoundingBox2D trait for types which might have a bounding box
 
 use result::*;
 use traits::is_2d::*;
 use traits::is_buildable_2d::*;
 use point_2d::*;
 
+/// HasBoundingBox2D is a trait for types which might have a bounding box
 pub trait HasBoundingBox2D {
+    /// Should return the bounding box as a pair of two points. The first point should be the minimum for all coordinates, the second the maximum for all coordinates
     fn bounding_box(&self) -> Result<(Point2D, Point2D)>;
 
+    /// Returns the minimum position of the bounding box
     fn min_pos(&self) -> Result<Point2D> {
         let (min,_) = try!(self.bounding_box());
         Ok(min)
     }
 
+    /// Returns the maximum position of the bounding box
     fn max_pos(&self) -> Result<Point2D> {
         let (_,max) = try!(self.bounding_box());
         Ok(max)
     }
 
+    /// Returns the size the bounding box within the x-dimension
     fn size_x(&self) -> Result<f64> { //@todo change signature to return a Positive
         let (min, max) = try!(self.bounding_box());
         Ok((max.x() - min.x()).abs())
     }
 
+    /// Returns the size the bounding box within the y-dimension
     fn size_y(&self) -> Result<f64> {
         let (min, max) = try!(self.bounding_box());
         Ok((max.y() - min.y()).abs())
     }
 
+    /// Returns the center of the bounding box
     fn center_bb(&self) -> Result<Point2D> {
         let (min, max) = try!(self.bounding_box());
         Ok(*Point2D::build(min.x() + (max.x() - min.x()) / 2.0,
                            min.y() + (max.y() - min.y()) / 2.0))
     }
 
+    /// Tests whether this bounding box is within the other
     fn is_inside<B>(&self, other: &B) -> Result<bool> where
         Self: Sized, B: HasBoundingBox2D {
 
@@ -66,6 +74,7 @@ pub trait HasBoundingBox2D {
         Err(ErrorKind::BoundingBoxMissing)
     }
 
+    /// Tests whether this bounding box contains a position
     fn contains<P>(&self, other: &P) -> Result<bool> where
         Self: Sized, P: Is2D {
 
@@ -82,6 +91,7 @@ pub trait HasBoundingBox2D {
         Err(ErrorKind::BoundingBoxMissing)
     }
 
+    /// Tests whether this bounding box contains the other
     fn has_inside<B>(&self, other: &B) -> Result<bool> where
         Self: Sized, B: HasBoundingBox2D {
 
@@ -99,6 +109,7 @@ pub trait HasBoundingBox2D {
         Err(ErrorKind::BoundingBoxMissing)
     }
 
+    /// Tests whether this bounding box and the other overlap in any way
     fn collides_with<B>(&self, other: &B) -> Result<bool> where
         Self: Sized, B: HasBoundingBox2D {
 

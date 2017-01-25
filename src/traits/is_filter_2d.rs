@@ -17,6 +17,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use traits::is_2d::*;
 
+/// IsFilter2D is a trait used for filters for 2D positions
 pub trait IsFilter2D {
+    /// Should return true if a position passes the filter, otherwise false
     fn is_allowed(&self, p: &Is2D) -> bool;
 }

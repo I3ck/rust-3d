@@ -32,6 +32,7 @@ use functions::{dist_3d, sqr_dist_3d};
 use positive::*;
 
 #[derive (PartialEq, PartialOrd)]
+/// FilterSphere, a sphere filter within 3D space
 pub struct FilterSphere {
     center: Point3D,
     radius: f64
@@ -63,9 +64,11 @@ impl Clone for FilterSphere {
 }
 
 impl FilterSphere {
+    /// Creates a new FilterSphere at origin with a radius of 1
     pub fn new() -> Self {
         FilterSphere {center: *Point3D::new(), radius: 1.0}
     }
+    /// Creates a new FilterSphere with the given parameters
     pub fn build(center: Point3D, p_radius: Positive) -> Self {
         FilterSphere {center: center, radius: p_radius.get()}
     }

@@ -29,6 +29,7 @@ use traits::has_bounding_box_3d::*;
 use traits::is_tree_3d::*;
 use traits::is_oc_tree::*;
 
+/// OcTree
 pub struct OcTree<P> where
     P: IsEditable3D + IsBuildable3D {
 

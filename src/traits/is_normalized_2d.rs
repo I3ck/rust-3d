@@ -18,11 +18,13 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use result::*;
 use traits::is_2d::*;
 
+/// IsNormalized2D is a trait used for types which are positioned within the 2D space and normalized
 pub trait IsNormalized2D : Is2D {
+    /// Should return a new normalized object
     fn new<P>(p: P) -> Result<Box<Self>> where
         P: Is2D;
-
+    /// Should return a new normalized object which only points in the x-Direction
     fn norm_x() -> Self;
-
+    /// Should return a new normalized object which only points in the y-Direction
     fn norm_y() -> Self;
 }

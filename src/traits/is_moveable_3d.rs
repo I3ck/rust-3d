@@ -15,6 +15,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Module containing the IsMoveable3D trait used for types within 3D space which can be moved
 
+/// IsMoveable3D is a trait used for types within 3D space which can be moved
 pub trait IsMoveable3D { //@todo remove trait and impl in IsBuildable2D
+    /// Should move the object by the given offset
     fn move_by(&mut self, x: f64, y: f64, z: f64);
 }

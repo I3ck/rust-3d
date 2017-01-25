@@ -32,6 +32,7 @@ use traits::transformable_to_2d::*;
 use functions::{sqr_dist_3d};
 
 #[derive (PartialEq, PartialOrd)]
+/// Point3D, a point / position within 3D space
 pub struct Point3D {
     pub x: f64,
     pub y: f64,

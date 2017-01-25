@@ -20,15 +20,18 @@ use point_2d::*;
 use traits::is_2d::*;
 use traits::has_bounding_box_2d::*;
 
+/// BoundingBox2D, an axis aligned bounding box within 2D space
 pub struct BoundingBox2D {
     pub min: Point2D,
     pub max: Point2D
 }
 
 impl BoundingBox2D {
+    /// Creates a new BoundingBox2D with the given min and max positions
     pub fn new(min: Point2D, max: Point2D) -> BoundingBox2D { //@todo return result and check for correctness within min max, or fix it //@todo also offer other constructor with concrete values (or build from Is2D)
         BoundingBox2D{min: min, max: max}
     }
+    /// Creates a new BoundBox2D which contains all the given positions
     pub fn from_iterator<'a, It2D,P>(source: It2D) -> Result<BoundingBox2D> where
         It2D: IntoIterator<Item=&'a Box<P>>,
         P: 'a + Is2D + Sized {

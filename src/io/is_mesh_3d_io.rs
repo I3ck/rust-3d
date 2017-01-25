@@ -23,6 +23,7 @@ use traits::is_mesh_3d::*;
 use std::io::prelude::*;
 use std::fs::File;
 
+/// Saves an IsMesh3D in the ASCII .stl file format
 pub fn save_stl_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
     P: IsBuildable3D { //@todo .stl cant have negative coordinates, therefore must be offset by BB (or show error)
 
@@ -46,6 +47,7 @@ pub fn save_stl_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
     f.write_all(b"solid \n").map_err(|e| e.to_error_kind())
 }
 
+/// Saves an IsMesh3D in the ASCII .ply file format
 pub fn save_ply_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
     P: IsBuildable3D {
 

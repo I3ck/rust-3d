@@ -40,6 +40,7 @@ use traits::is_moveable_3d::*;
 
 ///@todo move these functions to better fitting files or make them methods of the correct types
 
+/// Returns the center of two IsBuildable3D
 pub fn center<P>(p1: &P, p2: &P) -> Box<P> where
     P: IsBuildable3D {
 
@@ -50,6 +51,7 @@ pub fn center<P>(p1: &P, p2: &P) -> Box<P> where
     )
 }
 
+/// Returns the distance between two IsND in case their number of dimensions match
 pub fn dist<P,U>(p1: &P, p2: &U) -> Result<f64> where
     P: IsND,
     U: IsND {
@@ -57,6 +59,7 @@ pub fn dist<P,U>(p1: &P, p2: &U) -> Result<f64> where
     sqr_dist(p1,p2).map(|x| x.sqrt())
 }
 
+/// Returns the squared distance between two IsND in case their number of dimensions match
 pub fn sqr_dist<P,U>(p1: &P, p2: &U) -> Result<f64> where
     P: IsND,
     U: IsND {
@@ -76,6 +79,7 @@ pub fn sqr_dist<P,U>(p1: &P, p2: &U) -> Result<f64> where
     Ok(result)
 }
 
+/// Returns the cross product between a Is3D and a IsBuildable3D
 pub fn cross<P,U>(first: &P, other: &U) -> Box<U> where //@todo try to implement in Is3D trait
     P: Is3D,
     U: IsBuildable3D {
@@ -86,22 +90,26 @@ pub fn cross<P,U>(first: &P, other: &U) -> Box<U> where //@todo try to implement
     U::build(x, y, z)
 }
 
-pub fn dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where
+/// Returns the distance between two IsND in case their number of dimensions match
+pub fn dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where //@todo duplicate
     P: IsND,
     U: IsND {
 
     sqr_dist_nd(p1,p2).map(|x| x.sqrt())
 }
 
+/// Returns the distance between two Is2D
 pub fn dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
     sqr_dist_2d(p1,p2).sqrt()
 }
 
+/// Returns the distance between two Is3D
 pub fn dist_3d(p1: &Is3D, p2: &Is3D) -> f64 {
     sqr_dist_3d(p1,p2).sqrt()
 }
 
-pub fn sqr_dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where
+/// Returns the squared distance between two IsND in case their number of dimensions match
+pub fn sqr_dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where //@todo duplicate
     P: IsND,
     U: IsND {
 
@@ -115,15 +123,18 @@ pub fn sqr_dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where
     Ok(result)
 }
 
+/// Returns the squared distance between two Is2D
 pub fn sqr_dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
     (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2)
 }
 
+/// Returns the squared distance between two Is3D
 pub fn sqr_dist_3d(p1: &Is3D, p2: &Is3D) -> f64 {
     (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2) + (p1.z() - p2.z()).powi(2)
 }
 
-pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Option<Ordering> where
+/// Compares two IsBuildable3D at a given dimensions
+pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Option<Ordering> where //@todo could be Is3D
     P: IsBuildable3D {
 
     match dim {
@@ -134,7 +145,8 @@ pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Option<Ordering> where
     }
 }
 
-pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where
+/// Calculates the distance within a given dimension between two IsBuildable3D
+pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where //@todo could be Is3D
     P: IsBuildable3D {
 
     match dim {
@@ -145,7 +157,8 @@ pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where
     }
 }
 
-pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, max_size: usize) where
+/// Helper function to keep a collection of positions limited in size and sorted
+pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, max_size: usize) where //@todo move to KdTree
     P: Is3D + Clone {
 
     if pc.len() > max_size {
@@ -160,6 +173,7 @@ pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, max_size: usi
 }
 
 //@todo move to plane or use there
+/// Extrudes a 2D point cloud into 3D space with a given center and direction
 pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, PointCloud3D<P3>) where
     P2: TransFormableTo3D,
     P3: IsBuildable3D + IsMoveable3D + Clone {
@@ -177,7 +191,8 @@ pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, Point
     (pc_3d_a, pc_3d_b)
 }
 
-pub fn calc_direction<P>(reference: &Point3D, p: &Point3D) -> Direction where
+/// Calculates the direction of one point to another in terms of an enum
+pub fn calc_direction<P>(reference: &Point3D, p: &Point3D) -> Direction where //@todo move to OcTree code
     P: Is3D {
 
     if p.x() >= reference.x() && p.y() >= reference.y() && p.z() >= reference.z() {
@@ -200,7 +215,8 @@ pub fn calc_direction<P>(reference: &Point3D, p: &Point3D) -> Direction where
 }
 
 //@todo refactor to work with IsBuildable3D?
-pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where
+/// Calculates the min and max values of sub nodes of an OcTree
+pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where //@todo move to OcTree
     P: IsBuildable3D + Clone { //@todo better name
 
     let middle = center(min, max);
@@ -227,7 +243,8 @@ pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where
     }
 }
 
-pub fn in_bb<P>(p: &P, min: &P, max: &P) -> bool where
+/// Checks whether a point is within a bounding box
+pub fn in_bb<P>(p: &P, min: &P, max: &P) -> bool where //@todo duplicate
     P: Is3D {
 
     p.x() >= min.x() && p.x() <= max.x() &&
@@ -237,6 +254,7 @@ pub fn in_bb<P>(p: &P, min: &P, max: &P) -> bool where
 
 //@todo rename or overload operators
 //@todo implement for 2D aswell, maybe move to traits
+/// Calculates the vector between two positions
 pub fn conn<P>(p_from: &P, p_to: &P) -> P where
     P: IsBuildable3D {
 
@@ -247,6 +265,7 @@ pub fn conn<P>(p_from: &P, p_to: &P) -> P where
     )
 }
 
+/// Projects a point onto a plane
 pub fn project_point_on_plane<PL,P2,P3,N>(plane: &PL, point: &P3) -> P2 where
     PL: IsPlane3D<P3,N>,
     P2: IsBuildable2D,
@@ -264,7 +283,8 @@ pub fn project_point_on_plane<PL,P2,P3,N>(plane: &PL, point: &P3) -> P2 where
     p2transf
 }
 
-pub fn apply_view_2d<P>(view: View, pc: PointCloud2D<P>) -> PointCloud2D<P> where
+/// Applies a view to the given point cloud returning a new point cloud with only the allowed positions
+pub fn apply_view_2d<P>(view: View, pc: PointCloud2D<P>) -> PointCloud2D<P> where //@todo make trait and implement in pc
     P: Is2D + Clone {
 
     match view {
@@ -285,6 +305,7 @@ pub fn apply_view_2d<P>(view: View, pc: PointCloud2D<P>) -> PointCloud2D<P> wher
     }
 }
 
+/// Applies a view to the given point cloud returning a new point cloud with only the allowed positions
 pub fn apply_view_3d<P>(view: View, pc: PointCloud3D<P>) -> PointCloud3D<P> where
     P: Is3D + Clone {
 

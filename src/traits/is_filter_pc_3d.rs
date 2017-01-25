@@ -19,8 +19,9 @@ use traits::is_3d::*;
 use point_cloud_3d::*;
 use view::*;
 
+/// IsFilterPC3D is a trait used for filters for 3D position collections
 pub trait IsFilterPC3D<P> where
     P: Is3D {
-
+    /// Should filter the passed points by setting the flags within the view
     fn filter(&self, pc: &PointCloud3D<P>, view: &mut View); //@todo could have optional search structures   also define traits for different search structs e.g. trait solely to search in_box_2d
 }

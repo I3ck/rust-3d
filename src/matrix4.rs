@@ -22,11 +22,13 @@ use traits::is_buildable_nd::*;
 use traits::is_buildable_3d::*;
 use functions::cross;
 
+/// Matrix4, a matrix with 4 rows and columns
 pub struct Matrix4 {
     pub data: [[f64; 4]; 4]
 }
 
 impl Matrix4 {
+    /// Creates a new matrix which does nothing when multiplying by it
     pub fn new() -> Matrix4 {
         Matrix4{
             data: [
@@ -38,6 +40,7 @@ impl Matrix4 {
         }
     }
 
+    /// Creates a new matrix which contains only zeroes
     pub fn zeroes() -> Matrix4 {
         Matrix4{
             data: [
@@ -49,6 +52,7 @@ impl Matrix4 {
         }
     }
 
+    /// Creates a new matrix which applies translation
     pub fn translation(x: f64, y: f64, z: f64) -> Matrix4 {
         Matrix4{
             data: [
@@ -60,6 +64,7 @@ impl Matrix4 {
         }
     }
 
+    /// Creates a new matrix which applies scaling
     pub fn scale(x: f64, y: f64, z: f64) -> Matrix4 {
         Matrix4{
             data: [
@@ -71,6 +76,7 @@ impl Matrix4 {
         }
     }
 
+    /// Creates a new matrix which applies rotation
     pub fn rotation(rad_x: f64, rad_y: f64, rad_z: f64) -> Matrix4 {
         let (mut mx, mut my, mut mz) = (Matrix4::new(), Matrix4::new(), Matrix4::new());
 
@@ -93,6 +99,7 @@ impl Matrix4 {
     }
 
     ///@todo wont have to be of type option once uvec implemented
+    /// Creates a new matrix which applies rotation around an axis
     pub fn rotation_axis<P>(axis: &P, rad: f64) -> Result<Matrix4> where
         P: IsBuildable3D {
 
@@ -106,6 +113,7 @@ impl Matrix4 {
         Ok(result)
     }
 
+    /// Creates a new matrix which applies perspective transformation
     pub fn perspective(close: f64, away: f64, fov_rad: f64) -> Matrix4 {
         let range = close - away;
         let tan_fov_half = (fov_rad/2.0).tan();
@@ -119,6 +127,7 @@ impl Matrix4 {
     }
 
     //@todo require normalized vectors in these functions
+    /// Creates a new matrix which applies a look at transformation
     pub fn look_at<P>(target: &P, up: &P) -> Result<Matrix4> where
         P: IsBuildable3D { //@todo wont have to be an option once unitvector is defined whis is always l > 0 ( l == 1)
 
@@ -138,6 +147,7 @@ impl Matrix4 {
         Ok(result)
     }
 
+    /// Multiplies this matrix by another
     pub fn multiply_m(&self, other: &Matrix4) -> Matrix4 {
         let mut result = Matrix4::new();
         for i in 0..4 {
@@ -152,6 +162,7 @@ impl Matrix4 {
         result
     }
 
+    /// Multiplies all values of this matrix by the factor
     pub fn multiply_f(&self, other: f64) -> Matrix4 {
         let mut result = Matrix4::new();
         for i in 0..4 {

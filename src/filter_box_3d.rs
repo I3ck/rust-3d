@@ -32,6 +32,7 @@ use functions::{sqr_dist_3d};
 use positive::*;
 
 #[derive (PartialEq, PartialOrd)]
+/// FilterBox3D, a box filter within 3D space
 pub struct FilterBox3D {
     center: Point3D,
     size_x: f64,
@@ -73,12 +74,15 @@ impl Clone for FilterBox3D {
 }
 
 impl FilterBox3D {
+    /// Creates a new FilterBox3D at origin with sizes of 1
     pub fn new() -> Self {
         FilterBox3D {center: *Point3D::new(), size_x: 1.0, size_y: 1.0, size_z: 1.0}
     }
+    /// Creates a new FilterBox3D with the given parameters
     pub fn build(center: Point3D, p_size_x: Positive, p_size_y: Positive, p_size_z: Positive) -> Self {
         FilterBox3D {center: center, size_x: p_size_x.get(), size_y: p_size_y.get(), size_z: p_size_z.get()}
     }
+    /// Creates a new FilterBox3D with the same dimensions as the given bounding box
     pub fn from_bb(hbb: &HasBoundingBox3D) -> Option<Self> {
         match (hbb.center_bb(), hbb.size_x(), hbb.size_y(), hbb.size_z()) {
             (Ok(center), Ok(sx), Ok(sy), Ok(sz)) => if sx > 0.0 && sy > 0.0 && sz > 0.0 {

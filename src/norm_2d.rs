@@ -28,6 +28,7 @@ use traits::is_buildable_2d::*;
 use functions::{sqr_dist_2d};
 
 #[derive (PartialEq, PartialOrd)]
+/// Norm2D, a normalized vector within 2D space
 pub struct Norm2D {
     pub x: f64,
     pub y: f64

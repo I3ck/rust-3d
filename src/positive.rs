@@ -17,11 +17,13 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use result::*;
 
+/// Positive, a wrapper for a f64 value, ensuring it is always > 0
 pub struct Positive {
     val: f64
 }
 
 impl Positive {
+    /// Creates a new Positive if input > 0, fails otherwise
     pub fn new(val: f64) -> Result<Positive> {
         if val > 0.0 {
             return Ok(Positive {val: val});
@@ -29,6 +31,7 @@ impl Positive {
         Err(ErrorKind::NumberInWrongRange)
     }
 
+    /// Returns the wrapped value
     pub fn get(&self) -> f64 {
         self.val
     }

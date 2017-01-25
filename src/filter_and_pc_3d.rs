@@ -20,6 +20,7 @@ use traits::is_filter_pc_3d::*;
 use point_cloud_3d::*;
 use view::*;
 
+/// FilterAndPC3D, a filter to chain multiple 3D filters with the and condition => must pass all filters to pass this filter
 pub struct FilterAndPC3D<P> where
     P: Is3D {
 

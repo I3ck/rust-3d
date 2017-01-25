@@ -22,19 +22,21 @@ use traits::is_normalized_3d::*;
 use functions::{conn, cross};
 use norm_3d::*;
 
+/// IsMesh3D is trait used for meshes in 3D space
 pub trait IsMesh3D<P> where
     P: IsBuildable3D {
-
+    /// Should return the number of faces within the mesh
     fn num_faces(&self) -> usize;
-
+    /// Should return the number of vertices within the mesh
     fn num_vertices(&self) -> usize;
-
+    /// Should return the ids of vertices of the given face
     fn face_vertex_ids(&self, faceid: usize) -> Result<(usize, usize, usize)>;
-
+    /// Should return the vertices of the given face
     fn face_vertices(&self, faceid: usize) -> Result<(P, P, P)>;
-
+    /// Should return the vertex with the given id
     fn vertex(&self, vertexid: usize) -> Result<P>;
 
+    /// Returns the normal of a face
     fn face_normal(&self, faceid: usize) -> Result<Norm3D> {
         let (v1, v2, v3) = try!(self.face_vertices(faceid));
 

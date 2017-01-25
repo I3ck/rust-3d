@@ -19,8 +19,9 @@ use traits::is_2d::*;
 use point_cloud_2d::*;
 use view::*;
 
+/// IsFilterPC2D is a trait used for filters for 2D position collections
 pub trait IsFilterPC2D<P> where
     P: Is2D {
-
+    /// Should filter the passed points by setting the flags within the view
     fn filter(&self, pc: &PointCloud2D<P>, view: &mut View); //@todo could have optional search structures   also define traits for different search structs e.g. trait solely to search in_box_2d
 }

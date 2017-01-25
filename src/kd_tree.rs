@@ -29,6 +29,7 @@ use traits::is_editable_3d::*;
 use traits::is_tree_3d::*;
 use traits::is_kd_tree_3d::*;
 
+/// KdTree
 pub struct KdTree<P> where
     P: Is3D {
 
@@ -119,6 +120,7 @@ impl<P> IsKdTree3D<P> for KdTree<P> where
     }
 }
 
+//@todo documentation (or make private)
 impl<P> KdNode<P> where
     P: IsBuildableND + IsBuildable3D + Clone {
 

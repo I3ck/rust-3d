@@ -18,16 +18,17 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use result::*;
 use traits::is_2d::*;
 
+/// IsRandomAccessible2D is a trait used for collections of positions within 2D space
 pub trait IsRandomAccessible2D<P> where
     P: Is2D {
-
+    /// Should return the number of points within the collection
     fn n_points(&self) -> usize;
-
+    /// Should return the point of the given id
     fn get_point(&self, index: usize) -> Result<P>;
-
+    /// Should append a point to the collection
     fn append_point(&mut self, point: P);
-
+    /// Should insert a point at the given index
     fn insert_point(&mut self, index: usize, point: P) -> Result<()>;
-
+    /// Should apply the function to the point at the given index
     fn map_point(&mut self, index: usize, mut f: &mut FnMut(&mut P)) -> Result<()>;
 }

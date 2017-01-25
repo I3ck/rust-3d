@@ -25,6 +25,7 @@ use traits::is_2d::*;
 use traits::is_buildable_nd::*;
 use traits::is_nd::*;
 
+/// IsBuildable2D is a trait used for types which are positioned in 2D space and can be constructed
 pub trait IsBuildable2D :
     Is2D +
     IsBuildableND +
@@ -34,11 +35,14 @@ pub trait IsBuildable2D :
     PartialOrd +
     Hash {
 
+    /// Should build an object from x and y coordinates
     fn build(x: f64, y: f64) -> Box<Self>; //@todo rename both here and in 3d, also possibly rename the trait
 
-    fn from<P>(&mut self, other: P) where
+    /// Should use the coordinates of another as its own
+    fn from<P>(&mut self, other: P) where //@todo only require Is2D for other?
         P: IsBuildable2D;
 
+    /// Returns this with normalized values
     fn normalized(&self) -> Result<Box<Self>> {
         let l = self.abs();
         if l <= 0.0 {
@@ -47,6 +51,7 @@ pub trait IsBuildable2D :
         Ok(Self::build(self.x() / l, self.y() / l))
     }
 
+    /// Creates this from a "x y" string. E.g. "4.3 17.29"
     fn parse(text: String) -> Result<Box<Self>> {
         let split = text.split(" ");
         let words = split.collect::<Vec<&str>>();

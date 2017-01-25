@@ -24,7 +24,9 @@ use traits::has_center_of_gravity_3d::*;
 use point_cloud_3d::{PointCloud3D};
 use functions::{calc_sub_min_max, in_bb};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
+///@todo make all private or document
 
+/// OcNode, which is a single node used within OcTree
 pub enum OcNode<P> where
     P: IsEditable3D + IsBuildable3D {
 

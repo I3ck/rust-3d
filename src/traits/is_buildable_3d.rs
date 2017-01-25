@@ -25,6 +25,7 @@ use traits::is_3d::*;
 use traits::is_buildable_nd::*;
 use matrix4::*;
 
+/// IsBuildable3D is a trait used for types which are positioned in 3D space and can be constructed
 pub trait IsBuildable3D :
     Is3D +
     Eq +
@@ -33,11 +34,14 @@ pub trait IsBuildable3D :
     PartialOrd +
     Hash {
 
+    /// Should build an object from x, y and z coordinates
     fn build(x: f64, y: f64, z: f64) -> Box<Self>;
 
-    fn from<P>(&mut self, other: P) where P: IsBuildable3D;
+    /// Should use the coordinates of another as its own
+    fn from<P>(&mut self, other: P) where P: IsBuildable3D; //@todo only require Is2D for other?
 
     //@todo return new or alter self???
+    /// Applies a matrix to this
     fn multiply_m(&self, m: &Matrix4) -> Box<Self> {
         let mut result_x = 0.0;
         let mut result_y = 0.0;
@@ -59,6 +63,7 @@ pub trait IsBuildable3D :
         Self::build(result_x, result_y, result_z)
     }
 
+    /// Returns this with normalized values
     fn normalized(&self) -> Result<Box<Self>> {
         let l = self.abs();
         if l <= 0.0 {
@@ -67,6 +72,7 @@ pub trait IsBuildable3D :
         Ok(Self::build(self.x() / l, self.y() / l, self.z() / l))
     }
 
+    /// Creates this from a "x y z" string. E.g. "32.2 14.7 1.90"
     fn parse(text: String) -> Result<Box<Self>> {
         let split = text.split(" ");
         let words = split.collect::<Vec<&str>>();

@@ -18,7 +18,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use traits::is_2d::*;
 use traits::is_buildable_3d::*;
 
+/// TransFormableTo3D is a trait used for any type which can be transformed 3D space
 pub trait TransFormableTo3D : Is2D {
+    /// Should create representation of self within the 3D space with a given z-coordinate
     fn transform_to_3d<P>(&self, z: f64) -> P where
         P: IsBuildable3D;
 }

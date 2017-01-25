@@ -31,6 +31,7 @@ use traits::is_filter_pc_2d::*;
 //@todo filters could be written for any type or at least for n dimensions?
 //@todo rename these to PC filters, and add PointFilters of signature   filter(&Is_2d) -> bool which can then be used in the pc methods
 
+/// FilterPC2D, a filter which can transform any IsFilter2D into an IsFilterPC2D
 pub struct FilterPC2D<F> where
     F: IsFilter2D {
 

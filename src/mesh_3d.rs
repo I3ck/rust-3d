@@ -25,6 +25,7 @@ use traits::has_bounding_box_3d::*;
 use point_3d::*;
 use point_cloud_3d::*;
 
+/// Mesh3D, a mesh with tri-faces within 3D space
 pub struct Mesh3D<P> where
     P: Is3D {
 

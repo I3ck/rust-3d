@@ -18,19 +18,23 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use traits::is_3d::*;
 use traits::is_editable_nd::*;
 
+/// IsEditable3D is a trait used for types which are positioned in 3D space and their position can be changed
 pub trait IsEditable3D : Is3D + IsEditableND {
+    /// Should set the position in x
     fn set_x(&mut self, val: f64); //@todo these kinda make it moveable, maybe put into IsMoveable3D? Or remove moveable trait
-
+    /// Should set the position in y
     fn set_y(&mut self, val: f64);
-
+    /// Should set the position in z
     fn set_z(&mut self, val: f64);
 
+    /// Sets the position from a x, y and z values
     fn set_pos(&mut self, x: f64, y: f64, z: f64) {
         self.set_x(x);
         self.set_y(y);
         self.set_z(z);
     }
 
+    /// Adds the coordinates of other onto this. x = x + other.x ...
     fn add<P>(&mut self, other: &P) where
         P: Is3D {
 
@@ -42,6 +46,7 @@ pub trait IsEditable3D : Is3D + IsEditableND {
         self.set_z(z);
     }
 
+    /// Substracts the coordinates of other from this. x = x - other.x ...
     fn substract<P>(&mut self, other: &P) where
         P: Is3D {
 
@@ -53,6 +58,7 @@ pub trait IsEditable3D : Is3D + IsEditableND {
         self.set_z(z);
     }
 
+    /// Scales the coordinates by applying a factor to all of them
     fn scale(&mut self, val: f64) {
         let x = val * self.x();
         let y = val * self.y();

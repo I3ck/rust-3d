@@ -31,6 +31,7 @@ use point_3d::{Point3D};
 use bounding_box_3d::*;
 use functions::dist_3d;
 
+/// PointCloud3D, a collection of positions within 3D space
 pub struct PointCloud3D<P> where
     P: Is3D {
 
@@ -39,11 +40,12 @@ pub struct PointCloud3D<P> where
 
 impl<P> PointCloud3D<P> where
     P: Is3D {
-
+    /// Creates a new, empty point cloud
     pub fn new() -> PointCloud3D<P> {
         PointCloud3D{data: Vec::new()}
     }
 
+    /// Serializes the point cloud
     pub fn to_str(&self) -> String {
         let mut result = String::new();
         for p in &self.data {
@@ -52,26 +54,32 @@ impl<P> PointCloud3D<P> where
         result
     }
 
+    /// Pushes a new position to the end of the point cloud
     pub fn push(&mut self, p: P) {
         self.data.push(Box::new(p));
     }
 
+    /// Returns the length / number of elements
     pub fn len(&self) -> usize {
         self.data.len()
     }
 
+    /// Sorts all positions within the point cloud by x
     pub fn sort_x(&mut self) {
         self.data.sort_by(|a, b| a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
     }
 
+    /// Sorts all positions within the point cloud by y
     pub fn sort_y(&mut self) {
         self.data.sort_by(|a, b| a.y().partial_cmp(&b.y()).unwrap_or(Ordering::Equal));
     }
 
+    /// Sorts all positions within the point cloud by z
     pub fn sort_z(&mut self) {
         self.data.sort_by(|a, b| a.z().partial_cmp(&b.z()).unwrap_or(Ordering::Equal));
     }
 
+    /// Applies a function to each position
     pub fn for_each_point<F>(&mut self, mut f: F) where
         F: FnMut(&mut P) {
 
@@ -84,6 +92,7 @@ impl<P> PointCloud3D<P> where
 impl<P> PointCloud3D<P> where
     P: Is3D + Clone {
 
+    /// Creates a copy of the point cloud
     pub fn clone(&self) -> PointCloud3D<P> {
         let mut data: Vec<Box<P>>;
         data = Vec::new();
@@ -95,12 +104,15 @@ impl<P> PointCloud3D<P> where
         PointCloud3D { data: data }
     }
 
+    /// Appends all values of other behind this
     pub fn consume(&mut self, other: Self) {
         for p in other.data {
             self.data.push(Box::new((*p).clone()));
         }
     }
 
+    //@todo can be implemented without Clone
+    /// Returns the length / path between all positions within the point cloud
     pub fn path_length(&self) -> f64 { //@todo define trait for this WithLength or similar
         let mut length : f64 = 0.0;
         if self.data.len() < 2 { return length; }
@@ -115,6 +127,7 @@ impl<P> PointCloud3D<P> where
 impl<P> PointCloud3D<P> where
     P: IsBuildable3D + Clone {
 
+    /// Creates a new point cloud from an input string
     pub fn parse(text: String) -> Result<PointCloud3D<P>> {
         let lines = text.split("\n");
 

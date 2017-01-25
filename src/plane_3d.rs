@@ -20,6 +20,7 @@ use traits::is_3d::*;
 use traits::is_buildable_3d::*;
 use traits::is_normalized_3d::*;
 
+/// Plane3D, a plane within 3D space
 pub struct Plane3D<P,N> where
     P: Is3D,
     N: IsNormalized3D {

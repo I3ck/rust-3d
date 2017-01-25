@@ -25,6 +25,7 @@ use std::fs::File;
 
 //@todo better name for params
 //@todo "where" less specific?
+/// Saves a PointCloud2D as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xy file format or .csv files
 pub fn save_xy<P>(pc: &PointCloud2D<P>, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()> where
     P: IsEditable2D + IsBuildable2D {
 

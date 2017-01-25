@@ -20,6 +20,7 @@ use std::fmt;
 use std::num::ParseFloatError;
 use std::io::Error as ioError;
 
+/// The Error Enum used by rust-3d
 pub enum ErrorKind {
     MinMaxSwapped,
     MinMaxEqual,
@@ -38,6 +39,7 @@ pub enum ErrorKind {
 }
 
 impl ErrorKind {
+    /// Returns readable text for the ErrorKind
     fn as_str(&self) -> &'static str {
         match *self {
             ErrorKind::MinMaxSwapped             => "Passed min/max values are swapped (min > max)",
@@ -64,9 +66,12 @@ impl fmt::Debug for ErrorKind {
     }
 }
 
+/// Result type used by rust-3d
 pub type Result<T> = result::Result<T, ErrorKind>;
 
+/// Trait used to convert other Errors to ErrorKind
 pub trait ToErrorKind {
+    /// Creates an ErrorKind from this
     fn to_error_kind(&self) -> ErrorKind;
 }
 

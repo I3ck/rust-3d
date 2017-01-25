@@ -28,6 +28,7 @@ use point_3d::*;
 use point_cloud_3d::*;
 use compressed_point_3d::*;
 
+/// CompressedPointCloud3D
 pub struct CompressedPointCloud3D<T> where
     T: Unsigned + PrimInt {
 
@@ -41,7 +42,7 @@ pub struct CompressedPointCloud3D<T> where
 
 impl<T> CompressedPointCloud3D<T> where
     T: Unsigned + PrimInt {
-
+    /// Creates a new CompressedPointCloud3D from a normal point cloud
     pub fn compress<P>(pc: &PointCloud3D<P>) -> Result<CompressedPointCloud3D<T>> where
         P: Is3D {
 
@@ -76,8 +77,7 @@ impl<T> CompressedPointCloud3D<T> where
         Ok(CompressedPointCloud3D::<T>{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data})
     }
 
-//------------------------------------------------------------------------------
-
+    /// Creates a new point cloud from this
     pub fn decompress<P>(&self) -> PointCloud3D<P> where
         P: Is3D + IsBuildable3D {
 

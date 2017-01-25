@@ -25,6 +25,7 @@ use std::fs::File;
 
 //@todo better name for params
 //@todo "where" less specific?
+/// Saves a PointCloud3D as x y z coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xyz file format or .csv files
 pub fn save_xyz<P>(pc: &PointCloud3D<P>, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()> where
     P: IsEditable3D + IsBuildable3D {
 

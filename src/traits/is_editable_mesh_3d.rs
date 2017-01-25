@@ -19,14 +19,15 @@ use result::*;
 use traits::is_buildable_3d::*;
 use traits::is_mesh_3d::*;
 
+/// IsEditableMesh3D is a trait used for meshes in 3D space which can be edited
 pub trait IsEditableMesh3D<P> : IsMesh3D<P> where
     P: IsBuildable3D {
-
+    /// Should create a new and empty mesh. No vertices, no faces
     fn new() -> Self;
-
+    /// Should add a vertex to the end and return its id
     fn add_vertex(&mut self, vertex: P) -> usize;
-
+    /// Should add a face with the 3 positions. Also should return the id of the new face
     fn add_face(&mut self, v1: P, v2: P, v3: P) -> usize;
-
+    /// Should add a face to the mesh by connecting the vertices via their ids. Should return the id of the newly added face
     fn try_add_connection(&mut self, vid1: usize, vid2: usize, vid3: usize) -> Result<usize>;
 }

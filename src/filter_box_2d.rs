@@ -32,6 +32,7 @@ use functions::{sqr_dist_2d};
 use positive::*;
 
 #[derive (PartialEq, PartialOrd)]
+/// FilterBox2D, a box filter within 2D space
 pub struct FilterBox2D {
     center: Point2D,
     size_x: f64,
@@ -68,13 +69,16 @@ impl Clone for FilterBox2D {
 }
 
 impl FilterBox2D {
+    /// Creates a new FilterBox2D at origin with sizes of 1
     pub fn new() -> Self {
         FilterBox2D {center: *Point2D::new(), size_x: 1.0, size_y: 1.0}
     }
+    /// Creates a new FilterBox2D with the given parameters
     pub fn build(center: Point2D, p_size_x: Positive, p_size_y: Positive) -> Self {
         FilterBox2D {center: center, size_x: p_size_x.get(), size_y: p_size_y.get()}
     }
     //@todo make this a trait
+    /// Creates a new FilterBox2D with the same dimensions as the given bounding box
     pub fn from_bb(hbb: &HasBoundingBox2D) -> Option<Self> {
         match (hbb.center_bb(), hbb.size_x(), hbb.size_y()) {
             (Ok(center), Ok(sx), Ok(sy)) => if sx > 0.0 && sy > 0.0 {

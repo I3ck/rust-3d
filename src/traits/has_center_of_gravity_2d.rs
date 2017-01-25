@@ -18,6 +18,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use result::*;
 use point_2d::*;
 
+/// HasCenterOfGravity2D is a trait for types which might have a center of gravity
 pub trait HasCenterOfGravity2D {
+    /// Should return the center of gravity
     fn center_of_gravity(&self) -> Result<Point2D>;
 }

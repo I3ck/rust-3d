@@ -29,10 +29,12 @@ use traits::is_buildable_2d::*;
 ///@todo correct reserving
 ///@todo order parameters (e.g. center and n_points always first)
 
-pub fn origin() -> Box<Point2D> {
+/// Returns a point at the origin
+pub fn origin() -> Box<Point2D> { //@todo private?
     Point2D::build(0.0, 0.0)
 }
 
+/// Creates a 2D rectangle from given center width and height
 pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
@@ -46,6 +48,7 @@ pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> Box<PointC
     Box::new(pc)
 }
 
+/// Creates a involut circle with the given center, diameter, resolution and start and end angles in radians
 pub fn involut_circle<P>(center: &P, diameter: Positive, n_points: usize, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
@@ -62,6 +65,7 @@ pub fn involut_circle<P>(center: &P, diameter: Positive, n_points: usize, radian
     Box::new(pc)
 }
 
+/// Creates an arc with the given center, diameter, resolution and start and end angles in radians
 pub fn arc<P>(center: &P, diameter: Positive, n_points: usize, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
@@ -77,6 +81,7 @@ pub fn arc<P>(center: &P, diameter: Positive, n_points: usize, radians_start: f6
     Box::new(pc)
 }
 
+/// Creates an ellipse with the given center, a, b and resolution
 pub fn ellipse<P>(center: &P, ap: Positive, bp: Positive, n_points: usize) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 

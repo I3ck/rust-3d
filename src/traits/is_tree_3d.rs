@@ -18,14 +18,15 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use traits::is_3d::*;
 use point_cloud_3d::*;
 
+/// IsTree3D is a trait used for types which are any type of tree within 3D space
 pub trait IsTree3D<P> where
     P: Is3D {
-
+    /// Should create a new tree
     fn new() -> Self;
-
+    /// Should return the number of elements within the tree
     fn size(&self) -> usize;
-
+    /// Should return all positions within the tree as point cloud
     fn to_pointcloud(&self) -> PointCloud3D<P>; //@todo as trait
-
-    fn build(&mut self, pc : PointCloud3D<P>) -> bool;
+    /// Should create a new tree from a given point cloud
+    fn build(&mut self, pc : PointCloud3D<P>) -> bool; //@todo return Result
 }

@@ -18,6 +18,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use result::*;
 use traits::is_nd::*;
 
+/// IsEditableND is a trait used for types which are positioned in n-dimensional space and their position can be changed
 pub trait IsEditableND : IsND {
+    /// Should set the coordinate / position at dimension to val
     fn set_position(&mut self, dimension: usize, val: f64) -> Result<()>; //@todo rename
 }
