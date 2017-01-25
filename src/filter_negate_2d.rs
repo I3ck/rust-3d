@@ -13,6 +13,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//! Module containing FilterNegate2D, a filter within 2D space which negates another filter
+
 use traits::is_filter_2d::*;
 use traits::is_2d::*;
 

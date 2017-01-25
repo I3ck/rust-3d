@@ -13,6 +13,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//! 3D/2D library written in Rust.
+//! Offering useful containers, structures and algorithms for 2D and 3D space.
+//! Meant as basis for numeric algorithms, viewers, game engines, ...
+
 pub mod traits;
 pub mod io;
 pub mod functions;

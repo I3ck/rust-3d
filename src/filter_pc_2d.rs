@@ -13,6 +13,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//! Module containing FilterPC2D, a filter which can transform any IsFilter2D into an IsFilterPC2D
+
 use std::collections::HashSet;
 
 use point_cloud_2d::*;

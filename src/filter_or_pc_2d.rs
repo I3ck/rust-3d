@@ -13,6 +13,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//! Module containing FilterOrPC2D, a filter to chain multiple 2D filters with the or condition => must pass any filter to pass this filter
+
 use traits::is_2d::*;
 use traits::is_filter_pc_2d::*;
 use point_cloud_2d::*;

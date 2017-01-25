@@ -13,6 +13,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//! Module containing the IsEditable2D trait used for types which are positioned in 2D space and their position can be changed
+
 use traits::is_2d::*;
 use traits::is_editable_nd::*;
 

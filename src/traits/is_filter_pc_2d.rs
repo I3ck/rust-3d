@@ -13,6 +13,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//! Module containing the IsFilterPC2D trait used for filters for 2D position collections
+
 use traits::is_2d::*;
 use point_cloud_2d::*;
 use view::*;

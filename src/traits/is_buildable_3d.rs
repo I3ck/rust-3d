@@ -13,6 +13,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//! Module containing the IsBuildable3D trait used for types which are positioned in 3D space and can be constructed
+
 extern crate core;
 
 use self::core::str::FromStr;

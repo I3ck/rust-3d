@@ -13,6 +13,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//! Module containing the IsND trait used for types which are positioned within the n-dimensional space
+
 use result::*;
 
 //@todo description

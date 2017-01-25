@@ -13,6 +13,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//! Module containing the IsTree3D trait used for types which are any type of tree within 3D space
+
 use traits::is_3d::*;
 use point_cloud_3d::*;
 

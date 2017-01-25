@@ -13,6 +13,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//! Module containing BoundingBox3D, an axis aligned bounding box within 3D space
+
 use result::*;
 use point_3d::*;
 use traits::is_3d::*;

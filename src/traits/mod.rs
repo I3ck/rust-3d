@@ -13,6 +13,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//! Containing traits used by rust-3d
+
 pub mod has_bounding_box_2d;
 pub mod has_bounding_box_3d;
 pub mod has_center_of_gravity_2d;
