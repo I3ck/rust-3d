@@ -148,7 +148,7 @@ impl<P> IsRandomAccessible2D<P> for PointCloud2D<P> where
         }
     }
 
-    fn map_point(&mut self, index: usize, mut f: FnMut(&mut P)) -> Result<()> {
+    fn map_point(&mut self, index: usize, mut f: &mut FnMut(&mut P)) -> Result<()> {
         if index >= self.len() {
             Err(ErrorKind::IncorrectVertexID)
         } else {
