@@ -151,8 +151,6 @@ impl IsBuildableND for FilterBox3D {
     }
 }
 
-//@todo drop this impl once not required anymore for editable?
-//@todo or always set sizes to 1
 impl IsBuildable3D for FilterBox3D {
     fn build(x: f64, y: f64, z: f64) -> Box<Self> {
         Box::new(FilterBox3D::build(*Point3D::build(x, y, z), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap()))

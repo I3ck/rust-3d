@@ -16,18 +16,16 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! Module for IO operations on 2D point clouds
 
 use result::*;
-use traits::is_editable_2d::*;
-use traits::is_buildable_2d::*;
+use traits::is_2d::*;
 use point_cloud_2d::*;
 
 use std::io::prelude::*;
 use std::fs::File;
 
 //@todo better name for params
-//@todo "where" less specific?
 /// Saves a PointCloud2D as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xy file format or .csv files
 pub fn save_xy<P>(pc: &PointCloud2D<P>, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()> where
-    P: IsEditable2D + IsBuildable2D {
+    P: Is2D {
 
     let mut f = try!(File::create(filepath).map_err(|e| e.to_error_kind()));
 
