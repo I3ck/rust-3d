@@ -30,6 +30,7 @@ use traits::is_filter_2d::*;
 use point_2d::*;
 use functions::{dist_2d, sqr_dist_2d};
 use positive::*;
+use bounding_box_2d::*;
 
 #[derive (PartialEq, PartialOrd)]
 /// FilterCircle, a circle filter within 2D space
@@ -157,10 +158,10 @@ impl IsEditable2D for FilterCircle {
 }
 
 impl HasBoundingBox2D for FilterCircle {
-    fn bounding_box(&self) -> Result<(Point2D, Point2D)> {
+    fn bounding_box(&self) -> Result<BoundingBox2D> {
         let p_min = *Point2D::build(self.center.x() - self.radius, self.center.y() - self.radius);
         let p_max = *Point2D::build(self.center.x() + self.radius, self.center.y() + self.radius);
-        return Ok((p_min, p_max));
+        Ok(BoundingBox2D::new(p_min, p_max))
     }
 }
 

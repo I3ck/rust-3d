@@ -185,9 +185,8 @@ impl<P> IsMoveable2D for PointCloud2D<P> where
 impl<P> HasBoundingBox2D for PointCloud2D<P>
     where P: Is2D {
 
-    fn bounding_box(&self) -> Result<(Point2D, Point2D)> {
-        let bb = try!(BoundingBox2D::from_iterator(&self.data));
-        bb.bounding_box()
+    fn bounding_box(&self) -> Result<BoundingBox2D> {
+        BoundingBox2D::from_iterator(&self.data)
     }
 }
 

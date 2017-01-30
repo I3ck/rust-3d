@@ -73,7 +73,7 @@ impl BoundingBox3D {
 }
 
 impl HasBoundingBox3D for BoundingBox3D {
-    fn bounding_box(&self) -> Result<(Point3D, Point3D)> {
-        Ok((self.min.clone(), self.max.clone()))
+    fn bounding_box(&self) -> Result<BoundingBox3D> {
+        Ok(BoundingBox3D::new(self.min.clone(), self.max.clone()))
     }
 }

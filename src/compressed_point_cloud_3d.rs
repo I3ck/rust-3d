@@ -27,6 +27,7 @@ use traits::has_bounding_box_3d::*;
 use point_3d::*;
 use point_cloud_3d::*;
 use compressed_point_3d::*;
+use bounding_box_3d::*;
 
 /// CompressedPointCloud3D
 pub struct CompressedPointCloud3D<T> where
@@ -46,11 +47,11 @@ impl<T> CompressedPointCloud3D<T> where
     pub fn compress<P>(pc: &PointCloud3D<P>) -> Result<CompressedPointCloud3D<T>> where
         P: Is3D {
 
-        let (pmin, pmax) = try!(pc.bounding_box());
+        let bb = try!(pc.bounding_box());
 
-        let rangex = (pmax.x - pmin.x).abs();
-        let rangey = (pmax.y - pmin.y).abs();
-        let rangez = (pmax.z - pmin.z).abs();
+        let rangex = (bb.max.x - bb.min.x).abs();
+        let rangey = (bb.max.y - bb.min.y).abs();
+        let rangez = (bb.max.z - bb.min.z).abs();
 
         let maxval = try!(T::max_value().to_f64().ok_or(ErrorKind::NumberConversionError));
         let unitsizex = rangex / maxval;
@@ -60,9 +61,9 @@ impl<T> CompressedPointCloud3D<T> where
         let mut data = Vec::new();
 
         for p in &pc.data {
-            let distx = p.x() - pmin.x;
-            let disty = p.y() - pmin.y;
-            let distz = p.z() - pmin.z;
+            let distx = p.x() - bb.min.x;
+            let disty = p.y() - bb.min.y;
+            let distz = p.z() - bb.min.z;
 
             let unitsx = try!(T::from(distx / unitsizex).ok_or(ErrorKind::NumberConversionError));
             let unitsy = try!(T::from(disty / unitsizey).ok_or(ErrorKind::NumberConversionError));
@@ -74,7 +75,7 @@ impl<T> CompressedPointCloud3D<T> where
                 unitsz: unitsz
             })
         }
-        Ok(CompressedPointCloud3D::<T>{start: pmin, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data})
+        Ok(CompressedPointCloud3D::<T>{start: bb.min, unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data})
     }
 
     /// Creates a new point cloud from this

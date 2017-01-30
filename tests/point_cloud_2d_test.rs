@@ -46,11 +46,11 @@ fn point_cloud_2d_test() {
 
     match pc.bounding_box() {
         Err(_) => assert!(false),
-        Ok((bbmin, bbmax)) => {
-            assert!(bbmin.x() == 0.1);
-            assert!(bbmin.y() == 0.2);
-            assert!(bbmax.x() == 0.2);
-            assert!(bbmax.y() == 0.3);
+        Ok(bb) => {
+            assert!(bb.min.x() == 0.1);
+            assert!(bb.min.y() == 0.2);
+            assert!(bb.max.x() == 0.2);
+            assert!(bb.max.y() == 0.3);
         }
     }
     assert!(pc.to_str() == "0.1 0.2\n0.2 0.3\n");

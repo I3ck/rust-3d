@@ -67,7 +67,7 @@ impl BoundingBox2D {
 }
 
 impl HasBoundingBox2D for BoundingBox2D {
-    fn bounding_box(&self) -> Result<(Point2D, Point2D)> {
-        Ok((self.min.clone(), self.max.clone()))
+    fn bounding_box(&self) -> Result<BoundingBox2D> {
+        Ok(BoundingBox2D::new(self.min.clone(), self.max.clone()))
     }
 }

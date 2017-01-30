@@ -30,6 +30,7 @@ use traits::is_filter_3d::*;
 use point_3d::*;
 use functions::{dist_3d, sqr_dist_3d};
 use positive::*;
+use bounding_box_3d::*;
 
 #[derive (PartialEq, PartialOrd)]
 /// FilterSphere, a sphere filter within 3D space
@@ -168,10 +169,10 @@ impl IsEditable3D for FilterSphere {
 }
 
 impl HasBoundingBox3D for FilterSphere {
-    fn bounding_box(&self) -> Result<(Point3D, Point3D)> {
+    fn bounding_box(&self) -> Result<BoundingBox3D> {
         let p_min = *Point3D::build(self.center.x() - self.radius, self.center.y() - self.radius, self.center.z() - self.radius);
         let p_max = *Point3D::build(self.center.x() + self.radius, self.center.y() + self.radius, self.center.z() + self.radius);
-        return Ok((p_min, p_max));
+        Ok(BoundingBox3D::new(p_min, p_max))
     }
 }
 

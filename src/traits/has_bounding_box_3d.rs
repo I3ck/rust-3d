@@ -19,48 +19,49 @@ use result::*;
 use traits::is_3d::*;
 use traits::is_buildable_3d::*;
 use point_3d::*;
+use bounding_box_3d::*;
 
 /// HasBoundingBox3D is a trait for types which might have a bounding box
 pub trait HasBoundingBox3D  {
     /// Should return the bounding box as a pair of two points. The first point should be the minimum for all coordinates, the second the maximum for all coordinates
-    fn bounding_box(&self) -> Result<(Point3D, Point3D)>;
+    fn bounding_box(&self) -> Result<BoundingBox3D>;
 
     /// Returns the minimum position of the bounding box
     fn min_pos(&self) -> Result<Point3D> {
-        let (min,_) = try!(self.bounding_box());
-        Ok(min)
+        let bb = try!(self.bounding_box());
+        Ok(bb.min)
     }
 
     /// Returns the maximum position of the bounding box
     fn max_pos(&self) -> Result<Point3D> {
-        let (_,max) = try!(self.bounding_box());
-        Ok(max)
+        let bb = try!(self.bounding_box());
+        Ok(bb.max)
     }
 
     /// Returns the size the bounding box within the x-dimension
     fn size_x(&self) -> Result<f64> {
-        let (min, max) = try!(self.bounding_box());
-        Ok((max.x() - min.x()).abs())
+        let bb = try!(self.bounding_box());
+        Ok((bb.max.x() - bb.min.x()).abs())
     }
 
     /// Returns the size the bounding box within the y-dimension
     fn size_y(&self) -> Result<f64> {
-        let (min, max) = try!(self.bounding_box());
-        Ok((max.y() - min.y()).abs())
+        let bb = try!(self.bounding_box());
+        Ok((bb.max.y() - bb.min.y()).abs())
     }
 
     /// Returns the size the bounding box within the z-dimension
     fn size_z(&self) -> Result<f64> {
-        let (min, max) = try!(self.bounding_box());
-        Ok((max.z() - min.z()).abs())
+        let bb = try!(self.bounding_box());
+        Ok((bb.max.z() - bb.min.z()).abs())
     }
 
     /// Returns the center of the bounding box
     fn center_bb(&self) -> Result<Point3D> {
-        let (min, max) = try!(self.bounding_box());
-        Ok(*Point3D::build(min.x() + (max.x() - min.x()) / 2.0,
-                           min.y() + (max.y() - min.y()) / 2.0,
-                           min.z() + (max.z() - min.z()) / 2.0))
+        let bb = try!(self.bounding_box());
+        Ok(*Point3D::build(bb.min.x() + (bb.max.x() - bb.min.x()) / 2.0,
+                           bb.min.y() + (bb.max.y() - bb.min.y()) / 2.0,
+                           bb.min.z() + (bb.max.z() - bb.min.z()) / 2.0))
     }
 
     /// Tests whether this bounding box is within the other
@@ -68,8 +69,8 @@ pub trait HasBoundingBox3D  {
         Self: Sized, B: HasBoundingBox3D {
 
         if let (Ok(bbthis), Ok(bbother)) = (self.bounding_box(), other.bounding_box()) {
-            let (minthis, maxthis) = bbthis;
-            let (minother, maxother) = bbother;
+            let (minthis, maxthis) = (bbthis.min, bbthis.max);
+            let (minother, maxother) = (bbother.min, bbother.max);
 
             return Ok(
                    minthis.x() > minother.x()
@@ -88,7 +89,7 @@ pub trait HasBoundingBox3D  {
         Self: Sized, P: Is3D {
 
         if let Ok(bbthis) = self.bounding_box() {
-            let (minthis, maxthis) = bbthis;
+            let (minthis, maxthis) = (bbthis.min, bbthis.max);
 
             return Ok(
                    other.x() > minthis.x()
@@ -107,8 +108,8 @@ pub trait HasBoundingBox3D  {
         Self: Sized, B: HasBoundingBox3D {
 
         if let (Ok(bbthis), Ok(bbother)) = (self.bounding_box(), other.bounding_box()) {
-            let (minthis, maxthis) = bbthis;
-            let (minother, maxother) = bbother;
+            let (minthis, maxthis) = (bbthis.min, bbthis.max);
+            let (minother, maxother) = (bbother.min, bbother.max);
 
             return Ok(
                    minthis.x() < minother.x()
@@ -127,8 +128,8 @@ pub trait HasBoundingBox3D  {
         Self: Sized, B: HasBoundingBox3D {
 
         if let (Ok(bbthis), Ok(bbother)) = (self.bounding_box(), other.bounding_box()) {
-            let (minthis, maxthis) = bbthis;
-            let (minother, maxother) = bbother;
+            let (minthis, maxthis) = (bbthis.min, bbthis.max);
+            let (minother, maxother) = (bbother.min, bbother.max);
 
             let (xsizethis, ysizethis, zsizethis) = (
                 (minthis.x() - maxthis.x()).abs(),

@@ -192,9 +192,8 @@ impl<P> IsMoveable3D for PointCloud3D<P> where
 impl<P> HasBoundingBox3D for PointCloud3D<P> where
     P: Is3D {
 
-    fn bounding_box(&self) -> Result<(Point3D, Point3D)> {
-        let bb = try!(BoundingBox3D::from_iterator(&self.data));
-        bb.bounding_box()
+    fn bounding_box(&self) -> Result<BoundingBox3D> {
+        BoundingBox3D::from_iterator(&self.data)
     }
 }
 

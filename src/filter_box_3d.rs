@@ -30,6 +30,7 @@ use traits::is_filter_3d::*;
 use point_3d::*;
 use functions::{sqr_dist_3d};
 use positive::*;
+use bounding_box_3d::*;
 
 #[derive (PartialEq, PartialOrd)]
 /// FilterBox3D, a box filter within 3D space
@@ -189,10 +190,10 @@ impl IsEditable3D for FilterBox3D {
 }
 
 impl HasBoundingBox3D for FilterBox3D {
-    fn bounding_box(&self) -> Result<(Point3D, Point3D)> {
+    fn bounding_box(&self) -> Result<BoundingBox3D> {
         let p_min = *Point3D::build(self.center.x() - self.size_x / 2.0, self.center.y() - self.size_y / 2.0, self.center.z() - self.size_z / 2.0);
         let p_max = *Point3D::build(self.center.x() + self.size_x / 2.0, self.center.y() + self.size_y / 2.0, self.center.z() + self.size_z / 2.0);
-        return Ok((p_min, p_max));
+        Ok(BoundingBox3D::new(p_min, p_max))
     }
 }
 

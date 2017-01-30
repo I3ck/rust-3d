@@ -24,6 +24,7 @@ use traits::is_buildable_3d::*;
 use traits::has_bounding_box_3d::*;
 use point_3d::*;
 use point_cloud_3d::*;
+use bounding_box_3d::*;
 
 /// Mesh3D, a mesh with tri-faces within 3D space
 pub struct Mesh3D<P> where
@@ -111,7 +112,7 @@ impl<P> IsEditableMesh3D<P> for Mesh3D<P> where
 impl<P> HasBoundingBox3D for Mesh3D<P> where
     P: Is3D {
 
-    fn bounding_box(&self) -> Result<(Point3D, Point3D)> {
+    fn bounding_box(&self) -> Result<BoundingBox3D> {
         self.pc.bounding_box()
     }
 

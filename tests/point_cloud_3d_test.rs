@@ -46,13 +46,13 @@ fn test_point_cloud_3d() {
 
     match pc.bounding_box() {
         Err(_) => assert!(false),
-        Ok((bbmin, bbmax)) => {
-            assert!(bbmin.x() == 0.1);
-            assert!(bbmin.y() == 0.2);
-            assert!(bbmin.z() == 0.3);
-            assert!(bbmax.x() == 0.2);
-            assert!(bbmax.y() == 0.3);
-            assert!(bbmax.z() == 0.4);
+        Ok(bb) => {
+            assert!(bb.min.x() == 0.1);
+            assert!(bb.min.y() == 0.2);
+            assert!(bb.min.z() == 0.3);
+            assert!(bb.max.x() == 0.2);
+            assert!(bb.max.y() == 0.3);
+            assert!(bb.max.z() == 0.4);
         }
     }
     assert!(pc.to_str() == "0.1 0.2 0.3\n0.2 0.3 0.4\n");
