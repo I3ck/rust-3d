@@ -9,13 +9,11 @@ notes
 rust-3d is still in really early stages, and is likely to change A LOT over time.
 Feel free to open an issue in case you're missing something or found a bug.
 Also some code might be untested, I am working on 100% test coverage, tho.
-Once this is fairly well tested, I'll also add it to crates.
-
-
 
 
 traits
 -----
+Please check the [documentation](https://docs.rs/rust-3d/) for the most recent and extensive info.  
 ```rust
 IsND //anything defined by a position in n-dimensional space
 Is2D //anything defined by a position in 2D space
@@ -50,6 +48,7 @@ Although implementations are provided as well:
 
 implementations
 ---------------
+Please check the [documentation](https://docs.rs/rust-3d/) for the most recent and extensive info.  
 ```rust
 Point2D //a point in 2D space
 Point3D //a point in 3D space
@@ -80,6 +79,7 @@ FilterOrPC3D //filter combinator to get the result of applying many 3D filters c
 
 factories
 ---------
+Please check the [documentation](https://docs.rs/rust-3d/) for the most recent and extensive info.  
 ```rust
 rectangle //a rectangle
 involut_circle //an involut circle (e.g. used for gear generation)
@@ -89,6 +89,7 @@ ellipse //an ellipse
 
 interpolations
 --------------
+Please check the [documentation](https://docs.rs/rust-3d/) for the most recent and extensive info.  
 ```rust
 interpolation_bezier // https://en.wikipedia.org/wiki/B%C3%A9zier_curve
 interpolate_cosine
