@@ -27,6 +27,7 @@ use traits::is_buildable_3d::*;
 use traits::is_editable_3d::*;
 use traits::has_bounding_box_3d::*;
 use traits::has_center_of_gravity_3d::*;
+use traits::has_length::*;
 use point_3d::{Point3D};
 use bounding_box_3d::*;
 use functions::dist_3d;
@@ -109,18 +110,6 @@ impl<P> PointCloud3D<P> where
         for p in other.data {
             self.data.push(Box::new((*p).clone()));
         }
-    }
-
-    //@todo can be implemented without Clone
-    /// Returns the length / path between all positions within the point cloud
-    pub fn path_length(&self) -> f64 { //@todo define trait for this WithLength or similar
-        let mut length : f64 = 0.0;
-        if self.data.len() < 2 { return length; }
-
-        for i in 1..self.data.len() {
-            length += dist_3d(&*self.data[i], &*self.data[i-1]);
-        }
-        length
     }
 }
 
@@ -224,6 +213,20 @@ impl<P> HasCenterOfGravity3D for PointCloud3D<P>
             (sumy / sizef),
             (sumz / sizef)
         ))
+    }
+}
+
+impl<P> HasLength for PointCloud3D<P> where
+    P: Is3D {
+
+    fn length(&self) -> f64 {
+        let mut length : f64 = 0.0;
+        if self.data.len() < 2 { return length; }
+
+        for i in 1..self.data.len() {
+            length += dist_3d(&*self.data[i], &*self.data[i-1]);
+        }
+        length
     }
 }
 

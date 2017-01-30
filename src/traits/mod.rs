@@ -19,6 +19,7 @@ pub mod has_bounding_box_2d;
 pub mod has_bounding_box_3d;
 pub mod has_center_of_gravity_2d;
 pub mod has_center_of_gravity_3d;
+pub mod has_length;
 pub mod is_editable_2d;
 pub mod is_editable_3d;
 pub mod is_editable_nd;

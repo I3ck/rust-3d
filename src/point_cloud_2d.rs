@@ -26,6 +26,7 @@ use traits::is_buildable_2d::*;
 use traits::is_editable_2d::*;
 use traits::has_bounding_box_2d::*;
 use traits::has_center_of_gravity_2d::*;
+use traits::has_length::*;
 use point_2d::*;
 use bounding_box_2d::*;
 use functions::dist_2d;
@@ -80,17 +81,6 @@ impl<P> PointCloud2D<P> where
         for p in &mut self.data {
             f(&mut **p);
         }
-    }
-
-    /// Returns the length / path between all positions within the point cloud
-    pub fn path_length(&self) -> f64 { //@todo define trait for this WithLength or similar
-        let mut length : f64 = 0.0;
-        if self.data.len() < 2 { return length; }
-
-        for i in 1..self.data.len() {
-            length += dist_2d(&*self.data[i], &*self.data[i-1]);
-        }
-        length
     }
 }
 
@@ -214,6 +204,20 @@ impl<P> HasCenterOfGravity2D for PointCloud2D<P>
             (sumx / sizef),
             (sumy / sizef)
         ))
+    }
+}
+
+impl<P> HasLength for PointCloud2D<P> where
+    P: Is2D {
+
+    fn length(&self) -> f64 {
+        let mut length : f64 = 0.0;
+        if self.data.len() < 2 { return length; }
+
+        for i in 1..self.data.len() {
+            length += dist_2d(&*self.data[i], &*self.data[i-1]);
+        }
+        length
     }
 }
 

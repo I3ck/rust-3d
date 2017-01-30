@@ -21,6 +21,7 @@ use result::*;
 use point_cloud_2d::*;
 use traits::is_buildable_2d::*;
 use traits::is_editable_2d::*;
+use traits::has_length::*;
 
 
 ///@todo correct reserving
@@ -85,7 +86,7 @@ pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
     }
 
     let mut pc = PointCloud2D::new();
-    let p_dist = base_points.path_length() / (n_points - 1) as f64;
+    let p_dist = base_points.length() / (n_points - 1) as f64;
 
     for i in 0..n_points {
         let mut traveled : f64 = 0.0;
@@ -119,7 +120,7 @@ pub fn interpolation_linear<P>(base_points: &PointCloud2D<P>, n_points: usize) -
     }
 
     let mut pc = PointCloud2D::new();
-    let p_dist = base_points.path_length() / (n_points - 1) as f64;
+    let p_dist = base_points.length() / (n_points - 1) as f64;
 
     for i in 0..n_points {
         let mut traveled : f64 = 0.0;
