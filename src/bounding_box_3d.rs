@@ -28,8 +28,14 @@ pub struct BoundingBox3D {
 
 impl BoundingBox3D {
     /// Creates a new BoundingBox3D with the given min and max positions
-    pub fn new(min: Point3D, max: Point3D) -> BoundingBox3D { //@todo return result and check for correctness within min max, or fix it //@todo also offer other constructor with concrete values (or build from Is2D)
-        BoundingBox3D{min: min, max: max}
+    pub fn new(min: Point3D, max: Point3D) -> Result<BoundingBox3D> {
+        if min.x == max.x || min.y == max.y || min.z == max.z {
+            Err(ErrorKind::MinMaxEqual)
+        } else if min.x > max.x || min.y > max.y || min.z > max.z {
+            Err(ErrorKind::MinMaxSwapped)
+        } else {
+            Ok(BoundingBox3D{min: min, max: max})
+        }
     }
     /// Creates a new BoundBox3D which contains all the given positions
     pub fn from_iterator<'a, It3D,P>(source: It3D) -> Result<BoundingBox3D> where
@@ -65,7 +71,7 @@ impl BoundingBox3D {
             count += 1;
         }
         if count >= 2 {
-            Ok((Self::new(Point3D{x: minx, y: miny, z: minz}, Point3D{x: maxx, y: maxy, z: maxz})))
+            Self::new(Point3D{x: minx, y: miny, z: minz}, Point3D{x: maxx, y: maxy, z: maxz})
         } else {
             Err(ErrorKind::TooFewPoints)
         }
@@ -74,6 +80,6 @@ impl BoundingBox3D {
 
 impl HasBoundingBox3D for BoundingBox3D {
     fn bounding_box(&self) -> Result<BoundingBox3D> {
-        Ok(BoundingBox3D::new(self.min.clone(), self.max.clone()))
+        BoundingBox3D::new(self.min.clone(), self.max.clone())
     }
 }

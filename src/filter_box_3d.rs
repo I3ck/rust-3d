@@ -193,7 +193,7 @@ impl HasBoundingBox3D for FilterBox3D {
     fn bounding_box(&self) -> Result<BoundingBox3D> {
         let p_min = *Point3D::build(self.center.x() - self.size_x / 2.0, self.center.y() - self.size_y / 2.0, self.center.z() - self.size_z / 2.0);
         let p_max = *Point3D::build(self.center.x() + self.size_x / 2.0, self.center.y() + self.size_y / 2.0, self.center.z() + self.size_z / 2.0);
-        Ok(BoundingBox3D::new(p_min, p_max))
+        BoundingBox3D::new(p_min, p_max)
     }
 }
 
