@@ -37,3 +37,5 @@ pub mod filter_or_2d;
 pub mod filter_or_3d;
 pub mod filter_xor_2d;
 pub mod filter_xor_3d;
+pub mod filter_outer_inner_2d;
+pub mod filter_outer_inner_3d;
