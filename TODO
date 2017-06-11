@@ -1,7 +1,5 @@
-implement HasBoundingBox for pointcloud
 iterators for collections
 unittest all the things
-simplify use statements
 rename moveAble
 octree for voxel image
 kdtree for 2d or generic
@@ -15,8 +13,6 @@ has_position trait which then can implement many other traits by using the provi
 
 many tests are missing
 
-filters for 3d
-
 update README and tests
 
 make kd-tree n-dimensional   (maybe the octree as well, but might be easier to implement quadtree)
@@ -25,19 +21,13 @@ make trees referencing via ids
 
 filters should be directed (this could be dropped and a TransFormed wrapper applied [which inverse transformes incoming points first])
 
-negating filters which can be used to e.g. create ring filters
-
 for impls and structs only require as few traits as possible
-
-own error enum
 
 use get methods of Vec to have safer code
 
 IO methods split from the impls / traits as algorithms on them
 
 some structs / traits have 2d/3d specification even if they can only exist in one of the spaces. e.g. filter_circle can't have a 3d version, rename accordingly
-
-*0.5   better than /2
 
 update README (especially filters are missing now)
 
@@ -51,10 +41,6 @@ try to avoid dynamic traits
 
 also implement is_buildable_nd etc. and make is_buildable_2d also is_buildable_nd
 
-rustdoc!!!
-
-inner/outer filter combinator -> outer && !inner
-
 outlier removal (filter which holds a kdtree of the reference structure, calc median / medium distance to k-nearest
 neighbours remove which are further than x, furthest x percent further than x times
 median / average dist...   could take either kdtree or iterator or random access
@@ -63,3 +49,8 @@ and be destructible to kdtree)
 segmantation detection
 
 either many more filters or factories for filters (same for shapes)
+
+IO methods for PC and mesh for all general file formats
+
+octree is missing many query methods
+(also implement quad tree once these are implemented)
