@@ -19,7 +19,7 @@ use rust_3d::traits::is_buildable_2d::*;
 use rust_3d::traits::is_filter_2d::*;
 use rust_3d::point_2d::*;
 use rust_3d::positive::*;
-use rust_3d::filter_box_2d::*;
+use rust_3d::filters::filter_box_2d::*;
 
 #[test]
 fn filter_box_2d_test() {

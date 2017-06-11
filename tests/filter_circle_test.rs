@@ -19,7 +19,7 @@ use rust_3d::traits::is_buildable_2d::*;
 use rust_3d::traits::is_filter_2d::*;
 use rust_3d::point_2d::*;
 use rust_3d::positive::*;
-use rust_3d::filter_circle::*;
+use rust_3d::filters::filter_circle::*;
 
 #[test]
 fn filter_circle_test() {

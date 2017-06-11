@@ -20,10 +20,10 @@ use rust_3d::traits::is_filter_2d::*;
 use rust_3d::point_2d::*;
 use rust_3d::positive::*;
 use rust_3d::view::*;
-use rust_3d::filter_box_2d::*;
+use rust_3d::filters::filter_box_2d::*;
 use rust_3d::point_cloud_2d::*;
 use rust_3d::traits::is_filter_pc_2d::*;
-use rust_3d::filter_pc_2d::*;
+use rust_3d::filters::filter_pc_2d::*;
 
 #[test]
 fn filter_pc_2d_test() {

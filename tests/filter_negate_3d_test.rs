@@ -19,8 +19,8 @@ use rust_3d::traits::is_buildable_3d::*;
 use rust_3d::traits::is_filter_3d::*;
 use rust_3d::point_3d::*;
 use rust_3d::positive::*;
-use rust_3d::filter_box_3d::*;
-use rust_3d::filter_negate_3d::*;
+use rust_3d::filters::filter_box_3d::*;
+use rust_3d::filters::filter_negate_3d::*;
 
 #[test]
 fn filter_negate_3d_test() { //same as box test, just negated
