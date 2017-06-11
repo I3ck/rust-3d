@@ -103,7 +103,7 @@ impl Matrix4 {
     pub fn rotation_axis<P>(axis: &P, rad: f64) -> Result<Matrix4> where
         P: IsBuildable3D {
 
-        let u = try!(axis.clone().normalized());
+        let u = axis.clone().normalized()?;
         let mut result = Matrix4::new();
         //@todo needs testing!!!
         result.data[0][0] = rad.cos() + u.x()*u.x()*(1.0 - rad.cos());          result.data[0][1] = u.x()*u.y()*(1.0 -rad.cos()) - u.z()*rad.sin();     result.data[0][2] = u.x()*u.z()*(1.0 - rad.cos()) + u.y()*rad.sin();    result.data[0][3] = 0.0;
@@ -131,12 +131,12 @@ impl Matrix4 {
     pub fn look_at<P>(target: &P, up: &P) -> Result<Matrix4> where
         P: IsBuildable3D { //@todo wont have to be an option once unitvector is defined whis is always l > 0 ( l == 1)
 
-        let n = try!(target.clone().normalized());
-        let u = try!(up.clone().normalized().map(|x| {
+        let n = target.clone().normalized()?;
+        let u = up.clone().normalized().map(|x| {
             let mut result = *Point3D::new(); //@todo can be dropped?
             result.from(*(cross(&*x, target)));
             result
-        }));
+        })?;
         let v = cross(&*n, &u);
 
         let mut result = Matrix4::new();

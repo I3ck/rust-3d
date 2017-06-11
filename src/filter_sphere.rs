@@ -123,9 +123,9 @@ impl IsBuildableND for FilterSphere {
             return Err(ErrorKind::DimensionsDontMatch);
         }
 
-        self.center.set_x(try!(other.get_position(0)));
-        self.center.set_y(try!(other.get_position(1)));
-        self.center.set_z(try!(other.get_position(2)));
+        self.center.set_x(other.get_position(0)?);
+        self.center.set_y(other.get_position(1)?);
+        self.center.set_z(other.get_position(2)?);
         Ok(())
     }
 }

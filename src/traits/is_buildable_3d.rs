@@ -78,9 +78,9 @@ pub trait IsBuildable3D :
         let words = split.collect::<Vec<&str>>();
         match words.len() {
             3 => {
-                let x = try!(f64::from_str(words[0]).map_err(|e| e.to_error_kind()));
-                let y = try!(f64::from_str(words[1]).map_err(|e| e.to_error_kind()));
-                let z = try!(f64::from_str(words[2]).map_err(|e| e.to_error_kind()));
+                let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
+                let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
+                let z = f64::from_str(words[2]).map_err(|e| e.to_error_kind())?;
                 Ok(Self::build(x,y,z))
             },
             _ => Err(ErrorKind::ParseError)

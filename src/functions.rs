@@ -118,7 +118,7 @@ pub fn sqr_dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where //@todo duplicate
     }
     let mut result : f64 = 0.0;
     for i in 0..P::n_dimensions() {
-        result += (try!(p1.get_position(i)) - try!(p2.get_position(i))).powi(2);
+        result += (p1.get_position(i)? - p2.get_position(i)?).powi(2);
     }
     Ok(result)
 }

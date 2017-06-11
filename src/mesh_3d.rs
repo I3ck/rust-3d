@@ -58,7 +58,7 @@ impl<P> IsMesh3D<P> for Mesh3D<P> where
     }
 
     fn face_vertices(&self, faceid: usize) -> Result<(P, P, P)> {
-        let (id1, id2, id3) = try!(self.face_vertex_ids(faceid));
+        let (id1, id2, id3) = self.face_vertex_ids(faceid)?;
         if let (Ok(v1), Ok(v2), Ok(v3)) = (self.vertex(id1), self.vertex(id2), self.vertex(id3)) {
             return Ok((v1, v2, v3));
         }

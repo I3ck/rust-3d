@@ -28,37 +28,37 @@ pub trait HasBoundingBox3D  {
 
     /// Returns the minimum position of the bounding box
     fn min_pos(&self) -> Result<Point3D> {
-        let bb = try!(self.bounding_box());
+        let bb = self.bounding_box()?;
         Ok(bb.min)
     }
 
     /// Returns the maximum position of the bounding box
     fn max_pos(&self) -> Result<Point3D> {
-        let bb = try!(self.bounding_box());
+        let bb = self.bounding_box()?;
         Ok(bb.max)
     }
 
     /// Returns the size the bounding box within the x-dimension
     fn size_x(&self) -> Result<f64> {
-        let bb = try!(self.bounding_box());
+        let bb = self.bounding_box()?;
         Ok((bb.max.x() - bb.min.x()).abs())
     }
 
     /// Returns the size the bounding box within the y-dimension
     fn size_y(&self) -> Result<f64> {
-        let bb = try!(self.bounding_box());
+        let bb = self.bounding_box()?;
         Ok((bb.max.y() - bb.min.y()).abs())
     }
 
     /// Returns the size the bounding box within the z-dimension
     fn size_z(&self) -> Result<f64> {
-        let bb = try!(self.bounding_box());
+        let bb = self.bounding_box()?;
         Ok((bb.max.z() - bb.min.z()).abs())
     }
 
     /// Returns the center of the bounding box
     fn center_bb(&self) -> Result<Point3D> {
-        let bb = try!(self.bounding_box());
+        let bb = self.bounding_box()?;
         Ok(*Point3D::build(bb.min.x() + (bb.max.x() - bb.min.x()) / 2.0,
                            bb.min.y() + (bb.max.y() - bb.min.y()) / 2.0,
                            bb.min.z() + (bb.max.z() - bb.min.z()) / 2.0))

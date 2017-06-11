@@ -27,13 +27,13 @@ use std::fs::File;
 pub fn save_xyz<P>(pc: &PointCloud3D<P>, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()> where
     P: Is3D {
 
-    let mut f = try!(File::create(filepath).map_err(|e| e.to_error_kind()));
+    let mut f = File::create(filepath).map_err(|e| e.to_error_kind())?;
     for p in &pc.data {
         let buffer = p.x().to_string()  + delim_coord
                    + &p.y().to_string() + delim_coord
                    + &p.z().to_string()
                    + delim_pos;
-        try!(f.write_all(buffer.as_bytes()).map_err(|e| e.to_error_kind()));
+        f.write_all(buffer.as_bytes()).map_err(|e| e.to_error_kind())?;
     }
     Ok(())
 }

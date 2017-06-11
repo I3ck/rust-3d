@@ -111,8 +111,8 @@ impl IsBuildableND for Point2D {
             return Err(ErrorKind::DimensionsDontMatch);
         }
 
-        self.x = try!(other.get_position(0));
-        self.y = try!(other.get_position(1));
+        self.x = other.get_position(0)?;
+        self.y = other.get_position(1)?;
         Ok(())
     }
 }

@@ -7,6 +7,8 @@ octree for voxel image
 kdtree for 2d or generic
 quadtree
 
+either keep the README up to date or refer to the docs only
+
 any/all pc filter docs don't note that these are pc filters
 
 has_position trait which then can implement many other traits by using the provided position (similar for others)
@@ -17,13 +19,11 @@ filters for 3d
 
 update README and tests
 
-make proper crate
-
 make kd-tree n-dimensional   (maybe the octree as well, but might be easier to implement quadtree)
 
 make trees referencing via ids
 
-filters should be directed
+filters should be directed (this could be dropped and a TransFormed wrapper applied [which inverse transformes incoming points first])
 
 negating filters which can be used to e.g. create ring filters
 
@@ -61,3 +61,5 @@ median / average dist...   could take either kdtree or iterator or random access
 and be destructible to kdtree)
 
 segmantation detection
+
+either many more filters or factories for filters (same for shapes)

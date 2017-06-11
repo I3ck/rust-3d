@@ -27,14 +27,14 @@ use std::fs::File;
 pub fn save_stl_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
     P: IsBuildable3D { //@todo .stl cant have negative coordinates, therefore must be offset by BB (or show error)
 
-    let mut f = try!(File::create(filepath).map_err(|e| e.to_error_kind()));
+    let mut f = File::create(filepath).map_err(|e| e.to_error_kind())?;
 
     //@todo precision?
-    try!(f.write_all(b"solid \n").map_err(|e| e.to_error_kind()));
+    f.write_all(b"solid \n").map_err(|e| e.to_error_kind())?;
 
     for i in 0..mesh.num_faces() {
-        let (v1, v2, v3) = try!(mesh.face_vertices(i));
-        let n = try!(mesh.face_normal(i));
+        let (v1, v2, v3) = mesh.face_vertices(i)?;
+        let n = mesh.face_normal(i)?;
         let buffer = "facet normal ".to_string() + &n.to_str() + "\n"
                        + "    outer loop\n"
                        + "        vertex " + &v1.to_str() + "\n"
@@ -42,7 +42,7 @@ pub fn save_stl_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
                        + "        vertex " + &v3.to_str() + "\n"
                        + "    end loop\n"
                        + "endfacet\n";
-        try!(f.write_all(buffer.as_bytes()).map_err(|e| e.to_error_kind()));
+        f.write_all(buffer.as_bytes()).map_err(|e| e.to_error_kind())?;
     }
     f.write_all(b"solid \n").map_err(|e| e.to_error_kind())
 }
@@ -51,7 +51,7 @@ pub fn save_stl_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
 pub fn save_ply_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
     P: IsBuildable3D {
 
-    let mut f = try!(File::create(filepath).map_err(|e| e.to_error_kind()));
+    let mut f = File::create(filepath).map_err(|e| e.to_error_kind())?;
 
     //@todo remove unnecessary comments in header
     //@todo better header, or let caller decide
@@ -66,16 +66,16 @@ pub fn save_ply_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
                    + "element face " + &mesh.num_faces().to_string() + "\n"
                    + "property list uchar int vertex_index { \"vertex_indices\" is a list of ints }\n"
                    + "end_header                 { delimits the end of the header }\n";
-    try!(f.write_all(header.as_bytes()).map_err(|e| e.to_error_kind()));
+    f.write_all(header.as_bytes()).map_err(|e| e.to_error_kind())?;
 
     for i in 0..mesh.num_vertices() {
-        let vertex = try!(mesh.vertex(i));
-        try!(f.write_all((vertex.to_str() + "\n").as_bytes()).map_err(|e| e.to_error_kind()));
+        let vertex = mesh.vertex(i)?;
+        f.write_all((vertex.to_str() + "\n").as_bytes()).map_err(|e| e.to_error_kind())?;
     }
 
     for i in 0..mesh.num_faces() {
-        let (vid1, vid2, vid3) = try!(mesh.face_vertex_ids(i));
-        try!(f.write_all(("3 ".to_string() + &vid1.to_string() + " " + &vid2.to_string() + " " + &vid3.to_string() + "\n").as_bytes()).map_err(|e| e.to_error_kind()));
+        let (vid1, vid2, vid3) = mesh.face_vertex_ids(i)?;
+        f.write_all(("3 ".to_string() + &vid1.to_string() + " " + &vid2.to_string() + " " + &vid3.to_string() + "\n").as_bytes()).map_err(|e| e.to_error_kind())?;
     }
     Ok(())
 }

@@ -235,8 +235,8 @@ impl<P> fmt::Display for PointCloud3D<P> where
 
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for p in &self.data {
-            try!(p.fmt(f));
-            try!(f.write_str("\n"));
+            p.fmt(f)?;
+            f.write_str("\n")?;
         }
         Ok(())
     }

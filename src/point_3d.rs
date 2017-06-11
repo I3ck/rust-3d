@@ -118,9 +118,9 @@ impl IsBuildableND for Point3D {
             return Err(ErrorKind::DimensionsDontMatch);
         }
 
-        self.x = try!(other.get_position(0));
-        self.y = try!(other.get_position(1));
-        self.z = try!(other.get_position(2));
+        self.x = other.get_position(0)?;
+        self.y = other.get_position(1)?;
+        self.z = other.get_position(2)?;
         Ok(())
     }
 }
