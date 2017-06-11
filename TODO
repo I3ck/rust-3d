@@ -53,6 +53,8 @@ also implement is_buildable_nd etc. and make is_buildable_2d also is_buildable_n
 
 rustdoc!!!
 
+inner/outer filter combinator -> outer && !inner
+
 outlier removal (filter which holds a kdtree of the reference structure, calc median / medium distance to k-nearest
 neighbours remove which are further than x, furthest x percent further than x times
 median / average dist...   could take either kdtree or iterator or random access
