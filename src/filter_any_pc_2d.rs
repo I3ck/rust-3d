@@ -13,24 +13,24 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing FilterOrPC3D, a filter to chain multiple 3D filters with the or condition => must pass any filter to pass this filter
+//! Module containing FilterAnyPC2D, a filter to chain multiple 2D filters with the or condition => must pass any filter to pass this filter
 
-use traits::is_3d::*;
-use traits::is_filter_pc_3d::*;
-use point_cloud_3d::*;
+use traits::is_2d::*;
+use traits::is_filter_pc_2d::*;
+use point_cloud_2d::*;
 use view::*;
 
-/// FilterOrPC3D, a filter to chain multiple 3D filters with the or condition => must pass any filter to pass this filter
-pub struct FilterOrPC3D<P> where
-    P: Is3D {
+/// FilterAnyPC2D, a filter to chain multiple 2D filters with the or condition => must pass any filter to pass this filter
+pub struct FilterAnyPC2D<P> where
+    P: Is2D {
 
-    pub filters: Vec<Box<IsFilterPC3D<P>>>
+    pub filters: Vec<Box<IsFilterPC2D<P>>>
 }
 
-impl<P> IsFilterPC3D<P> for FilterOrPC3D<P> where
-    P: Is3D {
-
-    fn filter(&self, pc: &PointCloud3D<P>, mut view: &mut View) {
+impl<P> IsFilterPC2D<P> for FilterAnyPC2D<P> where
+    P: Is2D {
+    ///@todo ensure this returns nothing if no filter (same for 3D version)
+    fn filter(&self, pc: &PointCloud2D<P>, mut view: &mut View) {
         let view_initial = view.clone();
         for f in &self.filters {
             let mut view_now = view_initial.clone();

@@ -7,6 +7,8 @@ octree for voxel image
 kdtree for 2d or generic
 quadtree
 
+any/all pc filter docs don't note that these are pc filters
+
 has_position trait which then can implement many other traits by using the provided position (similar for others)
 
 many tests are missing

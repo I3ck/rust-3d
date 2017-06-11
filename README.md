@@ -73,8 +73,8 @@ FilterPC2D //filter which can be used for point clouds in 2D space
 FilterPC3D //filter which can be used for point clouds in 3D space
 FilterAllPC2D //filter combinator to get the result of applying many 2D filters in a chain
 FilterAllPC3D //filter combinator to get the result of applying many 3D filters in a chain
-FilterOrPC2D //filter combinator to get the result of applying many 2D filters concurrently
-FilterOrPC3D //filter combinator to get the result of applying many 3D filters concurrently
+FilterAnyPC2D //filter combinator to get the result of applying many 2D filters concurrently
+FilterAnyPC3D //filter combinator to get the result of applying many 3D filters concurrently
 ```
 
 factories
