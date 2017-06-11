@@ -39,7 +39,7 @@ pub trait HasBoundingBox2D {
     }
 
     /// Returns the size the bounding box within the x-dimension
-    fn size_x(&self) -> Result<f64> { //@todo change signature to return a Positive
+    fn size_x(&self) -> Result<f64> {
         let bb = try!(self.bounding_box());
         Ok((bb.max.x() - bb.min.x()).abs())
     }

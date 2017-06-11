@@ -71,8 +71,8 @@ FilterNegate2D //filter not negate any other 2D filter
 FilterNegate3D //filter not negate any other 3D filter
 FilterPC2D //filter which can be used for point clouds in 2D space
 FilterPC3D //filter which can be used for point clouds in 3D space
-FilterAndPC2D //filter combinator to get the result of applying many 2D filters in a chain
-FilterAndPC3D //filter combinator to get the result of applying many 3D filters in a chain
+FilterAllPC2D //filter combinator to get the result of applying many 2D filters in a chain
+FilterAllPC3D //filter combinator to get the result of applying many 3D filters in a chain
 FilterOrPC2D //filter combinator to get the result of applying many 2D filters concurrently
 FilterOrPC3D //filter combinator to get the result of applying many 3D filters concurrently
 ```

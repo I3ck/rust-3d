@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing FilterAndPC2D, a filter to chain multiple 2D filters with the and condition => must pass all filters to pass this filter
+//! Module containing FilterAllPC2D, a filter to chain multiple 2D filters with the and condition => must pass all filters to pass this filter
 
 use traits::is_2d::*;
 use traits::is_filter_pc_2d::*;
@@ -22,14 +22,14 @@ use view::*;
 
 //@todo missing build methods
 
-/// FilterAndPC2D, a filter to chain multiple 2D filters with the and condition => must pass all filters to pass this filter
-pub struct FilterAndPC2D<P> where
+/// FilterAllPC2D, a filter to chain multiple 2D filters with the and condition => must pass all filters to pass this filter
+pub struct FilterAllPC2D<P> where
     P: Is2D {
 
     pub filters: Vec<Box<IsFilterPC2D<P>>>
 }
 
-impl<P> IsFilterPC2D<P> for FilterAndPC2D<P> where
+impl<P> IsFilterPC2D<P> for FilterAllPC2D<P> where
     P: Is2D {
 
     fn filter(&self, pc: &PointCloud2D<P>, mut view: &mut View) {
