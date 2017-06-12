@@ -19,7 +19,7 @@ use traits::is_filter_2d::*;
 use traits::is_2d::*;
 use filters::filter_and_2d::*;
 use filters::filter_negate_2d::*;
-///@todo add tests
+//@todo add tests
 
 /// FilterOuterInner2D, a filter within 2D space which combines an inner and an outer filter. Where the inner is negated while the outer is allowed. This is useful to create hollow filter shapes
 pub struct FilterOuterInner2D<FOuter, FInner> where

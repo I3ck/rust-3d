@@ -98,7 +98,7 @@ impl Matrix4 {
         mx.multiply_m(&my.multiply_m(&mz))
     }
 
-    ///@todo wont have to be of type option once uvec implemented
+    //@todo wont have to be of type option once uvec implemented
     /// Creates a new matrix which applies rotation around an axis
     pub fn rotation_axis<P>(axis: &P, rad: f64) -> Result<Matrix4> where
         P: IsBuildable3D {

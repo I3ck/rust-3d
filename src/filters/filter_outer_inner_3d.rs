@@ -19,7 +19,7 @@ use traits::is_filter_3d::*;
 use traits::is_3d::*;
 use filters::filter_and_3d::*;
 use filters::filter_negate_3d::*;
-///@todo add tests
+//@todo add tests
 
 /// FilterOuterInner3D, a filter within 3D space which combines an inner and an outer filter. Where the inner is negated while the outer is allowed. This is useful to create hollow filter shapes
 pub struct FilterOuterInner3D<FOuter, FInner> where

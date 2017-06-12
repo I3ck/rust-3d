@@ -29,7 +29,7 @@ pub struct FilterAnyPC2D<P> where
 
 impl<P> IsFilterPC2D<P> for FilterAnyPC2D<P> where
     P: Is2D {
-    ///@todo ensure this returns nothing if no filter (same for 3D version)
+    //@todo ensure this returns nothing if no filter (same for 3D version)
     fn filter(&self, pc: &PointCloud2D<P>, mut view: &mut View) {
         let view_initial = view.clone();
         for f in &self.filters {

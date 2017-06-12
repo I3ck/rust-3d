@@ -17,7 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use traits::is_3d::*;
 use traits::is_filter_3d::*;
-///@todo add tests
+//@todo add tests
 
 /// FilterAll3D, a filter to chain multiple 3D filters with the and condition => must pass all filters to pass this filter
 pub struct FilterAll3D {

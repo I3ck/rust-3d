@@ -17,7 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use traits::is_filter_3d::*;
 use traits::is_3d::*;
-///@todo add tests
+//@todo add tests
 
 /// FilterOR3D, a filter within 3D space which combines two filters and is true if one of its filters is true
 pub struct FilterOR3D<F1, F2> where

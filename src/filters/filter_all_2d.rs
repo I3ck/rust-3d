@@ -17,7 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use traits::is_2d::*;
 use traits::is_filter_2d::*;
-///@todo add tests
+//@todo add tests
 
 /// FilterAll2D, a filter to chain multiple 2D filters with the and condition => must pass all filters to pass this filter
 pub struct FilterAll2D {

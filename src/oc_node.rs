@@ -24,7 +24,7 @@ use traits::has_center_of_gravity_3d::*;
 use point_cloud_3d::{PointCloud3D};
 use functions::{calc_sub_min_max, in_bb};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
-///@todo make all private or document
+//@todo make all private or document
 
 /// OcNode, which is a single node used within OcTree
 pub enum OcNode<P> where
@@ -75,7 +75,7 @@ fn collect_center_or_all<P>(n: &OcNode<P>, only_collect_centers: bool, depth: i8
     }
 }
 
-///@todo define somewhere else
+//@todo define somewhere else
 fn build_subnode<P>(pc: Vec<P>,bb: (P, P)) -> Option<Box<OcNode<P>>> where
     P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
 

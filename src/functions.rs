@@ -37,7 +37,7 @@ use traits::is_plane_3d::*;
 use traits::is_normalized_3d::*;
 use traits::is_moveable_3d::*;
 
-///@todo move these functions to better fitting files or make them methods of the correct types
+//@todo move these functions to better fitting files or make them methods of the correct types
 
 /// Returns the center of two IsBuildable3D
 pub fn center<P>(p1: &P, p2: &P) -> Box<P> where

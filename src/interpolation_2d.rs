@@ -23,8 +23,8 @@ use traits::is_buildable_2d::*;
 use traits::has_length::*;
 
 
-///@todo correct reserving
-///@todo some algorithms (e.g. bezier) can be ported to 3d, maybe write them directly generic over the dimension
+//@todo correct reserving
+//@todo some algorithms (e.g. bezier) can be ported to 3d, maybe write them directly generic over the dimension
 
 fn factorial(number: usize) -> usize {
     let mut result = 1;

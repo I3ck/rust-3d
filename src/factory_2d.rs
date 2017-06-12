@@ -22,12 +22,12 @@ use point_2d::*;
 use point_cloud_2d::*;
 use traits::is_buildable_2d::*;
 
-///@todo entire file has to be added to tests
-///@todo add some type level checks like diameter > 0 etc., or return Option types (similar to flaggedT?)
-///@todo define trait for pc2d factories, later for 3d as well
-///@todo remove center as param and create all around origin
-///@todo correct reserving
-///@todo order parameters (e.g. center and n_points always first)
+//@todo entire file has to be added to tests
+//@todo add some type level checks like diameter > 0 etc., or return Option types (similar to flaggedT?)
+//@todo define trait for pc2d factories, later for 3d as well
+//@todo remove center as param and create all around origin
+//@todo correct reserving
+//@todo order parameters (e.g. center and n_points always first)
 
 /// Returns a point at the origin
 pub fn origin() -> Box<Point2D> { //@todo private?

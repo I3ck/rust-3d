@@ -17,7 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use traits::is_filter_2d::*;
 use traits::is_2d::*;
-///@todo add tests
+//@todo add tests
 
 /// FilterAND2D, a filter within 2D space which combines two filters and is true if both of its filters is true
 pub struct FilterAND2D<F1, F2> where
