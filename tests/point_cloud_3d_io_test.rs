@@ -30,20 +30,28 @@ static GENERATE_EXCEPTED_RESULT_FILES: bool = false;
 
 #[test]
 fn point_cloud_3d_io_test() {
-    let path_expected = "tests/data/expected_pc_3d_save1.csv";
-    let path_tmp = "tests/tmp/pc_3d_save1.tmp";
-    let mut pc = PointCloud3D::<Point3D>::new();
+    {
+        let path_expected = "tests/data/expected_pc_3d_save1.csv";
+        let path_tmp = "tests/tmp/pc_3d_save1.tmp";
+        let mut pc = PointCloud3D::<Point3D>::new();
 
-    for i in 0..10 {
-        let p = *Point3D::build(0.1 * i as f64, 0.2 * i as f64, 0.3 * i as f64);
-        pc.push(p);
+        for i in 0..10 {
+            let p = *Point3D::build(0.1 * i as f64, 0.2 * i as f64, 0.3 * i as f64);
+            pc.push(p);
+        }
+
+        if GENERATE_EXCEPTED_RESULT_FILES {
+            save_xyz(&pc, &path_expected, ";", "\n");
+        }
+
+        save_xyz(&pc, &path_tmp, ";", "\n");
+
+        assert_files_equal(path_expected, path_tmp);
     }
 
-    if GENERATE_EXCEPTED_RESULT_FILES {
-        save_xyz(&pc, &path_expected, ";", "\n");
+    {
+        //@todo also compare values
+        let pc = load_xyz::<Point3D>("tests/data/test_cube.xyz", " ", "\n").unwrap();
+        assert!(pc.len() == 20 * 20 * 20);
     }
-
-    save_xyz(&pc, &path_tmp, ";", "\n");
-
-    assert_files_equal(path_expected, path_tmp);
 }
