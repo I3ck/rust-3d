@@ -15,10 +15,14 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Module for IO operations on 2D point clouds
 
+extern crate core;
+
 use result::*;
 use traits::is_2d::*;
+use traits::is_buildable_2d::*;
 use point_cloud_2d::*;
 
+use self::core::str::FromStr;
 use std::io::prelude::*;
 use std::fs::File;
 
@@ -36,4 +40,35 @@ pub fn save_xy<P>(pc: &PointCloud2D<P>, filepath: &str, delim_coord: &str, delim
         f.write_all(buffer.as_bytes()).map_err(|e| e.to_error_kind())?;
     }
     Ok(())
+}
+
+//@todo better name for params
+/// Loads a PointCloud2D as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to load the .xy file format or .csv files
+pub fn load_xy<P>(filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<PointCloud2D<P>> where
+    P: Is2D + IsBuildable2D {
+
+    let mut f = File::open(filepath)?;
+
+    let mut content = String::new();
+    f.read_to_string(&mut content)?;
+    let lines = content.split(delim_pos);
+
+    let mut pc = PointCloud2D::<P>::new();
+    for line in lines {
+        if line == "" {
+            continue;
+        }
+        ///@todo write util for this (change the buildable method to support custom delimiter)
+        let split = line.split(delim_coord);
+        let words = split.collect::<Vec<&str>>();
+        match words.len() {
+            2 => {
+                let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
+                let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
+                pc.push(*P::build(x,y))
+            },
+            _ => return Err(ErrorKind::ParseError)
+        }
+    }
+    Ok(pc)
 }

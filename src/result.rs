@@ -86,3 +86,9 @@ impl ToErrorKind for ioError {
         ErrorKind::IOError //@todo improve reporting
     }
 }
+
+impl From<ioError> for ErrorKind {
+    fn from(_error: ioError) -> Self {
+        ErrorKind::IOError //@todo improve reporting
+    }
+}
