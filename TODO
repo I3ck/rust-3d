@@ -11,6 +11,8 @@ any/all pc filter docs don't note that these are pc filters
 
 has_position trait which then can implement many other traits by using the provided position (similar for others)
 
+the io file names dont match with the class file names   pointcloud_io  vs point_cloud
+
 many tests are missing
 
 update README and tests
@@ -54,3 +56,5 @@ IO methods for PC and mesh for all general file formats
 
 octree is missing many query methods
 (also implement quad tree once these are implemented)
+
+new filter type for directions/normals or positions & normals

@@ -10,3 +10,6 @@ extrusionMesh.stl
 *.swp
 *.xy
 *.xyz
+
+!tests/data/test_cube.xy
+!tests/data/test_cube.xyz
