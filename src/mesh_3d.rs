@@ -22,7 +22,6 @@ use traits::is_3d::*;
 use traits::is_editable_3d::*;
 use traits::is_buildable_3d::*;
 use traits::has_bounding_box_3d::*;
-use point_3d::*;
 use point_cloud_3d::*;
 use bounding_box_3d::*;
 

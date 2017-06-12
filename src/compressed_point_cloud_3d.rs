@@ -27,7 +27,6 @@ use traits::has_bounding_box_3d::*;
 use point_3d::*;
 use point_cloud_3d::*;
 use compressed_point_3d::*;
-use bounding_box_3d::*;
 
 /// CompressedPointCloud3D
 pub struct CompressedPointCloud3D<T> where

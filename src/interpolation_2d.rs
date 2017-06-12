@@ -20,7 +20,6 @@ use std::f64::consts::PI;
 use result::*;
 use point_cloud_2d::*;
 use traits::is_buildable_2d::*;
-use traits::is_editable_2d::*;
 use traits::has_length::*;
 
 

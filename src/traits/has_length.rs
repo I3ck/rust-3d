@@ -15,9 +15,6 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Module containing the HasLength trait used for types which have a physical length
 
-use result::*;
-use point_3d::*;
-
 /// HasLength is a trait used for types which have a physical length
 pub trait HasLength {
     /// Should return the physical length

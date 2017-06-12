@@ -24,7 +24,6 @@ use traits::is_nd::*;
 use traits::is_2d::*;
 use traits::is_normalized_2d::*;
 use traits::is_buildable_nd::*;
-use traits::is_buildable_2d::*;
 use functions::{sqr_dist_2d};
 
 #[derive (PartialEq, PartialOrd)]

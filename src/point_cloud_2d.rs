@@ -23,7 +23,6 @@ use traits::is_2d::*;
 use traits::is_random_accessible_2d::*;
 use traits::is_moveable_2d::*;
 use traits::is_buildable_2d::*;
-use traits::is_editable_2d::*;
 use traits::has_bounding_box_2d::*;
 use traits::has_center_of_gravity_2d::*;
 use traits::has_length::*;
@@ -116,7 +115,7 @@ impl<P> PointCloud2D<P> where
 
         let mut pc = PointCloud2D::new();
         for line in lines {
-            P::parse(String::from(line)).map(|p| pc.push(*p));
+            P::parse(String::from(line)).map(|p| pc.push(*p))?;
         }
         if pc.len() == 0 { return Err(ErrorKind::ParseError); }
         Ok(pc)

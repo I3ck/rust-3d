@@ -34,9 +34,9 @@ impl<FOuter, FInner> FilterOuterInner2D<FOuter, FInner> where
     FInner: IsFilter2D {
 
     /// Creates a new FilterOuterInner2D from two other IsFilter2D
-    pub fn build(filterOuter: FOuter, filterInner: FInner) -> Self {
+    pub fn build(filter_outer: FOuter, filter_inner: FInner) -> Self {
         FilterOuterInner2D {
-            filter: FilterAND2D::build(filterOuter, FilterNegate2D::build(filterInner))
+            filter: FilterAND2D::build(filter_outer, FilterNegate2D::build(filter_inner))
         }
     }
 }

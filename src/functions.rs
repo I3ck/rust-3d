@@ -31,7 +31,6 @@ use traits::is_buildable_nd::*;
 use traits::is_buildable_2d::*;
 use traits::is_buildable_3d::*;
 use traits::is_editable_2d::*;
-use traits::is_editable_3d::*;
 use traits::transformable_to_2d::*;
 use traits::transformable_to_3d::*;
 use traits::is_plane_3d::*;

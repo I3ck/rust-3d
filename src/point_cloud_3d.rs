@@ -24,7 +24,6 @@ use traits::is_3d::*;
 use traits::is_random_accessible_3d::*;
 use traits::is_moveable_3d::*;
 use traits::is_buildable_3d::*;
-use traits::is_editable_3d::*;
 use traits::has_bounding_box_3d::*;
 use traits::has_center_of_gravity_3d::*;
 use traits::has_length::*;
@@ -122,7 +121,7 @@ impl<P> PointCloud3D<P> where
 
         let mut pc = PointCloud3D::new();
         for line in lines {
-            P::parse(String::from(line)).map(|p| pc.push(*p));
+            P::parse(String::from(line)).map(|p| pc.push(*p))?;
         }
         if pc.len() == 0 { return Err(ErrorKind::ParseError); }
         Ok(pc)

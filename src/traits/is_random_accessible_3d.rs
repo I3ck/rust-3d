@@ -30,5 +30,5 @@ pub trait IsRandomAccessible3D<P> where
     /// Should insert a point at the given index
     fn insert_point(&mut self, index: usize, point: P) -> Result<()>;
     /// Should apply the function to the point at the given index
-    fn map_point(&mut self, index: usize, mut f: &mut FnMut(&mut P)) -> Result<()>;
+    fn map_point(&mut self, index: usize, f: &mut FnMut(&mut P)) -> Result<()>;
 }

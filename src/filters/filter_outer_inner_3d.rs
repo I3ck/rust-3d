@@ -34,9 +34,9 @@ impl<FOuter, FInner> FilterOuterInner3D<FOuter, FInner> where
     FInner: IsFilter3D {
 
     /// Creates a new FilterOuterInner3D from two other IsFilter3D
-    pub fn build(filterOuter: FOuter, filterInner: FInner) -> Self {
+    pub fn build(filter_outer: FOuter, filter_inner: FInner) -> Self {
         FilterOuterInner3D {
-            filter: FilterAND3D::build(filterOuter, FilterNegate3D::build(filterInner))
+            filter: FilterAND3D::build(filter_outer, FilterNegate3D::build(filter_inner))
         }
     }
 }

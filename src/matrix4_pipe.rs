@@ -15,7 +15,6 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Module containing Matrix4Pipe, which makes it easier to pipe different matrices in a defined order
 
-use result::*;
 use matrix4::*;
 use traits::is_buildable_3d::*;
 

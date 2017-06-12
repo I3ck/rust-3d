@@ -22,7 +22,6 @@ use std::hash::{Hash};
 
 use result::*;
 use traits::is_3d::*;
-use traits::is_buildable_nd::*;
 use matrix4::*;
 
 /// IsBuildable3D is a trait used for types which are positioned in 3D space and can be constructed

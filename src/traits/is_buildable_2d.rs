@@ -23,7 +23,6 @@ use self::core::str::FromStr;
 use result::*;
 use traits::is_2d::*;
 use traits::is_buildable_nd::*;
-use traits::is_nd::*;
 
 /// IsBuildable2D is a trait used for types which are positioned in 2D space and can be constructed
 pub trait IsBuildable2D :
