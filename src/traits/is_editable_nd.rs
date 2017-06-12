@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing the IsEditableND trait used for types which are positioned in n-dimensional space and their position can be changed
+//! IsEditableND trait used for types which are positioned in n-dimensional space and their position can be changed
 
 use result::*;
 use traits::is_nd::*;

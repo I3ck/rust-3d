@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing View, which defines a restriced / full view onto any T. E.g. used when filtering collections of points.
+//! View, which defines a restriced / full view onto any T. E.g. used when filtering collections of points.
 
 use std::collections::HashSet;
 

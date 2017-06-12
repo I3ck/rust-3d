@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing the IsNormalized3D trait used for types which are positioned within the 3D space and normalized
+//! IsNormalized3D trait used for types which are positioned within the 3D space and normalized
 
 use result::*;
 use traits::is_3d::*;

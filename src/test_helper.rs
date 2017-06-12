@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing helper functions for testing
+//! helper functions for testing
 
 use std::io::prelude::*;
 use std::fs::File;

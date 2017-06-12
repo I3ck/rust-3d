@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing the IsMesh3D trait used for meshes in 3D space
+//! IsMesh3D trait used for meshes in 3D space
 
 use result::*;
 use traits::is_buildable_3d::*;

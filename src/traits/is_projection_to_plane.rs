@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing the IsProjectionToPlane trait used types which can be projected onto and from planes within 3D space
+//! IsProjectionToPlane trait used types which can be projected onto and from planes within 3D space
 
 use traits::is_2d::*;
 use traits::is_buildable_2d::*;

@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing the Is3D trait used for types which are positioned within the 3D space
+//! Is3D trait used for types which are positioned within the 3D space
 
 use traits::is_nd::*;
 

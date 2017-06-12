@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing Plane3D, a plane within 3D space
+//! Plane3D, a plane within 3D space
 
 use traits::is_plane_3d::*;
 use traits::is_3d::*;

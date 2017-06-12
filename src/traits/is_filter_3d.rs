@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing the IsFilter3D trait used for filters for 3D positions
+//! IsFilter3D trait used for filters for 3D positions
 
 use traits::is_3d::*;
 

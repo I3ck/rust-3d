@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing interpolations within 2D space. E.g. bezier, linear, cosine
+//! interpolations within 2D space. E.g. bezier, linear, cosine
 
 use std::f64::consts::PI;
 

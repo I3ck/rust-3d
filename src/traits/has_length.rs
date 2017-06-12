@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing the HasLength trait used for types which have a physical length
+//! HasLength trait used for types which have a physical length
 
 /// HasLength is a trait used for types which have a physical length
 pub trait HasLength {

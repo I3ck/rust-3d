@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing FilterXOR3D, a filter within 3D space which combines two filters and is true iff one of its filters is true
+//! FilterXOR3D, a filter within 3D space which combines two filters and is true iff one of its filters is true
 
 use traits::is_filter_3d::*;
 use traits::is_3d::*;

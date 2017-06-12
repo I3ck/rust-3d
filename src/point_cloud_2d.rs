@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing PointCloud2D, a collection of positions within 2D space
+//! PointCloud2D, a collection of positions within 2D space
 
 use std::fmt;
 use std::cmp::Ordering;

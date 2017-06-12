@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing FilterCircle, a circle filter within 2D space
+//! FilterCircle, a circle filter within 2D space
 
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};

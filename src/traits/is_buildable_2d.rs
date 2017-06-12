@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing the IsBuildable2D trait used for types which are positioned in 2D space and can be constructed
+//! IsBuildable2D trait used for types which are positioned in 2D space and can be constructed
 
 extern crate core;
 

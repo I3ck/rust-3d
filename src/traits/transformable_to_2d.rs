@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing the TransFormableTo2D trait used for any type which can be transformed 2D space
+//! TransFormableTo2D trait used for any type which can be transformed 2D space
 
 use traits::is_buildable_2d::*;
 use traits::is_3d::*;

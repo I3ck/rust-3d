@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing Result, the result type used within rust-3d. Also defining the error enum and several transformation methods between error types.
+//! Result, the result type used within rust-3d. Also defining the error enum and several transformation methods between error types.
 
 use std::result;
 use std::fmt;

@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing PointCloud3D, a collection of positions within 3D space
+//! PointCloud3D, a collection of positions within 3D space
 
 use std::fmt;
 

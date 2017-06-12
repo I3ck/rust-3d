@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing FilterAnd2D, a filter within 2D space which combines two filters and is true if both of its filters are true
+//! FilterAnd2D, a filter within 2D space which combines two filters and is true if both of its filters are true
 
 use traits::is_filter_2d::*;
 use traits::is_2d::*;

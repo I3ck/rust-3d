@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing the IsMoveable3D trait used for types within 3D space which can be moved
+//! IsMoveable3D trait used for types within 3D space which can be moved
 
 /// IsMoveable3D is a trait used for types within 3D space which can be moved
 pub trait IsMoveable3D { //@todo remove trait and impl in IsBuildable2D

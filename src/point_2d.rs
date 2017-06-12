@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Module containing Point2D, a point / position within 2D space
+//! Point2D, a point / position within 2D space
 
 use std::fmt;
 use std::cmp::{Eq, Ordering};
