@@ -17,29 +17,29 @@ extern crate rust_3d;
 
 use rust_3d::traits::is_buildable_3d::*;
 use rust_3d::traits::is_filter_3d::*;
+use rust_3d::traits::is_filter_pc_3d::*;
 use rust_3d::point_3d::*;
 use rust_3d::positive::*;
 use rust_3d::filters::filter_box_3d::*;
+use rust_3d::filters::filter_pc_3d::*;
+use rust_3d::view::*;
+use rust_3d::io::pointcloud_3d_io::*;
 
 #[test]
 fn filter_box_3d_test() {
-    let center = *Point3D::build(10.0, -5.0, 1.0);
-    let size_x = Positive::new(3.0).unwrap();
-    let size_y = Positive::new(5.0).unwrap();
-    let size_z = Positive::new(10.0).unwrap();
-    let filter = FilterBox3D::build(center, size_x, size_y, size_z);
+    let center = *Point3D::build(10.0, 10.0, 10.0);
+    let size_x = Positive::new(2.1).unwrap();
+    let size_y = Positive::new(2.1).unwrap();
+    let size_z = Positive::new(2.1).unwrap();
+    let filter = FilterPC3D::build(FilterBox3D::build(center, size_x, size_y, size_z));
 
-    assert!( filter.is_allowed(&*Point3D::build(10.0, -5.0, 1.0)));
-    assert!( filter.is_allowed(&*Point3D::build(9.0, -5.0, 1.0)));
-    assert!(!filter.is_allowed(&*Point3D::build(8.0, -5.0, 1.0)));
-    assert!( filter.is_allowed(&*Point3D::build(11.0, -5.0, 1.0)));
-    assert!(!filter.is_allowed(&*Point3D::build(12.0, -5.0, 1.0)));
-    assert!( filter.is_allowed(&*Point3D::build(10.0, -3.0, 1.0)));
-    assert!(!filter.is_allowed(&*Point3D::build(10.0, -2.0, 1.0)));
-    assert!( filter.is_allowed(&*Point3D::build(10.0, -7.0, 1.0)));
-    assert!(!filter.is_allowed(&*Point3D::build(10.0, -8.0, 1.0)));
-    assert!( filter.is_allowed(&*Point3D::build(10.0, -5.0, -3.0)));
-    assert!(!filter.is_allowed(&*Point3D::build(10.0, -5.0, -5.0)));
-    assert!( filter.is_allowed(&*Point3D::build(10.0, -5.0, 5.0)));
-    assert!(!filter.is_allowed(&*Point3D::build(10.0, -5.0, 7.0)));
+    let mut view = View::Full;
+    let pc = load_xyz::<Point3D>("tests/data/test_cube.xyz", " ", "\n").unwrap();
+
+    filter.filter(&pc, &mut view);
+
+    match view {
+        View::Full => { assert!(false); }
+        View::Restricted(indices) => { assert!(indices.len() == 27) }
+    }
 }

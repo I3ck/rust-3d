@@ -17,6 +17,13 @@ many tests are missing
 
 update README and tests
 
+change other filter tests to use files as well
+also write tests for the combinator filters
+
+move combinator filters to own folder?
+
+method to create a new pc from another pc & view
+
 make kd-tree n-dimensional   (maybe the octree as well, but might be easier to implement quadtree)
 
 make trees referencing via ids
