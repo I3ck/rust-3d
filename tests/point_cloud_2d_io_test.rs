@@ -51,7 +51,7 @@ fn point_cloud_2d_io_test() {
 
     {
         //@todo also compare values
-        let pc = load_xy::<Point2D>("tests/data/test_cube.xy", " ", "\n").unwrap();
+        let pc = load_xy::<Point2D>("tests/data/test_square.xy", " ", "\n").unwrap();
         assert!(pc.len() == 20 * 20);
     }
 
