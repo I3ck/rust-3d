@@ -16,11 +16,11 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 extern crate rust_3d;
 
 use rust_3d::traits::is_buildable_3d::*;
-use rust_3d::traits::is_filter_3d::*;
+use rust_3d::traits::is_filter::*;
 use rust_3d::point_3d::*;
 use rust_3d::positive::*;
 use rust_3d::filters::filter_box_3d::*;
-use rust_3d::filters::filter_negate_3d::*;
+use rust_3d::filters::filter_negate::*;
 
 #[test]
 fn filter_negate_3d_test() { //same as box test, just negated
@@ -29,7 +29,7 @@ fn filter_negate_3d_test() { //same as box test, just negated
     let size_y = Positive::new(5.0).unwrap();
     let size_z = Positive::new(10.0).unwrap();
     let filter_box = FilterBox3D::build(center, size_x, size_y, size_z);
-    let filter = FilterNegate3D::build(filter_box);
+    let filter = FilterNegate::build(filter_box);
 
     assert!(!filter.is_allowed(&*Point3D::build(10.0, -5.0, 1.0)));
     assert!(!filter.is_allowed(&*Point3D::build(9.0, -5.0, 1.0)));

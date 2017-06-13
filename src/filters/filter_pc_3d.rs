@@ -13,37 +13,41 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! FilterPC3D, a filter which can transform any IsFilter3D into an IsFilterPC3D
+//! FilterPC3D, a filter which can transform any IsFilter into an IsFilterPC3D
 
+use std::marker::PhantomData;
 use std::collections::HashSet;
 
 use point_cloud_3d::*;
 use view::*;
 use traits::is_3d::*;
-use traits::is_filter_3d::*;
+use traits::is_filter::*;
 use traits::is_filter_pc_3d::*;
 
 //@todo untested
 //@todo concave hull, convex hull
 
-/// FilterPC3D, a filter which can transform any IsFilter3D into an IsFilterPC3D
-pub struct FilterPC3D<F> where
-    F: IsFilter3D {
+/// FilterPC3D, a filter which can transform any IsFilter into an IsFilterPC3D
+pub struct FilterPC3D<F, P> where
+    F: IsFilter<P>,
+    P: Is3D {
 
-    filter_3d: Box<F>
+    filter_3d: Box<F>,
+    _marker: PhantomData<P>
 }
 
-impl<F> FilterPC3D<F> where
-    F: IsFilter3D {
+impl<F, P> FilterPC3D<F, P> where
+    F: IsFilter<P>,
+    P: Is3D {
 
     pub fn build(filter_3d: F) -> Self {
-        FilterPC3D {filter_3d: Box::new(filter_3d)}
+        FilterPC3D {filter_3d: Box::new(filter_3d), _marker: PhantomData}
     }
 }
 
-impl<P,F> IsFilterPC3D<P> for FilterPC3D<F> where
+impl<F, P> IsFilterPC3D<P> for FilterPC3D<F, P> where
     P: Is3D,
-    F: IsFilter3D {
+    F: IsFilter<P> {
 
     fn filter(&self, pc: &PointCloud3D<P>, view: &mut View) {
         if pc.len() == 0 {

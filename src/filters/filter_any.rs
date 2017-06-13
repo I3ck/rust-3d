@@ -13,24 +13,25 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! FilterAll2D, a filter to chain multiple 2D filters with the and condition => must pass all filters to pass this filter
+//! FilterAny, a filter to chain multiple filters with the or condition => must pass any filter to pass this filter
 
-use traits::is_2d::*;
-use traits::is_filter_2d::*;
+use std::marker::PhantomData;
+use traits::is_filter::*;
 //@todo add tests
 
-/// FilterAll2D, a filter to chain multiple 2D filters with the and condition => must pass all filters to pass this filter
-pub struct FilterAll2D {
-    pub filters: Vec<Box<IsFilter2D>>
+/// FilterAny, a filter to chain multiple filters with the or condition => must pass any filter to pass this filter
+pub struct FilterAny<T> {
+    pub filters: Vec<Box<IsFilter<T>>>,
+    _marker: PhantomData<T>
 }
 
-impl IsFilter2D for FilterAll2D {
-    fn is_allowed(&self, p: &Is2D) -> bool {
+impl<T> IsFilter<T> for FilterAny<T> {
+    fn is_allowed(&self, x: &T) -> bool {
         for f in &self.filters {
-            if !f.is_allowed(p) {
-                return false;
+            if f.is_allowed(x) {
+                return true;
             }
         }
-        true
+        false
     }
 }

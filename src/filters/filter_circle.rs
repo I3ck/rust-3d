@@ -26,7 +26,7 @@ use traits::is_buildable_2d::*;
 use traits::is_editable_nd::*;
 use traits::is_editable_2d::*;
 use traits::has_bounding_box_2d::*;
-use traits::is_filter_2d::*;
+use traits::is_filter::*;
 use point_2d::*;
 use functions::{dist_2d, sqr_dist_2d};
 use positive::*;
@@ -165,8 +165,10 @@ impl HasBoundingBox2D for FilterCircle {
     }
 }
 
-impl IsFilter2D for FilterCircle {
-    fn is_allowed(&self, p: &Is2D) -> bool {
+impl<T> IsFilter<T> for FilterCircle where
+    T: Is2D {
+
+    fn is_allowed(&self, p: &T) -> bool {
         dist_2d(p, &self.center) <= self.radius
     }
 }

@@ -13,30 +13,31 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! FilterNegate2D, a filter within 2D space which negates another filter
+//! FilterNegate, a filter which negates another filter
 
-use traits::is_filter_2d::*;
-use traits::is_2d::*;
+use std::marker::PhantomData;
+use traits::is_filter::*;
 
-/// FilterNegate2D, a filter within 2D space which negates another filter
-pub struct FilterNegate2D<F> where
-    F: IsFilter2D {
+/// FilterNegate, a filter which negates another filter
+pub struct FilterNegate<F, T> where
+    F: IsFilter<T> {
 
-    filter: Box<F>
+    filter: Box<F>,
+    _marker: PhantomData<T>
 }
 
-impl<F> FilterNegate2D<F> where
-    F: IsFilter2D {
-    /// Creates a new FilterNegate2D from another IsFilter2D which will be negated
+impl<F, T> FilterNegate<F, T> where
+    F: IsFilter<T> {
+    /// Creates a new FilterNegate from another IsFilter which will be negated
     pub fn build(filter: F) -> Self {
-        FilterNegate2D {filter: Box::new(filter)}
+        FilterNegate {filter: Box::new(filter), _marker: PhantomData}
     }
 }
 
-impl<F> IsFilter2D for FilterNegate2D<F> where
-    F: IsFilter2D {
+impl<F, T> IsFilter<T> for FilterNegate<F, T> where
+    F: IsFilter<T> {
 
-    fn is_allowed(&self, p: &Is2D) -> bool {
-        !self.filter.is_allowed(p)
+    fn is_allowed(&self, x: &T) -> bool {
+        !self.filter.is_allowed(x)
     }
 }

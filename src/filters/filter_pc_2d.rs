@@ -13,37 +13,41 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! FilterPC2D, a filter which can transform any IsFilter2D into an IsFilterPC2D
+//! FilterPC2D, a filter which can transform any IsFilter into an IsFilterPC2D
 
+use std::marker::PhantomData;
 use std::collections::HashSet;
 
 use point_cloud_2d::*;
 use view::*;
 use traits::is_2d::*;
-use traits::is_filter_2d::*;
+use traits::is_filter::*;
 use traits::is_filter_pc_2d::*;
 
 //@todo untested
 //@todo concave hull, convex hull
 
-/// FilterPC2D, a filter which can transform any IsFilter2D into an IsFilterPC2D
-pub struct FilterPC2D<F> where
-    F: IsFilter2D {
+/// FilterPC2D, a filter which can transform any IsFilter into an IsFilterPC2D
+pub struct FilterPC2D<F, P> where
+    F: IsFilter<P>,
+    P: Is2D {
 
-    filter_2d: Box<F>
+    filter_2d: Box<F>,
+    _marker: PhantomData<P>
 }
 
-impl<F> FilterPC2D<F> where
-    F: IsFilter2D {
+impl<F, P> FilterPC2D<F, P> where
+    F: IsFilter<P>,
+    P: Is2D {
 
     pub fn build(filter_2d: F) -> Self {
-        FilterPC2D {filter_2d: Box::new(filter_2d)}
+        FilterPC2D {filter_2d: Box::new(filter_2d), _marker: PhantomData}
     }
 }
 
-impl<P,F> IsFilterPC2D<P> for FilterPC2D<F> where
+impl<F, P> IsFilterPC2D<P> for FilterPC2D<F, P> where
     P: Is2D,
-    F: IsFilter2D {
+    F: IsFilter<P> {
 
     fn filter(&self, pc: &PointCloud2D<P>, view: &mut View) {
         if pc.len() == 0 {

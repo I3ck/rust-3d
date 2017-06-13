@@ -16,11 +16,11 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 extern crate rust_3d;
 
 use rust_3d::traits::is_buildable_2d::*;
-use rust_3d::traits::is_filter_2d::*;
+use rust_3d::traits::is_filter::*;
 use rust_3d::point_2d::*;
 use rust_3d::positive::*;
 use rust_3d::filters::filter_box_2d::*;
-use rust_3d::filters::filter_negate_2d::*;
+use rust_3d::filters::filter_negate::*;
 
 #[test]
 fn filter_negate_2d_test() { //same as box test, just negated
@@ -28,7 +28,7 @@ fn filter_negate_2d_test() { //same as box test, just negated
     let size_x = Positive::new(3.0).unwrap();
     let size_y = Positive::new(5.0).unwrap();
     let filter_box = FilterBox2D::build(center, size_x, size_y);
-    let filter = FilterNegate2D::build(filter_box);
+    let filter = FilterNegate::build(filter_box);
 
     assert!(!filter.is_allowed(&*Point2D::build(10.0, -5.0)));
     assert!(!filter.is_allowed(&*Point2D::build(9.0, -5.0)));

@@ -26,7 +26,7 @@ use traits::is_buildable_2d::*;
 use traits::is_editable_nd::*;
 use traits::is_editable_2d::*;
 use traits::has_bounding_box_2d::*;
-use traits::is_filter_2d::*;
+use traits::is_filter::*;
 use point_2d::*;
 use functions::{sqr_dist_2d};
 use positive::*;
@@ -180,8 +180,10 @@ impl HasBoundingBox2D for FilterBox2D {
     }
 }
 
-impl IsFilter2D for FilterBox2D {
-    fn is_allowed(&self, p: &Is2D) -> bool {
+impl<T> IsFilter<T> for FilterBox2D where
+    T: Is2D {
+        
+    fn is_allowed(&self, p: &T) -> bool {
            p.x() >= self.center.x() - self.size_x / 2.0
         && p.x() <= self.center.x() + self.size_x / 2.0
         && p.y() >= self.center.y() - self.size_y / 2.0

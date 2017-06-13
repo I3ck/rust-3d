@@ -26,7 +26,7 @@ use traits::is_buildable_3d::*;
 use traits::is_editable_nd::*;
 use traits::is_editable_3d::*;
 use traits::has_bounding_box_3d::*;
-use traits::is_filter_3d::*;
+use traits::is_filter::*;
 use point_3d::*;
 use functions::{dist_3d, sqr_dist_3d};
 use positive::*;
@@ -176,8 +176,10 @@ impl HasBoundingBox3D for FilterSphere {
     }
 }
 
-impl IsFilter3D for FilterSphere {
-    fn is_allowed(&self, p: &Is3D) -> bool {
+impl<T> IsFilter<T> for FilterSphere
+    where T: Is3D {
+
+    fn is_allowed(&self, p: &T) -> bool {
         dist_3d(p, &self.center) <= self.radius
     }
 }
