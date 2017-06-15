@@ -21,7 +21,7 @@ use std::cmp::Ordering;
 
 use result::*;
 use traits::is_3d::*;
-use traits::is_random_accessible_3d::*;
+use traits::is_random_accessible::*;
 use traits::is_moveable_3d::*;
 use traits::is_buildable_3d::*;
 use traits::has_bounding_box_3d::*;
@@ -128,7 +128,7 @@ impl<P> PointCloud3D<P> where
     }
 }
 
-impl<P> IsRandomAccessible3D<P> for PointCloud3D<P> where
+impl<P> IsRandomAccessible<P> for PointCloud3D<P> where
     P: Is3D + Clone {
 
     fn n_points(&self) -> usize {

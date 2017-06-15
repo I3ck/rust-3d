@@ -20,7 +20,7 @@ use std::cmp::Ordering;
 
 use result::*;
 use traits::is_2d::*;
-use traits::is_random_accessible_2d::*;
+use traits::is_random_accessible::*;
 use traits::is_moveable_2d::*;
 use traits::is_buildable_2d::*;
 use traits::has_bounding_box_2d::*;
@@ -122,7 +122,7 @@ impl<P> PointCloud2D<P> where
     }
 }
 
-impl<P> IsRandomAccessible2D<P> for PointCloud2D<P> where
+impl<P> IsRandomAccessible<P> for PointCloud2D<P> where
     P: Is2D + Clone {
 
     fn n_points(&self) -> usize {
