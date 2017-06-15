@@ -13,13 +13,15 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! IsRandomAccessible trait used for collections of elements which are random accessible
+//! IsRandomInsertible trait used for collections of elements which are random insertible
 
-use std::ops::Index;
-use std::ops::IndexMut;
+use result::*;
+use traits::is_random_accessible::*;
 
-/// IsRandomAccessible is a trait used for collections of elements which are random accessible
-pub trait IsRandomAccessible<T> : Index<usize> + IndexMut<usize> {
-    /// Should return the number of elements within the collection
-    fn len(&self) -> usize;
+/// IsRandomInsertible is a trait used for collections of elements which are random insertible
+pub trait IsRandomInsertible<T> : IsRandomAccessible<T> {
+    /// Should push an element to the end of collection
+    fn push(&mut self, point: T);
+    /// Should insert an element at the given index
+    fn insert(&mut self, index: usize, point: T) -> Result<()>;
 }

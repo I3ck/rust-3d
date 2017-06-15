@@ -23,6 +23,7 @@ use std::ops::IndexMut;
 use result::*;
 use traits::is_2d::*;
 use traits::is_random_accessible::*;
+use traits::is_random_insertible::*;
 use traits::is_moveable_2d::*;
 use traits::is_buildable_2d::*;
 use traits::has_bounding_box_2d::*;
@@ -142,11 +143,15 @@ impl<P> IndexMut<usize> for PointCloud2D<P> where
 }
 
 impl<P> IsRandomAccessible<P> for PointCloud2D<P> where
-    P: Is2D + Clone {
+    P: Is2D {
 
     fn len(&self) -> usize {
         self.len()
     }
+}
+
+impl<P> IsRandomInsertible<P> for PointCloud2D<P> where
+    P: Is2D {
 
     fn push(&mut self, point: P) {
         self.data.push(Box::new(point))
@@ -161,6 +166,7 @@ impl<P> IsRandomAccessible<P> for PointCloud2D<P> where
         }
     }
 }
+
 
 impl<P> IsMoveable2D for PointCloud2D<P> where
     P: Is2D + IsMoveable2D {

@@ -23,6 +23,7 @@ use std::ops::IndexMut;
 use result::*;
 use traits::is_3d::*;
 use traits::is_random_accessible::*;
+use traits::is_random_insertible::*;
 use traits::is_moveable_3d::*;
 use traits::is_buildable_3d::*;
 use traits::has_bounding_box_3d::*;
@@ -149,13 +150,18 @@ impl<P> IndexMut<usize> for PointCloud3D<P> where
 }
 
 impl<P> IsRandomAccessible<P> for PointCloud3D<P> where
-    P: Is3D + Clone {
+    P: Is3D {
 
     fn len(&self) -> usize {
         self.len()
     }
+}
 
-    fn push(&mut self, point: P) { //@todo rename to push
+
+impl<P> IsRandomInsertible<P> for PointCloud3D<P> where
+    P: Is3D {
+
+    fn push(&mut self, point: P) {
         self.data.push(Box::new(point))
     }
 
