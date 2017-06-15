@@ -17,6 +17,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::fmt;
 use std::cmp::Ordering;
+use std::ops::Index;
+use std::ops::IndexMut;
 
 use result::*;
 use traits::is_2d::*;
@@ -122,40 +124,39 @@ impl<P> PointCloud2D<P> where
     }
 }
 
+impl<P> Index<usize> for PointCloud2D<P> where
+    P: Is2D {
+
+    type Output = P;
+    fn index(&self, i: usize) -> &P {
+        &self.data[i]
+    }
+}
+
+impl<P> IndexMut<usize> for PointCloud2D<P> where
+    P: Is2D {
+
+    fn index_mut(&mut self, i: usize) -> &mut P {
+        &mut self.data[i]
+    }
+}
+
 impl<P> IsRandomAccessible<P> for PointCloud2D<P> where
     P: Is2D + Clone {
 
-    fn n_points(&self) -> usize {
+    fn len(&self) -> usize {
         self.len()
     }
 
-    fn get_point(&self, index: usize) -> Result<P> {
-        if index >= self.len() {
-            Err(ErrorKind::IncorrectVertexID)
-        } else {
-            Ok((*self.data[index]).clone())
-        }
-    }
-
-    fn append_point(&mut self, point: P) { //@todo rename to push
+    fn push(&mut self, point: P) {
         self.data.push(Box::new(point))
     }
 
-    fn insert_point(&mut self, index: usize, point: P) -> Result<()> {
+    fn insert(&mut self, index: usize, point: P) -> Result<()> {
         if index > self.len() {
             Err(ErrorKind::IncorrectVertexID)
         } else {
             self.data.insert(index, Box::new(point));
-            Ok(())
-        }
-    }
-
-    fn map_point(&mut self, index: usize, mut f: &mut FnMut(&mut P)) -> Result<()> {
-        if index >= self.len() {
-            Err(ErrorKind::IncorrectVertexID)
-        } else {
-            let ref mut p = self.data[index];
-            f(&mut **p);
             Ok(())
         }
     }

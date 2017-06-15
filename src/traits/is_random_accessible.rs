@@ -13,22 +13,21 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! IsRandomAccessible trait used for collections of positions
+//! IsRandomAccessible trait used for collections of elements which are random accessible
 
 use result::*;
 
-//@todo rename methods
+use std::ops::Index;
+use std::ops::IndexMut;
 
-/// IsRandomAccessible is a trait used for collections of positions
-pub trait IsRandomAccessible<T> {
-    /// Should return the number of points within the collection
-    fn n_points(&self) -> usize;
-    /// Should return the point of the given id
-    fn get_point(&self, index: usize) -> Result<T>;
-    /// Should append a point to the collection
-    fn append_point(&mut self, point: T);
-    /// Should insert a point at the given index
-    fn insert_point(&mut self, index: usize, point: T) -> Result<()>;
-    /// Should apply the function to the point at the given index
-    fn map_point(&mut self, index: usize, f: &mut FnMut(&mut T)) -> Result<()>;
+//@todo push / insert should become other trait
+
+/// IsRandomAccessible is a trait used for collections of elements which are random accessible
+pub trait IsRandomAccessible<T> : Index<usize> + IndexMut<usize> {
+    /// Should return the number of elements within the collection
+    fn len(&self) -> usize;
+    /// Should push an element to the end of collection
+    fn push(&mut self, point: T);
+    /// Should insert an element at the given index
+    fn insert(&mut self, index: usize, point: T) -> Result<()>;
 }

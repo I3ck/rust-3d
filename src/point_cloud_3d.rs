@@ -16,8 +16,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! PointCloud3D, a collection of positions within 3D space
 
 use std::fmt;
-
 use std::cmp::Ordering;
+use std::ops::Index;
+use std::ops::IndexMut;
 
 use result::*;
 use traits::is_3d::*;
@@ -54,11 +55,13 @@ impl<P> PointCloud3D<P> where
         result
     }
 
+    //@todo remove (is in random access trait)
     /// Pushes a new position to the end of the point cloud
     pub fn push(&mut self, p: P) {
         self.data.push(Box::new(p));
     }
 
+    //@todo remove (is in random access trait)
     /// Returns the length / number of elements
     pub fn len(&self) -> usize {
         self.data.len()
@@ -128,40 +131,39 @@ impl<P> PointCloud3D<P> where
     }
 }
 
+impl<P> Index<usize> for PointCloud3D<P> where
+    P: Is3D {
+
+    type Output = P;
+    fn index(&self, i: usize) -> &P {
+        &self.data[i]
+    }
+}
+
+impl<P> IndexMut<usize> for PointCloud3D<P> where
+    P: Is3D {
+
+    fn index_mut(&mut self, i: usize) -> &mut P {
+        &mut self.data[i]
+    }
+}
+
 impl<P> IsRandomAccessible<P> for PointCloud3D<P> where
     P: Is3D + Clone {
 
-    fn n_points(&self) -> usize {
+    fn len(&self) -> usize {
         self.len()
     }
 
-    fn get_point(&self, index: usize) -> Result<P> {
-        if index >= self.len() {
-            Err(ErrorKind::IncorrectVertexID)
-        } else {
-            Ok((*self.data[index]).clone())
-        }
-    }
-
-    fn append_point(&mut self, point: P) { //@todo rename to push
+    fn push(&mut self, point: P) { //@todo rename to push
         self.data.push(Box::new(point))
     }
 
-    fn insert_point(&mut self, index: usize, point: P) -> Result<()> {
+    fn insert(&mut self, index: usize, point: P) -> Result<()> {
         if index > self.len() {
             Err(ErrorKind::IncorrectVertexID)
         } else {
             self.data.insert(index, Box::new(point));
-            Ok(())
-        }
-    }
-
-    fn map_point(&mut self, index: usize, mut f: &mut FnMut(&mut P)) -> Result<()> {
-        if index >= self.len() {
-            Err(ErrorKind::IncorrectVertexID)
-        } else {
-            let ref mut p = self.data[index];
-            f(&mut **p);
             Ok(())
         }
     }
