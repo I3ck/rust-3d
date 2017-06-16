@@ -1,4 +1,3 @@
-iterators for collections
 unittest all the things
 rename moveAble
 octree for voxel image
@@ -9,9 +8,7 @@ either keep the README up to date or refer to the docs only
 
 the filter code is now very generic, consider moving it into its own crate
 
-any/all pc filter docs don't note that these are pc filters
-
-has_position trait which then can implement many other traits by using the provided position (similar for others)
+has_position trait which then can implement many other traits by using the provided position (similar for others) => Use AsMut or AsRef for these
 
 the io file names dont match with the class file names   pointcloud_io  vs point_cloud
 
@@ -24,7 +21,7 @@ also write tests for the combinator filters
 
 move combinator filters to own folder?
 
-method to create a new pc from another pc & view
+method to create a new pc from another pc & view (make this a trait)
 
 make kd-tree n-dimensional   (maybe the octree as well, but might be easier to implement quadtree)
 
@@ -34,15 +31,13 @@ filters should be directed (this could be dropped and a TransFormed wrapper appl
 
 for impls and structs only require as few traits as possible
 
-use get methods of Vec to have safer code
-
 IO methods split from the impls / traits as algorithms on them
 
 some structs / traits have 2d/3d specification even if they can only exist in one of the spaces. e.g. filter_circle can't have a 3d version, rename accordingly
 
 update README (especially filters are missing now)
 
-write tutorial / examples withing the README
+write tutorial / examples withing the README or make some huge readme / example program
 
 trait for pointcloud?
 
@@ -58,6 +53,8 @@ median / average dist...   could take either kdtree or iterator or random access
 and be destructible to kdtree)
 
 segmantation detection
+
+remove all dependencies on PC2D / PC3D and write the methods for RandomAccessible / Iterators -> rewrite the IO methods to only require those and rename the files to the extension. e.g. IO::XYZ  IO::XY   IO::STL
 
 either many more filters or factories for filters (same for shapes)
 
