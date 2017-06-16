@@ -13,28 +13,29 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! FilterAnyPC2D, a filter to chain multiple 2D filters with the or condition => must pass any filter to pass this filter
+//! FilterAnyRandomAccessible, a filter to chain multiple IsFilterRandomAccessible with the or condition => must pass any filter to pass this filter
 
-use traits::is_2d::*;
-use traits::is_filter_pc_2d::*;
-use point_cloud_2d::*;
+use traits::is_random_accessible::*;
+use traits::is_filter_random_accessible::*;
 use view::*;
 
-/// FilterAnyPC2D, a filter to chain multiple 2D filters with the or condition => must pass any filter to pass this filter
-pub struct FilterAnyPC2D<P> where
-    P: Is2D {
+//@todo missing build methods
 
-    pub filters: Vec<Box<IsFilterPC2D<P>>>
+/// FilterAnyRandomAccessible, a filter to chain multiple IsFilterRandomAccessible with the or condition => must pass any filter to pass this filter
+pub struct FilterAnyRandomAccessible<RA, T> where
+    RA: IsRandomAccessible<T> {
+
+    pub filters: Vec<Box<IsFilterRandomAccessible<RA, T>>>
 }
 
-impl<P> IsFilterPC2D<P> for FilterAnyPC2D<P> where
-    P: Is2D {
-    //@todo ensure this returns nothing if no filter (same for 3D version)
-    fn filter(&self, pc: &PointCloud2D<P>, mut view: &mut View) {
+impl<RA, T> IsFilterRandomAccessible<RA, T> for FilterAnyRandomAccessible<RA, T> where
+    RA: IsRandomAccessible<T> {
+
+    fn filter(&self, ra: &RA, mut view: &mut View) {
         let view_initial = view.clone();
         for f in &self.filters {
             let mut view_now = view_initial.clone();
-            f.filter(&pc, &mut view_now);
+            f.filter(&ra, &mut view_now);
             view.union(view_now);
         }
     }

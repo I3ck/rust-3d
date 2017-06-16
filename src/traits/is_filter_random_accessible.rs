@@ -13,15 +13,14 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! IsFilterPC3D trait used for filters for 3D position collections
+//! IsFilterRandomAccessible is a trait used for filters for random accessible collections
 
-use traits::is_3d::*;
-use point_cloud_3d::*;
+use traits::is_random_accessible::*;
 use view::*;
 
-/// IsFilterPC3D is a trait used for filters for 3D position collections
-pub trait IsFilterPC3D<P> where
-    P: Is3D {
-    /// Should filter the passed points by setting the flags within the view
-    fn filter(&self, pc: &PointCloud3D<P>, view: &mut View); //@todo could have optional search structures   also define traits for different search structs e.g. trait solely to search in_box_2d
+/// IsFilterRandomAccessible is a trait used for filters for random accessible collections
+pub trait IsFilterRandomAccessible<RA, T> where
+    RA: IsRandomAccessible<T> {
+    /// Should filter the passed elements by setting the flags within the view
+    fn filter(&self, ra: &RA, view: &mut View);
 }

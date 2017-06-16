@@ -15,12 +15,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 /// Containing filters
 
-pub mod filter_pc_2d;
-pub mod filter_pc_3d;
-pub mod filter_all_pc_2d;
-pub mod filter_all_pc_3d;
-pub mod filter_any_pc_2d;
-pub mod filter_any_pc_3d;
+pub mod filter_random_accessible;
+pub mod filter_all_random_accessible;
+pub mod filter_any_random_accessible;
 pub mod filter_box_2d;
 pub mod filter_box_3d;
 pub mod filter_circle;

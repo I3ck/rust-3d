@@ -17,11 +17,11 @@ extern crate rust_3d;
 
 use rust_3d::traits::is_buildable_2d::*;
 use rust_3d::traits::is_filter::*;
-use rust_3d::traits::is_filter_pc_2d::*;
+use rust_3d::traits::is_filter_random_accessible::*;
 use rust_3d::point_2d::*;
 use rust_3d::positive::*;
 use rust_3d::filters::filter_box_2d::*;
-use rust_3d::filters::filter_pc_2d::*;
+use rust_3d::filters::filter_random_accessible::*;
 use rust_3d::view::*;
 use rust_3d::io::pointcloud_2d_io::*;
 
@@ -30,7 +30,7 @@ fn filter_box_2d_test() {
     let center = *Point2D::build(10.0, 10.0);
     let size_x = Positive::new(2.1).unwrap();
     let size_y = Positive::new(2.1).unwrap();
-    let filter = FilterPC2D::build(FilterBox2D::build(center, size_x, size_y));
+    let filter = FilterRandomAccessible::build(FilterBox2D::build(center, size_x, size_y));
 
     let mut view = View::Full;
     let pc = load_xy::<Point2D>("tests/data/test_square.xy", " ", "\n").unwrap();

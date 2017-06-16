@@ -7,6 +7,8 @@ quadtree
 
 either keep the README up to date or refer to the docs only
 
+the filter code is now very generic, consider moving it into its own crate
+
 any/all pc filter docs don't note that these are pc filters
 
 has_position trait which then can implement many other traits by using the provided position (similar for others)

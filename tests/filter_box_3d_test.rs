@@ -17,11 +17,11 @@ extern crate rust_3d;
 
 use rust_3d::traits::is_buildable_3d::*;
 use rust_3d::traits::is_filter::*;
-use rust_3d::traits::is_filter_pc_3d::*;
+use rust_3d::traits::is_filter_random_accessible::*;
 use rust_3d::point_3d::*;
 use rust_3d::positive::*;
 use rust_3d::filters::filter_box_3d::*;
-use rust_3d::filters::filter_pc_3d::*;
+use rust_3d::filters::filter_random_accessible::*;
 use rust_3d::view::*;
 use rust_3d::io::pointcloud_3d_io::*;
 
@@ -31,7 +31,7 @@ fn filter_box_3d_test() {
     let size_x = Positive::new(2.1).unwrap();
     let size_y = Positive::new(2.1).unwrap();
     let size_z = Positive::new(2.1).unwrap();
-    let filter = FilterPC3D::build(FilterBox3D::build(center, size_x, size_y, size_z));
+    let filter = FilterRandomAccessible::build(FilterBox3D::build(center, size_x, size_y, size_z));
 
     let mut view = View::Full;
     let pc = load_xyz::<Point3D>("tests/data/test_cube.xyz", " ", "\n").unwrap();

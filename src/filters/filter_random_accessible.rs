@@ -13,53 +13,51 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! FilterPC2D, a filter which can transform any IsFilter into an IsFilterPC2D
+//! FilterRandomAccessible, a filter which can transform any IsFilter into an IsFilterRandomAccessible
 
 use std::marker::PhantomData;
 use std::collections::HashSet;
 
-use point_cloud_2d::*;
 use view::*;
-use traits::is_2d::*;
 use traits::is_filter::*;
-use traits::is_filter_pc_2d::*;
+use traits::is_random_accessible::*;
+use traits::is_filter_random_accessible::*;
 
 //@todo untested
 //@todo concave hull, convex hull
+//@todo rename to "lift" / "transform" or similar?
 
-/// FilterPC2D, a filter which can transform any IsFilter into an IsFilterPC2D
-pub struct FilterPC2D<F, P> where
-    F: IsFilter<P>,
-    P: Is2D {
+/// FilterRandomAccessible, a filter which can transform any IsFilter into an IsFilterRandomAccessible
+pub struct FilterRandomAccessible<F, T> where
+    F: IsFilter<T> {
 
-    filter_2d: Box<F>,
-    _marker: PhantomData<P>
+    filter: Box<F>,
+    _marker: PhantomData<T>
 }
 
-impl<F, P> FilterPC2D<F, P> where
-    F: IsFilter<P>,
-    P: Is2D {
+impl<F, T> FilterRandomAccessible<F, T> where
+    F: IsFilter<T> {
 
-    pub fn build(filter_2d: F) -> Self {
-        FilterPC2D {filter_2d: Box::new(filter_2d), _marker: PhantomData}
+    pub fn build(filter: F) -> Self {
+        FilterRandomAccessible {filter: Box::new(filter), _marker: PhantomData}
     }
 }
 
-impl<F, P> IsFilterPC2D<P> for FilterPC2D<F, P> where
-    P: Is2D,
-    F: IsFilter<P> {
+impl<F, T, RA> IsFilterRandomAccessible<RA, T> for FilterRandomAccessible<F, T> where
+    F: IsFilter<T>,
+    RA: IsRandomAccessible<T>{
 
-    fn filter(&self, pc: &PointCloud2D<P>, view: &mut View) {
-        if pc.len() == 0 {
+    fn filter(&self, ra: &RA, view: &mut View) {
+        if ra.len() == 0 {
             *view = View::Full;
             return;
         }
         match view {
             &mut View::Full => {
                 let mut indices = HashSet::new();
-                for (i, p) in pc.data.iter().enumerate() {
-                    let ref tmp = **p; //@todo get rid of this
-                    if self.filter_2d.is_allowed(tmp) {
+                let n = ra.len();
+                for i in 0..n {
+                    if self.filter.is_allowed(&ra[i]) {
                         indices.insert(i);
                     }
                 }
@@ -67,14 +65,13 @@ impl<F, P> IsFilterPC2D<P> for FilterPC2D<F, P> where
             }
             &mut View::Restricted(ref mut indices) => {
                 let mut indices_to_remove = Vec::<usize>::new();
-                let max = pc.len() - 1;
+                let max = ra.len() - 1;
                 for index in indices.iter() {
                     if *index > max {
                         indices_to_remove.push(*index);
                         continue;
                     }
-                    let ref p = *pc.data[*index];
-                    if !self.filter_2d.is_allowed(p) {
+                    if !self.filter.is_allowed(&ra[*index]) {
                         indices_to_remove.push(*index);
                     }
                 }

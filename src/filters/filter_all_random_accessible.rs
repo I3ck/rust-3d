@@ -13,28 +13,27 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! FilterAllPC2D, a filter to chain multiple 2D filters with the and condition => must pass all filters to pass this filter
+//! FilterAllRandomAccessible, a filter to chain multiple IsFilterRandomAccessible with the and condition => must pass all filters to pass this filter
 
-use traits::is_2d::*;
-use traits::is_filter_pc_2d::*;
-use point_cloud_2d::*;
+use traits::is_random_accessible::*;
+use traits::is_filter_random_accessible::*;
 use view::*;
 
 //@todo missing build methods
 
-/// FilterAllPC2D, a filter to chain multiple 2D filters with the and condition => must pass all filters to pass this filter
-pub struct FilterAllPC2D<P> where
-    P: Is2D {
+/// FilterAllRandomAccessible, a filter to chain multiple IsFilterRandomAccessible with the and condition => must pass all filters to pass this filter
+pub struct FilterAllRandomAccessible<RA, T> where
+    RA: IsRandomAccessible<T> {
 
-    pub filters: Vec<Box<IsFilterPC2D<P>>>
+    pub filters: Vec<Box<IsFilterRandomAccessible<RA, T>>>
 }
 
-impl<P> IsFilterPC2D<P> for FilterAllPC2D<P> where
-    P: Is2D {
+impl<RA, T> IsFilterRandomAccessible<RA, T> for FilterAllRandomAccessible<RA, T> where
+    RA: IsRandomAccessible<T> {
 
-    fn filter(&self, pc: &PointCloud2D<P>, mut view: &mut View) {
+    fn filter(&self, ra: &RA, mut view: &mut View) {
         for f in &self.filters {
-            f.filter(&pc, &mut view)
+            f.filter(&ra, &mut view)
         }
     }
 }

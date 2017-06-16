@@ -22,8 +22,8 @@ use rust_3d::positive::*;
 use rust_3d::view::*;
 use rust_3d::filters::filter_box_2d::*;
 use rust_3d::point_cloud_2d::*;
-use rust_3d::traits::is_filter_pc_2d::*;
-use rust_3d::filters::filter_pc_2d::*;
+use rust_3d::traits::is_filter_random_accessible::*;
+use rust_3d::filters::filter_random_accessible::*;
 
 #[test]
 fn filter_pc_2d_test() {
@@ -46,7 +46,7 @@ fn filter_pc_2d_test() {
     pc.push(*Point2D::build(10.0, -8.0)); // 10 NO
     // => 0 1 3 5 6 8 9 in => len = 7
 
-    let filter_pc = FilterPC2D::build(filter);
+    let filter_pc = FilterRandomAccessible::build(filter);
     filter_pc.filter(&pc, &mut view);
 
     match view {
