@@ -16,3 +16,4 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 /// rust-3d trait implementations for standard containers / structs
 
 pub mod vec;
+pub mod vec_deque;
