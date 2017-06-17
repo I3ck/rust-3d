@@ -3,6 +3,13 @@ rename moveAble
 octree for voxel image
 kdtree for 2d or generic
 quadtree
+convex hull https://github.com/I3ck/lib_2d/blob/master/inc/PointCloud.h#L401
+
+more filter shapes
+
+transformers as wrappers / intermediate structures
+
+add more combinator filters to the random accessible filters
 
 either keep the README up to date or refer to the docs only
 

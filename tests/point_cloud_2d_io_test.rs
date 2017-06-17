@@ -15,12 +15,11 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 extern crate rust_3d;
 
-use rust_3d::traits::is_2d::*;
 use rust_3d::traits::is_buildable_2d::*;
 use rust_3d::traits::is_moveable_2d::*;
 use rust_3d::point_2d::*;
 use rust_3d::point_cloud_2d::*;
-use rust_3d::io::pointcloud_2d_io::*;
+use rust_3d::io::xy::*;
 use rust_3d::test_helper::*;
 
 use std::io::prelude::*;
@@ -51,7 +50,8 @@ fn point_cloud_2d_io_test() {
 
     {
         //@todo also compare values
-        let pc = load_xy::<Point2D>("tests/data/test_square.xy", " ", "\n").unwrap();
+        let mut pc = PointCloud2D::<Point2D>::new();
+        load_xy(&mut pc, "tests/data/test_square.xy", " ", "\n").unwrap();
         assert!(pc.len() == 20 * 20);
     }
 

@@ -21,7 +21,7 @@ use rust_3d::traits::is_moveable_2d::*;
 use rust_3d::point_2d::*;
 use rust_3d::point_cloud_2d::*;
 use rust_3d::interpolation_2d::*;
-use rust_3d::io::pointcloud_2d_io::*;
+use rust_3d::io::xy::*;
 use rust_3d::test_helper::*;
 
 use std::io::prelude::*;

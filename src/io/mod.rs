@@ -16,5 +16,5 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 /// Containing IO functions / traits / types
 
 pub mod is_mesh_3d_io;
-pub mod pointcloud_2d_io;
+pub mod xy;
 pub mod pointcloud_3d_io;

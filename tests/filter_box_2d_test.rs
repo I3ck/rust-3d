@@ -23,7 +23,8 @@ use rust_3d::positive::*;
 use rust_3d::filters::filter_box_2d::*;
 use rust_3d::filters::filter_random_accessible::*;
 use rust_3d::view::*;
-use rust_3d::io::pointcloud_2d_io::*;
+use rust_3d::io::xy::*;
+use rust_3d::point_cloud_2d::*;
 
 #[test]
 fn filter_box_2d_test() {
@@ -33,7 +34,8 @@ fn filter_box_2d_test() {
     let filter = FilterRandomAccessible::build(FilterBox2D::build(center, size_x, size_y));
 
     let mut view = View::Full;
-    let pc = load_xy::<Point2D>("tests/data/test_square.xy", " ", "\n").unwrap();
+    let mut pc = PointCloud2D::<Point2D>::new();
+    load_xy(&mut pc,"tests/data/test_square.xy", " ", "\n").unwrap();
 
     filter.filter(&pc, &mut view);
 
