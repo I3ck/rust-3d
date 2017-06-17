@@ -20,6 +20,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 /// Meant as basis for numeric algorithms, viewers, game engines, ...
 
 pub mod traits;
+pub mod impls;
 pub mod io;
 pub mod filters;
 pub mod functions;

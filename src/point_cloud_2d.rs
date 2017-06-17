@@ -29,9 +29,11 @@ use traits::is_buildable_2d::*;
 use traits::has_bounding_box_2d::*;
 use traits::has_center_of_gravity_2d::*;
 use traits::has_length::*;
+use traits::is_view_buildable::*;
 use point_2d::*;
 use bounding_box_2d::*;
 use functions::dist_2d;
+use view::*;
 
 /// PointCloud2D, a collection of positions within 2D space
 pub struct PointCloud2D<P> where
@@ -224,6 +226,21 @@ impl<P> HasLength for PointCloud2D<P> where
             length += dist_2d(&*self.data[i], &*self.data[i-1]);
         }
         length
+    }
+}
+
+impl<P> IsViewBuildable for PointCloud2D<P> where
+    P: Is2D + Clone {
+
+    fn apply_view(&mut self, view: &View) -> Result<()> {
+        self.data.apply_view(view)?;
+        Ok(())
+    }
+
+    fn from_view(&self, view: &View) -> Result<Box<Self>> {
+        let mut cloned = self.clone();
+        cloned.apply_view(view)?;
+        Ok(Box::new(cloned))
     }
 }
 

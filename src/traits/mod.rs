@@ -46,4 +46,5 @@ pub mod transformable_to_2d;
 pub mod transformable_to_3d;
 pub mod is_filter;
 pub mod is_filter_random_accessible;
+pub mod is_view_buildable;
 pub mod is_nd;

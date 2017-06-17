@@ -29,9 +29,11 @@ use traits::is_buildable_3d::*;
 use traits::has_bounding_box_3d::*;
 use traits::has_center_of_gravity_3d::*;
 use traits::has_length::*;
+use traits::is_view_buildable::*;
 use point_3d::{Point3D};
 use bounding_box_3d::*;
 use functions::dist_3d;
+use view::*;
 
 /// PointCloud3D, a collection of positions within 3D space
 pub struct PointCloud3D<P> where
@@ -234,6 +236,21 @@ impl<P> HasLength for PointCloud3D<P> where
             length += dist_3d(&*self.data[i], &*self.data[i-1]);
         }
         length
+    }
+}
+
+impl<P> IsViewBuildable for PointCloud3D<P> where
+    P: Is3D + Clone {
+
+    fn apply_view(&mut self, view: &View) -> Result<()> {
+        self.data.apply_view(view)?;
+        Ok(())
+    }
+
+    fn from_view(&self, view: &View) -> Result<Box<Self>> {
+        let mut cloned = self.clone();
+        cloned.apply_view(view)?;
+        Ok(Box::new(cloned))
     }
 }
 
