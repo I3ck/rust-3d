@@ -18,7 +18,7 @@ use rust_3d::traits::is_buildable_3d::*;
 use rust_3d::traits::is_moveable_3d::*;
 use rust_3d::point_3d::*;
 use rust_3d::point_cloud_3d::*;
-use rust_3d::io::pointcloud_3d_io::*;
+use rust_3d::io::xyz::*;
 use rust_3d::test_helper::*;
 
 use std::io::prelude::*;
@@ -51,7 +51,8 @@ fn point_cloud_3d_io_test() {
 
     {
         //@todo also compare values
-        let pc = load_xyz::<Point3D>("tests/data/test_cube.xyz", " ", "\n").unwrap();
+        let mut pc = PointCloud3D::<Point3D>::new();
+        load_xyz(&mut pc, "tests/data/test_cube.xyz", " ", "\n").unwrap();
         assert!(pc.len() == 20 * 20 * 20);
     }
 }

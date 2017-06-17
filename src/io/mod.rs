@@ -17,4 +17,4 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 pub mod is_mesh_3d_io;
 pub mod xy;
-pub mod pointcloud_3d_io;
+pub mod xyz;

@@ -19,11 +19,12 @@ use rust_3d::traits::is_buildable_3d::*;
 use rust_3d::traits::is_filter::*;
 use rust_3d::traits::is_filter_random_accessible::*;
 use rust_3d::point_3d::*;
+use rust_3d::point_cloud_3d::*;
 use rust_3d::positive::*;
 use rust_3d::filters::filter_box_3d::*;
 use rust_3d::filters::filter_random_accessible::*;
 use rust_3d::view::*;
-use rust_3d::io::pointcloud_3d_io::*;
+use rust_3d::io::xyz::*;
 
 #[test]
 fn filter_box_3d_test() {
@@ -34,7 +35,8 @@ fn filter_box_3d_test() {
     let filter = FilterRandomAccessible::build(FilterBox3D::build(center, size_x, size_y, size_z));
 
     let mut view = View::Full;
-    let pc = load_xyz::<Point3D>("tests/data/test_cube.xyz", " ", "\n").unwrap();
+    let mut pc = PointCloud3D::<Point3D>::new();
+    load_xyz(&mut pc, "tests/data/test_cube.xyz", " ", "\n").unwrap();
 
     filter.filter(&pc, &mut view);
 
