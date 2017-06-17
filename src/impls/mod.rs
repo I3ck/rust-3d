@@ -17,3 +17,4 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 pub mod vec;
 pub mod vec_deque;
+pub mod linked_list;
