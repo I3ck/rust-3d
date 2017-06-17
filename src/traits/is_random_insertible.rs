@@ -21,7 +21,7 @@ use traits::is_random_accessible::*;
 /// IsRandomInsertible is a trait used for collections of elements which are random insertible
 pub trait IsRandomInsertible<T> : IsRandomAccessible<T> {
     /// Should push an element to the end of collection
-    fn push(&mut self, point: T);
+    fn push(&mut self, x: T);
     /// Should insert an element at the given index
-    fn insert(&mut self, index: usize, point: T) -> Result<()>;
+    fn insert(&mut self, index: usize, x: T) -> Result<()>;
 }

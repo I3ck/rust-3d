@@ -17,7 +17,29 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use result::*;
 use view::*;
+use traits::is_random_accessible::*;
+use traits::is_random_insertible::*;
 use traits::is_view_buildable::*;
+
+impl<T> IsRandomAccessible<T> for Vec<T> {
+    fn len(&self) -> usize {
+        self.len()
+    }
+}
+
+impl<T> IsRandomInsertible<T> for Vec<T> {
+    fn push(&mut self, x: T) {
+        self.push(x)
+    }
+
+    fn insert(&mut self, index: usize, x: T) -> Result<()> {
+        if index >= self.len() {
+            return Err(ErrorKind::IndexOutOfBounds);
+        }
+        self.insert(index, x);
+        Ok(())
+    }
+}
 
 impl<T> IsViewBuildable for Vec<T> where
     T: Clone {

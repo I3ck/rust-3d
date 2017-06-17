@@ -12,6 +12,11 @@ has_position trait which then can implement many other traits by using the provi
 
 the io file names dont match with the class file names   pointcloud_io  vs point_cloud
 
+add algorithms folder for algorithms
+
+make the tests folder of the exact same structure and file names as src,
+this way it becomes very easy to ensure everything is tested
+
 many tests are missing
 
 update README and tests
