@@ -57,7 +57,7 @@ impl Hash for Point3D { //@todo poor precision this way
 }
 
 impl Clone for Point3D {
-    fn clone(&self) -> Point3D {
+    fn clone(&self) -> Self {
         Point3D { x: self.x, y: self.y, z: self.z }
     }
 }

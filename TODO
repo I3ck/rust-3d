@@ -13,6 +13,8 @@ add more combinator filters to the random accessible filters
 
 either keep the README up to date or refer to the docs only
 
+sortable trait ?
+
 the filter code is now very generic, consider moving it into its own crate
 
 has_position trait which then can implement many other traits by using the provided position (similar for others) => Use AsMut or AsRef for these

@@ -81,18 +81,6 @@ impl<P> PointCloud2D<P> where
 impl<P> PointCloud2D<P> where
     P: Is2D + Clone {
 
-    /// Creates a copy of the point cloud
-    pub fn clone(&self) -> PointCloud2D<P> {
-        let mut data: Vec<Box<P>>;
-        data = Vec::new();
-
-        for p in &self.data {
-            data.push(p.clone());
-        }
-
-        PointCloud2D { data: data }
-    }
-
     /// Appends all values of other behind this
     pub fn consume(&mut self, other: Self) {
         for p in other.data {
@@ -114,6 +102,21 @@ impl<P> PointCloud2D<P> where
         }
         if pc.len() == 0 { return Err(ErrorKind::ParseError); }
         Ok(pc)
+    }
+}
+
+impl<P> Clone for PointCloud2D<P> where
+    P: Is2D + Clone {
+
+    fn clone(&self) -> Self {
+        let mut data: Vec<Box<P>>;
+        data = Vec::new();
+
+        for p in &self.data {
+            data.push(p.clone());
+        }
+
+        PointCloud2D { data: data }
     }
 }
 

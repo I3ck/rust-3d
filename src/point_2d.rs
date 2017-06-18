@@ -56,7 +56,7 @@ impl Hash for Point2D { //@todo poor precision this way
 }
 
 impl Clone for Point2D {
-    fn clone(&self) -> Point2D {
+    fn clone(&self) -> Self {
         Point2D { x: self.x, y: self.y }
     }
 }
