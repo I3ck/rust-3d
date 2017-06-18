@@ -48,3 +48,6 @@ pub mod is_filter;
 pub mod is_filter_random_accessible;
 pub mod is_view_buildable;
 pub mod is_nd;
+pub mod is_sortable_nd;
+pub mod is_sortable_2d;
+pub mod is_sortable_3d;
