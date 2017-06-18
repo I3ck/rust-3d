@@ -24,7 +24,7 @@ this way it becomes very easy to ensure everything is tested
 
 many tests are missing
 
-update README and tests
+update tests
 
 change other filter tests to use files as well
 also write tests for the combinator filters
@@ -43,11 +43,7 @@ IO methods split from the impls / traits as algorithms on them
 
 some structs / traits have 2d/3d specification even if they can only exist in one of the spaces. e.g. filter_circle can't have a 3d version, rename accordingly
 
-update README (especially filters are missing now)
-
-write tutorial / examples withing the README or make some huge readme / example program
-
-trait for pointcloud?
+write tutorial / examples / example program
 
 method to directly add points to pc via coordinates
 
