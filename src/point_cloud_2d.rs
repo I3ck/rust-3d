@@ -16,7 +16,6 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! PointCloud2D, a collection of positions within 2D space
 
 use std::fmt;
-use std::cmp::Ordering;
 use std::ops::Index;
 use std::ops::IndexMut;
 
@@ -32,7 +31,7 @@ use traits::has_length::*;
 use traits::is_view_buildable::*;
 use point_2d::*;
 use bounding_box_2d::*;
-use functions::dist_2d;
+use functions::{dist_2d, sort_vec_2d_x, sort_vec_2d_y};
 use view::*;
 
 /// PointCloud2D, a collection of positions within 2D space
@@ -60,12 +59,12 @@ impl<P> PointCloud2D<P> where
 
     /// Sorts all positions within the point cloud by x
     pub fn sort_x(&mut self) {
-        self.data.sort_by(|a, b| a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
+        sort_vec_2d_x(&mut self.data)
     }
 
     /// Sorts all positions within the point cloud by y
     pub fn sort_y(&mut self) {
-        self.data.sort_by(|a, b| a.y().partial_cmp(&b.y()).unwrap_or(Ordering::Equal));
+        sort_vec_2d_y(&mut self.data)
     }
 
     /// Applies a function to each position

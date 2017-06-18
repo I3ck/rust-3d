@@ -173,6 +173,46 @@ pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, max_size: usi
     }
 }
 
+/// Helper function to sort a Vec of Is2D by x
+pub fn sort_vec_2d_x<P>(xs: &mut Vec<P>) where
+    P: Is2D {
+
+        xs.sort_by(|a, b|
+            a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
+}
+
+/// Helper function to sort a Vec of Is2D by y
+pub fn sort_vec_2d_y<P>(xs: &mut Vec<P>) where
+    P: Is2D {
+
+        xs.sort_by(|a, b|
+            a.y().partial_cmp(&b.y()).unwrap_or(Ordering::Equal));
+}
+
+/// Helper function to sort a Vec of Is3D by x
+pub fn sort_vec_3d_x<P>(xs: &mut Vec<P>) where
+    P: Is3D {
+
+        xs.sort_by(|a, b|
+            a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
+}
+
+/// Helper function to sort a Vec of Is3D by y
+pub fn sort_vec_3d_y<P>(xs: &mut Vec<P>) where
+    P: Is3D {
+
+        xs.sort_by(|a, b|
+            a.y().partial_cmp(&b.y()).unwrap_or(Ordering::Equal));
+}
+
+/// Helper function to sort a Vec of Is3D by z
+pub fn sort_vec_3d_z<P>(xs: &mut Vec<P>) where
+    P: Is3D {
+
+        xs.sort_by(|a, b|
+            a.z().partial_cmp(&b.z()).unwrap_or(Ordering::Equal));
+}
+
 //@todo move to plane or use there
 /// Extrudes a 2D point cloud into 3D space with a given center and direction
 pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, PointCloud3D<P3>) where

@@ -16,7 +16,6 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! PointCloud3D, a collection of positions within 3D space
 
 use std::fmt;
-use std::cmp::Ordering;
 use std::ops::Index;
 use std::ops::IndexMut;
 
@@ -32,7 +31,7 @@ use traits::has_length::*;
 use traits::is_view_buildable::*;
 use point_3d::{Point3D};
 use bounding_box_3d::*;
-use functions::dist_3d;
+use functions::{dist_3d, sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z};
 use view::*;
 
 /// PointCloud3D, a collection of positions within 3D space
@@ -60,17 +59,17 @@ impl<P> PointCloud3D<P> where
 
     /// Sorts all positions within the point cloud by x
     pub fn sort_x(&mut self) {
-        self.data.sort_by(|a, b| a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
+        sort_vec_3d_x(&mut self.data);
     }
 
     /// Sorts all positions within the point cloud by y
     pub fn sort_y(&mut self) {
-        self.data.sort_by(|a, b| a.y().partial_cmp(&b.y()).unwrap_or(Ordering::Equal));
+        sort_vec_3d_y(&mut self.data);
     }
 
     /// Sorts all positions within the point cloud by z
     pub fn sort_z(&mut self) {
-        self.data.sort_by(|a, b| a.z().partial_cmp(&b.z()).unwrap_or(Ordering::Equal));
+        sort_vec_3d_z(&mut self.data);
     }
 
     /// Applies a function to each position
