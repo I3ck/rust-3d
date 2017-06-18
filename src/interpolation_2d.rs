@@ -21,6 +21,8 @@ use result::*;
 use point_cloud_2d::*;
 use traits::is_buildable_2d::*;
 use traits::has_length::*;
+use traits::is_random_insertible::*;
+use traits::is_random_accessible::*;
 
 
 //@todo correct reserving

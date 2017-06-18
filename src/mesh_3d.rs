@@ -24,6 +24,8 @@ use traits::is_buildable_3d::*;
 use traits::has_bounding_box_3d::*;
 use point_cloud_3d::*;
 use bounding_box_3d::*;
+use traits::is_random_insertible::*;
+use traits::is_random_accessible::*;
 
 /// Mesh3D, a mesh with tri-faces within 3D space
 pub struct Mesh3D<P> where

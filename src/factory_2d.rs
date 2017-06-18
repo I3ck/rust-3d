@@ -21,6 +21,7 @@ use positive::*;
 use point_2d::*;
 use point_cloud_2d::*;
 use traits::is_buildable_2d::*;
+use traits::is_random_insertible::*;
 
 //@todo entire file has to be added to tests
 //@todo add some type level checks like diameter > 0 etc., or return Option types (similar to flaggedT?)

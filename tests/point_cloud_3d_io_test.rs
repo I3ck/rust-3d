@@ -16,6 +16,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use rust_3d::traits::is_3d::*;
 use rust_3d::traits::is_buildable_3d::*;
 use rust_3d::traits::is_moveable_3d::*;
+use rust_3d::traits::is_random_insertible::*;
+use rust_3d::traits::is_random_accessible::*;
 use rust_3d::point_3d::*;
 use rust_3d::point_cloud_3d::*;
 use rust_3d::io::xyz::*;

@@ -18,6 +18,8 @@ extern crate rust_3d;
 use rust_3d::traits::is_2d::*;
 use rust_3d::traits::is_buildable_2d::*;
 use rust_3d::traits::is_moveable_2d::*;
+use rust_3d::traits::is_random_insertible::*;
+use rust_3d::traits::is_random_accessible::*;
 use rust_3d::point_2d::*;
 use rust_3d::point_cloud_2d::*;
 use rust_3d::interpolation_2d::*;

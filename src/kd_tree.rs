@@ -28,6 +28,8 @@ use traits::is_buildable_3d::*;
 use traits::is_editable_3d::*;
 use traits::is_tree_3d::*;
 use traits::is_kd_tree_3d::*;
+use traits::is_random_insertible::*;
+use traits::is_random_accessible::*;
 
 /// KdTree
 pub struct KdTree<P> where

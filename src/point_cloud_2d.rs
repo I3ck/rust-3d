@@ -58,16 +58,6 @@ impl<P> PointCloud2D<P> where
         result
     }
 
-    /// Pushes a new position to the end of the point cloud
-    pub fn push(&mut self, p: P) {
-        self.data.push(Box::new(p));
-    }
-
-    /// Returns the length / number of elements
-    pub fn len(&self) -> usize {
-        self.data.len()
-    }
-
     /// Sorts all positions within the point cloud by x
     pub fn sort_x(&mut self) {
         self.data.sort_by(|a, b| a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
@@ -148,7 +138,7 @@ impl<P> IsRandomAccessible<P> for PointCloud2D<P> where
     P: Is2D {
 
     fn len(&self) -> usize {
-        self.len()
+        self.data.len()
     }
 }
 

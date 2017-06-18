@@ -36,6 +36,8 @@ use traits::is_transformable_to_3d::*;
 use traits::is_plane_3d::*;
 use traits::is_normalized_3d::*;
 use traits::is_moveable_3d::*;
+use traits::is_random_accessible::*;
+use traits::is_random_insertible::*;
 
 //@todo move these functions to better fitting files or make them methods of the correct types
 

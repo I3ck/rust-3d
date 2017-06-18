@@ -24,6 +24,7 @@ use rust_3d::filters::filter_box_3d::*;
 use rust_3d::point_cloud_3d::*;
 use rust_3d::traits::is_filter_random_accessible::*;
 use rust_3d::filters::filter_random_accessible::*;
+use rust_3d::traits::is_random_insertible::*;
 
 #[test]
 fn filter_pc_3d_test() {

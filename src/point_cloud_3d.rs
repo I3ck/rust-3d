@@ -58,18 +58,6 @@ impl<P> PointCloud3D<P> where
         result
     }
 
-    //@todo remove (is in random access trait)
-    /// Pushes a new position to the end of the point cloud
-    pub fn push(&mut self, p: P) {
-        self.data.push(Box::new(p));
-    }
-
-    //@todo remove (is in random access trait)
-    /// Returns the length / number of elements
-    pub fn len(&self) -> usize {
-        self.data.len()
-    }
-
     /// Sorts all positions within the point cloud by x
     pub fn sort_x(&mut self) {
         self.data.sort_by(|a, b| a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
@@ -155,7 +143,7 @@ impl<P> IsRandomAccessible<P> for PointCloud3D<P> where
     P: Is3D {
 
     fn len(&self) -> usize {
-        self.len()
+        self.data.len()
     }
 }
 
