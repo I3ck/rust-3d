@@ -17,8 +17,6 @@ the filter code is now very generic, consider moving it into its own crate
 
 has_position trait which then can implement many other traits by using the provided position (similar for others) => Use AsMut or AsRef for these
 
-the io file names dont match with the class file names   pointcloud_io  vs point_cloud
-
 add algorithms folder for algorithms
 
 make the tests folder of the exact same structure and file names as src,
@@ -32,8 +30,6 @@ change other filter tests to use files as well
 also write tests for the combinator filters
 
 move combinator filters to own folder?
-
-method to create a new pc from another pc & view (make this a trait)
 
 make kd-tree n-dimensional   (maybe the octree as well, but might be easier to implement quadtree)
 
