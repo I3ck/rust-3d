@@ -31,6 +31,7 @@ use traits::has_length::*;
 use traits::is_view_buildable::*;
 use traits::is_sortable_nd::*;
 use traits::is_sortable_2d::*;
+use traits::is_mergeable::*;
 use point_2d::*;
 use bounding_box_2d::*;
 use functions::{dist_2d, sort_vec_2d_x, sort_vec_2d_y};
@@ -65,17 +66,6 @@ impl<P> PointCloud2D<P> where
 
         for p in &mut self.data {
             f(&mut **p);
-        }
-    }
-}
-
-impl<P> PointCloud2D<P> where
-    P: Is2D + Clone {
-
-    /// Appends all values of other behind this
-    pub fn consume(&mut self, other: Self) {
-        for p in other.data {
-            self.data.push(Box::new((*p).clone()));
         }
     }
 }
@@ -253,6 +243,22 @@ impl<P> IsSortable2D for PointCloud2D<P> where
 
     fn sort_y(&mut self) {
         sort_vec_2d_y(&mut self.data)
+    }
+}
+
+impl<P> IsMergeable for PointCloud2D<P> where
+    P: Is2D + Clone {
+
+    fn consume(&mut self, other: Self) {
+        for p in other.data {
+            self.data.push(Box::new((*p).clone()));
+        }
+    }
+
+    fn combine(&self, other: &Self) -> Self {
+        let mut result = self.clone();
+        result.consume(other.clone());
+        result
     }
 }
 

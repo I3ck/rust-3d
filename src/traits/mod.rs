@@ -51,3 +51,4 @@ pub mod is_nd;
 pub mod is_sortable_nd;
 pub mod is_sortable_2d;
 pub mod is_sortable_3d;
+pub mod is_mergeable;

@@ -31,6 +31,7 @@ use traits::has_length::*;
 use traits::is_view_buildable::*;
 use traits::is_sortable_nd::*;
 use traits::is_sortable_3d::*;
+use traits::is_mergeable::*;
 use point_3d::{Point3D};
 use bounding_box_3d::*;
 use functions::{dist_3d, sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z};
@@ -65,17 +66,6 @@ impl<P> PointCloud3D<P> where
 
         for p in &mut self.data {
             f(&mut **p);
-        }
-    }
-}
-
-impl<P> PointCloud3D<P> where
-    P: Is3D + Clone {
-
-    /// Appends all values of other behind this
-    pub fn consume(&mut self, other: Self) {
-        for p in other.data {
-            self.data.push(Box::new((*p).clone()));
         }
     }
 }
@@ -261,6 +251,22 @@ impl<P> IsSortable3D for PointCloud3D<P> where
 
     fn sort_z(&mut self) {
         sort_vec_3d_z(&mut self.data);
+    }
+}
+
+impl<P> IsMergeable for PointCloud3D<P> where
+    P: Is3D + Clone {
+
+    fn consume(&mut self, other: Self) {
+        for p in other.data {
+            self.data.push(Box::new((*p).clone()));
+        }
+    }
+
+    fn combine(&self, other: &Self) -> Self {
+        let mut result = self.clone();
+        result.consume(other.clone());
+        result
     }
 }
 
