@@ -29,6 +29,8 @@ use traits::has_bounding_box_3d::*;
 use traits::has_center_of_gravity_3d::*;
 use traits::has_length::*;
 use traits::is_view_buildable::*;
+use traits::is_sortable_nd::*;
+use traits::is_sortable_3d::*;
 use point_3d::{Point3D};
 use bounding_box_3d::*;
 use functions::{dist_3d, sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z};
@@ -55,21 +57,6 @@ impl<P> PointCloud3D<P> where
             result = result + &p.to_str() + "\n";
         }
         result
-    }
-
-    /// Sorts all positions within the point cloud by x
-    pub fn sort_x(&mut self) {
-        sort_vec_3d_x(&mut self.data);
-    }
-
-    /// Sorts all positions within the point cloud by y
-    pub fn sort_y(&mut self) {
-        sort_vec_3d_y(&mut self.data);
-    }
-
-    /// Sorts all positions within the point cloud by z
-    pub fn sort_z(&mut self) {
-        sort_vec_3d_z(&mut self.data);
     }
 
     /// Applies a function to each position
@@ -241,6 +228,39 @@ impl<P> IsViewBuildable for PointCloud3D<P> where
         let mut cloned = self.clone();
         cloned.apply_view(view)?;
         Ok(Box::new(cloned))
+    }
+}
+
+impl<P> IsSortableND for PointCloud3D<P> where
+    P: Is3D {
+
+    fn n_dimensions() -> usize {
+        3
+    }
+
+    fn sort_dim(&mut self, dimension: usize) -> Result<()> {
+        match dimension {
+            0 => { self.sort_x(); Ok(()) }
+            1 => { self.sort_y(); Ok(()) }
+            2 => { self.sort_z(); Ok(()) }
+            _ => Err(ErrorKind::IncorrectDimension)
+        }
+    }
+}
+
+impl<P> IsSortable3D for PointCloud3D<P> where
+    P: Is3D {
+
+    fn sort_x(&mut self) {
+        sort_vec_3d_x(&mut self.data);
+    }
+
+    fn sort_y(&mut self) {
+        sort_vec_3d_y(&mut self.data);
+    }
+
+    fn sort_z(&mut self) {
+        sort_vec_3d_z(&mut self.data);
     }
 }
 

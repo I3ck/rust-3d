@@ -29,6 +29,8 @@ use traits::has_bounding_box_2d::*;
 use traits::has_center_of_gravity_2d::*;
 use traits::has_length::*;
 use traits::is_view_buildable::*;
+use traits::is_sortable_nd::*;
+use traits::is_sortable_2d::*;
 use point_2d::*;
 use bounding_box_2d::*;
 use functions::{dist_2d, sort_vec_2d_x, sort_vec_2d_y};
@@ -55,16 +57,6 @@ impl<P> PointCloud2D<P> where
             result = result + &p.to_str() + "\n";
         }
         result
-    }
-
-    /// Sorts all positions within the point cloud by x
-    pub fn sort_x(&mut self) {
-        sort_vec_2d_x(&mut self.data)
-    }
-
-    /// Sorts all positions within the point cloud by y
-    pub fn sort_y(&mut self) {
-        sort_vec_2d_y(&mut self.data)
     }
 
     /// Applies a function to each position
@@ -233,6 +225,34 @@ impl<P> IsViewBuildable for PointCloud2D<P> where
         let mut cloned = self.clone();
         cloned.apply_view(view)?;
         Ok(Box::new(cloned))
+    }
+}
+
+impl<P> IsSortableND for PointCloud2D<P> where
+    P: Is2D {
+
+    fn n_dimensions() -> usize {
+        2
+    }
+
+    fn sort_dim(&mut self, dimension: usize) -> Result<()> {
+        match dimension {
+            0 => { self.sort_x(); Ok(()) }
+            1 => { self.sort_y(); Ok(()) }
+            _ => Err(ErrorKind::IncorrectDimension)
+        }
+    }
+}
+
+impl<P> IsSortable2D for PointCloud2D<P> where
+    P: Is2D {
+
+    fn sort_x(&mut self) {
+        sort_vec_2d_x(&mut self.data)
+    }
+
+    fn sort_y(&mut self) {
+        sort_vec_2d_y(&mut self.data)
     }
 }
 

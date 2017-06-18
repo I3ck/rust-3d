@@ -8,6 +8,7 @@ Meant as basis for numeric algorithms, viewers, game engines, ...
 notes
 -----
 rust-3d is still in really early stages, and is likely to change A LOT over time.
+The code coverage is also pretty bad right now, so there might be bugs.
 
 
 traits / implementations / algorithms
