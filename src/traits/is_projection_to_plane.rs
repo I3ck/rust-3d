@@ -18,8 +18,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use traits::is_2d::*;
 use traits::is_buildable_2d::*;
 use traits::is_3d::*;
-use traits::transformable_to_2d::*;
-use traits::transformable_to_3d::*;
+use traits::is_transformable_to_2d::*;
+use traits::is_transformable_to_3d::*;
 use traits::is_normalized_3d::*;
 use traits::is_plane_3d::*;
 use point_cloud_2d::*;
@@ -32,8 +32,8 @@ use point_cloud_3d::*;
 //@todo transformable traits required later on?
 /// IsProjectionToPlane is a trait used types which can be projected onto and from planes within 3D space
 pub trait IsProjectionToPlane<P2,P3,N> where
-    P2: Is2D + IsBuildable2D + TransFormableTo3D,
-    P3: Is3D + TransFormableTo2D,
+    P2: Is2D + IsBuildable2D + IsTransFormableTo3D,
+    P3: Is3D + IsTransFormableTo2D,
     N: IsNormalized3D {
     /// Should create a projection of the given 2d points on the given plane
     fn from_2d<PL>(plane: PL, pc: PointCloud2D<P2>) -> Box<Self> where

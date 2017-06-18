@@ -31,8 +31,8 @@ use traits::is_buildable_nd::*;
 use traits::is_buildable_2d::*;
 use traits::is_buildable_3d::*;
 use traits::is_editable_2d::*;
-use traits::transformable_to_2d::*;
-use traits::transformable_to_3d::*;
+use traits::is_transformable_to_2d::*;
+use traits::is_transformable_to_3d::*;
 use traits::is_plane_3d::*;
 use traits::is_normalized_3d::*;
 use traits::is_moveable_3d::*;
@@ -174,7 +174,7 @@ pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, max_size: usi
 //@todo move to plane or use there
 /// Extrudes a 2D point cloud into 3D space with a given center and direction
 pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, PointCloud3D<P3>) where
-    P2: TransFormableTo3D,
+    P2: IsTransFormableTo3D,
     P3: IsBuildable3D + IsMoveable3D + Clone {
 
     let mut pc_3d_a = PointCloud3D::new();
@@ -268,7 +268,7 @@ pub fn conn<P>(p_from: &P, p_to: &P) -> P where
 pub fn project_point_on_plane<PL,P2,P3,N>(plane: &PL, point: &P3) -> P2 where
     PL: IsPlane3D<P3,N>,
     P2: IsBuildable2D,
-    P3: IsBuildable3D + TransFormableTo2D,
+    P3: IsBuildable3D + IsTransFormableTo2D,
     N:  IsNormalized3D {
 
     let relative = conn(&plane.origin(), point);

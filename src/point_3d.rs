@@ -28,7 +28,7 @@ use traits::is_buildable_2d::*;
 use traits::is_buildable_3d::*;
 use traits::is_editable_nd::*;
 use traits::is_editable_3d::*;
-use traits::transformable_to_2d::*;
+use traits::is_transformable_to_2d::*;
 use functions::{sqr_dist_3d};
 
 #[derive (PartialEq, PartialOrd)]
@@ -163,7 +163,7 @@ impl IsEditable3D for Point3D {
     }
 }
 
-impl TransFormableTo2D for Point3D {
+impl IsTransFormableTo2D for Point3D {
     fn transform_to_2d<P>(&self) -> P where
         P: IsBuildable2D {
 
