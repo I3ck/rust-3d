@@ -11,6 +11,8 @@ transformers as wrappers / intermediate structures
 
 add more combinator filters to the random accessible filters
 
+type for face to be able to define e.g. filters for them
+
 replace Option returns with Result
 
 either keep the README up to date or refer to the docs only
