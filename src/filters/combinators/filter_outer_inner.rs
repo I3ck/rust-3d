@@ -16,8 +16,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! FilterOuterInner, a filter which combines an inner and an outer filter. Where the inner is negated while the outer is allowed. This is useful to create hollow filter shapes
 
 use traits::is_filter::*;
-use filters::filter_and::*;
-use filters::filter_negate::*;
+use filters::combinators::filter_and::*;
+use filters::combinators::filter_negate::*;
 //@todo add tests
 
 /// FilterOuterInner, a filter which combines an inner and an outer filter. Where the inner is negated while the outer is allowed. This is useful to create hollow filter shapes

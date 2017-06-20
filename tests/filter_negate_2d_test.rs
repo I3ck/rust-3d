@@ -20,7 +20,7 @@ use rust_3d::traits::is_filter::*;
 use rust_3d::point_2d::*;
 use rust_3d::positive::*;
 use rust_3d::filters::filter_box_2d::*;
-use rust_3d::filters::filter_negate::*;
+use rust_3d::filters::combinators::filter_negate::*;
 
 #[test]
 fn filter_negate_2d_test() { //same as box test, just negated

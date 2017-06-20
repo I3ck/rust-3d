@@ -11,9 +11,9 @@ transformers as wrappers / intermediate structures
 
 add more combinator filters to the random accessible filters
 
-either keep the README up to date or refer to the docs only
+replace Option returns with Result
 
-sortable trait ?
+either keep the README up to date or refer to the docs only
 
 the filter code is now very generic, consider moving it into its own crate
 

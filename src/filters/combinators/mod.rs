@@ -13,11 +13,14 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/// Containing filters
+/// Containing filter combinators
 
-pub mod combinators;
-pub mod filter_random_accessible;
-pub mod filter_box_2d;
-pub mod filter_box_3d;
-pub mod filter_circle;
-pub mod filter_sphere;
+pub mod filter_all_random_accessible;
+pub mod filter_any_random_accessible;
+pub mod filter_all;
+pub mod filter_any;
+pub mod filter_negate;
+pub mod filter_and;
+pub mod filter_or;
+pub mod filter_xor;
+pub mod filter_outer_inner;
