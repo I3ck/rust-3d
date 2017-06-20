@@ -22,7 +22,7 @@ use rust_3d::point_3d::*;
 use rust_3d::point_cloud_3d::*;
 use rust_3d::positive::*;
 use rust_3d::filters::filter_box_3d::*;
-use rust_3d::filters::filter_random_accessible::*;
+use rust_3d::filters::transformers::filter_random_accessible::*;
 use rust_3d::view::*;
 use rust_3d::io::xyz::*;
 

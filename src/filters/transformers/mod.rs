@@ -15,9 +15,4 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 /// Containing filters
 
-pub mod combinators;
-pub mod transformers;
-pub mod filter_box_2d;
-pub mod filter_box_3d;
-pub mod filter_circle;
-pub mod filter_sphere;
+pub mod filter_random_accessible;
