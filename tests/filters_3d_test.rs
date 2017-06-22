@@ -29,6 +29,7 @@ use rust_3d::filters::filter_sphere::*;
 use rust_3d::filters::combinators::filter_negate::*;
 use rust_3d::filters::combinators::filter_or::*;
 use rust_3d::filters::combinators::filter_and::*;
+use rust_3d::filters::combinators::filter_xor::*;
 use rust_3d::filters::transformers::filter_random_accessible::*;
 use rust_3d::view::*;
 use rust_3d::io::xyz::*;
@@ -99,4 +100,12 @@ fn filter_and_test() {
     let filterBox    = FilterBox3D::build(*Point3D::build(8.0, 8.0, 8.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(15.0).unwrap());
     let filter = FilterAND::build(filterSphere, filterBox);
     test_filter_3d::<FilterAND<FilterSphere, FilterBox3D, Point3D>, Point3D>(filter, "tests/data/expected_filter_and.xyz", "and");
+}
+
+#[test]
+fn filter_xor_test() {
+    let filterSphere = FilterSphere::build(*Point3D::build(13.0, 13.0, 13.0), Positive::new(10.0).unwrap());
+    let filterBox    = FilterBox3D::build(*Point3D::build(8.0, 8.0, 8.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(30.0).unwrap());
+    let filter = FilterXOR::build(filterSphere, filterBox);
+    test_filter_3d::<FilterXOR<FilterSphere, FilterBox3D, Point3D>, Point3D>(filter, "tests/data/expected_filter_xor.xyz", "xor");
 }
