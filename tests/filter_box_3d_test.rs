@@ -15,9 +15,11 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 extern crate rust_3d;
 
+use rust_3d::traits::is_3d::*;
 use rust_3d::traits::is_buildable_3d::*;
 use rust_3d::traits::is_filter::*;
 use rust_3d::traits::is_filter_random_accessible::*;
+use rust_3d::traits::is_random_accessible::*;
 use rust_3d::traits::is_view_buildable::*;
 use rust_3d::point_3d::*;
 use rust_3d::point_cloud_3d::*;
@@ -28,19 +30,15 @@ use rust_3d::view::*;
 use rust_3d::io::xyz::*;
 use rust_3d::test_helper::assert_files_equal;
 
-#[test]
-fn filter_box_3d_test() {
-    let path_expected = "tests/data/expected_filter_box_3d.xyz";
-    let path_tmp = "tests/tmp/filter_box_3d.xyz";
+fn test_filter_3d<F, P>(f: F, path_expected: &str) where
+    F: IsFilter<P>,
+    P: IsBuildable3D + Clone {
 
-    let center = *Point3D::build(10.0, 10.0, 10.0);
-    let size_x = Positive::new(2.1).unwrap();
-    let size_y = Positive::new(2.1).unwrap();
-    let size_z = Positive::new(2.1).unwrap();
-    let filter = FilterRandomAccessible::build(FilterBox3D::build(center, size_x, size_y, size_z));
+    let path_tmp = "tests/tmp/tmp.xyz";
+    let filter = FilterRandomAccessible::build(f);
 
     let mut view = View::Full;
-    let mut pc = PointCloud3D::<Point3D>::new();
+    let mut pc = PointCloud3D::<P>::new();
     load_xyz(&mut pc, "tests/data/test_cube.xyz", " ", "\n").unwrap();
 
     filter.filter(&pc, &mut view);
@@ -48,4 +46,13 @@ fn filter_box_3d_test() {
     pc.apply_view(&view);
     save_xyz(&pc, &path_tmp, " ", "\n");
     assert_files_equal(path_expected, path_tmp);
+}
+
+#[test]
+fn filter_box_3d_test() {
+    let center = *Point3D::build(10.0, 10.0, 10.0);
+    let size_x = Positive::new(2.1).unwrap();
+    let size_y = Positive::new(2.1).unwrap();
+    let size_z = Positive::new(2.1).unwrap();
+    test_filter_3d::<FilterBox3D, Point3D>(FilterBox3D::build(center, size_x, size_y, size_z), "tests/data/expected_filter_box_3d.xyz");
 }
