@@ -18,6 +18,7 @@ extern crate rust_3d;
 use rust_3d::traits::is_buildable_3d::*;
 use rust_3d::traits::is_filter::*;
 use rust_3d::traits::is_filter_random_accessible::*;
+use rust_3d::traits::is_view_buildable::*;
 use rust_3d::point_3d::*;
 use rust_3d::point_cloud_3d::*;
 use rust_3d::positive::*;
@@ -25,9 +26,13 @@ use rust_3d::filters::filter_box_3d::*;
 use rust_3d::filters::transformers::filter_random_accessible::*;
 use rust_3d::view::*;
 use rust_3d::io::xyz::*;
+use rust_3d::test_helper::assert_files_equal;
 
 #[test]
 fn filter_box_3d_test() {
+    let path_expected = "tests/data/expected_filter_box_3d.xyz";
+    let path_tmp = "tests/tmp/filter_box_3d.xyz";
+
     let center = *Point3D::build(10.0, 10.0, 10.0);
     let size_x = Positive::new(2.1).unwrap();
     let size_y = Positive::new(2.1).unwrap();
@@ -40,8 +45,7 @@ fn filter_box_3d_test() {
 
     filter.filter(&pc, &mut view);
 
-    match view {
-        View::Full => { assert!(false); }
-        View::Restricted(indices) => { assert!(indices.len() == 27) }
-    }
+    pc.apply_view(&view);
+    save_xyz(&pc, &path_tmp, " ", "\n");
+    assert_files_equal(path_expected, path_tmp);
 }
