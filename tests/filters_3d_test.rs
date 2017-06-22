@@ -26,6 +26,7 @@ use rust_3d::point_cloud_3d::*;
 use rust_3d::positive::*;
 use rust_3d::filters::filter_box_3d::*;
 use rust_3d::filters::filter_sphere::*;
+use rust_3d::filters::combinators::filter_negate::*;
 use rust_3d::filters::transformers::filter_random_accessible::*;
 use rust_3d::view::*;
 use rust_3d::io::xyz::*;
@@ -80,4 +81,12 @@ fn filter_sphere_test() {
     let radius = Positive::new(4.0).unwrap();
     let filter = FilterSphere::build(center, radius);
     test_filter_3d::<FilterSphere, Point3D>(filter, "tests/data/expected_filter_sphere.xyz", "sphere");
+}
+
+#[test]
+fn filter_negate_test() {
+    let center = *Point3D::build(10.0, 10.0, 10.0);
+    let radius = Positive::new(11.0).unwrap();
+    let filter = FilterNegate::build(FilterSphere::build(center, radius));
+    test_filter_3d::<FilterNegate<FilterSphere, Point3D>, Point3D>(filter, "tests/data/expected_filter_negate.xyz", "negate");
 }
