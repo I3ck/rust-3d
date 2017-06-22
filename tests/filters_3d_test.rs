@@ -75,7 +75,7 @@ fn filter_box_3d_test() {
     let size_x = Positive::new(2.1).unwrap();
     let size_y = Positive::new(2.1).unwrap();
     let size_z = Positive::new(2.1).unwrap();
-    test_filter_3d::<FilterBox3D, Point3D>(FilterBox3D::build(center, size_x, size_y, size_z), "tests/data/expected_filter_box_3d.xyz", "box3d");
+    test_filter_3d::<_, Point3D>(FilterBox3D::build(center, size_x, size_y, size_z), "tests/data/expected_filter_box_3d.xyz", "box3d");
 }
 
 #[test]
@@ -83,7 +83,7 @@ fn filter_sphere_test() {
     let center = *Point3D::build(10.0, 10.0, 10.0);
     let radius = Positive::new(4.0).unwrap();
     let filter = FilterSphere::build(center, radius);
-    test_filter_3d::<FilterSphere, Point3D>(filter, "tests/data/expected_filter_sphere.xyz", "sphere");
+    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_sphere.xyz", "sphere");
 }
 
 #[test]
@@ -91,7 +91,7 @@ fn filter_or_test() {
     let filterSphere = FilterSphere::build(*Point3D::build(14.0, 14.0, 14.0), Positive::new(5.0).unwrap());
     let filterBox    = FilterBox3D::build(*Point3D::build(4.0, 4.0, 4.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(15.0).unwrap());
     let filter = FilterOR::build(filterSphere, filterBox);
-    test_filter_3d::<FilterOR<FilterSphere, FilterBox3D, Point3D>, Point3D>(filter, "tests/data/expected_filter_or.xyz", "or");
+    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_or.xyz", "or");
 }
 
 #[test]
@@ -99,7 +99,7 @@ fn filter_and_test() {
     let filterSphere = FilterSphere::build(*Point3D::build(10.0, 10.0, 10.0), Positive::new(5.0).unwrap());
     let filterBox    = FilterBox3D::build(*Point3D::build(8.0, 8.0, 8.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(15.0).unwrap());
     let filter = FilterAND::build(filterSphere, filterBox);
-    test_filter_3d::<FilterAND<FilterSphere, FilterBox3D, Point3D>, Point3D>(filter, "tests/data/expected_filter_and.xyz", "and");
+    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_and.xyz", "and");
 }
 
 #[test]
@@ -107,5 +107,5 @@ fn filter_xor_test() {
     let filterSphere = FilterSphere::build(*Point3D::build(13.0, 13.0, 13.0), Positive::new(10.0).unwrap());
     let filterBox    = FilterBox3D::build(*Point3D::build(8.0, 8.0, 8.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(30.0).unwrap());
     let filter = FilterXOR::build(filterSphere, filterBox);
-    test_filter_3d::<FilterXOR<FilterSphere, FilterBox3D, Point3D>, Point3D>(filter, "tests/data/expected_filter_xor.xyz", "xor");
+    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_xor.xyz", "xor");
 }
