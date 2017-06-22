@@ -25,16 +25,17 @@ use rust_3d::point_3d::*;
 use rust_3d::point_cloud_3d::*;
 use rust_3d::positive::*;
 use rust_3d::filters::filter_box_3d::*;
+use rust_3d::filters::filter_sphere::*;
 use rust_3d::filters::transformers::filter_random_accessible::*;
 use rust_3d::view::*;
 use rust_3d::io::xyz::*;
 use rust_3d::test_helper::assert_files_equal;
 
-fn test_filter_3d<F, P>(f: F, path_expected: &str) where
+fn test_filter_3d<F, P>(f: F, path_expected: &str, unique_identifier: &str) where
     F: IsFilter<P>,
     P: IsBuildable3D + Clone {
 
-    let path_tmp = "tests/tmp/tmp.xyz";
+    let path_tmp = ["tests/tmp/tmp", unique_identifier, ".xyz"].join("");
     let filter = FilterRandomAccessible::build(f);
 
     let mut view = View::Full;
@@ -45,7 +46,23 @@ fn test_filter_3d<F, P>(f: F, path_expected: &str) where
 
     pc.apply_view(&view);
     save_xyz(&pc, &path_tmp, " ", "\n");
-    assert_files_equal(path_expected, path_tmp);
+    assert_files_equal(path_expected, &path_tmp);
+}
+
+fn write_expected<F, P>(f: F, path_expected: &str) where
+    F: IsFilter<P>,
+    P: IsBuildable3D + Clone {
+
+    let filter = FilterRandomAccessible::build(f);
+
+    let mut view = View::Full;
+    let mut pc = PointCloud3D::<P>::new();
+    load_xyz(&mut pc, "tests/data/test_cube.xyz", " ", "\n").unwrap();
+
+    filter.filter(&pc, &mut view);
+
+    pc.apply_view(&view);
+    save_xyz(&pc, &path_expected, " ", "\n");
 }
 
 #[test]
@@ -54,5 +71,13 @@ fn filter_box_3d_test() {
     let size_x = Positive::new(2.1).unwrap();
     let size_y = Positive::new(2.1).unwrap();
     let size_z = Positive::new(2.1).unwrap();
-    test_filter_3d::<FilterBox3D, Point3D>(FilterBox3D::build(center, size_x, size_y, size_z), "tests/data/expected_filter_box_3d.xyz");
+    test_filter_3d::<FilterBox3D, Point3D>(FilterBox3D::build(center, size_x, size_y, size_z), "tests/data/expected_filter_box_3d.xyz", "box3d");
+}
+
+#[test]
+fn filter_sphere_test() {
+    let center = *Point3D::build(10.0, 10.0, 10.0);
+    let radius = Positive::new(4.0).unwrap();
+    let filter = FilterSphere::build(center, radius);
+    test_filter_3d::<FilterSphere, Point3D>(filter, "tests/data/expected_filter_sphere.xyz", "sphere");
 }

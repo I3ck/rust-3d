@@ -13,3 +13,4 @@ extrusionMesh.stl
 
 !tests/data/test_square.xy
 !tests/data/test_cube.xyz
+!tests/data/expected_*
