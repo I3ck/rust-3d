@@ -27,6 +27,7 @@ use rust_3d::positive::*;
 use rust_3d::filters::filter_box_3d::*;
 use rust_3d::filters::filter_sphere::*;
 use rust_3d::filters::combinators::filter_negate::*;
+use rust_3d::filters::combinators::filter_or::*;
 use rust_3d::filters::transformers::filter_random_accessible::*;
 use rust_3d::view::*;
 use rust_3d::io::xyz::*;
@@ -84,9 +85,9 @@ fn filter_sphere_test() {
 }
 
 #[test]
-fn filter_negate_test() {
-    let center = *Point3D::build(10.0, 10.0, 10.0);
-    let radius = Positive::new(11.0).unwrap();
-    let filter = FilterNegate::build(FilterSphere::build(center, radius));
-    test_filter_3d::<FilterNegate<FilterSphere, Point3D>, Point3D>(filter, "tests/data/expected_filter_negate.xyz", "negate");
+fn filter_or_test() {
+    let filterSphere = FilterSphere::build(*Point3D::build(14.0, 14.0, 14.0), Positive::new(5.0).unwrap());
+    let filterBox    = FilterBox3D::build(*Point3D::build(4.0, 4.0, 4.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(15.0).unwrap());
+    let filter = FilterOR::build(filterSphere, filterBox);
+    test_filter_3d::<FilterOR<FilterSphere, FilterBox3D, Point3D>, Point3D>(filter, "tests/data/expected_filter_or.xyz", "or");
 }
