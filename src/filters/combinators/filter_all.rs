@@ -26,7 +26,6 @@ pub struct FilterAll<T> {
 }
 
 impl<T> FilterAll<T> {
-
     /// Creates a new FilterAll
     pub fn new() -> Self {
         FilterAll {filters: Vec::new(), _marker: PhantomData}
