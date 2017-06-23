@@ -31,6 +31,7 @@ use rust_3d::filters::combinators::filter_or::*;
 use rust_3d::filters::combinators::filter_and::*;
 use rust_3d::filters::combinators::filter_xor::*;
 use rust_3d::filters::combinators::filter_all::*;
+use rust_3d::filters::combinators::filter_any::*;
 use rust_3d::filters::transformers::filter_random_accessible::*;
 use rust_3d::view::*;
 use rust_3d::io::xyz::*;
@@ -121,4 +122,14 @@ fn filter_all_test() {
     test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_and.xyz", "and"); //same as the and test
 }
 
-// all any outer_inner
+#[test]
+fn filter_any_test() {
+    let filterSphere = FilterSphere::build(*Point3D::build(14.0, 14.0, 14.0), Positive::new(5.0).unwrap());
+    let filterBox    = FilterBox3D::build(*Point3D::build(4.0, 4.0, 4.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(15.0).unwrap());
+    let mut filter = FilterAny::new();
+    filter.filters.push(Box::new(filterSphere));
+    filter.filters.push(Box::new(filterBox));
+    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_or.xyz", "or"); //same as the or test
+}
+
+//any outer_inner
