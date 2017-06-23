@@ -25,6 +25,14 @@ pub struct FilterAll<T> {
     _marker: PhantomData<T>
 }
 
+impl<T> FilterAll<T> {
+
+    /// Creates a new FilterAll
+    pub fn new() -> Self {
+        FilterAll {filters: Vec::new(), _marker: PhantomData}
+    }
+}
+
 impl<T> IsFilter<T> for FilterAll<T> {
     fn is_allowed(&self, x: &T) -> bool {
         for f in &self.filters {

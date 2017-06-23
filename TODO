@@ -7,6 +7,8 @@ convex hull https://github.com/I3ck/lib_2d/blob/master/inc/PointCloud.h#L401
 
 more filter shapes
 
+mark functions and traits as tested/untested?
+
 transformers as wrappers / intermediate structures
 
 add more combinator filters to the random accessible filters
