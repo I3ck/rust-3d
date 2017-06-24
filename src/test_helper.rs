@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! helper functions for testing
+//! helper functions for testing (these functions unwrap and panic, only use for tests)
 
 use std::io::prelude::*;
 use std::fs::File;
@@ -41,6 +41,7 @@ pub fn assert_files_equal(filepath1: &str, filepath2: &str) {
     assert!(s1 == s2);
 }
 
+/// Tests a 3D filter by comparing the result of its usage on the test cube vs. its expected result
 pub fn test_filter_3d<F, P>(f: F, path_expected: &str, unique_identifier: &str) where
     F: IsFilter<P>,
     P: IsBuildable3D + Clone {
@@ -59,6 +60,7 @@ pub fn test_filter_3d<F, P>(f: F, path_expected: &str, unique_identifier: &str) 
     assert_files_equal(path_expected, &path_tmp);
 }
 
+/// Can be used to write the expected result of a filter to later compare against in a test
 pub fn write_expected<F, P>(f: F, path_expected: &str) where
     F: IsFilter<P>,
     P: IsBuildable3D + Clone {
