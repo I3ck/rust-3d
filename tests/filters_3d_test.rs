@@ -36,41 +36,7 @@ use rust_3d::filters::combinators::filter_outer_inner::*;
 use rust_3d::filters::transformers::filter_random_accessible::*;
 use rust_3d::view::*;
 use rust_3d::io::xyz::*;
-use rust_3d::test_helper::assert_files_equal;
-
-fn test_filter_3d<F, P>(f: F, path_expected: &str, unique_identifier: &str) where
-    F: IsFilter<P>,
-    P: IsBuildable3D + Clone {
-
-    let path_tmp = ["tests/tmp/tmp", unique_identifier, ".xyz"].join("");
-    let filter = FilterRandomAccessible::build(f);
-
-    let mut view = View::Full;
-    let mut pc = PointCloud3D::<P>::new();
-    load_xyz(&mut pc, "tests/data/test_cube.xyz", " ", "\n").unwrap();
-
-    filter.filter(&pc, &mut view);
-
-    pc.apply_view(&view);
-    save_xyz(&pc, &path_tmp, " ", "\n");
-    assert_files_equal(path_expected, &path_tmp);
-}
-
-fn write_expected<F, P>(f: F, path_expected: &str) where
-    F: IsFilter<P>,
-    P: IsBuildable3D + Clone {
-
-    let filter = FilterRandomAccessible::build(f);
-
-    let mut view = View::Full;
-    let mut pc = PointCloud3D::<P>::new();
-    load_xyz(&mut pc, "tests/data/test_cube.xyz", " ", "\n").unwrap();
-
-    filter.filter(&pc, &mut view);
-
-    pc.apply_view(&view);
-    save_xyz(&pc, &path_expected, " ", "\n");
-}
+use rust_3d::test_helper::*;
 
 #[test]
 fn filter_box_3d_test() {
@@ -88,58 +54,3 @@ fn filter_sphere_test() {
     let filter = FilterSphere::build(center, radius);
     test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_sphere.xyz", "sphere");
 }
-
-#[test]
-fn filter_or_test() {
-    let filterSphere = FilterSphere::build(*Point3D::build(14.0, 14.0, 14.0), Positive::new(5.0).unwrap());
-    let filterBox    = FilterBox3D::build(*Point3D::build(4.0, 4.0, 4.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(15.0).unwrap());
-    let filter = FilterOR::build(filterSphere, filterBox);
-    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_or.xyz", "or");
-}
-
-#[test]
-fn filter_and_test() {
-    let filterSphere = FilterSphere::build(*Point3D::build(10.0, 10.0, 10.0), Positive::new(5.0).unwrap());
-    let filterBox    = FilterBox3D::build(*Point3D::build(8.0, 8.0, 8.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(15.0).unwrap());
-    let filter = FilterAND::build(filterSphere, filterBox);
-    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_and.xyz", "and");
-}
-
-#[test]
-fn filter_xor_test() {
-    let filterSphere = FilterSphere::build(*Point3D::build(13.0, 13.0, 13.0), Positive::new(10.0).unwrap());
-    let filterBox    = FilterBox3D::build(*Point3D::build(8.0, 8.0, 8.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(30.0).unwrap());
-    let filter = FilterXOR::build(filterSphere, filterBox);
-    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_xor.xyz", "xor");
-}
-
-#[test]
-fn filter_all_test() {
-    let filterSphere = FilterSphere::build(*Point3D::build(10.0, 10.0, 10.0), Positive::new(5.0).unwrap());
-    let filterBox    = FilterBox3D::build(*Point3D::build(8.0, 8.0, 8.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(15.0).unwrap());
-    let mut filter = FilterAll::new();
-    filter.filters.push(Box::new(filterSphere));
-    filter.filters.push(Box::new(filterBox));
-    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_and.xyz", "and"); //same as the and test
-}
-
-#[test]
-fn filter_any_test() {
-    let filterSphere = FilterSphere::build(*Point3D::build(14.0, 14.0, 14.0), Positive::new(5.0).unwrap());
-    let filterBox    = FilterBox3D::build(*Point3D::build(4.0, 4.0, 4.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(15.0).unwrap());
-    let mut filter = FilterAny::new();
-    filter.filters.push(Box::new(filterSphere));
-    filter.filters.push(Box::new(filterBox));
-    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_or.xyz", "or"); //same as the or test
-}
-
-#[test]
-fn filter_outer_inner_test() {
-    let center      = *Point3D::build(10.0, 10.0, 10.0);
-    let filterOuter = FilterSphere::build(center.clone(), Positive::new(4.0).unwrap());
-    let filterInner = FilterSphere::build(center,         Positive::new(3.0).unwrap());
-    let filter      = FilterOuterInner::build(filterOuter, filterInner);
-    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_outer_inner.xyz", "outer_inner");
-}
-
-//any outer_inner
