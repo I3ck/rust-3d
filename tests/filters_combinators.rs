@@ -90,3 +90,11 @@ fn filter_outer_inner_test() {
     let filter      = FilterOuterInner::build(filterOuter, filterInner);
     test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_outer_inner.xyz", "outer_inner");
 }
+
+#[test]
+fn filter_negate_test() {
+    let center       = *Point3D::build(10.0, 10.0, 10.0);
+    let filterSphere = FilterSphere::build(center.clone(), Positive::new(10.0).unwrap());
+    let filter       = FilterNegate::build(filterSphere);
+    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_negate.xyz", "negate");
+}

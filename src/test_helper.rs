@@ -61,7 +61,7 @@ pub fn test_filter_3d<F, P>(f: F, path_expected: &str, unique_identifier: &str) 
 }
 
 /// Can be used to write the expected result of a filter to later compare against in a test
-pub fn write_expected<F, P>(f: F, path_expected: &str) where
+pub fn write_expected_filter_3d<F, P>(f: F, path_expected: &str) where
     F: IsFilter<P>,
     P: IsBuildable3D + Clone {
 
