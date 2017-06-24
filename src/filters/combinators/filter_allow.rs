@@ -13,16 +13,23 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Containing filter combinators
+//! FilterAllow, a filter which always returns true
 
-pub mod filter_all_random_accessible;
-pub mod filter_any_random_accessible;
-pub mod filter_all;
-pub mod filter_any;
-pub mod filter_negate;
-pub mod filter_and;
-pub mod filter_or;
-pub mod filter_xor;
-pub mod filter_outer_inner;
-pub mod filter_allow;
-pub mod filter_deny;
+use traits::is_filter::*;
+
+/// FilterAllow, a filter which always returns true
+pub struct FilterAllow {
+}
+
+impl FilterAllow {
+    /// Creates a new FilterAllow
+    pub fn new() -> Self {
+        FilterAllow {}
+    }
+}
+
+impl<T> IsFilter<T> for FilterAllow {
+    fn is_allowed(&self, _: &T) -> bool {
+        true
+    }
+}

@@ -33,6 +33,8 @@ use rust_3d::filters::combinators::filter_xor::*;
 use rust_3d::filters::combinators::filter_all::*;
 use rust_3d::filters::combinators::filter_any::*;
 use rust_3d::filters::combinators::filter_outer_inner::*;
+use rust_3d::filters::combinators::filter_allow::*;
+use rust_3d::filters::combinators::filter_deny::*;
 use rust_3d::filters::transformers::filter_random_accessible::*;
 use rust_3d::view::*;
 use rust_3d::io::xyz::*;
@@ -97,4 +99,16 @@ fn filter_negate_test() {
     let filterSphere = FilterSphere::build(center.clone(), Positive::new(10.0).unwrap());
     let filter       = FilterNegate::build(filterSphere);
     test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_negate.xyz", "negate");
+}
+
+#[test]
+fn filter_allow_test() {
+    let filter       = FilterAllow::new();
+    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_allow.xyz", "allow");
+}
+
+#[test]
+fn filter_deny_test() {
+    let filter       = FilterDeny::new();
+    test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_deny.xyz", "deny");
 }

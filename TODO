@@ -19,6 +19,12 @@ replace Option returns with Result
 
 either keep the README up to date or refer to the docs only
 
+new or build nameming convention?
+
+enable warnings as errors for tests (currently many warnings for unused imports etc)
+
+trait for type with one or many normals (normal() or normal(id))
+
 the filter code is now very generic, consider moving it into its own crate
 
 has_position trait which then can implement many other traits by using the provided position (similar for others) => Use AsMut or AsRef for these
