@@ -112,7 +112,7 @@ impl BoundingBox2D {
     }
 
     /// Tests whether this bounding box contains the other
-    pub fn has_inside<B>(&self, other: &BoundingBox2D) -> bool {
+    pub fn has_inside(&self, other: &BoundingBox2D) -> bool {
            self.min.x() < other.min.x()
         && self.min.y() < other.min.y()
         && self.max.x() > other.max.x()
@@ -120,7 +120,7 @@ impl BoundingBox2D {
     }
     //@todo code duplication (use the other functions here)
     /// Tests whether this bounding box and the other overlap in any way
-    pub fn collides_with<B>(&self, other: &BoundingBox2D) -> bool {
+    pub fn collides_with(&self, other: &BoundingBox2D) -> bool {
         let (xsizethis, ysizethis) = (
             (self.min.x() - self.max.x()).abs(),
             (self.min.y() - self.max.y()).abs());
@@ -140,9 +140,6 @@ impl BoundingBox2D {
            2.0 * xcenterthis - xcenterother < (xsizethis + xsizeother)
         && 2.0 * ycenterthis - ycenterother < (ysizethis + ysizeother)
     }
-
-
-
 }
 
 impl HasBoundingBox2D for BoundingBox2D {

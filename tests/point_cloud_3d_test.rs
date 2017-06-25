@@ -49,12 +49,12 @@ fn test_point_cloud_3d() {
     match pc.bounding_box() {
         Err(_) => assert!(false),
         Ok(bb) => {
-            assert!(bb.min.x() == 0.1);
-            assert!(bb.min.y() == 0.2);
-            assert!(bb.min.z() == 0.3);
-            assert!(bb.max.x() == 0.2);
-            assert!(bb.max.y() == 0.3);
-            assert!(bb.max.z() == 0.4);
+            assert!(bb.min().x() == 0.1);
+            assert!(bb.min().y() == 0.2);
+            assert!(bb.min().z() == 0.3);
+            assert!(bb.max().x() == 0.2);
+            assert!(bb.max().y() == 0.3);
+            assert!(bb.max().z() == 0.4);
         }
     }
     //@todo currently failing

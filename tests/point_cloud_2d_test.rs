@@ -49,10 +49,10 @@ fn point_cloud_2d_test() {
     match pc.bounding_box() {
         Err(_) => assert!(false),
         Ok(bb) => {
-            assert!(bb.min.x() == 0.1);
-            assert!(bb.min.y() == 0.2);
-            assert!(bb.max.x() == 0.2);
-            assert!(bb.max.y() == 0.3);
+            assert!(bb.min().x() == 0.1);
+            assert!(bb.min().y() == 0.2);
+            assert!(bb.max().x() == 0.2);
+            assert!(bb.max().y() == 0.3);
         }
     }
     //@todo test currently failing

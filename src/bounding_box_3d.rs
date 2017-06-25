@@ -112,7 +112,7 @@ impl BoundingBox3D {
     }
 
     /// Tests whether this bounding box is within the other
-    pub fn is_inside<B>(&self, other: &BoundingBox3D) -> bool {
+    pub fn is_inside(&self, other: &BoundingBox3D) -> bool {
            self.min.x() > other.min.x()
         && self.min.y() > other.min.y()
         && self.min.z() > other.min.z()
@@ -134,7 +134,7 @@ impl BoundingBox3D {
     }
 
     /// Tests whether this bounding box contains the other
-    pub fn has_inside<B>(&self, other: &BoundingBox3D) -> bool {
+    pub fn has_inside(&self, other: &BoundingBox3D) -> bool {
            self.min.x() < other.min.x()
         && self.min.y() < other.min.y()
         && self.min.z() < other.min.z()
@@ -145,7 +145,7 @@ impl BoundingBox3D {
 
     //@todo code duplication (use the other functions here)
     /// Tests whether this bounding box and the other overlap in any way
-    pub fn collides_with<B>(&self, other: &BoundingBox3D) -> bool {
+    pub fn collides_with(&self, other: &BoundingBox3D) -> bool {
         let (xsizethis, ysizethis, zsizethis) = (
             (self.min.x() - self.max.x()).abs(),
             (self.min.y() - self.max.y()).abs(),

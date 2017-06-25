@@ -41,38 +41,43 @@ fn test_bounding_box_3d() {
     pc4.push(*Point3D::build(-10.0, -10.0, -10.0));
     pc4.push(*Point3D::build(-11.0, -11.0, -11.0));
 
-    assert!(pc1.min_pos().unwrap().x() == 0.0);
-    assert!(pc1.min_pos().unwrap().y() == 0.0);
-    assert!(pc1.min_pos().unwrap().z() == 0.0);
-    assert!(pc1.max_pos().unwrap().x() == 1.0);
-    assert!(pc1.max_pos().unwrap().y() == 1.0);
-    assert!(pc1.max_pos().unwrap().z() == 1.0);
+    let bb1 = pc1.bounding_box().unwrap();
+    let bb2 = pc2.bounding_box().unwrap();
+    let bb3 = pc3.bounding_box().unwrap();
+    let bb4 = pc4.bounding_box().unwrap();
 
-    assert!(pc3.min_pos().unwrap().x() == -1.0);
-    assert!(pc3.min_pos().unwrap().y() == -1.0);
-    assert!(pc3.min_pos().unwrap().z() == -1.0);
-    assert!(pc3.max_pos().unwrap().x() == 2.0);
-    assert!(pc3.max_pos().unwrap().y() == 2.0);
-    assert!(pc3.max_pos().unwrap().z() == 2.0);
+    assert!(bb1.min().x() == 0.0);
+    assert!(bb1.min().y() == 0.0);
+    assert!(bb1.min().z() == 0.0);
+    assert!(bb1.max().x() == 1.0);
+    assert!(bb1.max().y() == 1.0);
+    assert!(bb1.max().z() == 1.0);
 
-    assert!(!pc4.is_inside(&pc1).unwrap());
-    assert!(!pc4.is_inside(&pc2).unwrap());
-    assert!(!pc4.is_inside(&pc3).unwrap());
+    assert!(bb3.min().x() == -1.0);
+    assert!(bb3.min().y() == -1.0);
+    assert!(bb3.min().z() == -1.0);
+    assert!(bb3.max().x() == 2.0);
+    assert!(bb3.max().y() == 2.0);
+    assert!(bb3.max().z() == 2.0);
 
-    assert!(!pc1.is_inside(&pc2).unwrap());
-    assert!(!pc1.has_inside(&pc2).unwrap());
+    assert!(!bb4.is_inside(&bb1));
+    assert!(!bb4.is_inside(&bb2));
+    assert!(!bb4.is_inside(&bb3));
 
-    assert!(!pc2.is_inside(&pc1).unwrap());
-    assert!(!pc2.has_inside(&pc1).unwrap());
+    assert!(!bb1.is_inside(&bb2));
+    assert!(!bb1.has_inside(&bb2));
 
-    assert!(pc1.collides_with(&pc2).unwrap());
-    assert!(pc2.collides_with(&pc1).unwrap());
+    assert!(!bb2.is_inside(&bb1));
+    assert!(!bb2.has_inside(&bb1));
 
-    assert!(pc3.has_inside(&pc1).unwrap());
-    assert!(pc3.has_inside(&pc2).unwrap());
-    assert!(pc3.collides_with(&pc1).unwrap());
-    assert!(pc3.collides_with(&pc2).unwrap());
+    assert!(bb1.collides_with(&bb2));
+    assert!(bb2.collides_with(&bb1));
 
-    assert!(!pc1.contains(&*Point3D::build(5.0, 5.0, 5.0)).unwrap());
-    assert!(pc1.contains(&*Point3D::build(0.5, 0.5, 0.5)).unwrap());
+    assert!(bb3.has_inside(&bb1));
+    assert!(bb3.has_inside(&bb2));
+    assert!(bb3.collides_with(&bb1));
+    assert!(bb3.collides_with(&bb2));
+
+    assert!(!bb1.contains(&*Point3D::build(5.0, 5.0, 5.0)));
+    assert!(bb1.contains(&*Point3D::build(0.5, 0.5, 0.5)));
 }
