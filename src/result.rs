@@ -36,7 +36,8 @@ pub enum ErrorKind {
     IncorrectDimension,
     DimensionsDontMatch,
     NumberConversionError,
-    NumberInWrongRange
+    NumberInWrongRange,
+    ComparisionFailed
 }
 
 impl ErrorKind {
@@ -57,7 +58,8 @@ impl ErrorKind {
             ErrorKind::IncorrectDimension        => "Trying to access an incorrect dimension",
             ErrorKind::DimensionsDontMatch       => "Trying to mix types with different dimensions",
             ErrorKind::NumberConversionError     => "Failed converting one number type to another",
-            ErrorKind::NumberInWrongRange        => "Passed number is within the wrong range"
+            ErrorKind::NumberInWrongRange        => "Passed number is within the wrong range",
+            ErrorKind::ComparisionFailed         => "Comparision between two values failed"
         }
     }
 }

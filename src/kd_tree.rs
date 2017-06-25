@@ -195,11 +195,11 @@ impl<P> KdNode<P> where
         let comp = dimension_compare(search, &self.val, self.dimension);
 
         match comp {
-            Some(res) => match res {
+            Ok(res) => match res {
                 Ordering::Less  => if let Some(ref node) = (&self).left { node.knearest(search, n, pc); },
                 _               => if let Some(ref node) = (&self).right { node.knearest(search, n, pc); }
             },
-            None => {}
+            Err(_) => {}
         }
 
         sort_and_limit(pc, search, n);
@@ -215,7 +215,7 @@ impl<P> KdNode<P> where
         let border_right = current_search + distance_best;
 
         match comp {
-            Some(res) => match res {
+            Ok(res) => match res {
                 Ordering::Less => if let Some(ref node) = (&self).right {
                     if pc.len() < n || border_right >= current_val {
                         node.knearest(search, n, pc);
@@ -228,7 +228,7 @@ impl<P> KdNode<P> where
                 },
                 Ordering::Equal => {}
             },
-            None => {}
+            Err(_) => {}
         }
 
         sort_and_limit(pc, search, n);
@@ -246,11 +246,11 @@ impl<P> KdNode<P> where
         let comp = dimension_compare(search, &self.val, self.dimension);
 
         match comp {
-            Some(res) => match res {
+            Ok(res) => match res {
                 Ordering::Less  => if let Some(ref node) = (&self).left { node.in_sphere(search, radius, pc); },
                 _               => if let Some(ref node) = (&self).right { node.in_sphere(search, radius, pc); }
             },
-            None => {}
+            Err(_) => {}
         }
 
         let (current_search, current_val) = match self.dimension {
@@ -265,7 +265,7 @@ impl<P> KdNode<P> where
 
 
         match comp {
-            Some(res) => match res {
+            Ok(res) => match res {
                 Ordering::Less => if let Some(ref node) = (&self).right {
                     if border_right >= current_val {
                         node.in_sphere(search, radius, pc);
@@ -278,14 +278,14 @@ impl<P> KdNode<P> where
                 },
                 Ordering::Equal => {}
             },
-            None => {}
+            Err(_) => {}
         }
     }
 
     pub fn in_box(&self, search: &P, x_size: f64, y_size: f64, z_size: f64, pc: &mut PointCloud3D<P>) {
         if x_size <= 0.0 || y_size <= 0.0 || z_size <= 0.0 { return; }
 
-        if let (Some(dist_x), Some(dist_y), Some(dist_z)) = (dimension_dist(search, &self.val, 0), dimension_dist(search, &self.val, 1), dimension_dist(search, &self.val, 2)) {
+        if let (Ok(dist_x), Ok(dist_y), Ok(dist_z)) = (dimension_dist(search, &self.val, 0), dimension_dist(search, &self.val, 1), dimension_dist(search, &self.val, 2)) {
             if dist_x <= 0.5 * x_size && dist_y <= 0.5 * y_size && dist_z <= 0.5 * z_size {
                 pc.push(self.val.clone());
             }
@@ -295,11 +295,11 @@ impl<P> KdNode<P> where
             let comp = dimension_compare(search, &self.val, self.dimension);
 
             match comp {
-                Some(res) => match res {
+                Ok(res) => match res {
                     Ordering::Less  => if let Some(ref node) = (&self).left { node.in_box(search, x_size, y_size, z_size, pc); },
                     _               => if let Some(ref node) = (&self).right { node.in_box(search, x_size, y_size, z_size, pc); }
                 },
-                None => {}
+                Err(_) => {}
             }
 
             let (current_search, current_val, current_size) = match self.dimension {
@@ -312,7 +312,7 @@ impl<P> KdNode<P> where
             let border_right = current_search + 0.5 * current_size;
 
             match comp {
-                Some(res) => match res {
+                Ok(res) => match res {
                     Ordering::Less => if let Some(ref node) = (&self).right {
                         if border_right >= current_val {
                             node.in_box(search, x_size, y_size, z_size, pc);
@@ -325,7 +325,7 @@ impl<P> KdNode<P> where
                     },
                     Ordering::Equal => {}
                 },
-                None => {}
+                Err(_) => {}
             }
         }
     }

@@ -84,14 +84,14 @@ impl FilterBox3D {
         FilterBox3D {center: center, size_x: p_size_x.get(), size_y: p_size_y.get(), size_z: p_size_z.get()}
     }
     /// Creates a new FilterBox3D with the same dimensions as the given bounding box
-    pub fn from_bb(hbb: &HasBoundingBox3D) -> Option<Self> {
+    pub fn from_bb(hbb: &HasBoundingBox3D) -> Result<Self> {
         match (hbb.center_bb(), hbb.size_x(), hbb.size_y(), hbb.size_z()) {
             (Ok(center), Ok(sx), Ok(sy), Ok(sz)) => if sx > 0.0 && sy > 0.0 && sz > 0.0 {
-                    Some(Self::build(center, Positive::new(sx).unwrap(), Positive::new(sy).unwrap(), Positive::new(sz).unwrap()))
+                    Ok(Self::build(center, Positive::new(sx).unwrap(), Positive::new(sy).unwrap(), Positive::new(sz).unwrap()))
                 } else {
-                    None
+                    Err(ErrorKind::BoundingBoxMissing)
                 },
-            _ => None,
+            _ => Err(ErrorKind::BoundingBoxMissing)
         }
     }
 }

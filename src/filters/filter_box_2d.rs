@@ -80,14 +80,14 @@ impl FilterBox2D {
     }
     //@todo make this a trait
     /// Creates a new FilterBox2D with the same dimensions as the given bounding box
-    pub fn from_bb(hbb: &HasBoundingBox2D) -> Option<Self> {
+    pub fn from_bb(hbb: &HasBoundingBox2D) -> Result<Self> {
         match (hbb.center_bb(), hbb.size_x(), hbb.size_y()) {
             (Ok(center), Ok(sx), Ok(sy)) => if sx > 0.0 && sy > 0.0 {
-                    Some(Self::build(center, Positive::new(sx).unwrap(), Positive::new(sy).unwrap()))
+                    Ok(Self::build(center, Positive::new(sx).unwrap(), Positive::new(sy).unwrap()))
                 } else {
-                    None
+                    Err(ErrorKind::BoundingBoxMissing)
                 },
-            _ => None,
+            _ => Err(ErrorKind::BoundingBoxMissing),
         }
     }
 }
@@ -182,7 +182,7 @@ impl HasBoundingBox2D for FilterBox2D {
 
 impl<T> IsFilter<T> for FilterBox2D where
     T: Is2D {
-        
+
     fn is_allowed(&self, p: &T) -> bool {
            p.x() >= self.center.x() - self.size_x / 2.0
         && p.x() <= self.center.x() + self.size_x / 2.0

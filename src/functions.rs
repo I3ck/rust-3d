@@ -135,26 +135,26 @@ pub fn sqr_dist_3d(p1: &Is3D, p2: &Is3D) -> f64 {
 }
 
 /// Compares two IsBuildable3D at a given dimensions
-pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Option<Ordering> where //@todo could be Is3D
+pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Result<Ordering> where //@todo could be Is3D
     P: IsBuildable3D {
 
     match dim {
-        0 => lhs.x().partial_cmp(&rhs.x()),
-        1 => lhs.y().partial_cmp(&rhs.y()),
-        2 => lhs.z().partial_cmp(&rhs.z()),
-        _ => None
+        0 => lhs.x().partial_cmp(&rhs.x()).ok_or(ErrorKind::ComparisionFailed),
+        1 => lhs.y().partial_cmp(&rhs.y()).ok_or(ErrorKind::ComparisionFailed),
+        2 => lhs.z().partial_cmp(&rhs.z()).ok_or(ErrorKind::ComparisionFailed),
+        _ => Err(ErrorKind::DimensionsDontMatch)
     }
 }
 
 /// Calculates the distance within a given dimension between two IsBuildable3D
-pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Option<f64> where //@todo could be Is3D
+pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Result<f64> where //@todo could be Is3D
     P: IsBuildable3D {
 
     match dim {
-        0 => Some((lhs.x() - rhs.x()).abs()),
-        1 => Some((lhs.y() - rhs.y()).abs()),
-        2 => Some((lhs.z() - rhs.z()).abs()),
-        _ => None
+        0 => Ok((lhs.x() - rhs.x()).abs()),
+        1 => Ok((lhs.y() - rhs.y()).abs()),
+        2 => Ok((lhs.z() - rhs.z()).abs()),
+        _ => Err(ErrorKind::DimensionsDontMatch)
     }
 }
 

@@ -15,7 +15,7 @@ add more combinator filters to the random accessible filters
 
 type for face to be able to define e.g. filters for them
 
-replace Option returns with Result
+Bounding box types should return a Positive
 
 new or build nameming convention?
 
