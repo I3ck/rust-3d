@@ -20,6 +20,7 @@ use traits::is_3d::*;
 use traits::is_buildable_3d::*;
 use point_3d::*;
 use bounding_box_3d::*;
+use positive::*;
 
 /// HasBoundingBox3D is a trait for types which might have a bounding box
 pub trait HasBoundingBox3D  {
@@ -39,21 +40,21 @@ pub trait HasBoundingBox3D  {
     }
 
     /// Returns the size the bounding box within the x-dimension
-    fn size_x(&self) -> Result<f64> {
+    fn size_x(&self) -> Result<Positive> {
         let bb = self.bounding_box()?;
-        Ok((bb.max.x() - bb.min.x()).abs())
+        Positive::new((bb.max.x() - bb.min.x()).abs())
     }
 
     /// Returns the size the bounding box within the y-dimension
-    fn size_y(&self) -> Result<f64> {
+    fn size_y(&self) -> Result<Positive> {
         let bb = self.bounding_box()?;
-        Ok((bb.max.y() - bb.min.y()).abs())
+        Positive::new((bb.max.y() - bb.min.y()).abs())
     }
 
     /// Returns the size the bounding box within the z-dimension
-    fn size_z(&self) -> Result<f64> {
+    fn size_z(&self) -> Result<Positive> {
         let bb = self.bounding_box()?;
-        Ok((bb.max.z() - bb.min.z()).abs())
+        Positive::new((bb.max.z() - bb.min.z()).abs())
     }
 
     /// Returns the center of the bounding box

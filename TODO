@@ -15,8 +15,6 @@ add more combinator filters to the random accessible filters
 
 type for face to be able to define e.g. filters for them
 
-Bounding box types should return a Positive
-
 new or build nameming convention?
 
 enable warnings as errors for tests (currently many warnings for unused imports etc)
