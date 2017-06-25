@@ -17,13 +17,15 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use result::*;
 use point_2d::*;
+use positive::*;
 use traits::is_2d::*;
+use traits::is_buildable_2d::*;
 use traits::has_bounding_box_2d::*;
 
 /// BoundingBox2D, an axis aligned bounding box within 2D space
 pub struct BoundingBox2D {
-    pub min: Point2D,
-    pub max: Point2D
+    min: Point2D,
+    max: Point2D
 }
 
 impl BoundingBox2D {
@@ -70,6 +72,77 @@ impl BoundingBox2D {
             Err(ErrorKind::TooFewPoints)
         }
     }
+    /// Returns the minimum position of the bounding box
+    pub fn min(&self) -> Point2D {
+        self.min.clone()
+    }
+    /// Returns the maximum position of the bounding box
+    pub fn max(&self) -> Point2D {
+        self.max.clone()
+    }
+    /// Returns the size the bounding box within the x-dimension
+    pub fn size_x(&self) -> Result<Positive> {
+        Positive::new((self.max.x() - self.min.x()).abs())
+    }
+    /// Returns the size the bounding box within the y-dimension
+    pub fn size_y(&self) -> Result<Positive> {
+        Positive::new((self.max.y() - self.min.y()).abs())
+    }
+    /// Returns the center of the bounding box
+    pub fn center_bb(&self) -> Point2D {
+        *Point2D::build(self.min.x() + (self.max.x() - self.min.x()) / 2.0,
+                        self.min.y() + (self.max.y() - self.min.y()) / 2.0)
+    }
+    /// Tests whether this bounding box is within the other
+    pub fn is_inside(&self, other: &BoundingBox2D) -> bool {
+           self.min.x() > other.min.x()
+        && self.min.y() > other.min.y()
+        && self.max.x() < other.max.x()
+        && self.max.y() < other.max.y()
+    }
+
+    /// Tests whether this bounding box contains a position
+    pub fn contains<P>(&self, other: &P) -> bool where
+        Self: Sized, P: Is2D {
+
+           other.x() > self.min.x()
+        && other.x() < self.max.x()
+        && other.y() > self.min.y()
+        && other.y() < self.max.y()
+    }
+
+    /// Tests whether this bounding box contains the other
+    pub fn has_inside<B>(&self, other: &BoundingBox2D) -> bool {
+           self.min.x() < other.min.x()
+        && self.min.y() < other.min.y()
+        && self.max.x() > other.max.x()
+        && self.max.y() > other.max.y()
+    }
+    //@todo code duplication (use the other functions here)
+    /// Tests whether this bounding box and the other overlap in any way
+    pub fn collides_with<B>(&self, other: &BoundingBox2D) -> bool {
+        let (xsizethis, ysizethis) = (
+            (self.min.x() - self.max.x()).abs(),
+            (self.min.y() - self.max.y()).abs());
+
+        let (xsizeother, ysizeother) = (
+            (other.min.x() - other.max.x()).abs(),
+            (other.min.y() - other.max.y()).abs());
+
+        let (xcenterthis, ycenterthis) = (
+            (self.min.x() + self.max.x() / 2.0),
+            (self.min.y() + self.max.y() / 2.0));
+
+        let (xcenterother, ycenterother) = (
+            (other.min.x() + other.max.x() / 2.0),
+            (other.min.y() + other.max.y() / 2.0));
+
+           2.0 * xcenterthis - xcenterother < (xsizethis + xsizeother)
+        && 2.0 * ycenterthis - ycenterother < (ysizethis + ysizeother)
+    }
+
+
+
 }
 
 impl HasBoundingBox2D for BoundingBox2D {

@@ -80,9 +80,9 @@ impl FilterBox2D {
     }
     //@todo make this a trait
     /// Creates a new FilterBox2D with the same dimensions as the given bounding box
-    pub fn from_bb(hbb: &HasBoundingBox2D) -> Result<Self> {
-        match (hbb.center_bb(), hbb.size_x(), hbb.size_y()) {
-            (Ok(center), Ok(sx), Ok(sy)) =>
+    pub fn from_bb(bb: &BoundingBox2D) -> Result<Self> {
+        match (bb.center_bb(), bb.size_x(), bb.size_y()) {
+            (center, Ok(sx), Ok(sy)) =>
                 Ok(Self::build(center, sx, sy)),
             _ => Err(ErrorKind::BoundingBoxMissing),
         }

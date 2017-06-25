@@ -84,9 +84,9 @@ impl FilterBox3D {
         FilterBox3D {center: center, size_x: p_size_x.get(), size_y: p_size_y.get(), size_z: p_size_z.get()}
     }
     /// Creates a new FilterBox3D with the same dimensions as the given bounding box
-    pub fn from_bb(hbb: &HasBoundingBox3D) -> Result<Self> {
-        match (hbb.center_bb(), hbb.size_x(), hbb.size_y(), hbb.size_z()) {
-            (Ok(center), Ok(sx), Ok(sy), Ok(sz)) =>
+    pub fn from_bb(bb: &BoundingBox3D) -> Result<Self> {
+        match (bb.center_bb(), bb.size_x(), bb.size_y(), bb.size_z()) {
+            (center, Ok(sx), Ok(sy), Ok(sz)) =>
                 Ok(Self::build(center, sx, sy, sz)),
             _ => Err(ErrorKind::BoundingBoxMissing)
         }
