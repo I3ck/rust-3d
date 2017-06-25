@@ -17,8 +17,6 @@ type for face to be able to define e.g. filters for them
 
 replace Option returns with Result
 
-either keep the README up to date or refer to the docs only
-
 new or build nameming convention?
 
 enable warnings as errors for tests (currently many warnings for unused imports etc)
@@ -41,8 +39,6 @@ update tests
 change other filter tests to use files as well
 also write tests for the combinator filters
 
-move combinator filters to own folder?
-
 make kd-tree n-dimensional   (maybe the octree as well, but might be easier to implement quadtree)
 
 make trees referencing via ids
@@ -57,11 +53,7 @@ some structs / traits have 2d/3d specification even if they can only exist in on
 
 write tutorial / examples / example program
 
-method to directly add points to pc via coordinates
-
 try to avoid dynamic traits
-
-also implement is_buildable_nd etc. and make is_buildable_2d also is_buildable_nd
 
 outlier removal (filter which holds a kdtree of the reference structure, calc median / medium distance to k-nearest
 neighbours remove which are further than x, furthest x percent further than x times
@@ -69,8 +61,6 @@ median / average dist...   could take either kdtree or iterator or random access
 and be destructible to kdtree)
 
 segmantation detection
-
-remove all dependencies on PC2D / PC3D and write the methods for RandomAccessible / Iterators -> rewrite the IO methods to only require those and rename the files to the extension. e.g. IO::XYZ  IO::XY   IO::STL
 
 either many more filters or factories for filters (same for shapes)
 
