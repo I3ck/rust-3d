@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! Positive, a wrapper for a f64 value, ensuring it is always > 0
 
 use result::*;
+use std::ops::Add;
 
 /// Positive, a wrapper for a f64 value, ensuring it is always > 0
 pub struct Positive {
@@ -34,5 +35,13 @@ impl Positive {
     /// Returns the wrapped value
     pub fn get(&self) -> f64 {
         self.val
+    }
+}
+
+impl Add for Positive {
+    type Output = Positive;
+
+    fn add(self, other: Positive) -> Positive {
+        Positive {val: self.val + other.val}
     }
 }

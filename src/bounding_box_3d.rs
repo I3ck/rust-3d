@@ -78,39 +78,32 @@ impl BoundingBox3D {
             Err(ErrorKind::TooFewPoints)
         }
     }
-
     /// Returns the minimum position of the bounding box
     pub fn min(&self) -> Point3D {
         self.min.clone()
     }
-
     /// Returns the maximum position of the bounding box
     pub fn max(&self) -> Point3D {
         self.max.clone()
     }
-
     /// Returns the size the bounding box within the x-dimension
-    pub fn size_x(&self) -> Result<Positive> {
-        Positive::new((self.max.x() - self.min.x()).abs())
+    pub fn size_x(&self) -> Positive {
+        Positive::new((self.max.x() - self.min.x()).abs()).unwrap() //safe since constrain enforced on construction
     }
-
     /// Returns the size the bounding box within the y-dimension
-    pub fn size_y(&self) -> Result<Positive> {
-        Positive::new((self.max.y() - self.min.y()).abs())
+    pub fn size_y(&self) -> Positive {
+        Positive::new((self.max.y() - self.min.y()).abs()).unwrap() //safe since constrain enforced on construction
     }
-
     /// Returns the size the bounding box within the z-dimension
-    pub fn size_z(&self) -> Result<Positive> {
-        Positive::new((self.max.z() - self.min.z()).abs())
+    pub fn size_z(&self) -> Positive {
+        Positive::new((self.max.z() - self.min.z()).abs()).unwrap() //safe since constrain enforced on construction
     }
-
     /// Returns the center of the bounding box
     pub fn center_bb(&self) -> Point3D {
         *Point3D::build(self.min.x() + (self.max.x() - self.min.x()) / 2.0,
                         self.min.y() + (self.max.y() - self.min.y()) / 2.0,
                         self.min.z() + (self.max.z() - self.min.z()) / 2.0)
     }
-
     /// Tests whether this bounding box is within the other
     pub fn is_inside(&self, other: &BoundingBox3D) -> bool {
            self.min.x() > other.min.x()
@@ -120,7 +113,6 @@ impl BoundingBox3D {
         && self.max.y() < other.max.y()
         && self.max.z() < other.max.z()
     }
-
     /// Tests whether this bounding box contains a position
     pub fn contains<P>(&self, other: &P) -> bool where
         Self: Sized, P: Is3D {
@@ -132,7 +124,6 @@ impl BoundingBox3D {
         && other.z() > self.min.z()
         && other.z() < self.max.z()
     }
-
     /// Tests whether this bounding box contains the other
     pub fn has_inside(&self, other: &BoundingBox3D) -> bool {
            self.min.x() < other.min.x()
@@ -142,33 +133,11 @@ impl BoundingBox3D {
         && self.max.y() > other.max.y()
         && self.max.z() > other.max.z()
     }
-
-    //@todo code duplication (use the other functions here)
     /// Tests whether this bounding box and the other overlap in any way
     pub fn collides_with(&self, other: &BoundingBox3D) -> bool {
-        let (xsizethis, ysizethis, zsizethis) = (
-            (self.min.x() - self.max.x()).abs(),
-            (self.min.y() - self.max.y()).abs(),
-            (self.min.z() - self.max.z()).abs());
-
-        let (xsizeother, ysizeother, zsizeother) = (
-            (other.min.x() - other.max.x()).abs(),
-            (other.min.y() - other.max.y()).abs(),
-            (other.min.z() - other.max.z()).abs());
-
-        let (xcenterthis, ycenterthis, zcenterthis) = (
-            (self.min.x() + self.max.x() / 2.0),
-            (self.min.y() + self.max.y() / 2.0),
-            (self.min.z() + self.max.z() / 2.0));
-
-        let (xcenterother, ycenterother, zcenterother) = (
-            (other.min.x() + other.max.x() / 2.0),
-            (other.min.y() + other.max.y() / 2.0),
-            (other.min.z() + other.max.z() / 2.0));
-
-           2.0 * xcenterthis - xcenterother < (xsizethis + xsizeother)
-        && 2.0 * ycenterthis - ycenterother < (ysizethis + ysizeother)
-        && 2.0 * zcenterthis - zcenterother < (zsizethis + zsizeother)
+           2.0 * self.center_bb().x - other.center_bb().x < ((self.size_x() + other.size_x()).get())
+        && 2.0 * self.center_bb().y - other.center_bb().y < ((self.size_y() + other.size_y()).get())
+        && 2.0 * self.center_bb().z - other.center_bb().z < ((self.size_z() + other.size_z()).get())
     }
 }
 

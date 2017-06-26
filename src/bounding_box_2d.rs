@@ -81,12 +81,12 @@ impl BoundingBox2D {
         self.max.clone()
     }
     /// Returns the size the bounding box within the x-dimension
-    pub fn size_x(&self) -> Result<Positive> {
-        Positive::new((self.max.x() - self.min.x()).abs())
+    pub fn size_x(&self) -> Positive {
+        Positive::new((self.max.x() - self.min.x()).abs()).unwrap() //safe since constrain enforced on construction
     }
     /// Returns the size the bounding box within the y-dimension
-    pub fn size_y(&self) -> Result<Positive> {
-        Positive::new((self.max.y() - self.min.y()).abs())
+    pub fn size_y(&self) -> Positive {
+        Positive::new((self.max.y() - self.min.y()).abs()).unwrap() //safe since constrain enforced on construction
     }
     /// Returns the center of the bounding box
     pub fn center_bb(&self) -> Point2D {
@@ -100,7 +100,6 @@ impl BoundingBox2D {
         && self.max.x() < other.max.x()
         && self.max.y() < other.max.y()
     }
-
     /// Tests whether this bounding box contains a position
     pub fn contains<P>(&self, other: &P) -> bool where
         Self: Sized, P: Is2D {
@@ -110,7 +109,6 @@ impl BoundingBox2D {
         && other.y() > self.min.y()
         && other.y() < self.max.y()
     }
-
     /// Tests whether this bounding box contains the other
     pub fn has_inside(&self, other: &BoundingBox2D) -> bool {
            self.min.x() < other.min.x()
@@ -118,27 +116,10 @@ impl BoundingBox2D {
         && self.max.x() > other.max.x()
         && self.max.y() > other.max.y()
     }
-    //@todo code duplication (use the other functions here)
     /// Tests whether this bounding box and the other overlap in any way
     pub fn collides_with(&self, other: &BoundingBox2D) -> bool {
-        let (xsizethis, ysizethis) = (
-            (self.min.x() - self.max.x()).abs(),
-            (self.min.y() - self.max.y()).abs());
-
-        let (xsizeother, ysizeother) = (
-            (other.min.x() - other.max.x()).abs(),
-            (other.min.y() - other.max.y()).abs());
-
-        let (xcenterthis, ycenterthis) = (
-            (self.min.x() + self.max.x() / 2.0),
-            (self.min.y() + self.max.y() / 2.0));
-
-        let (xcenterother, ycenterother) = (
-            (other.min.x() + other.max.x() / 2.0),
-            (other.min.y() + other.max.y() / 2.0));
-
-           2.0 * xcenterthis - xcenterother < (xsizethis + xsizeother)
-        && 2.0 * ycenterthis - ycenterother < (ysizethis + ysizeother)
+           2.0 * self.center_bb().x - other.center_bb().x < ((self.size_x() + other.size_x()).get())
+        && 2.0 * self.center_bb().y - other.center_bb().y < ((self.size_y() + other.size_y()).get())
     }
 }
 
