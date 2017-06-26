@@ -83,10 +83,6 @@ impl FilterBox3D {
     pub fn build(center: Point3D, p_size_x: Positive, p_size_y: Positive, p_size_z: Positive) -> Self {
         FilterBox3D {center: center, size_x: p_size_x.get(), size_y: p_size_y.get(), size_z: p_size_z.get()}
     }
-    /// Creates a new FilterBox3D with the same dimensions as the given bounding box
-    pub fn from_bb(bb: &BoundingBox3D) -> Self {
-        Self::build(bb.center_bb(), bb.size_x(), bb.size_y(), bb.size_z())
-    }
 }
 
 impl IsND for FilterBox3D {
@@ -198,5 +194,11 @@ impl<T> IsFilter<T> for FilterBox3D where
         && p.y() <= self.center.y() + self.size_y / 2.0
         && p.z() >= self.center.z() - self.size_z / 2.0
         && p.z() <= self.center.z() + self.size_z / 2.0
+    }
+}
+
+impl From<BoundingBox3D> for FilterBox3D {
+    fn from(x: BoundingBox3D) -> Self {
+        Self::build(x.center_bb(), x.size_x(), x.size_y(), x.size_z())
     }
 }

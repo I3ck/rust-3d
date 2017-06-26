@@ -78,11 +78,6 @@ impl FilterBox2D {
     pub fn build(center: Point2D, p_size_x: Positive, p_size_y: Positive) -> Self {
         FilterBox2D {center: center, size_x: p_size_x.get(), size_y: p_size_y.get()}
     }
-    //@todo make this a trait
-    /// Creates a new FilterBox2D with the same dimensions as the given bounding box
-    pub fn from_bb(bb: &BoundingBox2D) -> Self {
-        Self::build(bb.center_bb(), bb.size_x(), bb.size_y())
-    }
 }
 
 impl IsND for FilterBox2D {
@@ -181,5 +176,11 @@ impl<T> IsFilter<T> for FilterBox2D where
         && p.x() <= self.center.x() + self.size_x / 2.0
         && p.y() >= self.center.y() - self.size_y / 2.0
         && p.y() <= self.center.y() + self.size_y / 2.0
+    }
+}
+
+impl From<BoundingBox2D> for FilterBox2D {
+    fn from(x: BoundingBox2D) -> Self {
+        Self::build(x.center_bb(), x.size_x(), x.size_y())
     }
 }
