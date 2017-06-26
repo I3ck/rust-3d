@@ -34,7 +34,7 @@ impl<F1, F2, T> FilterAND<F1, F2, T> where
     F2: IsFilter<T> {
 
     /// Creates a new FilterAND from two other IsFilter
-    pub fn build(filter1: F1, filter2: F2) -> Self {
+    pub fn new(filter1: F1, filter2: F2) -> Self {
         FilterAND {filter1: Box::new(filter1), filter2: Box::new(filter2), _marker: PhantomData}
     }
 }

@@ -50,7 +50,7 @@ pub fn test_filter_2d<F, P>(f: F, path_expected: &str, unique_identifier: &str) 
     P: IsBuildable2D + Clone {
 
     let path_tmp = ["tests/tmp/tmp", unique_identifier, ".xyz"].join("");
-    let filter = FilterRandomAccessible::build(f);
+    let filter = FilterRandomAccessible::new(f);
 
     let mut view = View::Full;
     let mut pc = PointCloud2D::<P>::new();
@@ -69,7 +69,7 @@ pub fn test_filter_3d<F, P>(f: F, path_expected: &str, unique_identifier: &str) 
     P: IsBuildable3D + Clone {
 
     let path_tmp = ["tests/tmp/tmp", unique_identifier, ".xyz"].join("");
-    let filter = FilterRandomAccessible::build(f);
+    let filter = FilterRandomAccessible::new(f);
 
     let mut view = View::Full;
     let mut pc = PointCloud3D::<P>::new();
@@ -87,7 +87,7 @@ pub fn write_expected_filter_2d<F, P>(f: F, path_expected: &str) where
     F: IsFilter<P>,
     P: IsBuildable2D + Clone {
 
-    let filter = FilterRandomAccessible::build(f);
+    let filter = FilterRandomAccessible::new(f);
 
     let mut view = View::Full;
     let mut pc = PointCloud2D::<P>::new();
@@ -104,7 +104,7 @@ pub fn write_expected_filter_3d<F, P>(f: F, path_expected: &str) where
     F: IsFilter<P>,
     P: IsBuildable3D + Clone {
 
-    let filter = FilterRandomAccessible::build(f);
+    let filter = FilterRandomAccessible::new(f);
 
     let mut view = View::Full;
     let mut pc = PointCloud3D::<P>::new();

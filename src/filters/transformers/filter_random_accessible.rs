@@ -38,7 +38,7 @@ pub struct FilterRandomAccessible<F, T> where
 impl<F, T> FilterRandomAccessible<F, T> where
     F: IsFilter<T> {
 
-    pub fn build(filter: F) -> Self {
+    pub fn new(filter: F) -> Self {
         FilterRandomAccessible {filter: Box::new(filter), _marker: PhantomData}
     }
 }

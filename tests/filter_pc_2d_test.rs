@@ -47,7 +47,7 @@ fn filter_pc_2d_test() {
     pc.push(*Point2D::build(10.0, -8.0)); // 10 NO
     // => 0 1 3 5 6 8 9 in => len = 7
 
-    let filter_pc = FilterRandomAccessible::build(filter);
+    let filter_pc = FilterRandomAccessible::new(filter);
     filter_pc.filter(&pc, &mut view);
 
     match view {

@@ -44,7 +44,7 @@ use rust_3d::test_helper::*;
 fn filter_or_test() {
     let filterSphere = FilterSphere::build(*Point3D::build(14.0, 14.0, 14.0), Positive::new(5.0).unwrap());
     let filterBox    = FilterBox3D::build(*Point3D::build(4.0, 4.0, 4.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(15.0).unwrap());
-    let filter = FilterOR::build(filterSphere, filterBox);
+    let filter = FilterOR::new(filterSphere, filterBox);
     test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_or.xyz", "or");
 }
 
@@ -52,7 +52,7 @@ fn filter_or_test() {
 fn filter_and_test() {
     let filterSphere = FilterSphere::build(*Point3D::build(10.0, 10.0, 10.0), Positive::new(5.0).unwrap());
     let filterBox    = FilterBox3D::build(*Point3D::build(8.0, 8.0, 8.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(15.0).unwrap());
-    let filter = FilterAND::build(filterSphere, filterBox);
+    let filter = FilterAND::new(filterSphere, filterBox);
     test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_and.xyz", "and");
 }
 
@@ -60,7 +60,7 @@ fn filter_and_test() {
 fn filter_xor_test() {
     let filterSphere = FilterSphere::build(*Point3D::build(13.0, 13.0, 13.0), Positive::new(10.0).unwrap());
     let filterBox    = FilterBox3D::build(*Point3D::build(8.0, 8.0, 8.0), Positive::new(5.0).unwrap(), Positive::new(7.0).unwrap(), Positive::new(30.0).unwrap());
-    let filter = FilterXOR::build(filterSphere, filterBox);
+    let filter = FilterXOR::new(filterSphere, filterBox);
     test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_xor.xyz", "xor");
 }
 
@@ -97,7 +97,7 @@ fn filter_outer_inner_test() {
 fn filter_negate_test() {
     let center       = *Point3D::build(10.0, 10.0, 10.0);
     let filterSphere = FilterSphere::build(center.clone(), Positive::new(10.0).unwrap());
-    let filter       = FilterNegate::build(filterSphere);
+    let filter       = FilterNegate::new(filterSphere);
     test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_negate.xyz", "negate");
 }
 

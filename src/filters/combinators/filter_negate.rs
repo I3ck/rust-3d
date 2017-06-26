@@ -29,7 +29,7 @@ pub struct FilterNegate<F, T> where
 impl<F, T> FilterNegate<F, T> where
     F: IsFilter<T> {
     /// Creates a new FilterNegate from another IsFilter which will be negated
-    pub fn build(filter: F) -> Self {
+    pub fn new(filter: F) -> Self {
         FilterNegate {filter: Box::new(filter), _marker: PhantomData}
     }
 }
