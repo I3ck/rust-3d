@@ -18,7 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use result::*;
 use std::ops::Add;
 
-#[derive (PartialEq, PartialOrd)]
+#[derive (Copy, Clone, PartialEq, PartialOrd)]
 /// Positive, a wrapper for a f64 value, ensuring it is always > 0
 pub struct Positive {
     val: f64
