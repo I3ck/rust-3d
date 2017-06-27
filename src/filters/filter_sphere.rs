@@ -113,7 +113,7 @@ impl IsBuildableND for FilterSphere {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterSphere::build(*Point3D::build(coords[0], coords[1], coords[2]), Positive::new(1.0).unwrap())))
+        Ok(Box::new(FilterSphere::build(*Point3D::build(coords[0], coords[1], coords[2]), Positive::one())))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -134,7 +134,7 @@ impl IsBuildableND for FilterSphere {
 //@todo or always set sizes to 1
 impl IsBuildable3D for FilterSphere {
     fn build(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(FilterSphere::build(*Point3D::build(x, y, z), Positive::new(1.0).unwrap()))
+        Box::new(FilterSphere::build(*Point3D::build(x, y, z), Positive::one()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable3D {

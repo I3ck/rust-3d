@@ -108,7 +108,7 @@ impl IsBuildableND for FilterCircle {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterCircle::build(*Point2D::build(coords[0], coords[1]), Positive::new(1.0).unwrap())))
+        Ok(Box::new(FilterCircle::build(*Point2D::build(coords[0], coords[1]), Positive::one())))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -128,7 +128,7 @@ impl IsBuildableND for FilterCircle {
 //@todo or always set sizes to 1
 impl IsBuildable2D for FilterCircle {
     fn build(x: f64, y: f64) -> Box<Self> {
-        Box::new(FilterCircle::build(*Point2D::build(x, y), Positive::new(1.0).unwrap()))
+        Box::new(FilterCircle::build(*Point2D::build(x, y), Positive::one()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable2D {
