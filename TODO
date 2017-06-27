@@ -17,6 +17,8 @@ type for face to be able to define e.g. filters for them
 
 new or build nameming convention?
 
+consider removing the new() from is buildable nd
+
 enable warnings as errors for tests (currently many warnings for unused imports etc)
 
 trait for type with one or many normals (normal() or normal(id))

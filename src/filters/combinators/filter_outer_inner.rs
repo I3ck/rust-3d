@@ -33,7 +33,7 @@ impl<FOuter, FInner, T> FilterOuterInner<FOuter, FInner, T> where
     FInner: IsFilter<T> {
 
     /// Creates a new FilterOuterInner from two other IsFilter
-    pub fn build(filter_outer: FOuter, filter_inner: FInner) -> Self {
+    pub fn new(filter_outer: FOuter, filter_inner: FInner) -> Self {
         FilterOuterInner {
             filter: FilterAND::new(filter_outer, FilterNegate::new(filter_inner))
         }
