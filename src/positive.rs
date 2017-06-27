@@ -18,6 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use result::*;
 use std::ops::Add;
 
+#[derive (PartialEq, PartialOrd)]
 /// Positive, a wrapper for a f64 value, ensuring it is always > 0
 pub struct Positive {
     val: f64
@@ -30,6 +31,10 @@ impl Positive {
             return Ok(Positive {val: val});
         }
         Err(ErrorKind::NumberInWrongRange)
+    }
+    /// Creates a new Positive with value 1
+    pub fn one() -> Positive {
+        Positive {val : 1.0}
     }
 
     /// Returns the wrapped value
