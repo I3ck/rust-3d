@@ -36,7 +36,7 @@ use bounding_box_2d::*;
 /// FilterCircle, a circle filter within 2D space
 pub struct FilterCircle {
     center: Point2D,
-    radius: f64
+    radius: Positive
 }
 
 impl Eq for FilterCircle {}
@@ -54,7 +54,7 @@ impl Ord for FilterCircle {
 impl Hash for FilterCircle { //@todo poor precision this way
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.center.hash(state);
-        (self.radius as u64).hash(state);
+        (self.radius.get() as u64).hash(state);
     }
 }
 
@@ -67,11 +67,11 @@ impl Clone for FilterCircle {
 impl FilterCircle {
     /// Creates a new FilterCircle at origin with a radius of 1
     pub fn new() -> Self {
-        FilterCircle {center: *Point2D::new(), radius: 1.0}
+        FilterCircle {center: *Point2D::new(), radius: Positive::one()}
     }
     /// Creates a new FilterCircle with the given parameters
     pub fn build(center: Point2D, p_radius: Positive) -> Self {
-        FilterCircle {center: center, radius: p_radius.get()}
+        FilterCircle {center: center, radius: p_radius}
     }
 }
 
@@ -159,8 +159,8 @@ impl IsEditable2D for FilterCircle {
 
 impl HasBoundingBox2D for FilterCircle {
     fn bounding_box(&self) -> Result<BoundingBox2D> {
-        let p_min = *Point2D::build(self.center.x() - self.radius, self.center.y() - self.radius);
-        let p_max = *Point2D::build(self.center.x() + self.radius, self.center.y() + self.radius);
+        let p_min = *Point2D::build(self.center.x() - self.radius.get(), self.center.y() - self.radius.get());
+        let p_max = *Point2D::build(self.center.x() + self.radius.get(), self.center.y() + self.radius.get());
         BoundingBox2D::new(p_min, p_max)
     }
 }
@@ -169,6 +169,6 @@ impl<T> IsFilter<T> for FilterCircle where
     T: Is2D {
 
     fn is_allowed(&self, p: &T) -> bool {
-        dist_2d(p, &self.center) <= self.radius
+        dist_2d(p, &self.center) <= self.radius.get()
     }
 }

@@ -36,9 +36,9 @@ use bounding_box_3d::*;
 /// FilterBox3D, a box filter within 3D space
 pub struct FilterBox3D {
     center: Point3D,
-    size_x: f64,
-    size_y: f64,
-    size_z: f64
+    size_x: Positive,
+    size_y: Positive,
+    size_z: Positive
 }
 
 impl Eq for FilterBox3D {}
@@ -62,9 +62,9 @@ impl Ord for FilterBox3D {
 impl Hash for FilterBox3D { //@todo poor precision this way
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.center.hash(state);
-        (self.size_x as u64).hash(state);
-        (self.size_y as u64).hash(state);
-        (self.size_z as u64).hash(state);
+        (self.size_x.get() as u64).hash(state);
+        (self.size_y.get() as u64).hash(state);
+        (self.size_z.get() as u64).hash(state);
     }
 }
 
@@ -77,11 +77,11 @@ impl Clone for FilterBox3D {
 impl FilterBox3D {
     /// Creates a new FilterBox3D at origin with sizes of 1
     pub fn new() -> Self {
-        FilterBox3D {center: *Point3D::new(), size_x: 1.0, size_y: 1.0, size_z: 1.0}
+        FilterBox3D {center: *Point3D::new(), size_x: Positive::one(), size_y: Positive::one(), size_z: Positive::one()}
     }
     /// Creates a new FilterBox3D with the given parameters
     pub fn build(center: Point3D, p_size_x: Positive, p_size_y: Positive, p_size_z: Positive) -> Self {
-        FilterBox3D {center: center, size_x: p_size_x.get(), size_y: p_size_y.get(), size_z: p_size_z.get()}
+        FilterBox3D {center: center, size_x: p_size_x, size_y: p_size_y, size_z: p_size_z}
     }
 }
 
@@ -123,7 +123,7 @@ impl IsBuildableND for FilterBox3D {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterBox3D::build(*Point3D::build(coords[0], coords[1], coords[2]), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap())))
+        Ok(Box::new(FilterBox3D::build(*Point3D::build(coords[0], coords[1], coords[2]), Positive::one(), Positive::one(), Positive::one())))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -142,7 +142,7 @@ impl IsBuildableND for FilterBox3D {
 
 impl IsBuildable3D for FilterBox3D {
     fn build(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(FilterBox3D::build(*Point3D::build(x, y, z), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap(), Positive::new(1.0).unwrap()))
+        Box::new(FilterBox3D::build(*Point3D::build(x, y, z), Positive::one(), Positive::one(), Positive::one()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable3D {
@@ -178,8 +178,8 @@ impl IsEditable3D for FilterBox3D {
 
 impl HasBoundingBox3D for FilterBox3D {
     fn bounding_box(&self) -> Result<BoundingBox3D> {
-        let p_min = *Point3D::build(self.center.x() - self.size_x / 2.0, self.center.y() - self.size_y / 2.0, self.center.z() - self.size_z / 2.0);
-        let p_max = *Point3D::build(self.center.x() + self.size_x / 2.0, self.center.y() + self.size_y / 2.0, self.center.z() + self.size_z / 2.0);
+        let p_min = *Point3D::build(self.center.x() - self.size_x.get() / 2.0, self.center.y() - self.size_y.get() / 2.0, self.center.z() - self.size_z.get() / 2.0);
+        let p_max = *Point3D::build(self.center.x() + self.size_x.get() / 2.0, self.center.y() + self.size_y.get() / 2.0, self.center.z() + self.size_z.get() / 2.0);
         BoundingBox3D::new(p_min, p_max)
     }
 }
@@ -188,12 +188,12 @@ impl<T> IsFilter<T> for FilterBox3D where
     T: Is3D {
 
     fn is_allowed(&self, p: &T) -> bool {
-           p.x() >= self.center.x() - self.size_x / 2.0
-        && p.x() <= self.center.x() + self.size_x / 2.0
-        && p.y() >= self.center.y() - self.size_y / 2.0
-        && p.y() <= self.center.y() + self.size_y / 2.0
-        && p.z() >= self.center.z() - self.size_z / 2.0
-        && p.z() <= self.center.z() + self.size_z / 2.0
+           p.x() >= self.center.x() - self.size_x.get() / 2.0
+        && p.x() <= self.center.x() + self.size_x.get() / 2.0
+        && p.y() >= self.center.y() - self.size_y.get() / 2.0
+        && p.y() <= self.center.y() + self.size_y.get() / 2.0
+        && p.z() >= self.center.z() - self.size_z.get() / 2.0
+        && p.z() <= self.center.z() + self.size_z.get() / 2.0
     }
 }
 

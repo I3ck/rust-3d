@@ -36,7 +36,7 @@ use bounding_box_3d::*;
 /// FilterSphere, a sphere filter within 3D space
 pub struct FilterSphere {
     center: Point3D,
-    radius: f64
+    radius: Positive
 }
 
 impl Eq for FilterSphere {}
@@ -54,7 +54,7 @@ impl Ord for FilterSphere {
 impl Hash for FilterSphere { //@todo poor precision this way
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.center.hash(state);
-        (self.radius as u64).hash(state);
+        (self.radius.get() as u64).hash(state);
     }
 }
 
@@ -67,11 +67,11 @@ impl Clone for FilterSphere {
 impl FilterSphere {
     /// Creates a new FilterSphere at origin with a radius of 1
     pub fn new() -> Self {
-        FilterSphere {center: *Point3D::new(), radius: 1.0}
+        FilterSphere {center: *Point3D::new(), radius: Positive::one()}
     }
     /// Creates a new FilterSphere with the given parameters
     pub fn build(center: Point3D, p_radius: Positive) -> Self {
-        FilterSphere {center: center, radius: p_radius.get()}
+        FilterSphere {center: center, radius: p_radius}
     }
 }
 
@@ -170,8 +170,8 @@ impl IsEditable3D for FilterSphere {
 
 impl HasBoundingBox3D for FilterSphere {
     fn bounding_box(&self) -> Result<BoundingBox3D> {
-        let p_min = *Point3D::build(self.center.x() - self.radius, self.center.y() - self.radius, self.center.z() - self.radius);
-        let p_max = *Point3D::build(self.center.x() + self.radius, self.center.y() + self.radius, self.center.z() + self.radius);
+        let p_min = *Point3D::build(self.center.x() - self.radius.get(), self.center.y() - self.radius.get(), self.center.z() - self.radius.get());
+        let p_max = *Point3D::build(self.center.x() + self.radius.get(), self.center.y() + self.radius.get(), self.center.z() + self.radius.get());
         BoundingBox3D::new(p_min, p_max)
     }
 }
@@ -180,6 +180,6 @@ impl<T> IsFilter<T> for FilterSphere
     where T: Is3D {
 
     fn is_allowed(&self, p: &T) -> bool {
-        dist_3d(p, &self.center) <= self.radius
+        dist_3d(p, &self.center) <= self.radius.get()
     }
 }
