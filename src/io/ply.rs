@@ -60,7 +60,7 @@ pub fn save_ply_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
     Ok(())
 }
 
-#[allow(unused_assignments)] //@todo vertex_count and face_count create this warning. Find way to fix this without supressing
+//#[allow(unused_assignments)] //@todo vertex_count and face_count create this warning. Find way to fix this without supressing
 // @todo impl is really ugly currently, rework it
 // @todo allows incorrect headers and might fail on correct ones
 // @todo better error handling (currently returning same error for everything)
@@ -69,24 +69,23 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
     EM: IsEditableMesh3D<P>,
     P: IsBuildable3D + Clone {
 
-        //@todo either assume the mesh is empty and fail
-        //@todo or make algorithm work for appending
-
         let mut f = File::open(filepath)?;
         let mut content = String::new();
         f.read_to_string(&mut content)?;
         let lines = content.split("\n");
 
-        let mut found_ply = false;
-        let mut format_found = false;
-        let mut vertex_count: Option<usize> = None;
-        let mut counted_properties = 0;
-        let mut face_count: Option<usize> = None;
+        let mut found_ply            = false;
+        let mut format_found         = false;
         let mut vertex_indices_found = false;
-        let mut header_ended = false;
+        let mut header_ended         = false;
+
+        let mut counted_properties   = 0;
+
+        let mut vertex_count: Option<usize> = None;
+        let mut face_count:   Option<usize> = None;
 
         let mut vertices = Vec::<P>::new();
-        let mut indices = Vec::<usize>::new();
+        let mut indices  = Vec::<usize>::new();
 
 
         for line in lines {
@@ -146,7 +145,6 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
                         match words.len() {
                             3 => {
                                 face_count = Some(usize::from_str(words[2]).map_err(|e| e.to_error_kind())?);
-
                                 continue;
                             },
                             _ => return Err(ErrorKind::ParseError)
@@ -210,11 +208,6 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
             //@todo fail if too many lines?
         }
 
-        //@todo assert all sizes correct (counts with vec sizes, indices divisible by 3 etc)
-
-        //@todo ensure the index access here is correct (ply could contain incorrect ids)
-
-        ///@todo ensure size > 0 since chunks panics otherwise
         let n_vertices = vertices.len();
 
         match vertex_count {
@@ -230,15 +223,20 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
             return Err(ErrorKind::ParseError);
         }
 
+        if indices.len() % 3 != 0 {
+            return Err(ErrorKind::ParseError);
+        }
+
         for chunk in indices.chunks(3) {
             if chunk.len() == 3 {
                 if chunk[0] < n_vertices && chunk[1] < n_vertices && chunk[2] < n_vertices {
                     mesh.add_face(vertices[chunk[0]].clone(), vertices[chunk[1]].clone(), vertices[chunk[2]].clone());
-                } //@todo else error
-            } //@todo else error
+                } else {
+                    return Err(ErrorKind::ParseError);
+                }
+            } else {
+                return Err(ErrorKind::ParseError);
+            }
         }
-
-        //@todo use collected data to fill mesh
-
         Ok(())
     }
