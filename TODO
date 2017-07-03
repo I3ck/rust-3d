@@ -7,6 +7,12 @@ convex hull https://github.com/I3ck/lib_2d/blob/master/inc/PointCloud.h#L401
 
 more filter shapes
 
+maybe more trim().split() usages required
+
+use Default and Extend (instead of new() in traits or IsMergeable)?
+
+some stored .stls aren't properly displayed within Meshlab, but within Blender
+
 mark functions and traits as tested/untested?
 
 transformers as wrappers / intermediate structures

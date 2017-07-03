@@ -63,6 +63,7 @@ pub fn save_ply_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
 #[allow(unused_assignments)] //@todo vertex_count and face_count create this warning. Find way to fix this without supressing
 // @todo impl is really ugly currently, rework it
 // @todo allows incorrect headers and might fail on correct ones
+// @todo better error handling (currently returning same error for everything)
 /// Loads an IsMesh3D from the ASCII .ply file format
 pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
     EM: IsEditableMesh3D<P>,
@@ -113,11 +114,12 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
             match vertex_count {
                 None => {
                     if line.starts_with("element vertex") {
-                        let split = line.split(" ");
+                        let split = line.trim().split(" ");
                         let words = split.collect::<Vec<&str>>();
                         match words.len() {
                             3 => {
                                 vertex_count = Some(usize::from_str(words[2]).map_err(|e| e.to_error_kind())?);
+                                continue;
                             },
                             _ => return Err(ErrorKind::ParseError)
                         }
@@ -132,18 +134,20 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
                 continue;
             }
 
-            if counted_properties != 3 {
+            if counted_properties < 3 {
                 return Err(ErrorKind::ParseError);
             }
 
             match face_count {
                 None => {
                     if line.starts_with("element face") {
-                        let split = line.split(" ");
+                        let split = line.trim().split(" ");
                         let words = split.collect::<Vec<&str>>();
                         match words.len() {
                             3 => {
                                 face_count = Some(usize::from_str(words[2]).map_err(|e| e.to_error_kind())?);
+
+                                continue;
                             },
                             _ => return Err(ErrorKind::ParseError)
                         }
@@ -172,7 +176,7 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
             match vertex_count {
                 None => { return Err(ErrorKind::ParseError); }
                 Some(x) => {
-                    if x >= vertices.len() {
+                    if x > vertices.len() {
                         let p = P::parse(line.to_string())?;
                         vertices.push(*p);
                         continue;
@@ -183,8 +187,8 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
             match face_count {
                 None => { return Err(ErrorKind::ParseError); }
                 Some(x) => {
-                    if x >= indices.len() / 3 {
-                        let split = line.split(" ");
+                    if x > indices.len() / 3 {
+                        let split = line.trim().split(" ");
                         let words = split.collect::<Vec<&str>>();
 
                         match words.len() {
@@ -196,6 +200,7 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
                                 indices.push(a);
                                 indices.push(b);
                                 indices.push(c);
+                                continue;
                             },
                             _ => { return Err(ErrorKind::ParseError); }
                         }
