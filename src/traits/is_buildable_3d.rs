@@ -73,7 +73,7 @@ pub trait IsBuildable3D :
 
     /// Creates this from a "x y z" string. E.g. "32.2 14.7 1.90"
     fn parse(text: String) -> Result<Box<Self>> {
-        let split = text.split(" ");
+        let split = text.trim().split(" ");
         let words = split.collect::<Vec<&str>>();
         match words.len() {
             3 => {
