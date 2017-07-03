@@ -11,6 +11,8 @@ mark functions and traits as tested/untested?
 
 transformers as wrappers / intermediate structures
 
+write mesh/PC file type converter program once many IO methods are implemented?
+
 add more combinator filters to the random accessible filters
 
 type for face to be able to define e.g. filters for them

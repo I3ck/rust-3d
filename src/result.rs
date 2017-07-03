@@ -18,6 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::result;
 use std::fmt;
 use std::num::ParseFloatError;
+use std::num::ParseIntError;
 use std::io::Error as ioError;
 
 /// The Error Enum used by rust-3d
@@ -82,6 +83,12 @@ pub trait ToErrorKind {
 impl ToErrorKind for ParseFloatError {
     fn to_error_kind(&self) -> ErrorKind {
         ErrorKind::ParseError //@todo use new float conversion error instead?
+    }
+}
+
+impl ToErrorKind for ParseIntError {
+    fn to_error_kind(&self) -> ErrorKind {
+        ErrorKind::ParseError //@todo use new int conversion error instead?
     }
 }
 
