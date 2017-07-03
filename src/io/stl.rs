@@ -30,7 +30,7 @@ pub fn save_stl_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
     let mut f = File::create(filepath).map_err(|e| e.to_error_kind())?;
 
     //@todo precision?
-    f.write_all(b"solid \n").map_err(|e| e.to_error_kind())?;
+    f.write_all(b"solid\n").map_err(|e| e.to_error_kind())?;
 
     for i in 0..mesh.num_faces() {
         let (v1, v2, v3) = mesh.face_vertices(i)?;
@@ -44,5 +44,5 @@ pub fn save_stl_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
                        + "endfacet\n";
         f.write_all(buffer.as_bytes()).map_err(|e| e.to_error_kind())?;
     }
-    f.write_all(b"solid \n").map_err(|e| e.to_error_kind())
+    f.write_all(b"endsolid\n").map_err(|e| e.to_error_kind())
 }
