@@ -34,7 +34,7 @@ pub trait IsBuildable3D :
     Hash {
 
     /// Should build an object from x, y and z coordinates
-    fn build(x: f64, y: f64, z: f64) -> Box<Self>;
+    fn new(x: f64, y: f64, z: f64) -> Box<Self>;
 
     /// Should use the coordinates of another as its own
     fn from<P>(&mut self, other: P) where
@@ -60,7 +60,7 @@ pub trait IsBuildable3D :
                 }
             }
         }
-        Self::build(result_x, result_y, result_z)
+        Self::new(result_x, result_y, result_z)
     }
 
     /// Returns this with normalized values
@@ -69,7 +69,7 @@ pub trait IsBuildable3D :
         if l <= 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
         }
-        Ok(Self::build(self.x() / l, self.y() / l, self.z() / l))
+        Ok(Self::new(self.x() / l, self.y() / l, self.z() / l))
     }
 
     /// Creates this from a "x y z" string. E.g. "32.2 14.7 1.90"
@@ -81,7 +81,7 @@ pub trait IsBuildable3D :
                 let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
                 let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
                 let z = f64::from_str(words[2]).map_err(|e| e.to_error_kind())?;
-                Ok(Self::build(x,y,z))
+                Ok(Self::new(x,y,z))
             },
             _ => Err(ErrorKind::ParseError)
         }

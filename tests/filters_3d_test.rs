@@ -40,7 +40,7 @@ use rust_3d::test_helper::*;
 
 #[test]
 fn filter_box_3d_test() {
-    let center = *Point3D::build(10.0, 10.0, 10.0);
+    let center = *Point3D::new(10.0, 10.0, 10.0);
     let size_x = Positive::new(2.1).unwrap();
     let size_y = Positive::new(2.1).unwrap();
     let size_z = Positive::new(2.1).unwrap();
@@ -49,7 +49,7 @@ fn filter_box_3d_test() {
 
 #[test]
 fn filter_sphere_test() {
-    let center = *Point3D::build(10.0, 10.0, 10.0);
+    let center = *Point3D::new(10.0, 10.0, 10.0);
     let radius = Positive::new(4.0).unwrap();
     let filter = FilterSphere::new(center, radius);
     test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_sphere.xyz", "sphere");

@@ -33,12 +33,12 @@ fn mesh_test() {
     assert!(mesh.vertex(0).is_err());
     assert!(mesh.face_normal(0).is_err());
 
-    mesh.add_vertex(*Point3D::build(0.0, 0.1, 0.2));
+    mesh.add_vertex(*Point3D::new(0.0, 0.1, 0.2));
     assert!(mesh.num_vertices() == 1);
     assert!(mesh.num_faces() == 0);
 
-    mesh.add_vertex(*Point3D::build(0.1, 0.2, 0.3));
-    mesh.add_vertex(*Point3D::build(0.2, 0.3, 0.4));
+    mesh.add_vertex(*Point3D::new(0.1, 0.2, 0.3));
+    mesh.add_vertex(*Point3D::new(0.2, 0.3, 0.4));
     assert!(mesh.num_vertices() == 3);
     assert!(mesh.num_faces() == 0);
 
@@ -50,9 +50,9 @@ fn mesh_test() {
     assert!(mesh.num_faces() == 1);
 
     assert!(mesh.add_face(
-        *Point3D::build(1.0, 1.0, 1.0),
-        *Point3D::build(2.0, 2.0, 2.0),
-        *Point3D::build(3.0, 3.0, 3.0))
+        *Point3D::new(1.0, 1.0, 1.0),
+        *Point3D::new(2.0, 2.0, 2.0),
+        *Point3D::new(3.0, 3.0, 3.0))
         == 1);
     assert!(mesh.num_vertices() == 6);
     assert!(mesh.num_faces() == 2);

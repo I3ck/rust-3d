@@ -100,9 +100,9 @@ impl BoundingBox3D {
     }
     /// Returns the center of the bounding box
     pub fn center_bb(&self) -> Point3D {
-        *Point3D::build(self.min.x() + (self.max.x() - self.min.x()) / 2.0,
-                        self.min.y() + (self.max.y() - self.min.y()) / 2.0,
-                        self.min.z() + (self.max.z() - self.min.z()) / 2.0)
+        *Point3D::new(self.min.x() + (self.max.x() - self.min.x()) / 2.0,
+                      self.min.y() + (self.max.y() - self.min.y()) / 2.0,
+                      self.min.z() + (self.max.z() - self.min.z()) / 2.0)
     }
     /// Tests whether this bounding box is within the other
     pub fn is_inside(&self, other: &BoundingBox3D) -> bool {

@@ -32,14 +32,14 @@ use rust_3d::test_helper::*;
 
 #[test]
 fn filter_circle_test() {
-    let center = *Point2D::build(10.0, 10.0);
+    let center = *Point2D::new(10.0, 10.0);
     let size   = Positive::new(2.1).unwrap();
     test_filter_2d::<_, Point2D>(FilterCircle::new(center, size), "tests/data/expected_filter_circle.xy", "circle");
 }
 
 #[test]
 fn filter_box_2d_test() {
-    let center = *Point2D::build(10.0, 10.0);
+    let center = *Point2D::new(10.0, 10.0);
     let size_x = Positive::new(2.1).unwrap();
     let size_y = Positive::new(4.1).unwrap();
     test_filter_2d::<_, Point2D>(FilterBox2D::new(center, size_x, size_y), "tests/data/expected_filter_box_2d.xy", "box_2d");

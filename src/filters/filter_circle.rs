@@ -100,7 +100,7 @@ impl IsBuildableND for FilterCircle {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterCircle::new(*Point2D::build(coords[0], coords[1]), Positive::one())))
+        Ok(Box::new(FilterCircle::new(*Point2D::new(coords[0], coords[1]), Positive::one())))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -119,8 +119,8 @@ impl IsBuildableND for FilterCircle {
 //@todo drop this impl once not required anymore for editable?
 //@todo or always set sizes to 1
 impl IsBuildable2D for FilterCircle {
-    fn build(x: f64, y: f64) -> Box<Self> {
-        Box::new(FilterCircle::new(*Point2D::build(x, y), Positive::one()))
+    fn new(x: f64, y: f64) -> Box<Self> {
+        Box::new(FilterCircle::new(*Point2D::new(x, y), Positive::one()))
     }
 
     fn from<P>(&mut self, other: P)
@@ -153,8 +153,8 @@ impl IsEditable2D for FilterCircle {
 
 impl HasBoundingBox2D for FilterCircle {
     fn bounding_box(&self) -> Result<BoundingBox2D> {
-        let p_min = *Point2D::build(self.center.x() - self.radius.get(), self.center.y() - self.radius.get());
-        let p_max = *Point2D::build(self.center.x() + self.radius.get(), self.center.y() + self.radius.get());
+        let p_min = *Point2D::new(self.center.x() - self.radius.get(), self.center.y() - self.radius.get());
+        let p_max = *Point2D::new(self.center.x() + self.radius.get(), self.center.y() + self.radius.get());
         BoundingBox2D::new(p_min, p_max)
     }
 }

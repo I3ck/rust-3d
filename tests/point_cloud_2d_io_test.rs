@@ -37,7 +37,7 @@ fn point_cloud_2d_io_test() {
         let mut pc = PointCloud2D::<Point2D>::new();
 
         for i in 0..10 {
-            let p = *Point2D::build(0.1 * i as f64, 0.2 * i as f64);
+            let p = *Point2D::new(0.1 * i as f64, 0.2 * i as f64);
             pc.push(p);
         }
 

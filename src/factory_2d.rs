@@ -32,7 +32,7 @@ use traits::is_random_insertible::*;
 
 /// Returns a point at the origin
 pub fn origin() -> Box<Point2D> { //@todo private?
-    Point2D::build(0.0, 0.0)
+    Point2D::new(0.0, 0.0)
 }
 
 /// Creates a 2D rectangle from given center width and height
@@ -42,10 +42,10 @@ pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> Box<PointC
     let mut pc = PointCloud2D::new();
     let w = width.get();
     let h = height.get();
-    pc.push(*P::build(center.x() - w / 2.0, center.y() - h / 2.0));
-    pc.push(*P::build(center.x() + w / 2.0, center.y() - h / 2.0));
-    pc.push(*P::build(center.x() + w / 2.0, center.y() + h / 2.0));
-    pc.push(*P::build(center.x() - w / 2.0, center.y() + h / 2.0));
+    pc.push(*P::new(center.x() - w / 2.0, center.y() - h / 2.0));
+    pc.push(*P::new(center.x() + w / 2.0, center.y() - h / 2.0));
+    pc.push(*P::new(center.x() + w / 2.0, center.y() + h / 2.0));
+    pc.push(*P::new(center.x() - w / 2.0, center.y() + h / 2.0));
     Box::new(pc)
 }
 
@@ -60,8 +60,8 @@ pub fn involut_circle<P>(center: &P, diameter: Positive, n_points: usize, radian
 
     for i in 0..n_points {
         let current = (i as f64) * p_dist;
-        pc.push(*P::build(center.x() + d/2.0 * (current.cos() + current * current.sin()),
-                          center.y() + d/2.0 * (current.sin() - current * current.cos())));
+        pc.push(*P::new(center.x() + d/2.0 * (current.cos() + current * current.sin()),
+                        center.y() + d/2.0 * (current.sin() - current * current.cos())));
     }
     Box::new(pc)
 }
@@ -76,8 +76,8 @@ pub fn arc<P>(center: &P, diameter: Positive, n_points: usize, radians_start: f6
 
     for i in 0..n_points {
         let radians = radians_start + (i as f64) * p_dist;
-        pc.push(*P::build(center.x() + d/2.0 * radians.cos(),
-                          center.y() + d/2.0 * radians.sin()));
+        pc.push(*P::new(center.x() + d/2.0 * radians.cos(),
+                        center.y() + d/2.0 * radians.sin()));
     }
     Box::new(pc)
 }
@@ -94,8 +94,8 @@ pub fn ellipse<P>(center: &P, ap: Positive, bp: Positive, n_points: usize) -> Bo
 
     for i in 0..n_points {
         let radians = (i as f64) * p_dist;
-        pc.push(*P::build(center.x() + a * radians.cos() * angle.cos() - b * radians.sin() * angle.sin(),
-                          center.y() + a * radians.cos() * angle.sin() + b * radians.sin() * angle.cos()));
+        pc.push(*P::new(center.x() + a * radians.cos() * angle.cos() - b * radians.sin() * angle.sin(),
+                        center.y() + a * radians.cos() * angle.sin() + b * radians.sin() * angle.cos()));
     }
     Box::new(pc)
 }

@@ -183,7 +183,7 @@ impl<P> HasCenterOfGravity2D for PointCloud2D<P>
             sumy += p.y();
         }
 
-        Ok(*Point2D::build(
+        Ok(*Point2D::new(
             (sumx / sizef),
             (sumy / sizef)
         ))

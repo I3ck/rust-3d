@@ -44,7 +44,7 @@ use traits::is_random_insertible::*;
 pub fn center<P>(p1: &P, p2: &P) -> Box<P> where
     P: IsBuildable3D {
 
-    P::build(
+    P::new(
         p1.x() + (p2.x() - p1.x()) / 2.0,
         p1.y() + (p2.y() - p1.y()) / 2.0,
         p1.z() + (p2.z() - p1.z()) / 2.0
@@ -87,7 +87,7 @@ pub fn cross<P,U>(first: &P, other: &U) -> Box<U> where //@todo try to implement
     let x = first.y() * other.z() - first.z() * other.y();
     let y = first.z() * other.x() - first.x() * other.z();
     let z = first.x() * other.y() - first.y() * other.x();
-    U::build(x, y, z)
+    U::new(x, y, z)
 }
 
 /// Returns the distance between two IsND in case their number of dimensions match
@@ -272,14 +272,14 @@ pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where //@
     let mz = middle.z();
 
     match dir {
-        Direction::PPP => (*middle,                 max.clone()),
-        Direction::PPN => (*P::build(mx, my, nz),   *P::build(px, py, mz)),
-        Direction::PNP => (*P::build(mx, ny, mz),   *P::build(px, my, pz)),
-        Direction::PNN => (*P::build(mx, ny, nz),   *P::build(px, my, mz)),
-        Direction::NPP => (*P::build(nx, my, mz),   *P::build(mx, py, pz)),
-        Direction::NPN => (*P::build(nx, my, nz),   *P::build(mx, py, mz)),
-        Direction::NNP => (*P::build(nx, ny, mz),   *P::build(mx, my, pz)),
-        Direction::NNN => (min.clone(),             *middle)
+        Direction::PPP => (*middle,               max.clone()),
+        Direction::PPN => (*P::new(mx, my, nz),   *P::new(px, py, mz)),
+        Direction::PNP => (*P::new(mx, ny, mz),   *P::new(px, my, pz)),
+        Direction::PNN => (*P::new(mx, ny, nz),   *P::new(px, my, mz)),
+        Direction::NPP => (*P::new(nx, my, mz),   *P::new(mx, py, pz)),
+        Direction::NPN => (*P::new(nx, my, nz),   *P::new(mx, py, mz)),
+        Direction::NNP => (*P::new(nx, ny, mz),   *P::new(mx, my, pz)),
+        Direction::NNN => (min.clone(),           *middle)
     }
 }
 
@@ -298,7 +298,7 @@ pub fn in_bb<P>(p: &P, min: &P, max: &P) -> bool where //@todo duplicate
 pub fn conn<P>(p_from: &P, p_to: &P) -> P where
     P: IsBuildable3D {
 
-    *P::build(
+    *P::new(
         p_to.x() - p_from.x(),
         p_to.y() - p_from.y(),
         p_to.z() - p_from.z()

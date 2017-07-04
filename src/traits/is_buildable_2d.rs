@@ -35,7 +35,7 @@ pub trait IsBuildable2D :
     Hash {
 
     /// Should build an object from x and y coordinates
-    fn build(x: f64, y: f64) -> Box<Self>; //@todo rename both here and in 3d, also possibly rename the trait
+    fn new(x: f64, y: f64) -> Box<Self>;
 
     /// Should use the coordinates of another as its own
     fn from<P>(&mut self, other: P) where
@@ -47,7 +47,7 @@ pub trait IsBuildable2D :
         if l <= 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
         }
-        Ok(Self::build(self.x() / l, self.y() / l))
+        Ok(Self::new(self.x() / l, self.y() / l))
     }
 
     /// Creates this from a "x y" string. E.g. "4.3 17.29"
@@ -58,7 +58,7 @@ pub trait IsBuildable2D :
             2 => {
                 let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
                 let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
-                Ok(Self::build(x,y))
+                Ok(Self::new(x,y))
             },
             _ => Err(ErrorKind::ParseError)
         }

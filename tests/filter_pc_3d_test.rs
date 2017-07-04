@@ -28,7 +28,7 @@ use rust_3d::traits::is_random_insertible::*;
 
 #[test]
 fn filter_pc_3d_test() {
-    let center = *Point3D::build(10.0, -5.0, 1.0);
+    let center = *Point3D::new(10.0, -5.0, 1.0);
     let size_x = Positive::new(3.0).unwrap();
     let size_y = Positive::new(5.0).unwrap();
     let size_z = Positive::new(10.0).unwrap();
@@ -36,19 +36,19 @@ fn filter_pc_3d_test() {
 
     let mut pc = PointCloud3D::<Point3D>::new();
     let mut view = View::Full;
-    pc.push(*Point3D::build(10.0, -5.0, 1.0));  // 0 YES
-    pc.push(*Point3D::build(9.0, -5.0, 1.0));   // 1 YES
-    pc.push(*Point3D::build(8.0, -5.0, 1.0));   // 2 NO
-    pc.push(*Point3D::build(11.0, -5.0, 1.0));  // 3 YES
-    pc.push(*Point3D::build(12.0, -5.0, 1.0));  // 4 NO
-    pc.push(*Point3D::build(10.0, -3.0, 1.0));  // 5 YES
-    pc.push(*Point3D::build(10.0, -2.0, 1.0));  // 6 NO
-    pc.push(*Point3D::build(10.0, -7.0, 1.0));  // 7 YES
-    pc.push(*Point3D::build(10.0, -8.0, 1.0));  // 8 NO
-    pc.push(*Point3D::build(10.0, -5.0, -3.0)); // 9 YES
-    pc.push(*Point3D::build(10.0, -5.0, -5.0)); // 10 NO
-    pc.push(*Point3D::build(10.0, -5.0, 5.0));  // 11 YES
-    pc.push(*Point3D::build(10.0, -5.0, 7.0));  // 12 NO
+    pc.push(*Point3D::new(10.0, -5.0, 1.0));  // 0 YES
+    pc.push(*Point3D::new(9.0, -5.0, 1.0));   // 1 YES
+    pc.push(*Point3D::new(8.0, -5.0, 1.0));   // 2 NO
+    pc.push(*Point3D::new(11.0, -5.0, 1.0));  // 3 YES
+    pc.push(*Point3D::new(12.0, -5.0, 1.0));  // 4 NO
+    pc.push(*Point3D::new(10.0, -3.0, 1.0));  // 5 YES
+    pc.push(*Point3D::new(10.0, -2.0, 1.0));  // 6 NO
+    pc.push(*Point3D::new(10.0, -7.0, 1.0));  // 7 YES
+    pc.push(*Point3D::new(10.0, -8.0, 1.0));  // 8 NO
+    pc.push(*Point3D::new(10.0, -5.0, -3.0)); // 9 YES
+    pc.push(*Point3D::new(10.0, -5.0, -5.0)); // 10 NO
+    pc.push(*Point3D::new(10.0, -5.0, 5.0));  // 11 YES
+    pc.push(*Point3D::new(10.0, -5.0, 7.0));  // 12 NO
     // => 0 1 3 5 7 9 11  in => len = 7
 
     let filter_pc = FilterRandomAccessible::new(filter);

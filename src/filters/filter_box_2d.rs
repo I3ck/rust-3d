@@ -105,7 +105,7 @@ impl IsBuildableND for FilterBox2D {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterBox2D::new(*Point2D::build(coords[0], coords[1]), Positive::one(), Positive::one())))
+        Ok(Box::new(FilterBox2D::new(*Point2D::new(coords[0], coords[1]), Positive::one(), Positive::one())))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -122,13 +122,13 @@ impl IsBuildableND for FilterBox2D {
 }
 
 impl IsBuildable2D for FilterBox2D {
-    fn build(x: f64, y: f64) -> Box<Self> {
-        Box::new(FilterBox2D::new(*Point2D::build(x, y), Positive::one(), Positive::one()))
+    fn new(x: f64, y: f64) -> Box<Self> {
+        Box::new(FilterBox2D::new(*Point2D::new(x, y), Positive::one(), Positive::one()))
     }
 
     fn from<P>(&mut self, other: P) where
         P: Is2D {
-            
+
         self.center.from(other)
     }
 }
@@ -156,8 +156,8 @@ impl IsEditable2D for FilterBox2D {
 
 impl HasBoundingBox2D for FilterBox2D {
     fn bounding_box(&self) -> Result<BoundingBox2D> {
-        let p_min = *Point2D::build(self.center.x() - self.size_x.get() / 2.0, self.center.y() - self.size_y.get() / 2.0);
-        let p_max = *Point2D::build(self.center.x() + self.size_x.get() / 2.0, self.center.y() + self.size_y.get() / 2.0);
+        let p_min = *Point2D::new(self.center.x() - self.size_x.get() / 2.0, self.center.y() - self.size_y.get() / 2.0);
+        let p_max = *Point2D::new(self.center.x() + self.size_x.get() / 2.0, self.center.y() + self.size_y.get() / 2.0);
         BoundingBox2D::new(p_min, p_max)
     }
 }

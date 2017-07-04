@@ -114,7 +114,7 @@ impl IsBuildableND for Point2D {
 }
 
 impl IsBuildable2D for Point2D {
-    fn build(x: f64, y: f64) -> Box<Self> {
+    fn new(x: f64, y: f64) -> Box<Self> {
         Box::new(Point2D{x: x, y: y})
     }
 
@@ -151,7 +151,7 @@ impl IsTransFormableTo3D for Point2D {
     fn transform_to_3d<P>(&self, z: f64) -> P where
         P: IsBuildable3D {
 
-        *P::build(self.x, self.y, z)
+        *P::new(self.x, self.y, z)
     }
 }
 

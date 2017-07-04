@@ -86,7 +86,7 @@ impl<T> CompressedPointCloud3D<T> where
 
         for p in &self.data {
             if let (Some(unitsxf), Some(unitsyf), Some(unitszf)) = (p.unitsx.to_f64(), p.unitsy.to_f64(), p.unitsz.to_f64()) {
-                pc.push(*P::build(
+                pc.push(*P::new(
                     self.start.x + (self.unitsizex * unitsxf),
                     self.start.y + (self.unitsizey * unitsyf),
                     self.start.z + (self.unitsizez * unitszf)

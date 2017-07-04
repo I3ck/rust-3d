@@ -185,7 +185,7 @@ impl<P> HasCenterOfGravity3D for PointCloud3D<P>
             sumz += p.z();
         }
 
-        Ok(*Point3D::build(
+        Ok(*Point3D::new(
             (sumx / sizef),
             (sumy / sizef),
             (sumz / sizef)
