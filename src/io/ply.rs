@@ -60,17 +60,16 @@ pub fn save_ply_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
     Ok(())
 }
 
-// @todo impl is really ugly currently, rework it
 // @todo allows incorrect headers and might fail on correct ones
 /// Loads an IsMesh3D from the ASCII .ply file format
 pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
     EM: IsEditableMesh3D<P>,
     P: IsBuildable3D + Clone {
 
-        let mut f = File::open(filepath)?;
+        let mut f       = File::open(filepath)?;
         let mut content = String::new();
         f.read_to_string(&mut content)?;
-        let lines = content.split("\n");
+        let lines       = content.split("\n");
 
         let mut found_ply            = false;
         let mut format_found         = false;
@@ -87,86 +86,85 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
 
 
         for line in lines {
-
-            if !found_ply {
-                if line == "ply" {
-                    found_ply = true;
-                    continue;
-                }
-                return Err(ErrorKind::PlyLoadStartNotFound);
-            }
-
-            if !format_found {
-                if line == "format ascii 1.0" {
-                    format_found = true;
-                    continue;
-                }
-                return Err(ErrorKind::PlyLoadFormatNotFound);
-            }
-
-            if line.starts_with("comment") {
-                continue;
-            }
-
-            match vertex_count {
-                None => {
-                    if line.starts_with("element vertex") {
-                        let split = line.trim().split(" ");
-                        let words = split.collect::<Vec<&str>>();
-                        match words.len() {
-                            3 => {
-                                vertex_count = Some(usize::from_str(words[2]).map_err(|e| e.to_error_kind())?);
-                                continue;
-                            },
-                            _ => return Err(ErrorKind::PlyLoadError)
-                        }
-                    }
-                    return Err(ErrorKind::PlyLoadError);
-                }
-                Some(_) => {}
-            }
-
-            if line.starts_with("property float") {
-                counted_properties += 1;
-                continue;
-            }
-
-            if counted_properties < 3 {
-                return Err(ErrorKind::PlyLoadWrongPropertyCount);
-            }
-
-            match face_count {
-                None => {
-                    if line.starts_with("element face") {
-                        let split = line.trim().split(" ");
-                        let words = split.collect::<Vec<&str>>();
-                        match words.len() {
-                            3 => {
-                                face_count = Some(usize::from_str(words[2]).map_err(|e| e.to_error_kind())?);
-                                continue;
-                            },
-                            _ => return Err(ErrorKind::PlyLoadError)
-                        }
-                    }
-                    return Err(ErrorKind::PlyLoadError);
-                }
-                Some(_) => {}
-            }
-
-            if !vertex_indices_found {
-                if line.ends_with("vertex_indices") {
-                    vertex_indices_found = true;
-                    continue;
-                }
-                return Err(ErrorKind::PlyLoadVertexIndexDefinitionNotFound);
-            }
-
             if !header_ended {
-                if line == "end_header" {
-                    header_ended = true;
+                if !found_ply {
+                    if line == "ply" {
+                        found_ply = true;
+                        continue;
+                    }
+                    return Err(ErrorKind::PlyLoadStartNotFound);
+                }
+
+                if !format_found {
+                    if line == "format ascii 1.0" {
+                        format_found = true;
+                        continue;
+                    }
+                    return Err(ErrorKind::PlyLoadFormatNotFound);
+                }
+
+                if line.starts_with("comment") {
                     continue;
                 }
-                return Err(ErrorKind::PlyLoadHeaderEndNotFound);
+
+                match vertex_count {
+                    None => {
+                        if line.starts_with("element vertex") {
+                            let words = to_words(line);
+                            match words.len() {
+                                3 => {
+                                    vertex_count = Some(usize::from_str(words[2]).map_err(|e| e.to_error_kind())?);
+                                    continue;
+                                },
+                                _ => return Err(ErrorKind::PlyLoadError)
+                            }
+                        }
+                        return Err(ErrorKind::PlyLoadError);
+                    }
+                    Some(_) => {}
+                }
+
+                if line.starts_with("property float") {
+                    counted_properties += 1;
+                    continue;
+                }
+
+                if counted_properties < 3 {
+                    return Err(ErrorKind::PlyLoadWrongPropertyCount);
+                }
+
+                match face_count {
+                    None => {
+                        if line.starts_with("element face") {
+                            let words = to_words(line);
+                            match words.len() {
+                                3 => {
+                                    face_count = Some(usize::from_str(words[2]).map_err(|e| e.to_error_kind())?);
+                                    continue;
+                                },
+                                _ => return Err(ErrorKind::PlyLoadError)
+                            }
+                        }
+                        return Err(ErrorKind::PlyLoadError);
+                    }
+                    Some(_) => {}
+                }
+
+                if !vertex_indices_found {
+                    if line.ends_with("vertex_indices") {
+                        vertex_indices_found = true;
+                        continue;
+                    }
+                    return Err(ErrorKind::PlyLoadVertexIndexDefinitionNotFound);
+                }
+
+                if !header_ended {
+                    if line == "end_header" {
+                        header_ended = true;
+                        continue;
+                    }
+                    return Err(ErrorKind::PlyLoadHeaderEndNotFound);
+                }
             }
 
             match vertex_count {
@@ -184,57 +182,73 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
                 None => { return Err(ErrorKind::PlyLoadFaceCountNotFound); }
                 Some(x) => {
                     if x > indices.len() / 3 {
-                        let split = line.trim().split(" ");
-                        let words = split.collect::<Vec<&str>>();
-
-                        match words.len() {
-                            4 => {
-                                //@todo ensure words[0] == 3 for tri faces
-                                let a = usize::from_str(words[1]).map_err(|e| e.to_error_kind())?;
-                                let b = usize::from_str(words[2]).map_err(|e| e.to_error_kind())?;
-                                let c = usize::from_str(words[3]).map_err(|e| e.to_error_kind())?;
-                                indices.push(a);
-                                indices.push(b);
-                                indices.push(c);
-                                continue;
-                            },
-                            _ => { return Err(ErrorKind::PlyLoadError); }
-                        }
+                        collect_index_line(line, &mut indices)?;
+                        continue;
                     }
                 }
             }
-            //@todo fail if too many lines?
         }
-
-        let n_vertices = vertices.len();
 
         match vertex_count {
             None => { return Err(ErrorKind::PlyLoadVertexCountNotFound); }
             Some(x) => {
-                if x != n_vertices {
+                if x != vertices.len() {
                     return Err(ErrorKind::PlyLoadVertexCountIncorrect);
                 }
             }
         }
 
-        if indices.len() == 0 {
-            return Err(ErrorKind::PlyLoadVerticesIncorrect);
-        }
+        fill_mesh(&vertices, &indices, mesh)
+    }
 
-        if indices.len() % 3 != 0 {
-            return Err(ErrorKind::PlyLoadVerticesIncorrect);
-        }
+//@todo docs and to utils?
+fn to_words(line: &str) -> Vec<&str> {
+    let split = line.trim().split(" ");
+    split.collect::<Vec<&str>>()
+}
 
-        for chunk in indices.chunks(3) {
-            if chunk.len() == 3 {
-                if chunk[0] < n_vertices && chunk[1] < n_vertices && chunk[2] < n_vertices {
-                    mesh.add_face(vertices[chunk[0]].clone(), vertices[chunk[1]].clone(), vertices[chunk[2]].clone());
-                } else {
-                    return Err(ErrorKind::PlyLoadVerticesIncorrect);
-                }
+fn collect_index_line(line: &str, indices: &mut Vec<usize>) -> Result<()> {
+    let words = to_words(line);
+    match words.len() {
+        4 => {
+            //@todo ensure words[0] == 3 for tri faces
+            let a = usize::from_str(words[1]).map_err(|e| e.to_error_kind())?;
+            let b = usize::from_str(words[2]).map_err(|e| e.to_error_kind())?;
+            let c = usize::from_str(words[3]).map_err(|e| e.to_error_kind())?;
+            indices.push(a);
+            indices.push(b);
+            indices.push(c);
+            Ok(())
+        },
+        _ => Err(ErrorKind::PlyLoadError)
+    }
+}
+
+fn fill_mesh<EM, P>(vertices: &Vec<P>, indices: &Vec<usize>, mesh: &mut EM) -> Result<()> where
+    EM: IsEditableMesh3D<P>,
+    P: IsBuildable3D + Clone {
+
+    let n_vertices = vertices.len();
+
+    if indices.len() == 0 {
+        return Err(ErrorKind::PlyLoadVerticesIncorrect);
+    }
+
+    if indices.len() % 3 != 0 {
+        return Err(ErrorKind::PlyLoadVerticesIncorrect);
+    }
+
+    for chunk in indices.chunks(3) {
+        if chunk.len() == 3 {
+            if chunk[0] < n_vertices && chunk[1] < n_vertices && chunk[2] < n_vertices {
+                mesh.add_face(vertices[chunk[0]].clone(), vertices[chunk[1]].clone(), vertices[chunk[2]].clone());
             } else {
                 return Err(ErrorKind::PlyLoadVerticesIncorrect);
             }
+        } else {
+            return Err(ErrorKind::PlyLoadVerticesIncorrect);
         }
-        Ok(())
     }
+
+    Ok(())
+}
