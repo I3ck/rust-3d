@@ -36,16 +36,15 @@ pub fn save_ply_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
     //@todo remove unnecessary comments in header
     //@todo better header, or let caller decide
     let header = "ply\n".to_string()
-                   + "format ascii 1.0           { ascii/binary, format version number }\n"
-                   + "TODO comment  { comments keyword specified, like all lines }\n"
-                   + "TODO more comments \n"
+                   + "format ascii 1.0\n"
+                   + "comment Created by rust-3d\n"
                    + "element vertex " + &mesh.num_vertices().to_string() + "\n"
-                   + "property float x           { vertex contains float \"x\" coordinate }\n"
-                   + "property float y           { y coordinate is also a vertex property }\n"
-                   + "property float z           { z coordinate, too }\n"
+                   + "property float x\n"
+                   + "property float y\n"
+                   + "property float z\n"
                    + "element face " + &mesh.num_faces().to_string() + "\n"
-                   + "property list uchar int vertex_index { \"vertex_indices\" is a list of ints }\n"
-                   + "end_header                 { delimits the end of the header }\n";
+                   + "property list uchar uint vertex_indices\n"
+                   + "end_header\n";
     f.write_all(header.as_bytes()).map_err(|e| e.to_error_kind())?;
 
     for i in 0..mesh.num_vertices() {
