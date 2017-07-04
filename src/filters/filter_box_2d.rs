@@ -126,7 +126,9 @@ impl IsBuildable2D for FilterBox2D {
         Box::new(FilterBox2D::new(*Point2D::build(x, y), Positive::one(), Positive::one()))
     }
 
-    fn from<P>(&mut self, other: P) where P: IsBuildable2D {
+    fn from<P>(&mut self, other: P) where
+        P: Is2D {
+            
         self.center.from(other)
     }
 }

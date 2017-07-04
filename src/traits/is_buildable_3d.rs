@@ -37,7 +37,8 @@ pub trait IsBuildable3D :
     fn build(x: f64, y: f64, z: f64) -> Box<Self>;
 
     /// Should use the coordinates of another as its own
-    fn from<P>(&mut self, other: P) where P: IsBuildable3D; //@todo only require Is2D for other?
+    fn from<P>(&mut self, other: P) where
+        P: Is3D;
 
     //@todo return new or alter self???
     /// Applies a matrix to this

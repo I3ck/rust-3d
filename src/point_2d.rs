@@ -118,7 +118,9 @@ impl IsBuildable2D for Point2D {
         Box::new(Point2D{x: x, y: y})
     }
 
-    fn from<P>(&mut self, other: P) where P: IsBuildable2D {
+    fn from<P>(&mut self, other: P)
+        where P: Is2D {
+
         self.x = other.x();
         self.y = other.y();
     }

@@ -126,7 +126,9 @@ impl IsBuildable3D for Point3D {
         Box::new(Point3D{x: x, y: y, z: z})
     }
 
-    fn from<P>(&mut self, other: P) where P: IsBuildable3D {
+    fn from<P>(&mut self, other: P)
+        where P: Is3D {
+
         self.x = other.x();
         self.y = other.y();
         self.z = other.z();

@@ -137,7 +137,9 @@ impl IsBuildable3D for FilterBox3D {
         Box::new(FilterBox3D::new(*Point3D::build(x, y, z), Positive::one(), Positive::one(), Positive::one()))
     }
 
-    fn from<P>(&mut self, other: P) where P: IsBuildable3D {
+    fn from<P>(&mut self, other: P)
+        where P: Is3D {
+
         self.center.from(other)
     }
 }

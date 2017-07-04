@@ -38,8 +38,8 @@ pub trait IsBuildable2D :
     fn build(x: f64, y: f64) -> Box<Self>; //@todo rename both here and in 3d, also possibly rename the trait
 
     /// Should use the coordinates of another as its own
-    fn from<P>(&mut self, other: P) where //@todo only require Is2D for other?
-        P: IsBuildable2D;
+    fn from<P>(&mut self, other: P) where
+        P: Is2D;
 
     /// Returns this with normalized values
     fn normalized(&self) -> Result<Box<Self>> {

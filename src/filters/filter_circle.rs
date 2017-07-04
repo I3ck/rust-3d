@@ -123,7 +123,9 @@ impl IsBuildable2D for FilterCircle {
         Box::new(FilterCircle::new(*Point2D::build(x, y), Positive::one()))
     }
 
-    fn from<P>(&mut self, other: P) where P: IsBuildable2D {
+    fn from<P>(&mut self, other: P)
+        where P: Is2D {
+
         self.center.from(other)
     }
 }
