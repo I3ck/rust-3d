@@ -17,7 +17,6 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::marker::PhantomData;
 use traits::is_filter::*;
-//@todo add tests
 
 /// FilterOR, a filter which combines two filters and is true if one of its filters is true
 pub struct FilterOR<F1, F2, T> where

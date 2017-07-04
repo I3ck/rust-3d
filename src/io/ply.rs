@@ -33,8 +33,6 @@ pub fn save_ply_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
 
     let mut f = File::create(filepath).map_err(|e| e.to_error_kind())?;
 
-    //@todo remove unnecessary comments in header
-    //@todo better header, or let caller decide
     let header = "ply\n".to_string()
                    + "format ascii 1.0\n"
                    + "comment Created by rust-3d\n"
