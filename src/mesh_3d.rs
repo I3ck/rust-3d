@@ -27,6 +27,7 @@ use bounding_box_3d::*;
 use traits::is_random_insertible::*;
 use traits::is_random_accessible::*;
 
+#[derive (Default)]
 /// Mesh3D, a mesh with tri-faces within 3D space
 pub struct Mesh3D<P> where
     P: Is3D {
@@ -76,13 +77,6 @@ impl<P> IsMesh3D<P> for Mesh3D<P> where
 
 impl<P> IsEditableMesh3D<P> for Mesh3D<P> where
     P: IsEditable3D + IsBuildable3D + Clone {
-
-    fn new() -> Self {
-        Mesh3D {
-            pc: PointCloud3D::new(),
-            topology: Vec::new()
-        }
-    }
 
     fn add_vertex(&mut self, vertex: P) -> usize {
         self.pc.push(vertex);

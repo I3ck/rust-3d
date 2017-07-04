@@ -18,7 +18,6 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use result::*;
 use point_3d::*;
 use traits::is_3d::*;
-use traits::is_buildable_nd::*;
 use traits::is_buildable_3d::*;
 use functions::cross;
 
@@ -133,7 +132,7 @@ impl Matrix4 {
 
         let n = target.clone().normalized()?;
         let u = up.clone().normalized().map(|x| {
-            let mut result = *Point3D::new(); //@todo can be dropped?
+            let mut result = Point3D::default(); //@todo can be dropped?
             result.from(*(cross(&*x, target)));
             result
         })?;

@@ -32,7 +32,7 @@ use traits::is_buildable_3d::*;
 use traits::is_transformable_to_3d::*;
 use functions::{sqr_dist_2d};
 
-#[derive (PartialEq, PartialOrd)]
+#[derive (PartialEq, PartialOrd, Default)]
 /// Point2D, a point / position within 2D space
 pub struct Point2D {
     pub x: f64,
@@ -43,7 +43,7 @@ impl Eq for Point2D {}
 
 impl Ord for Point2D {
     fn cmp(&self, other: &Self) -> Ordering {
-        let origin = *Point2D::new();
+        let origin = Point2D::default();
         sqr_dist_2d(&origin, self).partial_cmp(&sqr_dist_2d(&origin, other)).unwrap_or(Ordering::Equal)
     }
 }
@@ -93,10 +93,6 @@ impl Is2D for Point2D {
 }
 
 impl IsBuildableND for Point2D {
-    fn new() -> Box<Self> {
-        Box::new(Point2D{x: 0.0, y: 0.0})
-    }
-
     fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);

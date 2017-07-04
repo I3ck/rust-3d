@@ -32,7 +32,7 @@ use functions::{sqr_dist_2d};
 use positive::*;
 use bounding_box_2d::*;
 
-#[derive (PartialEq, PartialOrd)]
+#[derive (PartialEq, PartialOrd, Default)]
 /// FilterBox2D, a box filter within 2D space
 pub struct FilterBox2D {
     center: Point2D,
@@ -44,7 +44,7 @@ impl Eq for FilterBox2D {}
 
 impl Ord for FilterBox2D {
     fn cmp(&self, other: &Self) -> Ordering {
-        let origin = *Point2D::new();
+        let origin = Point2D::default();
         match sqr_dist_2d(&origin, &self.center).partial_cmp(&sqr_dist_2d(&origin, &other.center)) {
             Some(x) => x,
             None => match self.size_x.partial_cmp(&other.size_x) {
@@ -70,10 +70,6 @@ impl Clone for FilterBox2D {
 }
 
 impl FilterBox2D {
-    /// Creates a new FilterBox2D at origin with sizes of 1
-    pub fn new() -> Self {
-        FilterBox2D {center: *Point2D::new(), size_x: Positive::one(), size_y: Positive::one()}
-    }
     /// Creates a new FilterBox2D with the given parameters
     pub fn build(center: Point2D, p_size_x: Positive, p_size_y: Positive) -> Self {
         FilterBox2D {center: center, size_x: p_size_x, size_y: p_size_y}
@@ -105,10 +101,6 @@ impl Is2D for FilterBox2D {
 }
 
 impl IsBuildableND for FilterBox2D {
-    fn new() -> Box<Self> {
-        Box::new(FilterBox2D::new())
-    }
-
     fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);

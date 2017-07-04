@@ -27,7 +27,7 @@ use rust_3d::point_3d::*;
 fn point_3d_test() {
     let eps = 0.0000001;
 
-    let mut p1 = *Point3D::new();
+    let mut p1 = Point3D::default();
 
     assert!(p1.x() == 0.0);
     assert!(p1.y() == 0.0);

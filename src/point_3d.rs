@@ -31,7 +31,7 @@ use traits::is_editable_3d::*;
 use traits::is_transformable_to_2d::*;
 use functions::{sqr_dist_3d};
 
-#[derive (PartialEq, PartialOrd)]
+#[derive (PartialEq, PartialOrd, Default)]
 /// Point3D, a point / position within 3D space
 pub struct Point3D {
     pub x: f64,
@@ -43,7 +43,7 @@ impl Eq for Point3D {}
 
 impl Ord for Point3D {
     fn cmp(&self, other: &Self) -> Ordering {
-        let origin = *Point3D::new();
+        let origin = Point3D::default();
         sqr_dist_3d(&origin, self).partial_cmp(&sqr_dist_3d(&origin, other)).unwrap_or(Ordering::Equal)
     }
 }
@@ -100,10 +100,6 @@ impl Is3D for Point3D {
 }
 
 impl IsBuildableND for Point3D {
-    fn new() -> Box<Self> {
-        Box::new(Point3D{x: 0.0, y: 0.0, z: 0.0})
-    }
-
     fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);

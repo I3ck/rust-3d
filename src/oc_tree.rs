@@ -29,6 +29,7 @@ use traits::has_bounding_box_3d::*;
 use traits::is_tree_3d::*;
 use traits::is_oc_tree::*;
 
+#[derive (Default)]
 /// OcTree
 pub struct OcTree<P> where
     P: IsEditable3D + IsBuildable3D {
@@ -39,15 +40,7 @@ pub struct OcTree<P> where
 }
 
 impl<P> IsTree3D<P> for OcTree<P> where
-    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
-
-    fn new() -> OcTree<P> {
-        OcTree {
-            root: None,
-            min: *P::new(),
-            max: *P::new()
-        }
-    }
+    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone + Default {
 
     fn size(&self) -> usize {
         match self.root {
@@ -82,7 +75,7 @@ impl<P> IsTree3D<P> for OcTree<P> where
 }
 
 impl<P> IsOcTree<P> for OcTree<P> where
-    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
+    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone + Default {
 
     //@todo rewrite or make new method which returns cog instead of stopping recursion
     fn collect(&self,  maxdepth: i8) -> PointCloud3D<P> {

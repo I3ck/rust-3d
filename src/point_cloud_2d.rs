@@ -37,6 +37,7 @@ use bounding_box_2d::*;
 use functions::{dist_2d, sort_vec_2d_x, sort_vec_2d_y};
 use view::*;
 
+#[derive (Default)]
 /// PointCloud2D, a collection of positions within 2D space
 pub struct PointCloud2D<P> where
     P: Is2D {

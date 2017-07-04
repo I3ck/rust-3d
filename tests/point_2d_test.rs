@@ -27,10 +27,10 @@ use rust_3d::point_2d::*;
 fn point_2d_test() {
 
     let eps = 0.0000001;
-    let origin = *Point2D::new();
+    let origin = Point2D::default();
 
 
-    let mut p1 = *Point2D::new();
+    let mut p1 = Point2D::default();
 
     assert!(p1.x() == 0.0);
     assert!(p1.y() == 0.0);

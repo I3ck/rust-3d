@@ -23,7 +23,6 @@ use point_2d::*;
 use traits::is_nd::*;
 use traits::is_2d::*;
 use traits::is_normalized_2d::*;
-use traits::is_buildable_nd::*;
 use functions::{sqr_dist_2d};
 
 #[derive (PartialEq, PartialOrd)]
@@ -37,7 +36,7 @@ impl Eq for Norm2D {}
 
 impl Ord for Norm2D {
     fn cmp(&self, other: &Self) -> Ordering {
-        let origin = *Point2D::new();
+        let origin = Point2D::default();
         sqr_dist_2d(&origin, self).partial_cmp(&sqr_dist_2d(&origin, other)).unwrap_or(Ordering::Equal)
     }
 }

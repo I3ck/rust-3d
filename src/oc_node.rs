@@ -61,13 +61,13 @@ pub enum Direction { //@todo rename //@todo private?
 
 //@todo define somewhere else
 fn collect_center_or_all<P>(n: &OcNode<P>, only_collect_centers: bool, depth: i8, maxdepth: i8, mut pc: &mut PointCloud3D<P>) where
-    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
+    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone + Default {
 
     if only_collect_centers {
         let mut sub_pc = PointCloud3D::new();
         n.collect(depth+1, maxdepth, &mut sub_pc);
         if let Ok(c) = sub_pc.center_of_gravity() {
-            let mut p = *P::new();
+            let mut p = P::default();
             p.from(c);
             pc.push(p);
         }
@@ -78,7 +78,7 @@ fn collect_center_or_all<P>(n: &OcNode<P>, only_collect_centers: bool, depth: i8
 
 //@todo define somewhere else
 fn build_subnode<P>(pc: Vec<P>,bb: (P, P)) -> Option<Box<OcNode<P>>> where
-    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
+    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone + Default {
 
     match pc.len() {
         0 => None,
@@ -91,7 +91,7 @@ fn build_subnode<P>(pc: Vec<P>,bb: (P, P)) -> Option<Box<OcNode<P>>> where
 
 
 impl<P> OcNode<P> where
-    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
+    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone + Default {
 
     pub fn new(min: &P, max: &P, pc: Vec<P>) -> OcNode<P> {
         if pc.len() == 1 { return OcNode::Leaf(pc[0].clone()); };

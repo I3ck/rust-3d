@@ -32,7 +32,7 @@ use functions::{dist_3d, sqr_dist_3d};
 use positive::*;
 use bounding_box_3d::*;
 
-#[derive (PartialEq, PartialOrd)]
+#[derive (PartialEq, PartialOrd, Default)]
 /// FilterSphere, a sphere filter within 3D space
 pub struct FilterSphere {
     center: Point3D,
@@ -43,7 +43,7 @@ impl Eq for FilterSphere {}
 
 impl Ord for FilterSphere {
     fn cmp(&self, other: &Self) -> Ordering {
-        let origin = *Point3D::new();
+        let origin = Point3D::default();
         match sqr_dist_3d(&origin, &self.center).partial_cmp(&sqr_dist_3d(&origin, &other.center)) {
             Some(x) => x,
             None => self.radius.partial_cmp(&other.radius).unwrap_or(Ordering::Equal)
@@ -65,10 +65,6 @@ impl Clone for FilterSphere {
 }
 
 impl FilterSphere {
-    /// Creates a new FilterSphere at origin with a radius of 1
-    pub fn new() -> Self {
-        FilterSphere {center: *Point3D::new(), radius: Positive::one()}
-    }
     /// Creates a new FilterSphere with the given parameters
     pub fn build(center: Point3D, p_radius: Positive) -> Self {
         FilterSphere {center: center, radius: p_radius}
@@ -105,10 +101,6 @@ impl Is3D for FilterSphere {
 }
 
 impl IsBuildableND for FilterSphere {
-    fn new() -> Box<Self> {
-        Box::new(FilterSphere::new())
-    }
-
     fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);

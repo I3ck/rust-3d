@@ -24,7 +24,7 @@ use rust_3d::io::stl::*;
 
 #[test]
 fn mesh_io_test() {
-    let mut m = Mesh3D::<Point3D>::new();
+    let mut m = Mesh3D::<Point3D>::default();
     load_ply_ascii(&mut m, "tests/data/torus_only_vertex_data.ply");
     assert!(m.num_faces()    == 1152);
     assert!(m.num_vertices() == 3456);
@@ -32,7 +32,7 @@ fn mesh_io_test() {
 
     save_ply_ascii(&m, "tests/tmp/torus_only_vertex_data.ply");
 
-    let mut m = Mesh3D::<Point3D>::new();
+    let mut m = Mesh3D::<Point3D>::default();
     load_ply_ascii(&mut m, "tests/tmp/torus_only_vertex_data.ply");
     assert!(m.num_faces()    == 1152);
     assert!(m.num_vertices() == 3456);

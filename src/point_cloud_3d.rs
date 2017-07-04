@@ -37,6 +37,7 @@ use bounding_box_3d::*;
 use functions::{dist_3d, sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z};
 use view::*;
 
+#[derive (Default)]
 /// PointCloud3D, a collection of positions within 3D space
 pub struct PointCloud3D<P> where
     P: Is3D {

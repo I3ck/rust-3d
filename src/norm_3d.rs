@@ -23,7 +23,6 @@ use point_3d::*;
 use traits::is_nd::*;
 use traits::is_3d::*;
 use traits::is_normalized_3d::*;
-use traits::is_buildable_nd::*;
 use functions::{sqr_dist_3d};
 
 #[derive (PartialEq, PartialOrd)]
@@ -38,7 +37,7 @@ impl Eq for Norm3D{}
 
 impl Ord for Norm3D {
     fn cmp(&self, other: &Self) -> Ordering {
-        let origin = *Point3D::new();
+        let origin = Point3D::default();
         sqr_dist_3d(&origin, self).partial_cmp(&sqr_dist_3d(&origin, other)).unwrap_or(Ordering::Equal)
     }
 }

@@ -21,7 +21,7 @@ use traits::is_buildable_3d::*;
 use traits::is_normalized_3d::*;
 
 /// Plane3D, a plane within 3D space
-pub struct Plane3D<P,N> where
+pub struct Plane3D<P, N> where
     P: Is3D,
     N: IsNormalized3D {
 
@@ -30,18 +30,22 @@ pub struct Plane3D<P,N> where
     pub v: N
 }
 
+impl<P, N> Default for Plane3D<P, N> where
+    P: Is3D + Default,
+    N: IsNormalized3D {
 
-impl<P,N> IsPlane3D<P,N> for Plane3D<P,N> where
-    P: IsBuildable3D + Clone,
-    N: IsNormalized3D + Clone {
-
-    fn new() -> Box<Self> {
-        Box::new(Plane3D {
-            origin: *P::build(0.0, 0.0, 0.0),
+    fn default() -> Self {
+        Plane3D {
+            origin: P::default(),
             u: N::norm_x(),
             v: N::norm_y()
-        })
+        }
     }
+}
+
+impl<P, N> IsPlane3D<P,N> for Plane3D<P,N> where
+    P: IsBuildable3D + Clone,
+    N: IsNormalized3D + Clone {
 
     fn build(origin: P, u: N, v: N) -> Box<Self> {
         Box::new(Plane3D {

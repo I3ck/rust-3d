@@ -31,6 +31,7 @@ use traits::is_kd_tree_3d::*;
 use traits::is_random_insertible::*;
 use traits::is_random_accessible::*;
 
+#[derive (Default)]
 /// KdTree
 pub struct KdTree<P> where
     P: Is3D {
@@ -48,11 +49,7 @@ pub struct KdNode<P> where
 }
 
 impl<P> IsTree3D<P> for KdTree<P> where
-    P: IsBuildableND + IsBuildable3D + Clone {
-
-    fn new() -> KdTree<P> {
-        KdTree { root: None }
-    }
+    P: IsBuildableND + IsBuildable3D + Clone + Default {
 
     fn size(&self) -> usize {
         match self.root {
@@ -81,7 +78,7 @@ impl<P> IsTree3D<P> for KdTree<P> where
 }
 
 impl<P> IsKdTree3D<P> for KdTree<P> where
-    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
+    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone + Default {
 
     fn knearest(&self, search: &P, n: usize) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();
@@ -124,7 +121,7 @@ impl<P> IsKdTree3D<P> for KdTree<P> where
 
 //@todo documentation (or make private)
 impl<P> KdNode<P> where
-    P: IsBuildableND + IsBuildable3D + Clone {
+    P: IsBuildableND + IsBuildable3D + Clone + Default {
 
     pub fn new(dim: i8, mut pc: Vec<Box<P>>) -> KdNode<P> {
         let dimension = dim % 2;
@@ -147,12 +144,12 @@ impl<P> KdNode<P> where
         let mut pc_left = Vec::new();
         let mut pc_right = Vec::new();
 
-        let mut val = P::new();
+        let mut val = P::default();
 
         for (i, p) in pc.into_iter().enumerate() {
             if      i < median  { pc_left.push(p); }
             else if i > median  { pc_right.push(p); }
-            else                { val = p; }
+            else                { val = *p; }
         }
 
         let left = match pc_left.len() {
@@ -168,7 +165,7 @@ impl<P> KdNode<P> where
         KdNode {
             left: left,
             right: right,
-            val: *val,
+            val: val,
             dimension: dimension
         }
     }

@@ -32,7 +32,7 @@ use functions::{sqr_dist_3d};
 use positive::*;
 use bounding_box_3d::*;
 
-#[derive (PartialEq, PartialOrd)]
+#[derive (PartialEq, PartialOrd, Default)]
 /// FilterBox3D, a box filter within 3D space
 pub struct FilterBox3D {
     center: Point3D,
@@ -45,7 +45,7 @@ impl Eq for FilterBox3D {}
 
 impl Ord for FilterBox3D {
     fn cmp(&self, other: &Self) -> Ordering {
-        let origin = *Point3D::new();
+        let origin = Point3D::default();
         match sqr_dist_3d(&origin, &self.center).partial_cmp(&sqr_dist_3d(&origin, &other.center)) {
             Some(x) => x,
             None => match self.size_x.partial_cmp(&other.size_x) {
@@ -75,10 +75,6 @@ impl Clone for FilterBox3D {
 }
 
 impl FilterBox3D {
-    /// Creates a new FilterBox3D at origin with sizes of 1
-    pub fn new() -> Self {
-        FilterBox3D {center: *Point3D::new(), size_x: Positive::one(), size_y: Positive::one(), size_z: Positive::one()}
-    }
     /// Creates a new FilterBox3D with the given parameters
     pub fn build(center: Point3D, p_size_x: Positive, p_size_y: Positive, p_size_z: Positive) -> Self {
         FilterBox3D {center: center, size_x: p_size_x, size_y: p_size_y, size_z: p_size_z}
@@ -115,10 +111,6 @@ impl Is3D for FilterBox3D {
 }
 
 impl IsBuildableND for FilterBox3D {
-    fn new() -> Box<Self> {
-        Box::new(FilterBox3D::new())
-    }
-
     fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);

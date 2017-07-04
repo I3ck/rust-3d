@@ -20,8 +20,6 @@ use traits::is_nd::*;
 
 /// IsBuildableND is a trait used for types which are positioned in n-dimensional space and can be constructed
 pub trait IsBuildableND : IsND {
-    /// Should create an object
-    fn new() -> Box<Self>;
     /// Should build an object from the correct number of coordinates
     fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>>;
     /// Should use the coordinates of another as its own

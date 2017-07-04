@@ -23,8 +23,6 @@ use traits::is_normalized_3d::*;
 pub trait IsPlane3D<P,N> where
     P: Is3D,
     N: IsNormalized3D {
-    /// Should return a new plane
-    fn new() -> Box<Self>;
     /// Should return a new plane with the given origin, u and v vectors
     fn build(origin: P, u: N, v: N) -> Box<Self>;
     /// Should return the origin of the plane

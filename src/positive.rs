@@ -50,3 +50,9 @@ impl Add for Positive {
         Positive {val: self.val + other.val}
     }
 }
+
+impl Default for Positive {
+    fn default() -> Self {
+        Self::one()
+    }
+}

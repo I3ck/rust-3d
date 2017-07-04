@@ -21,8 +21,6 @@ use point_cloud_3d::*;
 /// IsTree3D is a trait used for types which are any type of tree within 3D space
 pub trait IsTree3D<P> where
     P: Is3D {
-    /// Should create a new tree
-    fn new() -> Self;
     /// Should return the number of elements within the tree
     fn size(&self) -> usize;
     /// Should return all positions within the tree as point cloud

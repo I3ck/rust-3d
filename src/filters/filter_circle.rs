@@ -32,7 +32,7 @@ use functions::{dist_2d, sqr_dist_2d};
 use positive::*;
 use bounding_box_2d::*;
 
-#[derive (PartialEq, PartialOrd)]
+#[derive (PartialEq, PartialOrd, Default)]
 /// FilterCircle, a circle filter within 2D space
 pub struct FilterCircle {
     center: Point2D,
@@ -43,7 +43,7 @@ impl Eq for FilterCircle {}
 
 impl Ord for FilterCircle {
     fn cmp(&self, other: &Self) -> Ordering {
-        let origin = *Point2D::new();
+        let origin = Point2D::default();
         match sqr_dist_2d(&origin, &self.center).partial_cmp(&sqr_dist_2d(&origin, &other.center)) {
             Some(x) => x,
             None => self.radius.partial_cmp(&other.radius).unwrap_or(Ordering::Equal)
@@ -65,10 +65,6 @@ impl Clone for FilterCircle {
 }
 
 impl FilterCircle {
-    /// Creates a new FilterCircle at origin with a radius of 1
-    pub fn new() -> Self {
-        FilterCircle {center: *Point2D::new(), radius: Positive::one()}
-    }
     /// Creates a new FilterCircle with the given parameters
     pub fn build(center: Point2D, p_radius: Positive) -> Self {
         FilterCircle {center: center, radius: p_radius}
@@ -100,10 +96,6 @@ impl Is2D for FilterCircle {
 }
 
 impl IsBuildableND for FilterCircle {
-    fn new() -> Box<Self> {
-        Box::new(FilterCircle::new())
-    }
-
     fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
