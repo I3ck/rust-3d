@@ -93,7 +93,7 @@ impl Is2D for Point2D {
 }
 
 impl IsBuildableND for Point2D {
-    fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
+    fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
         }

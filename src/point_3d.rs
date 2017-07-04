@@ -100,7 +100,7 @@ impl Is3D for Point3D {
 }
 
 impl IsBuildableND for Point3D {
-    fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
+    fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);
         }

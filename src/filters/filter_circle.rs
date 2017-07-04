@@ -96,7 +96,7 @@ impl Is2D for FilterCircle {
 }
 
 impl IsBuildableND for FilterCircle {
-    fn build_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
+    fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
