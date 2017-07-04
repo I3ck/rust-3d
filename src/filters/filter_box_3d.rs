@@ -76,7 +76,7 @@ impl Clone for FilterBox3D {
 
 impl FilterBox3D {
     /// Creates a new FilterBox3D with the given parameters
-    pub fn build(center: Point3D, p_size_x: Positive, p_size_y: Positive, p_size_z: Positive) -> Self {
+    pub fn new(center: Point3D, p_size_x: Positive, p_size_y: Positive, p_size_z: Positive) -> Self {
         FilterBox3D {center: center, size_x: p_size_x, size_y: p_size_y, size_z: p_size_z}
     }
 }
@@ -115,7 +115,7 @@ impl IsBuildableND for FilterBox3D {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterBox3D::build(*Point3D::build(coords[0], coords[1], coords[2]), Positive::one(), Positive::one(), Positive::one())))
+        Ok(Box::new(FilterBox3D::new(*Point3D::build(coords[0], coords[1], coords[2]), Positive::one(), Positive::one(), Positive::one())))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -134,7 +134,7 @@ impl IsBuildableND for FilterBox3D {
 
 impl IsBuildable3D for FilterBox3D {
     fn build(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(FilterBox3D::build(*Point3D::build(x, y, z), Positive::one(), Positive::one(), Positive::one()))
+        Box::new(FilterBox3D::new(*Point3D::build(x, y, z), Positive::one(), Positive::one(), Positive::one()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable3D {
@@ -191,6 +191,6 @@ impl<T> IsFilter<T> for FilterBox3D where
 
 impl From<BoundingBox3D> for FilterBox3D {
     fn from(x: BoundingBox3D) -> Self {
-        Self::build(x.center_bb(), x.size_x(), x.size_y(), x.size_z())
+        Self::new(x.center_bb(), x.size_x(), x.size_y(), x.size_z())
     }
 }

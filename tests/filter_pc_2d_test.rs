@@ -31,7 +31,7 @@ fn filter_pc_2d_test() {
     let center = *Point2D::build(10.0, -5.0);
     let size_x = Positive::new(3.0).unwrap();
     let size_y = Positive::new(5.0).unwrap();
-    let filter = FilterBox2D::build(center, size_x, size_y);
+    let filter = FilterBox2D::new(center, size_x, size_y);
     let mut pc = PointCloud2D::<Point2D>::new();
     let mut view = View::Full;
     pc.push(*Point2D::build(10.0, -5.0)); // 0  YES

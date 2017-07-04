@@ -32,7 +32,7 @@ fn filter_pc_3d_test() {
     let size_x = Positive::new(3.0).unwrap();
     let size_y = Positive::new(5.0).unwrap();
     let size_z = Positive::new(10.0).unwrap();
-    let filter = FilterBox3D::build(center, size_x, size_y, size_z);
+    let filter = FilterBox3D::new(center, size_x, size_y, size_z);
 
     let mut pc = PointCloud3D::<Point3D>::new();
     let mut view = View::Full;

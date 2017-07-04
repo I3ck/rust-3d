@@ -27,18 +27,6 @@ pub struct Matrix4 {
 }
 
 impl Matrix4 {
-    /// Creates a new matrix which does nothing when multiplying by it
-    pub fn new() -> Matrix4 {
-        Matrix4{
-            data: [
-                [1.0, 0.0, 0.0, 0.0],
-                [0.0, 1.0, 0.0, 0.0],
-                [0.0, 0.0, 1.0, 0.0],
-                [0.0, 0.0, 0.0, 1.0]
-            ]
-        }
-    }
-
     /// Creates a new matrix which contains only zeroes
     pub fn zeroes() -> Matrix4 {
         Matrix4{
@@ -77,7 +65,7 @@ impl Matrix4 {
 
     /// Creates a new matrix which applies rotation
     pub fn rotation(rad_x: f64, rad_y: f64, rad_z: f64) -> Matrix4 {
-        let (mut mx, mut my, mut mz) = (Matrix4::new(), Matrix4::new(), Matrix4::new());
+        let (mut mx, mut my, mut mz) = (Matrix4::default(), Matrix4::default(), Matrix4::default());
 
         mx.data[0][0] = 1.0;     mx.data[0][1] = 0.0;           mx.data[0][2] = 0.0;            mx.data[0][3] = 0.0;
         mx.data[1][0] = 0.0;     mx.data[1][1] = rad_x.cos();    mx.data[1][2] = -rad_x.sin();    mx.data[1][3] = 0.0;
@@ -103,7 +91,7 @@ impl Matrix4 {
         P: IsBuildable3D {
 
         let u = axis.clone().normalized()?;
-        let mut result = Matrix4::new();
+        let mut result = Matrix4::default();
         //@todo needs testing!!!
         result.data[0][0] = rad.cos() + u.x()*u.x()*(1.0 - rad.cos());          result.data[0][1] = u.x()*u.y()*(1.0 -rad.cos()) - u.z()*rad.sin();     result.data[0][2] = u.x()*u.z()*(1.0 - rad.cos()) + u.y()*rad.sin();    result.data[0][3] = 0.0;
         result.data[1][0] = u.y()*u.x()*(1.0 - rad.cos()) + u.z()*rad.sin();    result.data[1][1] = rad.cos() + u.y()*u.y()*(1.0 - rad.cos());          result.data[1][2] = u.y()*u.z()*(1.0 - rad.cos()) - u.x()*rad.sin();    result.data[1][3] = 0.0;
@@ -117,7 +105,7 @@ impl Matrix4 {
         let range = close - away;
         let tan_fov_half = (fov_rad/2.0).tan();
 
-        let mut result = Matrix4::new();
+        let mut result = Matrix4::default();
         result.data[0][0] = 1.0 / (tan_fov_half * away);  result.data[0][1] = 0.0;               result.data[0][2] = 0.0;                      result.data[0][3] = 0.0;
         result.data[1][0] = 0.0;                        result.data[1][1] = 1.0 / tan_fov_half;  result.data[1][2] = 0.0;                      result.data[1][3] = 0.0;
         result.data[2][0] = 0.0;                        result.data[2][1] = 0.0;               result.data[2][2] = (-close - away) / range;  result.data[2][3] = 2.0 * away * close / range;
@@ -138,7 +126,7 @@ impl Matrix4 {
         })?;
         let v = cross(&*n, &u);
 
-        let mut result = Matrix4::new();
+        let mut result = Matrix4::default();
         result.data[0][0] = u.x();  result.data[0][1] = u.y();  result.data[0][2] = u.z();  result.data[0][3] = 0.0;
         result.data[1][0] = v.x();  result.data[1][1] = v.y();  result.data[1][2] = v.z();  result.data[1][3] = 0.0;
         result.data[2][0] = n.x();  result.data[2][1] = n.y();  result.data[2][2] = n.z();  result.data[2][3] = 0.0;
@@ -148,7 +136,7 @@ impl Matrix4 {
 
     /// Multiplies this matrix by another
     pub fn multiply_m(&self, other: &Matrix4) -> Matrix4 {
-        let mut result = Matrix4::new();
+        let mut result = Matrix4::default();
         for i in 0..4 {
             for j in 0..4 {
                 result.data[i][j] =
@@ -163,12 +151,25 @@ impl Matrix4 {
 
     /// Multiplies all values of this matrix by the factor
     pub fn multiply_f(&self, other: f64) -> Matrix4 {
-        let mut result = Matrix4::new();
+        let mut result = Matrix4::default();
         for i in 0..4 {
             for j in 0..4 {
                 result.data[i][j] = other * self.data[i][j];
             }
         }
         result
+    }
+}
+
+impl Default for Matrix4 {
+    fn default() -> Self {
+        Matrix4{
+            data: [
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0]
+            ]
+        }
     }
 }

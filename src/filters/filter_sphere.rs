@@ -66,7 +66,7 @@ impl Clone for FilterSphere {
 
 impl FilterSphere {
     /// Creates a new FilterSphere with the given parameters
-    pub fn build(center: Point3D, p_radius: Positive) -> Self {
+    pub fn new(center: Point3D, p_radius: Positive) -> Self {
         FilterSphere {center: center, radius: p_radius}
     }
 }
@@ -105,7 +105,7 @@ impl IsBuildableND for FilterSphere {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterSphere::build(*Point3D::build(coords[0], coords[1], coords[2]), Positive::one())))
+        Ok(Box::new(FilterSphere::new(*Point3D::build(coords[0], coords[1], coords[2]), Positive::one())))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -126,7 +126,7 @@ impl IsBuildableND for FilterSphere {
 //@todo or always set sizes to 1
 impl IsBuildable3D for FilterSphere {
     fn build(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(FilterSphere::build(*Point3D::build(x, y, z), Positive::one()))
+        Box::new(FilterSphere::new(*Point3D::build(x, y, z), Positive::one()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable3D {

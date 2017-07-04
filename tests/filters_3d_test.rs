@@ -44,13 +44,13 @@ fn filter_box_3d_test() {
     let size_x = Positive::new(2.1).unwrap();
     let size_y = Positive::new(2.1).unwrap();
     let size_z = Positive::new(2.1).unwrap();
-    test_filter_3d::<_, Point3D>(FilterBox3D::build(center, size_x, size_y, size_z), "tests/data/expected_filter_box_3d.xyz", "box3d");
+    test_filter_3d::<_, Point3D>(FilterBox3D::new(center, size_x, size_y, size_z), "tests/data/expected_filter_box_3d.xyz", "box3d");
 }
 
 #[test]
 fn filter_sphere_test() {
     let center = *Point3D::build(10.0, 10.0, 10.0);
     let radius = Positive::new(4.0).unwrap();
-    let filter = FilterSphere::build(center, radius);
+    let filter = FilterSphere::new(center, radius);
     test_filter_3d::<_, Point3D>(filter, "tests/data/expected_filter_sphere.xyz", "sphere");
 }

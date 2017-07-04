@@ -18,6 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use matrix4::*;
 use traits::is_buildable_3d::*;
 
+#[derive (Default)]
 /// Matrix4Pipe, which makes it easier to pipe different matrices in a defined order
 pub struct Matrix4Pipe {
     pub mtranslation: Matrix4,
@@ -29,17 +30,6 @@ pub struct Matrix4Pipe {
 }
 
 impl Matrix4Pipe {
-    /// Creates a new matrix pipe which does nothing
-    pub fn new() -> Matrix4Pipe {
-        Matrix4Pipe {
-            mtranslation: Matrix4::new(),
-            mrotation: Matrix4::new(),
-            mscale: Matrix4::new(),
-            mperspective: Matrix4::new(),
-            mcamtrans: Matrix4::new(),
-            mcamlook: Matrix4::new()
-        }
-    }
     //@todo might be inversed order
     //@todo better overload operator * for Matrix4 to gain nicer syntax
     /// Creates a new matrix as a result of all defined operations set within the pipe
@@ -57,7 +47,7 @@ impl Matrix4Pipe {
     }
     /// Removes any translation from the pipe
     pub fn remove_translation(&mut self) {
-        self.mtranslation = Matrix4::new();
+        self.mtranslation = Matrix4::default();
     }
 
     /// Adds a rotation to the pipe
@@ -73,7 +63,7 @@ impl Matrix4Pipe {
     }
     /// Removes any rotation from the pipe
     pub fn remove_rotation(&mut self) {
-        self.mrotation = Matrix4::new();
+        self.mrotation = Matrix4::default();
     }
 
     /// Adds scaling to the pipe
@@ -82,7 +72,7 @@ impl Matrix4Pipe {
     }
     /// Removes any scaling from the pipe
     pub fn remove_scale(&mut self) {
-        self.mscale = Matrix4::new();
+        self.mscale = Matrix4::default();
     }
 
     /// Adds a perspective transformation to the pipe
@@ -91,7 +81,7 @@ impl Matrix4Pipe {
     }
     /// Removes any perspective transformation from the pipe
     pub fn remove_perspective(&mut self) {
-        self.mperspective = Matrix4::new();
+        self.mperspective = Matrix4::default();
     }
 
     /// Adds camera translation to the pipe
@@ -100,7 +90,7 @@ impl Matrix4Pipe {
     }
     /// Removes any camera translation from the pipe
     pub fn remove_camera_translation(&mut self) {
-        self.mcamtrans = Matrix4::new();
+        self.mcamtrans = Matrix4::default();
     }
 
     /// Adds a look at target to the pipe
@@ -112,6 +102,6 @@ impl Matrix4Pipe {
     }
     /// Removes any look at target from the pipe
     pub fn remove_look_at(&mut self) {
-        self.mcamlook = Matrix4::new();
+        self.mcamlook = Matrix4::default();
     }
 }

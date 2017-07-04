@@ -71,7 +71,7 @@ impl Clone for FilterBox2D {
 
 impl FilterBox2D {
     /// Creates a new FilterBox2D with the given parameters
-    pub fn build(center: Point2D, p_size_x: Positive, p_size_y: Positive) -> Self {
+    pub fn new(center: Point2D, p_size_x: Positive, p_size_y: Positive) -> Self {
         FilterBox2D {center: center, size_x: p_size_x, size_y: p_size_y}
     }
 }
@@ -105,7 +105,7 @@ impl IsBuildableND for FilterBox2D {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterBox2D::build(*Point2D::build(coords[0], coords[1]), Positive::one(), Positive::one())))
+        Ok(Box::new(FilterBox2D::new(*Point2D::build(coords[0], coords[1]), Positive::one(), Positive::one())))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -123,7 +123,7 @@ impl IsBuildableND for FilterBox2D {
 
 impl IsBuildable2D for FilterBox2D {
     fn build(x: f64, y: f64) -> Box<Self> {
-        Box::new(FilterBox2D::build(*Point2D::build(x, y), Positive::one(), Positive::one()))
+        Box::new(FilterBox2D::new(*Point2D::build(x, y), Positive::one(), Positive::one()))
     }
 
     fn from<P>(&mut self, other: P) where P: IsBuildable2D {
@@ -173,6 +173,6 @@ impl<T> IsFilter<T> for FilterBox2D where
 
 impl From<BoundingBox2D> for FilterBox2D {
     fn from(x: BoundingBox2D) -> Self {
-        Self::build(x.center_bb(), x.size_x(), x.size_y())
+        Self::new(x.center_bb(), x.size_x(), x.size_y())
     }
 }
