@@ -38,7 +38,20 @@ pub enum ErrorKind {
     DimensionsDontMatch,
     NumberConversionError,
     NumberInWrongRange,
-    ComparisionFailed
+    ComparisionFailed,
+    //@todo ply ones as own enum?
+    PlyLoadError,
+    PlyLoadStartNotFound,
+    PlyLoadFormatNotFound,
+    PlyLoadWrongPropertyCount,
+    PlyLoadVertexIndexDefinitionNotFound,
+    PlyLoadHeaderEndNotFound,
+    PlyLoadVertexCountNotFound,
+    PlyLoadFaceCountNotFound,
+    PlyLoadVertexCountIncorrect,
+    PlyLoadVerticesIncorrect,
+
+
 }
 
 impl ErrorKind {
@@ -60,7 +73,17 @@ impl ErrorKind {
             ErrorKind::DimensionsDontMatch       => "Trying to mix types with different dimensions",
             ErrorKind::NumberConversionError     => "Failed converting one number type to another",
             ErrorKind::NumberInWrongRange        => "Passed number is within the wrong range",
-            ErrorKind::ComparisionFailed         => "Comparision between two values failed"
+            ErrorKind::ComparisionFailed         => "Comparision between two values failed",
+            ErrorKind::PlyLoadError                         => "Error while loading .ply",
+            ErrorKind::PlyLoadStartNotFound                 => "Start of .ply header not found",
+            ErrorKind::PlyLoadFormatNotFound                => "Format of .ply missing or not supported",
+            ErrorKind::PlyLoadWrongPropertyCount            => "Property count of .ply missing or not supported",
+            ErrorKind::PlyLoadVertexIndexDefinitionNotFound => "Index definition in .ply not found",
+            ErrorKind::PlyLoadHeaderEndNotFound             => "End of header definition of .ply not found",
+            ErrorKind::PlyLoadVertexCountNotFound           => "Vertex count of .ply not found",
+            ErrorKind::PlyLoadFaceCountNotFound             => "Face count of .ply not found",
+            ErrorKind::PlyLoadVertexCountIncorrect          => "Vertex count of .ply not found",
+            ErrorKind::PlyLoadVerticesIncorrect             => "Vertices in .ply incorrect"
         }
     }
 }

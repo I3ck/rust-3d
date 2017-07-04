@@ -11,6 +11,8 @@ maybe more trim().split() usages required
 
 use Default and Extend (instead of new() in traits or IsMergeable)?
 
+support more ply formats or properly throw on error
+
 some stored .stls aren't properly displayed within Meshlab, but within Blender
 
 one of the filter tests managed to fail (possibly race condition within the test files)
