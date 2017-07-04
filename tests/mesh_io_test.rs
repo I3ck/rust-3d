@@ -20,13 +20,20 @@ use rust_3d::traits::is_editable_mesh_3d::*;
 use rust_3d::point_3d::*;
 use rust_3d::mesh_3d::*;
 use rust_3d::io::ply::*;
+use rust_3d::io::stl::*;
 
 #[test]
 fn mesh_io_test() {
     let mut m = Mesh3D::<Point3D>::new();
-
     load_ply_ascii(&mut m, "tests/data/torus_only_vertex_data.ply");
+    assert!(m.num_faces()    == 1152);
+    assert!(m.num_vertices() == 3456);
 
+
+    save_ply_ascii(&m, "tests/tmp/torus_only_vertex_data.ply");
+
+    let mut m = Mesh3D::<Point3D>::new();
+    load_ply_ascii(&mut m, "tests/tmp/torus_only_vertex_data.ply");
     assert!(m.num_faces()    == 1152);
     assert!(m.num_vertices() == 3456);
 }

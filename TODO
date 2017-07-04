@@ -65,6 +65,8 @@ write tutorial / examples / example program
 
 try to avoid dynamic traits
 
+trait for reset
+
 outlier removal (filter which holds a kdtree of the reference structure, calc median / medium distance to k-nearest
 neighbours remove which are further than x, furthest x percent further than x times
 median / average dist...   could take either kdtree or iterator or random access
