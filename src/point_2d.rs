@@ -23,7 +23,7 @@ use std::hash::{Hash, Hasher};
 use result::*;
 use traits::is_nd::*;
 use traits::is_2d::*;
-use traits::is_moveable_2d::*;
+use traits::is_movable_2d::*;
 use traits::is_buildable_nd::*;
 use traits::is_buildable_2d::*;
 use traits::is_editable_nd::*;
@@ -61,7 +61,7 @@ impl Clone for Point2D {
     }
 }
 
-impl IsMoveable2D for Point2D {
+impl IsMovable2D for Point2D {
     fn move_by(&mut self, x: f64, y: f64) {
         self.x += x;
         self.y += y;

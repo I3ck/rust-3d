@@ -20,7 +20,7 @@ use rust_3d::traits::is_2d::*;
 use rust_3d::traits::is_buildable_nd::*;
 use rust_3d::traits::is_buildable_2d::*;
 use rust_3d::traits::is_editable_2d::*;
-use rust_3d::traits::is_moveable_2d::*;
+use rust_3d::traits::is_movable_2d::*;
 use rust_3d::point_2d::*;
 
 #[test]

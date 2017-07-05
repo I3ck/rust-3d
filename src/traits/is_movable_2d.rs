@@ -13,10 +13,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! IsMoveable3D trait used for types within 3D space which can be moved
+//! IsMovable2D trait used for types within 2D space which can be moved
 
-/// IsMoveable3D is a trait used for types within 3D space which can be moved
-pub trait IsMoveable3D { //@todo remove trait and impl in IsBuildable2D
+/// IsMovable2D is a trait used for types within 2D space which can be moved
+pub trait IsMovable2D { //@todo remove trait and impl in IsBuildable2D
     /// Should move the object by the given offset
-    fn move_by(&mut self, x: f64, y: f64, z: f64);
+    fn move_by(&mut self, x: f64, y: f64);
 }

@@ -19,7 +19,7 @@ use rust_3d::traits::is_3d::*;
 use rust_3d::traits::is_buildable_nd::*;
 use rust_3d::traits::is_buildable_3d::*;
 use rust_3d::traits::is_editable_3d::*;
-use rust_3d::traits::is_moveable_3d::*;
+use rust_3d::traits::is_movable_3d::*;
 use rust_3d::functions::cross;
 use rust_3d::point_3d::*;
 

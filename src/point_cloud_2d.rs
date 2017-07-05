@@ -23,7 +23,7 @@ use result::*;
 use traits::is_2d::*;
 use traits::is_random_accessible::*;
 use traits::is_random_insertible::*;
-use traits::is_moveable_2d::*;
+use traits::is_movable_2d::*;
 use traits::is_buildable_2d::*;
 use traits::has_bounding_box_2d::*;
 use traits::has_center_of_gravity_2d::*;
@@ -145,8 +145,8 @@ impl<P> IsRandomInsertible<P> for PointCloud2D<P> where
 }
 
 
-impl<P> IsMoveable2D for PointCloud2D<P> where
-    P: Is2D + IsMoveable2D {
+impl<P> IsMovable2D for PointCloud2D<P> where
+    P: Is2D + IsMovable2D {
 
     fn move_by(&mut self, x: f64, y: f64) {
         for p in &mut self.data {

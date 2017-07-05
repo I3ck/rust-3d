@@ -17,7 +17,7 @@ extern crate rust_3d;
 
 use rust_3d::traits::is_3d::*;
 use rust_3d::traits::is_buildable_3d::*;
-use rust_3d::traits::is_moveable_3d::*;
+use rust_3d::traits::is_movable_3d::*;
 use rust_3d::traits::has_bounding_box_3d::*;
 use rust_3d::traits::is_random_insertible::*;
 use rust_3d::traits::is_random_accessible::*;

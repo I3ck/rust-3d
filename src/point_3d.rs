@@ -22,7 +22,7 @@ use std::hash::{Hash, Hasher};
 use result::*;
 use traits::is_nd::*;
 use traits::is_3d::*;
-use traits::is_moveable_3d::*;
+use traits::is_movable_3d::*;
 use traits::is_buildable_nd::*;
 use traits::is_buildable_2d::*;
 use traits::is_buildable_3d::*;
@@ -62,7 +62,7 @@ impl Clone for Point3D {
     }
 }
 
-impl IsMoveable3D for Point3D {
+impl IsMovable3D for Point3D {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         self.x += x;
         self.y += y;

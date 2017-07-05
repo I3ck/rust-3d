@@ -34,7 +34,7 @@ use traits::is_transformable_to_2d::*;
 use traits::is_transformable_to_3d::*;
 use traits::is_plane_3d::*;
 use traits::is_normalized_3d::*;
-use traits::is_moveable_3d::*;
+use traits::is_movable_3d::*;
 use traits::is_random_accessible::*;
 use traits::is_random_insertible::*;
 
@@ -216,7 +216,7 @@ pub fn sort_vec_3d_z<P>(xs: &mut Vec<P>) where
 /// Extrudes a 2D point cloud into 3D space with a given center and direction
 pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, PointCloud3D<P3>) where
     P2: IsTransFormableTo3D,
-    P3: IsBuildable3D + IsMoveable3D + Clone {
+    P3: IsBuildable3D + IsMovable3D + Clone {
 
     let mut pc_3d_a = PointCloud3D::new();
     let mut pc_3d_b = PointCloud3D::new();

@@ -23,7 +23,7 @@ use result::*;
 use traits::is_3d::*;
 use traits::is_random_accessible::*;
 use traits::is_random_insertible::*;
-use traits::is_moveable_3d::*;
+use traits::is_movable_3d::*;
 use traits::is_buildable_3d::*;
 use traits::has_bounding_box_3d::*;
 use traits::has_center_of_gravity_3d::*;
@@ -145,8 +145,8 @@ impl<P> IsRandomInsertible<P> for PointCloud3D<P> where
     }
 }
 
-impl<P> IsMoveable3D for PointCloud3D<P> where
-    P: Is3D + IsMoveable3D {
+impl<P> IsMovable3D for PointCloud3D<P> where
+    P: Is3D + IsMovable3D {
 
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         for p in &mut self.data {
