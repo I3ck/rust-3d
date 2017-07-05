@@ -19,8 +19,7 @@ use traits::is_random_accessible::*;
 use traits::is_filter_random_accessible::*;
 use view::*;
 
-//@todo missing build methods
-
+#[derive (Default)]
 /// FilterAnyRandomAccessible, a filter to chain multiple IsFilterRandomAccessible with the or condition => must pass any filter to pass this filter
 pub struct FilterAnyRandomAccessible<RA, T> where
     RA: IsRandomAccessible<T> {
