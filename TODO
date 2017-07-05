@@ -8,9 +8,15 @@ more filter shapes
 
 some Hash impls might lose precision
 
+the sort_x / y / z methods should always sort by the others as well
+so instead of Equal if x == x, compare y next
+(similar to return x < other.x || (x == other.x && y < other.y);)
+
 maybe more trim().split() usages required
 
 use Default and Extend (instead of new() in traits or IsMergeable)?
+
+some way to define a prelude or include everything (some files are basically only includes)
 
 support more ply formats or properly throw on error
 

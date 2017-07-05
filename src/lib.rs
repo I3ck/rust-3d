@@ -23,6 +23,7 @@ pub mod traits;
 pub mod impls;
 pub mod io;
 pub mod filters;
+pub mod algorithms;
 pub mod functions;
 pub mod point_2d;
 pub mod point_3d;

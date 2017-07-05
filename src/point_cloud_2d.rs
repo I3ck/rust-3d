@@ -85,6 +85,19 @@ impl<P> PointCloud2D<P> where
         if pc.len() == 0 { return Err(ErrorKind::ParseError); }
         Ok(pc)
     }
+
+    //@todo make trait?
+    /// Appends all elements of an IsRandomAccessible
+    pub fn append_ra<RA>(&mut self, ra: &RA) where
+        RA: IsRandomAccessible<P> {
+
+        let n = ra.len();
+        self.data.reserve(n);
+
+        for i in 0..n {
+            self.data.push(Box::new(ra[i].clone()));
+        }
+    }
 }
 
 impl<P> Clone for PointCloud2D<P> where
