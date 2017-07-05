@@ -13,18 +13,15 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-use rust_3d::traits::is_3d::*;
+#![deny(warnings)]
+
 use rust_3d::traits::is_buildable_3d::*;
-use rust_3d::traits::is_movable_3d::*;
 use rust_3d::traits::is_random_insertible::*;
 use rust_3d::traits::is_random_accessible::*;
 use rust_3d::point_3d::*;
 use rust_3d::point_cloud_3d::*;
 use rust_3d::io::xyz::*;
 use rust_3d::test_helper::*;
-
-use std::io::prelude::*;
-use std::fs::File;
 
 extern crate rust_3d;
 
@@ -43,10 +40,10 @@ fn point_cloud_3d_io_test() {
         }
 
         if GENERATE_EXCEPTED_RESULT_FILES {
-            save_xyz(&pc, &path_expected, ";", "\n");
+            save_xyz(&pc, &path_expected, ";", "\n").unwrap();
         }
 
-        save_xyz(&pc, &path_tmp, ";", "\n");
+        save_xyz(&pc, &path_tmp, ";", "\n").unwrap();
 
         assert_files_equal(path_expected, path_tmp);
     }

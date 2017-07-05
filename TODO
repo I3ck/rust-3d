@@ -4,8 +4,6 @@ kdtree for 2d or generic
 quadtree
 convex hull https://github.com/I3ck/lib_2d/blob/master/inc/PointCloud.h#L401
 
-enable warnings for tests
-
 more filter shapes
 
 some Hash impls might lose precision

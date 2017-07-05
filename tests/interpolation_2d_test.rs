@@ -13,11 +13,11 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#![deny(warnings)]
+
 extern crate rust_3d;
 
-use rust_3d::traits::is_2d::*;
 use rust_3d::traits::is_buildable_2d::*;
-use rust_3d::traits::is_movable_2d::*;
 use rust_3d::traits::is_random_insertible::*;
 use rust_3d::traits::is_random_accessible::*;
 use rust_3d::point_2d::*;
@@ -25,9 +25,6 @@ use rust_3d::point_cloud_2d::*;
 use rust_3d::interpolation_2d::*;
 use rust_3d::io::xy::*;
 use rust_3d::test_helper::*;
-
-use std::io::prelude::*;
-use std::fs::File;
 
 static GENERATE_EXCEPTED_RESULT_FILES: bool = false;
 
@@ -45,10 +42,10 @@ fn interpolate_bezier_test() {
     let result = *(interpolate_bezier(&pc, 50).unwrap());
 
     if GENERATE_EXCEPTED_RESULT_FILES {
-        save_xy(&result, &path_expected, ";", "\n");
+        save_xy(&result, &path_expected, ";", "\n").unwrap();
     }
 
-    save_xy(&result, &path_tmp, ";", "\n");
+    save_xy(&result, &path_tmp, ";", "\n").unwrap();
 
     assert!(result.len() == 50);
 
@@ -69,10 +66,10 @@ fn interpolate_cosine_test() {
     let result = *(interpolate_cosine(&pc, 50).unwrap());
 
     if GENERATE_EXCEPTED_RESULT_FILES {
-        save_xy(&result, &path_expected, ";", "\n");
+        save_xy(&result, &path_expected, ";", "\n").unwrap();
     }
 
-    save_xy(&result, &path_tmp, ";", "\n");
+    save_xy(&result, &path_tmp, ";", "\n").unwrap();
 
     assert!(result.len() == 50);
 
@@ -93,10 +90,10 @@ fn interpolate_linear_test() {
     let result = *(interpolation_linear(&pc, 50).unwrap());
 
     if GENERATE_EXCEPTED_RESULT_FILES {
-        save_xy(&result, &path_expected, ";", "\n");
+        save_xy(&result, &path_expected, ";", "\n").unwrap();
     }
 
-    save_xy(&result, &path_tmp, ";", "\n");
+    save_xy(&result, &path_tmp, ";", "\n").unwrap();
 
     assert!(result.len() == 50);
 

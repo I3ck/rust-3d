@@ -13,27 +13,27 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#![deny(warnings)]
+
 extern crate rust_3d;
 
 use rust_3d::traits::is_mesh_3d::*;
-use rust_3d::traits::is_editable_mesh_3d::*;
 use rust_3d::point_3d::*;
 use rust_3d::mesh_3d::*;
 use rust_3d::io::ply::*;
-use rust_3d::io::stl::*;
 
 #[test]
 fn mesh_io_test() {
     let mut m = Mesh3D::<Point3D>::default();
-    load_ply_ascii(&mut m, "tests/data/torus_only_vertex_data.ply");
+    load_ply_ascii(&mut m, "tests/data/torus_only_vertex_data.ply").unwrap();
     assert!(m.num_faces()    == 1152);
     assert!(m.num_vertices() == 3456);
 
 
-    save_ply_ascii(&m, "tests/tmp/torus_only_vertex_data.ply");
+    save_ply_ascii(&m, "tests/tmp/torus_only_vertex_data.ply").unwrap();
 
     let mut m = Mesh3D::<Point3D>::default();
-    load_ply_ascii(&mut m, "tests/tmp/torus_only_vertex_data.ply");
+    load_ply_ascii(&mut m, "tests/tmp/torus_only_vertex_data.ply").unwrap();
     assert!(m.num_faces()    == 1152);
     assert!(m.num_vertices() == 3456);
 }
