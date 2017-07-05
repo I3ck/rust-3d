@@ -51,7 +51,7 @@ impl Ord for FilterCircle {
     }
 }
 
-impl Hash for FilterCircle { //@todo poor precision this way
+impl Hash for FilterCircle {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.center.hash(state);
         (self.radius.get() as u64).hash(state);

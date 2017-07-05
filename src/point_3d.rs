@@ -48,7 +48,7 @@ impl Ord for Point3D {
     }
 }
 
-impl Hash for Point3D { //@todo poor precision this way
+impl Hash for Point3D {
     fn hash<H: Hasher>(&self, state: &mut H) {
         (self.x as u64).hash(state);
         (self.y as u64).hash(state);

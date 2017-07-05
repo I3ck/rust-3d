@@ -55,7 +55,7 @@ impl Ord for FilterBox2D {
     }
 }
 
-impl Hash for FilterBox2D { //@todo poor precision this way
+impl Hash for FilterBox2D {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.center.hash(state);
         (self.size_x.get() as u64).hash(state);

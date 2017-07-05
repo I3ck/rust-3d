@@ -59,7 +59,7 @@ impl Ord for FilterBox3D {
     }
 }
 
-impl Hash for FilterBox3D { //@todo poor precision this way
+impl Hash for FilterBox3D {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.center.hash(state);
         (self.size_x.get() as u64).hash(state);

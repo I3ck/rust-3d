@@ -51,7 +51,7 @@ impl Ord for FilterSphere {
     }
 }
 
-impl Hash for FilterSphere { //@todo poor precision this way
+impl Hash for FilterSphere {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.center.hash(state);
         (self.radius.get() as u64).hash(state);
