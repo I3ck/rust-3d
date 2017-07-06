@@ -26,9 +26,9 @@ use self::core::str::FromStr;
 use std::io::prelude::*;
 use std::fs::File;
 
-//@todo change to take IsMesh as template
 /// Saves an IsMesh3D in the ASCII .ply file format
-pub fn save_ply_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
+pub fn save_ply_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()> where
+    M: IsMesh3D<P>,
     P: IsBuildable3D {
 
     let mut f = File::create(filepath).map_err(|e| e.to_error_kind())?;
