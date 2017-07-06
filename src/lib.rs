@@ -29,6 +29,8 @@ pub mod point_2d;
 pub mod point_3d;
 pub mod line_2d;
 pub mod line_3d;
+pub mod ray_2d;
+pub mod ray_3d;
 pub mod plane_3d;
 pub mod point_cloud_2d;
 pub mod point_cloud_3d;

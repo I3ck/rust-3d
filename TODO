@@ -14,6 +14,8 @@ line primitive / is_line_2d/3d
 
 derive where possible now (e.g. Point wasn't deriving Clone, others might be able to derive Eq e.g.)
 
+similar to distances, add intersections
+
 the sort_x / y / z methods should always sort by the others as well
 so instead of Equal if x == x, compare y next
 (similar to return x < other.x || (x == other.x && y < other.y);)
