@@ -177,7 +177,9 @@ pub fn sort_vec_2d_x<P>(xs: &mut Vec<P>) where
     P: Is2D {
 
         xs.sort_by(|a, b|
-            a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
+            a.x().partial_cmp(&b.x())
+                .or_else(|| a.y().partial_cmp(&b.y()))
+                .unwrap_or(Ordering::Equal));
 }
 
 /// Helper function to sort a Vec of Is2D by y
@@ -185,7 +187,9 @@ pub fn sort_vec_2d_y<P>(xs: &mut Vec<P>) where
     P: Is2D {
 
         xs.sort_by(|a, b|
-            a.y().partial_cmp(&b.y()).unwrap_or(Ordering::Equal));
+            a.y().partial_cmp(&b.y())
+                .or_else(|| a.x().partial_cmp(&b.x()))
+                .unwrap_or(Ordering::Equal));
 }
 
 /// Helper function to sort a Vec of Is3D by x
@@ -193,7 +197,10 @@ pub fn sort_vec_3d_x<P>(xs: &mut Vec<P>) where
     P: Is3D {
 
         xs.sort_by(|a, b|
-            a.x().partial_cmp(&b.x()).unwrap_or(Ordering::Equal));
+            a.x().partial_cmp(&b.x())
+                .or_else(|| a.y().partial_cmp(&b.y()))
+                .or_else(|| a.z().partial_cmp(&b.z()))
+                .unwrap_or(Ordering::Equal));
 }
 
 /// Helper function to sort a Vec of Is3D by y
@@ -201,7 +208,10 @@ pub fn sort_vec_3d_y<P>(xs: &mut Vec<P>) where
     P: Is3D {
 
         xs.sort_by(|a, b|
-            a.y().partial_cmp(&b.y()).unwrap_or(Ordering::Equal));
+            a.y().partial_cmp(&b.y())
+                .or_else(|| a.z().partial_cmp(&b.z()))
+                .or_else(|| a.x().partial_cmp(&b.x()))
+                .unwrap_or(Ordering::Equal));
 }
 
 /// Helper function to sort a Vec of Is3D by z
@@ -209,7 +219,10 @@ pub fn sort_vec_3d_z<P>(xs: &mut Vec<P>) where
     P: Is3D {
 
         xs.sort_by(|a, b|
-            a.z().partial_cmp(&b.z()).unwrap_or(Ordering::Equal));
+            a.z().partial_cmp(&b.z())
+                .or_else(|| a.x().partial_cmp(&b.x()))
+                .or_else(|| a.y().partial_cmp(&b.y()))
+                .unwrap_or(Ordering::Equal));
 }
 
 //@todo move to plane or use there

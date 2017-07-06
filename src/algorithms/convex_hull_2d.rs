@@ -31,7 +31,7 @@ pub fn convex_hull_2d<RA, P>(ra: &RA) -> Vec<P> where
 
         let mut sorted = PointCloud2D::new();
         sorted.append_ra(ra);
-        sorted.sort_x(); //@todo might be important how the sorting handles the y values (current equal is assumed once a.x == b.x)
+        sorted.sort_x();
         let sorted = sorted;
 
         let mut lower = Vec::<P>::new();
