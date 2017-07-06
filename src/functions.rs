@@ -80,7 +80,7 @@ pub fn sqr_dist<P,U>(p1: &P, p2: &U) -> Result<f64> where
 }
 
 /// Returns the cross product between a Is3D and a IsBuildable3D
-pub fn cross<P,U>(first: &P, other: &U) -> Box<U> where //@todo try to implement in Is3D trait
+pub fn cross<P,U>(first: &P, other: &U) -> Box<U> where
     P: Is3D,
     U: IsBuildable3D {
 
@@ -91,7 +91,7 @@ pub fn cross<P,U>(first: &P, other: &U) -> Box<U> where //@todo try to implement
 }
 
 /// Returns the distance between two IsND in case their number of dimensions match
-pub fn dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where //@todo duplicate
+pub fn dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where
     P: IsND,
     U: IsND {
 
@@ -109,7 +109,7 @@ pub fn dist_3d(p1: &Is3D, p2: &Is3D) -> f64 {
 }
 
 /// Returns the squared distance between two IsND in case their number of dimensions match
-pub fn sqr_dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where //@todo duplicate
+pub fn sqr_dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where
     P: IsND,
     U: IsND {
 
@@ -134,8 +134,8 @@ pub fn sqr_dist_3d(p1: &Is3D, p2: &Is3D) -> f64 {
 }
 
 /// Compares two IsBuildable3D at a given dimensions
-pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Result<Ordering> where //@todo could be Is3D
-    P: IsBuildable3D {
+pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Result<Ordering> where
+    P: Is3D {
 
     match dim {
         0 => lhs.x().partial_cmp(&rhs.x()).ok_or(ErrorKind::ComparisionFailed),
@@ -146,8 +146,8 @@ pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Result<Ordering> where
 }
 
 /// Calculates the distance within a given dimension between two IsBuildable3D
-pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Result<f64> where //@todo could be Is3D
-    P: IsBuildable3D {
+pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Result<f64> where
+    P: Is3D {
 
     match dim {
         0 => Ok((lhs.x() - rhs.x()).abs()),
