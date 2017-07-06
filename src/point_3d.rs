@@ -29,9 +29,9 @@ use traits::is_buildable_3d::*;
 use traits::is_editable_nd::*;
 use traits::is_editable_3d::*;
 use traits::is_transformable_to_2d::*;
-use functions::{sqr_dist_3d};
+use distances_3d::*;
 
-#[derive (PartialEq, PartialOrd, Default)]
+#[derive (PartialEq, PartialOrd, Default, Clone)]
 /// Point3D, a point / position within 3D space
 pub struct Point3D {
     pub x: f64,
@@ -53,12 +53,6 @@ impl Hash for Point3D {
         (self.x as u64).hash(state);
         (self.y as u64).hash(state);
         (self.z as u64).hash(state);
-    }
-}
-
-impl Clone for Point3D {
-    fn clone(&self) -> Self {
-        Point3D { x: self.x, y: self.y, z: self.z }
     }
 }
 

@@ -30,9 +30,9 @@ use traits::is_editable_nd::*;
 use traits::is_editable_2d::*;
 use traits::is_buildable_3d::*;
 use traits::is_transformable_to_3d::*;
-use functions::{sqr_dist_2d};
+use distances_2d::*;
 
-#[derive (PartialEq, PartialOrd, Default)]
+#[derive (PartialEq, PartialOrd, Default, Clone)]
 /// Point2D, a point / position within 2D space
 pub struct Point2D {
     pub x: f64,
@@ -52,12 +52,6 @@ impl Hash for Point2D {
     fn hash<H: Hasher>(&self, state: &mut H) {
         (self.x as u64).hash(state);
         (self.y as u64).hash(state);
-    }
-}
-
-impl Clone for Point2D {
-    fn clone(&self) -> Self {
-        Point2D { x: self.x, y: self.y }
     }
 }
 
