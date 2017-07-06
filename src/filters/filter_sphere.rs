@@ -122,8 +122,6 @@ impl IsBuildableND for FilterSphere {
     }
 }
 
-//@todo drop this impl once not required anymore for editable?
-//@todo or always set sizes to 1
 impl IsBuildable3D for FilterSphere {
     fn new(x: f64, y: f64, z: f64) -> Box<Self> {
         Box::new(FilterSphere::new(*Point3D::new(x, y, z), Positive::one()))

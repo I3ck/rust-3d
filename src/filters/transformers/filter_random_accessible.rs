@@ -23,10 +23,6 @@ use traits::is_filter::*;
 use traits::is_random_accessible::*;
 use traits::is_filter_random_accessible::*;
 
-//@todo untested
-//@todo concave hull, convex hull
-//@todo rename to "lift" / "transform" or similar?
-
 /// FilterRandomAccessible, a filter which can transform any IsFilter into an IsFilterRandomAccessible
 pub struct FilterRandomAccessible<F, T> where
     F: IsFilter<T> {

@@ -116,8 +116,6 @@ impl IsBuildableND for FilterCircle {
     }
 }
 
-//@todo drop this impl once not required anymore for editable?
-//@todo or always set sizes to 1
 impl IsBuildable2D for FilterCircle {
     fn new(x: f64, y: f64) -> Box<Self> {
         Box::new(FilterCircle::new(*Point2D::new(x, y), Positive::one()))

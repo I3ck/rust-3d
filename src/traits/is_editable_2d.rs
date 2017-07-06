@@ -21,7 +21,7 @@ use traits::is_editable_nd::*;
 /// IsEditable2D is a trait used for types which are positioned in 2D space and their position can be changed
 pub trait IsEditable2D : Is2D + IsEditableND {
     /// Should set the position in x
-    fn set_x(&mut self, val: f64); //@todo these kinda make it movable, maybe put into IsMovable3D? Or remove movable trait
+    fn set_x(&mut self, val: f64);
     /// Should set the position in y
     fn set_y(&mut self, val: f64);
 
