@@ -15,8 +15,10 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Positive, a wrapper for a f64 value, ensuring it is always > 0
 
+use std::fmt;
 use result::*;
 use std::ops::Add;
+use std::hash::{Hash, Hasher};
 
 #[derive (Copy, Clone, PartialEq, PartialOrd)]
 /// Positive, a wrapper for a f64 value, ensuring it is always > 0
@@ -43,6 +45,14 @@ impl Positive {
     }
 }
 
+impl Eq for Positive {}
+
+impl Hash for Positive {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        (self.val as u64).hash(state);
+    }
+}
+
 impl Add for Positive {
     type Output = Positive;
 
@@ -54,5 +64,11 @@ impl Add for Positive {
 impl Default for Positive {
     fn default() -> Self {
         Self::one()
+    }
+}
+
+impl fmt::Display for Positive {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.val)
     }
 }
