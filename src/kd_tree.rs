@@ -21,7 +21,8 @@ use std::cmp::Ordering;
 
 use result::*;
 use point_cloud_3d::{PointCloud3D};
-use functions::{dist_3d, sqr_dist_3d, dimension_compare, dimension_dist, sort_and_limit};
+use distances_3d::*;
+use functions::{dimension_compare, dimension_dist, sort_and_limit};
 use traits::is_3d::*;
 use traits::is_buildable_nd::*;
 use traits::is_buildable_3d::*;

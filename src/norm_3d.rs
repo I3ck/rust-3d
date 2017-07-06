@@ -23,7 +23,7 @@ use point_3d::*;
 use traits::is_nd::*;
 use traits::is_3d::*;
 use traits::is_normalized_3d::*;
-use functions::{sqr_dist_3d};
+use distances_3d::*;
 
 #[derive (PartialEq, PartialOrd)]
 /// Norm3D, a normalized vector within 3D space

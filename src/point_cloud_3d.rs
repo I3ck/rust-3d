@@ -34,7 +34,8 @@ use traits::is_sortable_3d::*;
 use traits::is_mergeable::*;
 use point_3d::{Point3D};
 use bounding_box_3d::*;
-use functions::{dist_3d, sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z};
+use distances_3d::*;
+use functions::{sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z};
 use view::*;
 
 #[derive (Default)]

@@ -28,7 +28,7 @@ use traits::is_editable_3d::*;
 use traits::has_bounding_box_3d::*;
 use traits::is_filter::*;
 use point_3d::*;
-use functions::{dist_3d, sqr_dist_3d};
+use distances_3d::*;
 use positive::*;
 use bounding_box_3d::*;
 

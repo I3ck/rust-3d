@@ -23,7 +23,7 @@ use point_2d::*;
 use traits::is_nd::*;
 use traits::is_2d::*;
 use traits::is_normalized_2d::*;
-use functions::{sqr_dist_2d};
+use distances_2d::*;
 
 #[derive (PartialEq, PartialOrd)]
 /// Norm2D, a normalized vector within 2D space

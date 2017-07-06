@@ -34,7 +34,8 @@ use traits::is_sortable_2d::*;
 use traits::is_mergeable::*;
 use point_2d::*;
 use bounding_box_2d::*;
-use functions::{dist_2d, sort_vec_2d_x, sort_vec_2d_y};
+use distances_2d::*;
+use functions::{sort_vec_2d_x, sort_vec_2d_y};
 use view::*;
 
 #[derive (Default)]

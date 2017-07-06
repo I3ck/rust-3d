@@ -24,7 +24,7 @@ use point_cloud_2d::*;
 use point_cloud_3d::*;
 use oc_node::*;
 use view::*;
-use traits::is_nd::*;
+use distances_3d::*;
 use traits::is_2d::*;
 use traits::is_3d::*;
 use traits::is_buildable_2d::*;
@@ -51,34 +51,6 @@ pub fn center<P>(p1: &P, p2: &P) -> Box<P> where
     )
 }
 
-/// Returns the distance between two IsND in case their number of dimensions match
-pub fn dist<P,U>(p1: &P, p2: &U) -> Result<f64> where
-    P: IsND,
-    U: IsND {
-
-    sqr_dist(p1,p2).map(|x| x.sqrt())
-}
-
-/// Returns the squared distance between two IsND in case their number of dimensions match
-pub fn sqr_dist<P,U>(p1: &P, p2: &U) -> Result<f64> where
-    P: IsND,
-    U: IsND {
-
-    if P::n_dimensions() != U::n_dimensions() {
-        return Err(ErrorKind::DimensionsDontMatch);
-    }
-
-    let mut result : f64 = 0.0;
-    for i in 0..P::n_dimensions() {
-        if let (Ok(val1), Ok(val2)) = (p1.get_position(i), p2.get_position(i)) {
-            result += (val1 - val2).powi(2);
-        } else {
-            return Err(ErrorKind::IncorrectDimension);
-        }
-    }
-    Ok(result)
-}
-
 /// Returns the cross product between a Is3D and a IsBuildable3D
 pub fn cross<P,U>(first: &P, other: &U) -> Box<U> where
     P: Is3D,
@@ -88,49 +60,6 @@ pub fn cross<P,U>(first: &P, other: &U) -> Box<U> where
     let y = first.z() * other.x() - first.x() * other.z();
     let z = first.x() * other.y() - first.y() * other.x();
     U::new(x, y, z)
-}
-
-/// Returns the distance between two IsND in case their number of dimensions match
-pub fn dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where
-    P: IsND,
-    U: IsND {
-
-    sqr_dist_nd(p1,p2).map(|x| x.sqrt())
-}
-
-/// Returns the distance between two Is2D
-pub fn dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
-    sqr_dist_2d(p1,p2).sqrt()
-}
-
-/// Returns the distance between two Is3D
-pub fn dist_3d(p1: &Is3D, p2: &Is3D) -> f64 {
-    sqr_dist_3d(p1,p2).sqrt()
-}
-
-/// Returns the squared distance between two IsND in case their number of dimensions match
-pub fn sqr_dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64> where
-    P: IsND,
-    U: IsND {
-
-    if P::n_dimensions() != U::n_dimensions() {
-        return Err(ErrorKind::DimensionsDontMatch);
-    }
-    let mut result : f64 = 0.0;
-    for i in 0..P::n_dimensions() {
-        result += (p1.get_position(i)? - p2.get_position(i)?).powi(2);
-    }
-    Ok(result)
-}
-
-/// Returns the squared distance between two Is2D
-pub fn sqr_dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
-    (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2)
-}
-
-/// Returns the squared distance between two Is3D
-pub fn sqr_dist_3d(p1: &Is3D, p2: &Is3D) -> f64 {
-    (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2) + (p1.z() - p2.z()).powi(2)
 }
 
 /// Compares two IsBuildable3D at a given dimensions
