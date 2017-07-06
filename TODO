@@ -10,7 +10,13 @@ some Hash impls might lose precision
 
 many more distance functions
 
+new / default for line, ray, line segment
+
 line primitive / is_line_2d/3d
+
+distance methods for ray line line segment
+
+tests for ray line line segment
 
 derive where possible now (e.g. Point wasn't deriving Clone, others might be able to derive Eq e.g.)
 

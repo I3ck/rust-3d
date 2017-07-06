@@ -23,17 +23,17 @@ use line_2d::*;
 #[derive (PartialEq, PartialOrd, Eq, Clone, Hash)]
 /// Ray2D, a ray within 2D space
 pub struct Ray2D {
-    pub data: Line2D
+    pub line: Line2D
 }
 
-impl IsMovable2D for Ray2D{
+impl IsMovable2D for Ray2D {
     fn move_by(&mut self, x: f64, y: f64) {
-        self.data.move_by(x, y);
+        self.line.move_by(x, y);
     }
 }
 
-impl fmt::Display for Ray2D{
+impl fmt::Display for Ray2D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.data.fmt(f)
+        self.line.fmt(f)
     }
 }
