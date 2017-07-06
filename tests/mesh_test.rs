@@ -61,12 +61,12 @@ fn mesh_test() {
 
     match mesh.face_vertex_ids(0) {
         Err(_) => assert!(false),
-        Ok((id1, id2, id3)) => assert!(id1 == 0 && id2 == 1 && id3 == 2)
+        Ok(face) => assert!(face.a == 0 && face.b == 1 && face.c == 2)
     };
 
     match mesh.face_vertex_ids(1) {
         Err(_) => assert!(false),
-        Ok((id1, id2, id3)) => assert!(id1 == 3 && id2 == 4 && id3 == 5)
+        Ok(face) => assert!(face.a == 3 && face.b == 4 && face.c == 5)
     };
 
     match mesh.face_vertices(0) {

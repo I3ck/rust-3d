@@ -51,8 +51,8 @@ pub fn save_ply_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()> where
     }
 
     for i in 0..mesh.num_faces() {
-        let (vid1, vid2, vid3) = mesh.face_vertex_ids(i)?;
-        f.write_all(("3 ".to_string() + &vid1.to_string() + " " + &vid2.to_string() + " " + &vid3.to_string() + "\n").as_bytes()).map_err(|e| e.to_error_kind())?;
+        let face = mesh.face_vertex_ids(i)?;
+        f.write_all(("3 ".to_string() + &face.a.to_string() + " " + &face.b.to_string() + " " + &face.c.to_string() + "\n").as_bytes()).map_err(|e| e.to_error_kind())?;
     }
     Ok(())
 }

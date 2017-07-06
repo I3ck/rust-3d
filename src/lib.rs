@@ -58,3 +58,4 @@ pub mod result;
 pub mod distances_2d;
 pub mod distances_3d;
 pub mod distances_nd;
+pub mod face3;

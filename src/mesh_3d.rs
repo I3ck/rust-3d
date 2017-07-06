@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! Mesh3D, a mesh with tri-faces within 3D space
 
 use result::*;
+use face3::*;
 use traits::is_mesh_3d::*;
 use traits::is_editable_mesh_3d::*;
 use traits::is_3d::*;
@@ -47,7 +48,7 @@ impl<P> IsMesh3D<P> for Mesh3D<P> where
         self.pc.len()
     }
 
-    fn face_vertex_ids(&self, faceid: usize) -> Result<(usize, usize, usize)> {
+    fn face_vertex_ids(&self, faceid: usize) -> Result<Face3> {
         let id1 = 3*faceid + 0;
         let id2 = 3*faceid + 1;
         let id3 = 3*faceid + 2;
@@ -56,12 +57,12 @@ impl<P> IsMesh3D<P> for Mesh3D<P> where
             return Err(ErrorKind::IncorrectFaceID);
         }
 
-        Ok((self.topology[id1], self.topology[id2], self.topology[id3]))
+        Ok(Face3::new(self.topology[id1], self.topology[id2], self.topology[id3]))
     }
 
     fn face_vertices(&self, faceid: usize) -> Result<(P, P, P)> {
-        let (id1, id2, id3) = self.face_vertex_ids(faceid)?;
-        if let (Ok(v1), Ok(v2), Ok(v3)) = (self.vertex(id1), self.vertex(id2), self.vertex(id3)) {
+        let face = self.face_vertex_ids(faceid)?;
+        if let (Ok(v1), Ok(v2), Ok(v3)) = (self.vertex(face.a), self.vertex(face.b), self.vertex(face.c)) {
             return Ok((v1, v2, v3));
         }
         Err(ErrorKind::IncorrectVertexID)
