@@ -21,7 +21,7 @@ use strong_types::*;
 /// HalfEdge3D, the half edge data structure for 3D
 pub struct HalfEdge3D {
     edges: Vec<Edge>,
-    vertices_start_edges: Vec<Vec<EId>>
+    vertices_start_edges: Vec<Vec<EId>> //@todo better name
 }
 
 //@todo info text (file also has to note it includes both, OR move to own file)
@@ -58,7 +58,7 @@ impl HalfEdge3D {
 
     pub fn edges_originating(&self, id: VId) -> Result<Vec<EId>> {
         self.ensure_vertex_id(id)?;
-        Ok(self.vertices_start_edges[id.val])
+        Ok(self.vertices_start_edges[id.val].clone())
     }
 
     pub fn edges_ending(&self, id: VId) -> Result<Vec<EId>> {
@@ -123,7 +123,7 @@ impl HalfEdge3D {
     }
 
     fn ensure_vertex_id(&self, id: VId) -> Result<()> {
-        if id.val >= self.edges_of_vertices.len() { //@todo could cache len later if never changes
+        if id.val >= self.vertices_start_edges.len() { //@todo could cache len later if never changes
             return Err(ErrorKind::IncorrectFaceID); //@todo IncorrectVId
         }
         Ok(())
