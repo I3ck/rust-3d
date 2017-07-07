@@ -17,6 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 extern crate core;
 
+use strong_types::*;
 use result::*;
 use traits::is_buildable_3d::*;
 use traits::is_mesh_3d::*;
@@ -46,12 +47,12 @@ pub fn save_ply_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()> where
     f.write_all(header.as_bytes()).map_err(|e| e.to_error_kind())?;
 
     for i in 0..mesh.num_vertices() {
-        let vertex = mesh.vertex(i)?;
+        let vertex = mesh.vertex(VId{val: i})?;
         f.write_all((vertex.to_str() + "\n").as_bytes()).map_err(|e| e.to_error_kind())?;
     }
 
     for i in 0..mesh.num_faces() {
-        let face = mesh.face_vertex_ids(i)?;
+        let face = mesh.face_vertex_ids(FId{val: i})?;
         f.write_all(("3 ".to_string() + &face.a.to_string() + " " + &face.b.to_string() + " " + &face.c.to_string() + "\n").as_bytes()).map_err(|e| e.to_error_kind())?;
     }
     Ok(())

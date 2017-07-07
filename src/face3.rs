@@ -16,24 +16,25 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! Face3, a face defined by 3 indices (e.g. used for Mesh)
 
 use std::fmt;
+use strong_types::*;
 
 #[derive (PartialEq, PartialOrd, Clone, Eq, Ord, Hash)]
 /// Face3, a face defined by 3 indices (e.g. used for Mesh)
 pub struct Face3 {
-    pub a: usize,
-    pub b: usize,
-    pub c: usize
+    pub a: VId,
+    pub b: VId,
+    pub c: VId
 }
 
 impl Face3 {
     /// Creates a new Face3 from 3 indices
-    pub fn new(a: usize, b: usize, c: usize) -> Self {
+    pub fn new(a: VId, b: VId, c: VId) -> Self {
         Face3 {a: a, b: b, c: c}
     }
 }
 
 impl fmt::Display for Face3 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({}, {}, {})", self.a, self.b, self.c)
+        write!(f, "({}, {}, {})", self.a.val, self.b.val, self.c.val)
     }
 }

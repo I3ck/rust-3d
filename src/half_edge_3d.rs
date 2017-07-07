@@ -47,16 +47,16 @@ impl HalfEdge3D {
         let mut vertices_start_edges = Vec::new();
 
         for i in 0..n_faces {
-            match mesh.face_vertex_ids(i) {
+            match mesh.face_vertex_ids(FId{val: i}) {
                 Err(_) => {},
                 Ok(face) => {
-                    edges.push(Edge{tail: VId{val: face.a}, twin: None});
-                    edges.push(Edge{tail: VId{val: face.b}, twin: None});
-                    edges.push(Edge{tail: VId{val: face.c}, twin: None});
+                    edges.push(Edge{tail: face.a, twin: None});
+                    edges.push(Edge{tail: face.b, twin: None});
+                    edges.push(Edge{tail: face.c, twin: None});
 
-                    Self::safe_append_at(&mut vertices_start_edges, face.a, EId{val: i*3 + 0});
-                    Self::safe_append_at(&mut vertices_start_edges, face.b, EId{val: i*3 + 1});
-                    Self::safe_append_at(&mut vertices_start_edges, face.c, EId{val: i*3 + 2});
+                    Self::safe_append_at(&mut vertices_start_edges, face.a.val, EId{val: i*3 + 0});
+                    Self::safe_append_at(&mut vertices_start_edges, face.b.val, EId{val: i*3 + 1});
+                    Self::safe_append_at(&mut vertices_start_edges, face.c.val, EId{val: i*3 + 2});
                 }
             }
         }
@@ -79,19 +79,6 @@ impl HalfEdge3D {
         }
         result
     }
-
-    fn safe_append_at<T>(vec: &mut Vec<Vec<T>>, i: usize, val: T) where
-        T: Clone {
-
-        if i >= vec.len() {
-            vec.resize(i+1, Vec::new());
-        }
-
-        vec[i].push(val);
-    }
-
-
-
     /// Returns the ID of the vertex the edge originates from (error if id out of bounds)
     pub fn tail(&self, id: EId) -> Result<VId> {
         self.ensure_edge_id(id)?;
@@ -175,17 +162,27 @@ impl HalfEdge3D {
     }
     /// Fails if the edge ID is out of bounds
     fn ensure_edge_id(&self, id: EId) -> Result<()> {
-        if id.val >= self.edges.len() { //@todo could cache len later if edges never changes
+        if id.val >= self.edges.len() {
             return Err(ErrorKind::IncorrectEdgeID);
         }
         Ok(())
     }
     /// Fails if the vertex ID is out of bounds
     fn ensure_vertex_id(&self, id: VId) -> Result<()> {
-        if id.val >= self.vertices_start_edges.len() { //@todo could cache len later if never changes
+        if id.val >= self.vertices_start_edges.len() {
             return Err(ErrorKind::IncorrectVertexID);
         }
         Ok(())
+    }
+    /// Allows random adds anywhere on the Vec<Vec> by automatically resizing it with empty vectors
+    fn safe_append_at<T>(vec: &mut Vec<Vec<T>>, i: usize, val: T) where
+        T: Clone {
+
+        if i >= vec.len() {
+            vec.resize(i+1, Vec::new());
+        }
+
+        vec[i].push(val);
     }
 }
 

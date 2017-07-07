@@ -15,20 +15,41 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Containing strong type definitions for safer usage
 
-#[derive (Clone, Copy, PartialEq, Eq)]
+use std::fmt;
+
+//@todo write macro for these
+
+#[derive (Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Vertex ID
 pub struct VId {
     pub val: usize
 }
 
-#[derive (Clone, Copy, PartialEq, Eq)]
+impl fmt::Display for VId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.val)
+    }
+}
+
+#[derive (Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Face ID
 pub struct FId {
     pub val: usize
 }
 
-#[derive (Clone, Copy, PartialEq, Eq)]
+impl fmt::Display for FId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.val)
+    }
+}
+
+#[derive (Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Edge ID
 pub struct EId {
     pub val: usize
+}
+impl fmt::Display for EId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.val)
+    }
 }

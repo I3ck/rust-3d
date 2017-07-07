@@ -15,6 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsMesh3D trait used for meshes in 3D space
 
+use strong_types::*;
 use result::*;
 use face3::*;
 use traits::is_buildable_3d::*;
@@ -30,14 +31,14 @@ pub trait IsMesh3D<P> where
     /// Should return the number of vertices within the mesh
     fn num_vertices(&self) -> usize;
     /// Should return the ids of vertices of the given face
-    fn face_vertex_ids(&self, faceid: usize) -> Result<Face3>;
+    fn face_vertex_ids(&self, faceid: FId) -> Result<Face3>;
     /// Should return the vertices of the given face
-    fn face_vertices(&self, faceid: usize) -> Result<(P, P, P)>;
+    fn face_vertices(&self, faceid: FId) -> Result<(P, P, P)>;
     /// Should return the vertex with the given id
-    fn vertex(&self, vertexid: usize) -> Result<P>;
+    fn vertex(&self, vertexid: VId) -> Result<P>;
 
     /// Returns the normal of a face
-    fn face_normal(&self, faceid: usize) -> Result<Norm3D> {
+    fn face_normal(&self, faceid: FId) -> Result<Norm3D> {
         let (v1, v2, v3) = self.face_vertices(faceid)?;
 
         let v12 = conn(&v1, &v2);

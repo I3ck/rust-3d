@@ -15,6 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Mesh3D, a mesh with tri-faces within 3D space
 
+use strong_types::*;
 use result::*;
 use face3::*;
 use traits::is_mesh_3d::*;
@@ -35,7 +36,7 @@ pub struct Mesh3D<P> where
 
     //@todo not pub
     pub pc: PointCloud3D<P>,
-    pub topology: Vec<usize> //@todo use Vec<Face3> instead?
+    pub topology: Vec<VId>
 }
 
 impl<P> IsMesh3D<P> for Mesh3D<P> where
@@ -49,10 +50,10 @@ impl<P> IsMesh3D<P> for Mesh3D<P> where
         self.pc.len()
     }
 
-    fn face_vertex_ids(&self, faceid: usize) -> Result<Face3> {
-        let id1 = 3*faceid + 0;
-        let id2 = 3*faceid + 1;
-        let id3 = 3*faceid + 2;
+    fn face_vertex_ids(&self, faceid: FId) -> Result<Face3> {
+        let id1 = 3*faceid.val + 0;
+        let id2 = 3*faceid.val + 1;
+        let id3 = 3*faceid.val + 2;
 
         if id3 >= self.topology.len() {
             return Err(ErrorKind::IncorrectFaceID);
@@ -61,7 +62,7 @@ impl<P> IsMesh3D<P> for Mesh3D<P> where
         Ok(Face3::new(self.topology[id1], self.topology[id2], self.topology[id3]))
     }
 
-    fn face_vertices(&self, faceid: usize) -> Result<(P, P, P)> {
+    fn face_vertices(&self, faceid: FId) -> Result<(P, P, P)> {
         let face = self.face_vertex_ids(faceid)?;
         if let (Ok(v1), Ok(v2), Ok(v3)) = (self.vertex(face.a), self.vertex(face.b), self.vertex(face.c)) {
             return Ok((v1, v2, v3));
@@ -69,40 +70,40 @@ impl<P> IsMesh3D<P> for Mesh3D<P> where
         Err(ErrorKind::IncorrectVertexID)
     }
 
-    fn vertex(&self, vertexid: usize) -> Result<P> {
-        if vertexid >= self.pc.len() {
+    fn vertex(&self, vertexid: VId) -> Result<P> {
+        if vertexid.val >= self.pc.len() {
             return Err(ErrorKind::IncorrectVertexID);
         }
-        Ok(*self.pc.data[vertexid].clone())
+        Ok(*self.pc.data[vertexid.val].clone())
     }
 }
 
 impl<P> IsEditableMesh3D<P> for Mesh3D<P> where
     P: IsEditable3D + IsBuildable3D + Clone {
 
-    fn add_vertex(&mut self, vertex: P) -> usize {
+    fn add_vertex(&mut self, vertex: P) -> VId {
         self.pc.push(vertex);
-        self.pc.len() - 1
+        VId{val: self.pc.len() - 1}
     }
 
-    fn add_face(&mut self, v1: P, v2: P, v3: P) -> usize {
+    fn add_face(&mut self, v1: P, v2: P, v3: P) -> FId {
         let vid1 = self.add_vertex(v1);
         let vid2 = self.add_vertex(v2);
         let vid3 = self.add_vertex(v3);
         self.topology.push(vid1);
         self.topology.push(vid2);
         self.topology.push(vid3);
-        self.topology.len() / 3 - 1
+        FId{val: self.topology.len() / 3 - 1}
     }
 
-    fn try_add_connection(&mut self, vid1: usize, vid2: usize, vid3: usize) -> Result<usize> {
-        if vid1 >= self.pc.len() || vid2 >= self.pc.len() || vid3 >= self.pc.len() || vid1 == vid2 || vid1 == vid3 || vid2 == vid3 {
+    fn try_add_connection(&mut self, vid1: VId, vid2: VId, vid3: VId) -> Result<FId> {
+        if vid1.val >= self.pc.len() || vid2.val >= self.pc.len() || vid3.val >= self.pc.len() || vid1 == vid2 || vid1 == vid3 || vid2 == vid3 {
             return Err(ErrorKind::IncorrectVertexID);
         }
         self.topology.push(vid1);
         self.topology.push(vid2);
         self.topology.push(vid3);
-        Ok(self.topology.len() / 3 - 1)
+        Ok(FId{val: self.topology.len() / 3 - 1})
     }
 }
 
