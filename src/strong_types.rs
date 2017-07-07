@@ -15,19 +15,19 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Containing strong type definitions for safer usage
 
-#[derive (Clone, Copy)]
+#[derive (Clone, Copy, PartialEq, Eq)]
 /// Vertex ID
 pub struct VId {
     pub val: usize
 }
 
-#[derive (Clone, Copy)]
+#[derive (Clone, Copy, PartialEq, Eq)]
 /// Face ID
 pub struct FId {
     pub val: usize
 }
 
-#[derive (Clone, Copy)]
+#[derive (Clone, Copy, PartialEq, Eq)]
 /// Edge ID
 pub struct EId {
     pub val: usize

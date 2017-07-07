@@ -17,6 +17,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use result::*;
 use strong_types::*;
+use traits::is_mesh_3d::*;
+use traits::is_buildable_3d::*;
 
 /// Edge type used within the HalfEdge3D
 struct Edge {
@@ -32,6 +34,64 @@ pub struct HalfEdge3D {
 
 
 impl HalfEdge3D {
+    /// Creates a new HalfEdge3D for the given IsMesh3D
+    /// This only stays valid if IMesh3D is not changed after creation
+    /// The mesh must be manifold (@todo ensure via types?)
+    pub fn new<P, M>(mesh: &M) -> Self where
+        M: IsMesh3D<P>,
+        P: IsBuildable3D {
+
+        let n_faces = mesh.num_faces();
+
+        let mut edges = Vec::with_capacity(3 * n_faces);
+        let mut vertices_start_edges = Vec::new();
+
+        for i in 0..n_faces {
+            match mesh.face_vertex_ids(i) {
+                Err(_) => {},
+                Ok(face) => {
+                    edges.push(Edge{tail: VId{val: face.a}, twin: None});
+                    edges.push(Edge{tail: VId{val: face.b}, twin: None});
+                    edges.push(Edge{tail: VId{val: face.c}, twin: None});
+
+                    Self::safe_append_at(&mut vertices_start_edges, face.a, EId{val: i*3 + 0});
+                    Self::safe_append_at(&mut vertices_start_edges, face.b, EId{val: i*3 + 1});
+                    Self::safe_append_at(&mut vertices_start_edges, face.c, EId{val: i*3 + 2});
+                }
+            }
+        }
+
+        let mut result = HalfEdge3D{edges: edges , vertices_start_edges: vertices_start_edges };
+
+        // For each edge, get tail of next
+        // Of this get all edges originating
+        // Of these the one where next has the same tail must be the twin
+        // @todo could let this fail if there is more than one valid candidate (not manifold)
+        for i in 0..result.edges.len() {
+            let _ = result.next(EId{val: i})
+                .and_then(|next_id| result.edges_originating(result.edges[next_id.val].tail))
+                .map(|originating_ids| for originating_id in originating_ids {
+                    let _ = result.next(originating_id)
+                        .map(|candidate_id| if result.edges[candidate_id.val].tail == result.edges[i].tail {
+                            result.edges[i].twin = Some(candidate_id)
+                        });
+                });
+        }
+        result
+    }
+
+    fn safe_append_at<T>(vec: &mut Vec<Vec<T>>, i: usize, val: T) where
+        T: Clone {
+
+        if i >= vec.len() {
+            vec.resize(i+1, Vec::new());
+        }
+
+        vec[i].push(val);
+    }
+
+
+
     /// Returns the ID of the vertex the edge originates from (error if id out of bounds)
     pub fn tail(&self, id: EId) -> Result<VId> {
         self.ensure_edge_id(id)?;
