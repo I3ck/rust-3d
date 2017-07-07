@@ -10,6 +10,8 @@ some Hash impls might lose precision
 
 many more distance functions
 
+strong types for ids (see especially Mesh / HalfEdge)
+
 new / default for line, ray, line segment
 
 line primitive / is_line_2d/3d

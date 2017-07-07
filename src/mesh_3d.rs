@@ -33,8 +33,9 @@ use traits::is_random_accessible::*;
 pub struct Mesh3D<P> where
     P: Is3D {
 
+    //@todo not pub
     pub pc: PointCloud3D<P>,
-    pub topology: Vec<usize>
+    pub topology: Vec<usize> //@todo use Vec<Face3> instead?
 }
 
 impl<P> IsMesh3D<P> for Mesh3D<P> where
