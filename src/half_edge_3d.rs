@@ -35,7 +35,7 @@ impl HalfEdge3D {
     /// Returns the ID of the vertex the edge originates from (error if id out of bounds)
     pub fn tail(&self, id: EId) -> Result<VId> {
         self.ensure_edge_id(id)?;
-        Ok(self.edges[id.val].tail.clone())
+        Ok(self.edges[id.val].tail)
     }
     /// Returns the ID of the face the edge belongs to (error if id out of bounds)
     pub fn face(&self, id: EId) -> Result<FId> {
@@ -116,14 +116,14 @@ impl HalfEdge3D {
     /// Fails if the edge ID is out of bounds
     fn ensure_edge_id(&self, id: EId) -> Result<()> {
         if id.val >= self.edges.len() { //@todo could cache len later if edges never changes
-            return Err(ErrorKind::IncorrectFaceID); //@todo IncorrectEdgeID
+            return Err(ErrorKind::IncorrectEdgeID);
         }
         Ok(())
     }
     /// Fails if the vertex ID is out of bounds
     fn ensure_vertex_id(&self, id: VId) -> Result<()> {
         if id.val >= self.vertices_start_edges.len() { //@todo could cache len later if never changes
-            return Err(ErrorKind::IncorrectFaceID); //@todo IncorrectVId
+            return Err(ErrorKind::IncorrectVertexID);
         }
         Ok(())
     }
