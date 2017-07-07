@@ -12,7 +12,7 @@ many more distance functions
 
 strong types for ids (see especially Mesh / HalfEdge)
 
-use strong types also for mesh
+mesh trait could be defined in general (non-3d) and have another trait for the 3D version
 
 new / default for line, ray, line segment
 

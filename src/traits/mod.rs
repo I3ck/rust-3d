@@ -33,6 +33,7 @@ pub mod is_random_insertible;
 pub mod is_editable_mesh_3d;
 pub mod is_kd_tree_3d;
 pub mod is_mesh_3d;
+pub mod is_searchable_mesh_3d;
 pub mod is_movable_2d;
 pub mod is_movable_3d;
 pub mod is_normalized_2d;
