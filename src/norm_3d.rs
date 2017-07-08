@@ -17,12 +17,14 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
+use std::ops::{Mul};
 
 use result::*;
 use point_3d::*;
 use traits::is_nd::*;
 use traits::is_3d::*;
 use traits::is_normalized_3d::*;
+use traits::is_buildable_3d::*;
 use distances_3d::*;
 
 #[derive (PartialEq, PartialOrd)]
@@ -57,6 +59,14 @@ impl Clone for Norm3D {
             y: self.y,
             z: self.z
         }
+    }
+}
+
+impl Mul<f64> for Norm3D {
+    type Output = Point3D; //@todo could later be another type
+
+    fn mul(self, other: f64) -> Point3D {
+        *Point3D::new(other * self.x, other * self.y, other * self.z)
     }
 }
 

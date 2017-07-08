@@ -17,12 +17,14 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
+use std::ops::{Mul};
 
 use result::*;
 use point_2d::*;
 use traits::is_nd::*;
 use traits::is_2d::*;
 use traits::is_normalized_2d::*;
+use traits::is_buildable_2d::*;
 use distances_2d::*;
 
 #[derive (PartialEq, PartialOrd)]
@@ -54,6 +56,14 @@ impl Clone for Norm2D {
             x: self.x,
             y: self.y
         }
+    }
+}
+
+impl Mul<f64> for Norm2D {
+    type Output = Point2D; //@todo could later be another type
+
+    fn mul(self, other: f64) -> Point2D {
+        *Point2D::new(other * self.x, other * self.y)
     }
 }
 
