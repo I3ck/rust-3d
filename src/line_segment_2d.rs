@@ -15,14 +15,16 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! LineSegment2D, a line segment within 2D space
 
-//@todo haslength
-//@todo has bounding box
-//@todo has center of gravity
-
 use std::fmt;
 
+use result::*;
 use traits::is_2d::*;
+use traits::has_length::*;
+use traits::has_bounding_box_2d::*;
+use traits::has_center_of_gravity_2d::*;
 use traits::is_movable_2d::*;
+use point_2d::*;
+use bounding_box_2d::*;
 
 use line_2d::*;
 use positive::*;
@@ -37,6 +39,27 @@ pub struct LineSegment2D {
 impl IsMovable2D for LineSegment2D {
     fn move_by(&mut self, x: f64, y: f64) {
         self.line.move_by(x, y);
+    }
+}
+
+impl HasLength for LineSegment2D {
+    fn length(&self) -> f64 {
+        self.length.get()
+    }
+}
+
+impl HasBoundingBox2D for LineSegment2D {
+    fn bounding_box(&self) -> Result<BoundingBox2D> {
+        let mut pts = Vec::new();
+        pts.push(Box::new(self.line.source.clone()));
+        pts.push(Box::new(self.line.source.clone() + self.line.dir.clone() * self.length.get()));
+        BoundingBox2D::from_iterator(pts.iter())
+    }
+}
+
+impl HasCenterOfGravity2D for LineSegment2D {
+    fn center_of_gravity(&self) -> Result<Point2D> {
+        Ok(self.line.source.clone() + self.line.dir.clone() * 0.5 * self.length.get())
     }
 }
 

@@ -32,6 +32,8 @@ derive where possible now (e.g. Point wasn't deriving Clone, others might be abl
 
 similar to distances, add intersections
 
+implement all operators for vec / pt etc. for both directions Mul<f64> for Foo , Mul<Foo> for f64
+
 the sort_x / y / z methods should always sort by the others as well
 so instead of Equal if x == x, compare y next
 (similar to return x < other.x || (x == other.x && y < other.y);)
