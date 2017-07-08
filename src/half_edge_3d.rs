@@ -161,14 +161,14 @@ impl HalfEdge3D {
         id.val % 3 == 2
     }
     /// Fails if the edge ID is out of bounds
-    fn ensure_edge_id(&self, id: EId) -> Result<()> {
+    pub fn ensure_edge_id(&self, id: EId) -> Result<()> {
         if id.val >= self.edges.len() {
             return Err(ErrorKind::IncorrectEdgeID);
         }
         Ok(())
     }
     /// Fails if the vertex ID is out of bounds
-    fn ensure_vertex_id(&self, id: VId) -> Result<()> {
+    pub fn ensure_vertex_id(&self, id: VId) -> Result<()> {
         if id.val >= self.vertices_start_edges.len() {
             return Err(ErrorKind::IncorrectVertexID);
         }

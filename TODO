@@ -14,6 +14,12 @@ strong types for ids (see especially Mesh / HalfEdge)
 
 mesh trait could be defined in general (non-3d) and have another trait for the 3D version
 
+mesh could implement center of gravity
+
+rename either the half edge or IsSearchableMesh methods, so the names match
+
+remove all files from src/ toplevel and add only use sub folder
+
 new / default for line, ray, line segment
 
 line primitive / is_line_2d/3d
