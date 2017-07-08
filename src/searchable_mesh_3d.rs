@@ -25,20 +25,20 @@ use traits::is_searchable_mesh_3d::*;
 use half_edge_3d::*;
 
 /// SearchableMesh3D, transforms IsMesh3D to IsSearchableMesh3D
-pub struct SearchableMesh3D<P> where
+pub struct SearchableMesh3D<'a, P> where
     P: Is3D {
 
-    mesh: Box<IsMesh3D<P>>,
+    mesh: Box<IsMesh3D<P> + 'a>,
     he: HalfEdge3D
 }
 
-impl<P> SearchableMesh3D<P> where
+impl<'a, P> SearchableMesh3D<'a, P> where
     P: IsBuildable3D {
     /// Creates a new SearchableMesh3D from an IsMesh3D
     /// This only stays valid if IMesh3D is not changed after creation
     /// The mesh must be manifold (@todo ensure via types?)
     pub fn new<M>(mesh: Box<M>) -> Self where
-        M: 'static + IsMesh3D<P> {
+        M: 'a + IsMesh3D<P> {
 
         let he = HalfEdge3D::new(&*mesh);
 
@@ -54,7 +54,7 @@ impl<P> SearchableMesh3D<P> where
     }
 }
 
-impl<P> IsMesh3D<P> for SearchableMesh3D<P> where
+impl<'a, P> IsMesh3D<P> for SearchableMesh3D<'a, P> where
     P: IsBuildable3D + Clone {
 
     fn num_faces(&self) -> usize {
@@ -78,7 +78,7 @@ impl<P> IsMesh3D<P> for SearchableMesh3D<P> where
     }
 }
 
-impl<P> IsSearchableMesh3D<P> for SearchableMesh3D<P> where
+impl<'a, P> IsSearchableMesh3D<P> for SearchableMesh3D<'a, P> where
     P: IsBuildable3D + Clone {
 
     fn num_edges(&self) -> usize {
