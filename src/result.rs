@@ -40,24 +40,25 @@ pub enum ErrorKind {
     NumberConversionError,
     NumberInWrongRange,
     ComparisionFailed,
-    //@todo ply ones as own enum?
-    PlyLoadError,
-    PlyLoadStartNotFound,
-    PlyLoadFormatNotFound,
-    PlyLoadWrongPropertyCount,
-    PlyLoadVertexIndexDefinitionNotFound,
-    PlyLoadHeaderEndNotFound,
-    PlyLoadVertexCountNotFound,
-    PlyLoadFaceCountNotFound,
-    PlyLoadVertexCountIncorrect,
-    PlyLoadVerticesIncorrect,
+    PlyError(PlyError)
+}
 
-
+pub enum PlyError {
+    LoadError,
+    LoadStartNotFound,
+    LoadFormatNotFound,
+    LoadWrongPropertyCount,
+    LoadVertexIndexDefinitionNotFound,
+    LoadHeaderEndNotFound,
+    LoadVertexCountNotFound,
+    LoadFaceCountNotFound,
+    LoadVertexCountIncorrect,
+    LoadVerticesIncorrect,
 }
 
 impl ErrorKind {
     /// Returns readable text for the ErrorKind
-    fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> &'static str {
         match *self {
             ErrorKind::MinMaxSwapped             => "Passed min/max values are swapped (min > max)",
             ErrorKind::MinMaxEqual               => "Passed min/max values are equal",
@@ -76,16 +77,25 @@ impl ErrorKind {
             ErrorKind::NumberConversionError     => "Failed converting one number type to another",
             ErrorKind::NumberInWrongRange        => "Passed number is within the wrong range",
             ErrorKind::ComparisionFailed         => "Comparision between two values failed",
-            ErrorKind::PlyLoadError                         => "Error while loading .ply",
-            ErrorKind::PlyLoadStartNotFound                 => "Start of .ply header not found",
-            ErrorKind::PlyLoadFormatNotFound                => "Format of .ply missing or not supported",
-            ErrorKind::PlyLoadWrongPropertyCount            => "Property count of .ply missing or not supported",
-            ErrorKind::PlyLoadVertexIndexDefinitionNotFound => "Index definition in .ply not found",
-            ErrorKind::PlyLoadHeaderEndNotFound             => "End of header definition of .ply not found",
-            ErrorKind::PlyLoadVertexCountNotFound           => "Vertex count of .ply not found",
-            ErrorKind::PlyLoadFaceCountNotFound             => "Face count of .ply not found",
-            ErrorKind::PlyLoadVertexCountIncorrect          => "Vertex count of .ply not found",
-            ErrorKind::PlyLoadVerticesIncorrect             => "Vertices in .ply incorrect"
+            ErrorKind::PlyError(ref x)           => x.as_str()
+        }
+    }
+}
+
+impl PlyError {
+    /// Returns readable text for the PlyError
+    pub fn as_str(&self) -> &'static str {
+        match *self {
+            PlyError::LoadError                 => "Error while loading .ply",
+            PlyError::LoadStartNotFound         => "Start of .ply header not found",
+            PlyError::LoadFormatNotFound        => "Format of .ply missing or not supported",
+            PlyError::LoadWrongPropertyCount    => "Property count of .ply missing or not supported",
+            PlyError::LoadVertexIndexDefinitionNotFound => "Index definition in .ply not found",
+            PlyError::LoadHeaderEndNotFound     => "End of header definition of .ply not found",
+            PlyError::LoadVertexCountNotFound   => "Vertex count of .ply not found",
+            PlyError::LoadFaceCountNotFound     => "Face count of .ply not found",
+            PlyError::LoadVertexCountIncorrect  => "Vertex count of .ply not found",
+            PlyError::LoadVerticesIncorrect     => "Vertices in .ply incorrect"
         }
     }
 }

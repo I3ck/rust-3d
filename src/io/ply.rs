@@ -91,7 +91,7 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
                         found_ply = true;
                         continue;
                     }
-                    return Err(ErrorKind::PlyLoadStartNotFound);
+                    return Err(ErrorKind::PlyError(PlyError::LoadStartNotFound));
                 }
 
                 if !format_found {
@@ -99,7 +99,7 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
                         format_found = true;
                         continue;
                     }
-                    return Err(ErrorKind::PlyLoadFormatNotFound);
+                    return Err(ErrorKind::PlyError(PlyError::LoadFormatNotFound));
                 }
 
                 if line.starts_with("comment") {
@@ -115,10 +115,10 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
                                     vertex_count = Some(usize::from_str(words[2]).map_err(|e| e.to_error_kind())?);
                                     continue;
                                 },
-                                _ => return Err(ErrorKind::PlyLoadError)
+                                _ => return Err(ErrorKind::PlyError(PlyError::LoadError))
                             }
                         }
-                        return Err(ErrorKind::PlyLoadError);
+                        return Err(ErrorKind::PlyError(PlyError::LoadError));
                     }
                     Some(_) => {}
                 }
@@ -129,7 +129,7 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
                 }
 
                 if counted_properties < 3 {
-                    return Err(ErrorKind::PlyLoadWrongPropertyCount);
+                    return Err(ErrorKind::PlyError(PlyError::LoadWrongPropertyCount));
                 }
 
                 match face_count {
@@ -141,10 +141,10 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
                                     face_count = Some(usize::from_str(words[2]).map_err(|e| e.to_error_kind())?);
                                     continue;
                                 },
-                                _ => return Err(ErrorKind::PlyLoadError)
+                                _ => return Err(ErrorKind::PlyError(PlyError::LoadError))
                             }
                         }
-                        return Err(ErrorKind::PlyLoadError);
+                        return Err(ErrorKind::PlyError(PlyError::LoadError));
                     }
                     Some(_) => {}
                 }
@@ -154,7 +154,7 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
                         vertex_indices_found = true;
                         continue;
                     }
-                    return Err(ErrorKind::PlyLoadVertexIndexDefinitionNotFound);
+                    return Err(ErrorKind::PlyError(PlyError::LoadVertexIndexDefinitionNotFound));
                 }
 
                 if !header_ended {
@@ -162,12 +162,12 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
                         header_ended = true;
                         continue;
                     }
-                    return Err(ErrorKind::PlyLoadHeaderEndNotFound);
+                    return Err(ErrorKind::PlyError(PlyError::LoadHeaderEndNotFound));
                 }
             }
 
             match vertex_count {
-                None => { return Err(ErrorKind::PlyLoadVertexCountNotFound); }
+                None => { return Err(ErrorKind::PlyError(PlyError::LoadVertexCountNotFound)); }
                 Some(x) => {
                     if x > vertices.len() {
                         let p = P::parse(line.to_string())?;
@@ -178,7 +178,7 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
             }
 
             match face_count {
-                None => { return Err(ErrorKind::PlyLoadFaceCountNotFound); }
+                None => { return Err(ErrorKind::PlyError(PlyError::LoadFaceCountNotFound)); }
                 Some(x) => {
                     if x > indices.len() / 3 {
                         collect_index_line(line, &mut indices)?;
@@ -189,10 +189,10 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
         }
 
         match vertex_count {
-            None => { return Err(ErrorKind::PlyLoadVertexCountNotFound); }
+            None => { return Err(ErrorKind::PlyError(PlyError::LoadVertexCountNotFound)); }
             Some(x) => {
                 if x != vertices.len() {
-                    return Err(ErrorKind::PlyLoadVertexCountIncorrect);
+                    return Err(ErrorKind::PlyError(PlyError::LoadVertexCountIncorrect));
                 }
             }
         }
@@ -213,7 +213,7 @@ fn collect_index_line(line: &str, indices: &mut Vec<usize>) -> Result<()> {
             indices.push(c);
             Ok(())
         },
-        _ => Err(ErrorKind::PlyLoadError)
+        _ => Err(ErrorKind::PlyError(PlyError::LoadError))
     }
 }
 
@@ -224,11 +224,11 @@ fn fill_mesh<EM, P>(vertices: &Vec<P>, indices: &Vec<usize>, mesh: &mut EM) -> R
     let n_vertices = vertices.len();
 
     if indices.len() == 0 {
-        return Err(ErrorKind::PlyLoadVerticesIncorrect);
+        return Err(ErrorKind::PlyError(PlyError::LoadVerticesIncorrect));
     }
 
     if indices.len() % 3 != 0 {
-        return Err(ErrorKind::PlyLoadVerticesIncorrect);
+        return Err(ErrorKind::PlyError(PlyError::LoadVerticesIncorrect));
     }
 
     for chunk in indices.chunks(3) {
@@ -236,10 +236,10 @@ fn fill_mesh<EM, P>(vertices: &Vec<P>, indices: &Vec<usize>, mesh: &mut EM) -> R
             if chunk[0] < n_vertices && chunk[1] < n_vertices && chunk[2] < n_vertices {
                 mesh.add_face(vertices[chunk[0]].clone(), vertices[chunk[1]].clone(), vertices[chunk[2]].clone());
             } else {
-                return Err(ErrorKind::PlyLoadVerticesIncorrect);
+                return Err(ErrorKind::PlyError(PlyError::LoadVerticesIncorrect));
             }
         } else {
-            return Err(ErrorKind::PlyLoadVerticesIncorrect);
+            return Err(ErrorKind::PlyError(PlyError::LoadVerticesIncorrect));
         }
     }
 
