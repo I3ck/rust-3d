@@ -52,7 +52,10 @@ impl<P> PointCloud2D<P> where
     pub fn new() -> PointCloud2D<P> {
         PointCloud2D{data: Vec::new()}
     }
-
+    /// Creates a new, empty point cloud with capacity
+    pub fn with_capacity(n: usize) -> PointCloud2D<P> {
+        PointCloud2D{data: Vec::with_capacity(n)}
+    }
     /// Serializes the point cloud
     pub fn to_str(&self) -> String {
         let mut result = String::new();
@@ -61,7 +64,6 @@ impl<P> PointCloud2D<P> where
         }
         result
     }
-
     /// Applies a function to each position
     pub fn for_each_point<F>(&mut self, mut f: F) where
         F: FnMut(&mut P) {
@@ -74,7 +76,6 @@ impl<P> PointCloud2D<P> where
 
 impl<P> PointCloud2D<P> where
     P: IsBuildable2D + Clone {
-
     /// Creates a new point cloud from an input string
     pub fn parse(text: String) -> Result<PointCloud2D<P>> {
         let lines = text.split("\n");
@@ -86,7 +87,6 @@ impl<P> PointCloud2D<P> where
         if pc.len() == 0 { return Err(ErrorKind::ParseError); }
         Ok(pc)
     }
-
     //@todo make trait?
     /// Appends all elements of an IsRandomAccessible
     pub fn append_ra<RA>(&mut self, ra: &RA) where
