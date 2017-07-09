@@ -80,7 +80,7 @@ pub fn ellipse<P>(center: &P, n_points: usize, ap: Positive, bp: Positive) -> Bo
     let p_dist = PI / (n_points - 1) as f64;
     let a = ap.get();
     let b = bp.get();
-    let angle: f64 = 0.0; //@todo as parameter? or just drop from formulas?
+    let angle: f64 = 0.0;
 
     for i in 0..n_points {
         let radians = (i as f64) * p_dist;

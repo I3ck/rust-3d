@@ -149,7 +149,7 @@ impl HasBoundingBox2D for FilterCircle {
     fn bounding_box(&self) -> Result<BoundingBox2D> {
         let p_min = *Point2D::new(self.center.x() - self.radius.get(), self.center.y() - self.radius.get());
         let p_max = *Point2D::new(self.center.x() + self.radius.get(), self.center.y() + self.radius.get());
-        BoundingBox2D::new(p_min, p_max)
+        BoundingBox2D::new(&p_min, &p_max)
     }
 }
 

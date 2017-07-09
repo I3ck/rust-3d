@@ -30,13 +30,16 @@ pub struct BoundingBox2D {
 
 impl BoundingBox2D {
     /// Creates a new BoundingBox2D with the given min and max positions
-    pub fn new(min: Point2D, max: Point2D) -> Result<BoundingBox2D> {
-        if min.x == max.x || min.y == max.y {
+    pub fn new<P1, P2>(min: &P1, max: &P2) -> Result<BoundingBox2D> where
+        P1: Is2D,
+        P2: Is2D {
+
+        if min.x() == max.x() || min.y() == max.y() {
             Err(ErrorKind::MinMaxEqual)
-        } else if min.x > max.x || min.y > max.y {
+        } else if min.x() > max.x() || min.y() > max.y() {
             Err(ErrorKind::MinMaxSwapped)
         } else {
-            Ok(BoundingBox2D{min: min, max: max})
+            Ok(BoundingBox2D{min: Point2D{x: min.x(), y: min.y()}, max: Point2D{x: max.x(), y: max.y()}})
         }
     }
     /// Creates a new BoundBox2D which contains all the given positions
@@ -67,7 +70,7 @@ impl BoundingBox2D {
             count += 1;
         }
         if count >= 2 {
-            Self::new(Point2D{x: minx, y: miny}, Point2D{x: maxx, y: maxy})
+            Self::new(&Point2D{x: minx, y: miny}, &Point2D{x: maxx, y: maxy})
         } else {
             Err(ErrorKind::TooFewPoints)
         }
@@ -125,6 +128,6 @@ impl BoundingBox2D {
 
 impl HasBoundingBox2D for BoundingBox2D {
     fn bounding_box(&self) -> Result<BoundingBox2D> {
-        BoundingBox2D::new(self.min.clone(), self.max.clone())
+        BoundingBox2D::new(&self.min, &self.max)
     }
 }

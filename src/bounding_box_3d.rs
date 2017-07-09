@@ -30,13 +30,16 @@ pub struct BoundingBox3D {
 
 impl BoundingBox3D {
     /// Creates a new BoundingBox3D with the given min and max positions
-    pub fn new(min: Point3D, max: Point3D) -> Result<BoundingBox3D> {
-        if min.x == max.x || min.y == max.y || min.z == max.z {
+    pub fn new<P1, P2>(min: &P1, max: &P2) -> Result<BoundingBox3D> where
+        P1: Is3D,
+        P2: Is3D {
+
+        if min.x() == max.x() || min.y() == max.y() || min.z() == max.z() {
             Err(ErrorKind::MinMaxEqual)
-        } else if min.x > max.x || min.y > max.y || min.z > max.z {
+        } else if min.x() > max.x() || min.y() > max.y() || min.z() > max.z() {
             Err(ErrorKind::MinMaxSwapped)
         } else {
-            Ok(BoundingBox3D{min: min, max: max})
+            Ok(BoundingBox3D{min: Point3D{x: min.x(), y: min.y(), z: min.z()}, max: Point3D{x: max.x(), y: max.y(), z: max.z()}})
         }
     }
     /// Creates a new BoundBox3D which contains all the given positions
@@ -73,7 +76,7 @@ impl BoundingBox3D {
             count += 1;
         }
         if count >= 2 {
-            Self::new(Point3D{x: minx, y: miny, z: minz}, Point3D{x: maxx, y: maxy, z: maxz})
+            Self::new(&Point3D{x: minx, y: miny, z: minz}, &Point3D{x: maxx, y: maxy, z: maxz})
         } else {
             Err(ErrorKind::TooFewPoints)
         }
@@ -143,6 +146,6 @@ impl BoundingBox3D {
 
 impl HasBoundingBox3D for BoundingBox3D {
     fn bounding_box(&self) -> Result<BoundingBox3D> {
-        BoundingBox3D::new(self.min.clone(), self.max.clone())
+        BoundingBox3D::new(&self.min, &self.max)
     }
 }

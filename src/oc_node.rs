@@ -23,8 +23,9 @@ use traits::is_buildable_3d::*;
 use traits::is_editable_3d::*;
 use traits::has_center_of_gravity_3d::*;
 use traits::is_random_insertible::*;
-use point_cloud_3d::{PointCloud3D};
-use functions::{center, in_bb};
+use bounding_box_3d::*;
+use point_cloud_3d::*;
+use functions::{center};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
 //@todo make all private or document
 
@@ -127,6 +128,15 @@ fn collect_center_or_all<P>(n: &OcNode<P>, only_collect_centers: bool, depth: i8
         }
     } else {
         n.collect(depth+1, maxdepth, pc);
+    }
+}
+
+fn in_bb<P>(p: &P, min: &P, max: &P) -> bool where
+    P: Is3D {
+
+    match BoundingBox3D::new(min, max) {
+        Err(_) => return false,
+        Ok(x) => return x.contains(p)
     }
 }
 

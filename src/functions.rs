@@ -171,15 +171,6 @@ pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, Point
     (pc_3d_a, pc_3d_b)
 }
 
-/// Checks whether a point is within a bounding box
-pub fn in_bb<P>(p: &P, min: &P, max: &P) -> bool where //@todo duplicate
-    P: Is3D {
-
-    p.x() >= min.x() && p.x() <= max.x() &&
-    p.y() >= min.y() && p.y() <= max.y() &&
-    p.z() >= min.z() && p.z() <= max.z()
-}
-
 //@todo rename or overload operators
 //@todo implement for 2D aswell, maybe move to traits
 /// Calculates the vector between two positions

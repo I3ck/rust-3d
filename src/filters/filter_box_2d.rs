@@ -154,7 +154,7 @@ impl HasBoundingBox2D for FilterBox2D {
     fn bounding_box(&self) -> Result<BoundingBox2D> {
         let p_min = *Point2D::new(self.center.x() - self.size_x.get() / 2.0, self.center.y() - self.size_y.get() / 2.0);
         let p_max = *Point2D::new(self.center.x() + self.size_x.get() / 2.0, self.center.y() + self.size_y.get() / 2.0);
-        BoundingBox2D::new(p_min, p_max)
+        BoundingBox2D::new(&p_min, &p_max)
     }
 }
 

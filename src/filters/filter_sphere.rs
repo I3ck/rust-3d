@@ -159,7 +159,7 @@ impl HasBoundingBox3D for FilterSphere {
     fn bounding_box(&self) -> Result<BoundingBox3D> {
         let p_min = *Point3D::new(self.center.x() - self.radius.get(), self.center.y() - self.radius.get(), self.center.z() - self.radius.get());
         let p_max = *Point3D::new(self.center.x() + self.radius.get(), self.center.y() + self.radius.get(), self.center.z() + self.radius.get());
-        BoundingBox3D::new(p_min, p_max)
+        BoundingBox3D::new(&p_min, &p_max)
     }
 }
 

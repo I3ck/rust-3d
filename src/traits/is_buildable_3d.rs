@@ -40,7 +40,6 @@ pub trait IsBuildable3D :
     fn from<P>(&mut self, other: P) where
         P: Is3D;
 
-    //@todo return new or alter self???
     /// Applies a matrix to this
     fn multiply_m(&self, m: &Matrix4) -> Box<Self> {
         let mut result_x = 0.0;

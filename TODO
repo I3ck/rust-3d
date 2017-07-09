@@ -16,6 +16,8 @@ remove all files from src/ toplevel and add only use sub folder
 
 new / default for line, ray, line segment
 
+matrix multiplication -> Mul
+
 distance methods for ray line line segment
 
 derive where possible now (e.g. Point wasn't deriving Clone, others might be able to derive Eq e.g.)
