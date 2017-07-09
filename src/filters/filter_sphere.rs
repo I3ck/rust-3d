@@ -76,13 +76,8 @@ impl IsND for FilterSphere {
         3
     }
 
-    fn get_position(&self, dimension: usize) -> Result<f64> { //@todo here and for many others could be reworked to simply return get_position of center
-        match dimension {
-            0 => Ok(self.center.x()),
-            1 => Ok(self.center.y()),
-            2 => Ok(self.center.z()),
-            _ => Err(ErrorKind::IncorrectDimension)
-        }
+    fn get_position(&self, dimension: usize) -> Result<f64> {
+        self.center.get_position(dimension)
     }
 }
 

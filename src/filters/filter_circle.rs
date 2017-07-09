@@ -77,11 +77,7 @@ impl IsND for FilterCircle {
     }
 
     fn get_position(&self, dimension: usize) -> Result<f64> {
-        match dimension {
-            0 => Ok(self.center.x()),
-            1 => Ok(self.center.y()),
-            _ => Err(ErrorKind::IncorrectDimension)
-        }
+        self.center.get_position(dimension)
     }
 }
 
