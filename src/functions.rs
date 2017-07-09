@@ -13,7 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! utiliy functions
+//! utility functions
 
 use std::cmp::Ordering;
 

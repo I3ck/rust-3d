@@ -22,6 +22,7 @@ use result::*;
 use traits::is_buildable_3d::*;
 use traits::is_mesh_3d::*;
 use traits::is_editable_mesh_3d::*;
+use utils::to_words;
 
 use self::core::str::FromStr;
 use std::io::prelude::*;
@@ -198,12 +199,6 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
 
         fill_mesh(&vertices, &indices, mesh)
     }
-
-//@todo docs and to utils?
-fn to_words(line: &str) -> Vec<&str> {
-    let split = line.trim().split(" ");
-    split.collect::<Vec<&str>>()
-}
 
 fn collect_index_line(line: &str, indices: &mut Vec<usize>) -> Result<()> {
     let words = to_words(line);

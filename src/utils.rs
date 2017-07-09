@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Martin Buck
+Copyright 2017 Martin Buck
 This file is part of rust-3d.
 rust-3d is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -13,10 +13,22 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! IsMovable2D trait used for types within 2D space which can be moved
+//! internal utility functions
 
-/// IsMovable2D is a trait used for types within 2D space which can be moved
-pub trait IsMovable2D {
-    /// Should move the object by the given offset
-    fn move_by(&mut self, x: f64, y: f64);
+/// Splits a line into a Vec of its words
+pub fn to_words(line: &str) -> Vec<&str> {
+    let split = line.trim().split(" ");
+    split.collect::<Vec<&str>>()
 }
+
+/// Allows random adds anywhere on the Vec<Vec> by automatically resizing it with empty vectors
+pub fn safe_append_at<T>(vec: &mut Vec<Vec<T>>, i: usize, val: T) where
+    T: Clone {
+
+    if i >= vec.len() {
+        vec.resize(i+1, Vec::new());
+    }
+
+    vec[i].push(val);
+}
+

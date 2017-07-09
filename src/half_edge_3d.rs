@@ -19,6 +19,7 @@ use result::*;
 use strong_types::*;
 use traits::is_mesh_3d::*;
 use traits::is_buildable_3d::*;
+use utils::safe_append_at;
 
 /// Edge type used within the HalfEdge3D
 struct Edge {
@@ -54,9 +55,9 @@ impl HalfEdge3D {
                     edges.push(Edge{tail: face.b, twin: None});
                     edges.push(Edge{tail: face.c, twin: None});
 
-                    Self::safe_append_at(&mut vertices_start_edges, face.a.val, EId{val: i*3 + 0});
-                    Self::safe_append_at(&mut vertices_start_edges, face.b.val, EId{val: i*3 + 1});
-                    Self::safe_append_at(&mut vertices_start_edges, face.c.val, EId{val: i*3 + 2});
+                    safe_append_at(&mut vertices_start_edges, face.a.val, EId{val: i*3 + 0});
+                    safe_append_at(&mut vertices_start_edges, face.b.val, EId{val: i*3 + 1});
+                    safe_append_at(&mut vertices_start_edges, face.c.val, EId{val: i*3 + 2});
                 }
             }
         }
@@ -173,16 +174,6 @@ impl HalfEdge3D {
             return Err(ErrorKind::IncorrectVertexID);
         }
         Ok(())
-    }
-    /// Allows random adds anywhere on the Vec<Vec> by automatically resizing it with empty vectors
-    fn safe_append_at<T>(vec: &mut Vec<Vec<T>>, i: usize, val: T) where
-        T: Clone {
-
-        if i >= vec.len() {
-            vec.resize(i+1, Vec::new());
-        }
-
-        vec[i].push(val);
     }
 }
 
