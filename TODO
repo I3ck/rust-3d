@@ -28,10 +28,6 @@ distance methods for ray line line segment
 
 tests for ray line line segment
 
-strong types for radians / degree
-
-macro for strong types
-
 derive where possible now (e.g. Point wasn't deriving Clone, others might be able to derive Eq e.g.)
 
 similar to distances, add intersections

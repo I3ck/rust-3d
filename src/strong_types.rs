@@ -17,39 +17,37 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::fmt;
 
-//@todo write macro for these
-
-#[derive (Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-/// Vertex ID
-pub struct VId {
-    pub val: usize
+macro_rules! strong_usize {
+    ($NEW_NAME:ident) => (
+        #[derive (Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        pub struct $NEW_NAME {
+            pub val: usize
+        }
+        impl fmt::Display for $NEW_NAME {
+            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                write!(f, "{}", self.val)
+            }
+        }
+    )
 }
 
-impl fmt::Display for VId {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.val)
-    }
+macro_rules! strong_f64 {
+    ($NEW_NAME:ident) => (
+        #[derive (Clone, Copy, PartialEq)]
+        pub struct $NEW_NAME {
+            pub val: f64
+        }
+        impl fmt::Display for $NEW_NAME {
+            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                write!(f, "{}", self.val)
+            }
+        }
+    )
 }
 
-#[derive (Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-/// Face ID
-pub struct FId {
-    pub val: usize
-}
+strong_usize!(VId);
+strong_usize!(FId);
+strong_usize!(EId);
 
-impl fmt::Display for FId {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.val)
-    }
-}
-
-#[derive (Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-/// Edge ID
-pub struct EId {
-    pub val: usize
-}
-impl fmt::Display for EId {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.val)
-    }
-}
+strong_f64!(Deg);
+strong_f64!(Rad);
