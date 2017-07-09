@@ -23,11 +23,7 @@ use traits::is_buildable_2d::*;
 use traits::is_random_insertible::*;
 
 //@todo entire file has to be added to tests
-//@todo add some type level checks like diameter > 0 etc., or return Option types (similar to flaggedT?)
 //@todo define trait for pc2d factories, later for 3d as well
-//@todo remove center as param and create all around origin
-//@todo correct reserving
-//@todo order parameters (e.g. center and n_points always first)
 
 /// Creates a 2D rectangle from given center width and height
 pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> Box<PointCloud2D<P>> where
@@ -44,7 +40,7 @@ pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> Box<PointC
 }
 
 /// Creates a involut circle with the given center, diameter, resolution and start and end angles in radians
-pub fn involut_circle<P>(center: &P, diameter: Positive, n_points: usize, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
+pub fn involut_circle<P>(center: &P, n_points: usize, diameter: Positive, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
     let mut pc = PointCloud2D::with_capacity(n_points);
@@ -60,7 +56,7 @@ pub fn involut_circle<P>(center: &P, diameter: Positive, n_points: usize, radian
 }
 
 /// Creates an arc with the given center, diameter, resolution and start and end angles in radians
-pub fn arc<P>(center: &P, diameter: Positive, n_points: usize, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
+pub fn arc<P>(center: &P, n_points: usize, diameter: Positive, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
     let mut pc = PointCloud2D::with_capacity(n_points);
@@ -76,7 +72,7 @@ pub fn arc<P>(center: &P, diameter: Positive, n_points: usize, radians_start: f6
 }
 
 /// Creates an ellipse with the given center, a, b and resolution
-pub fn ellipse<P>(center: &P, ap: Positive, bp: Positive, n_points: usize) -> Box<PointCloud2D<P>> where
+pub fn ellipse<P>(center: &P, n_points: usize, ap: Positive, bp: Positive) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
     let mut pc = PointCloud2D::with_capacity(n_points);
