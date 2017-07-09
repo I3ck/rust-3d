@@ -15,6 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Is2D trait used for types which are positioned within the 2D space
 
+use strong_types::*;
 use traits::is_nd::*;
 
 /// Is2D is a trait used for types which are positioned within the 2D space
@@ -28,27 +29,22 @@ pub trait Is2D : IsND {
     fn pos(&self) -> (f64, f64) {
         ( self.x(), self.y() )
     }
-
     /// Calculates the dot product with another Is2D
     fn dot(&self, other: &Is2D) -> f64 {
         self.x() * other.x() + self.y() * other.y()
     }
-
     /// Calculates the cross product with another Is2D
     fn cross(&self, other: &Is2D) -> f64 {
         self.x() * other.y() - self.y() * other.x()
     }
-
     /// The absolute / length of this position
     fn abs(&self) -> f64 {
         ((self.x()).powi(2) + (self.y()).powi(2)).sqrt()
     }
-
     /// Calculates the angle to the other Is2D in radians
-    fn rad_to(&self, other: &Is2D) -> f64 {
-        (other.y() - self.y()).atan2(other.x() - self.x())
+    fn rad_to(&self, other: &Is2D) -> Rad {
+        Rad{val: (other.y() - self.y()).atan2(other.x() - self.x())}
     }
-
     /// Transforms the position in a "x y" string. E.g. "3.72 5.99"
     fn to_str(&self) -> String {
         let sx: String = self.x().to_string();

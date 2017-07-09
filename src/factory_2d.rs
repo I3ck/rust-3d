@@ -17,6 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::f64::consts::PI;
 
+use strong_types::*;
 use positive::*;
 use point_cloud_2d::*;
 use traits::is_buildable_2d::*;
@@ -40,12 +41,12 @@ pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> Box<PointC
 }
 
 /// Creates a involut circle with the given center, diameter, resolution and start and end angles in radians
-pub fn involut_circle<P>(center: &P, n_points: usize, diameter: Positive, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
+pub fn involut_circle<P>(center: &P, n_points: usize, diameter: Positive, start: Rad, end: Rad) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
     let mut pc = PointCloud2D::with_capacity(n_points);
     let d = diameter.get();
-    let p_dist = (radians_end - radians_start).abs() / (n_points - 1) as f64;
+    let p_dist = (end.val - start.val).abs() / (n_points - 1) as f64;
 
     for i in 0..n_points {
         let current = (i as f64) * p_dist;
@@ -56,15 +57,15 @@ pub fn involut_circle<P>(center: &P, n_points: usize, diameter: Positive, radian
 }
 
 /// Creates an arc with the given center, diameter, resolution and start and end angles in radians
-pub fn arc<P>(center: &P, n_points: usize, diameter: Positive, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
+pub fn arc<P>(center: &P, n_points: usize, diameter: Positive, start: Rad, end: Rad) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
     let mut pc = PointCloud2D::with_capacity(n_points);
     let d = diameter.get();
-    let p_dist = (radians_end - radians_start).abs() / (n_points - 1) as f64;
+    let p_dist = (end.val - start.val).abs() / (n_points - 1) as f64;
 
     for i in 0..n_points {
-        let radians = radians_start + (i as f64) * p_dist;
+        let radians = start.val + (i as f64) * p_dist;
         pc.push(*P::new(center.x() + d/2.0 * radians.cos(),
                         center.y() + d/2.0 * radians.sin()));
     }

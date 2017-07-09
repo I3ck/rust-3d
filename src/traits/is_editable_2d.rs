@@ -15,6 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsEditable2D trait used for types which are positioned in 2D space and their position can be changed
 
+use strong_types::*;
 use traits::is_2d::*;
 use traits::is_editable_nd::*;
 
@@ -60,9 +61,10 @@ pub trait IsEditable2D : Is2D + IsEditableND {
     }
 
     /// Rotates the position around a center ccw for rad radians
-    fn rotate<P>(&mut self, rad: f64, center: &P) where
+    fn rotate<P>(&mut self, r: Rad, center: &P) where
         P: Is2D {
 
+        let rad = r.val;
         let newx = center.x() + rad.cos() * (self.x() - center.x()) - rad.sin() * (self.y() - center.y());
         let newy = center.y() + rad.sin() * (self.x() - center.x()) + rad.cos() * (self.y() - center.y());
 

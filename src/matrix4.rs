@@ -15,6 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Matrix4, a matrix with 4 rows and columns
 
+use strong_types::*;
 use result::*;
 use point_3d::*;
 use traits::is_3d::*;
@@ -64,8 +65,9 @@ impl Matrix4 {
     }
 
     /// Creates a new matrix which applies rotation
-    pub fn rotation(rad_x: f64, rad_y: f64, rad_z: f64) -> Matrix4 {
+    pub fn rotation(x: Rad, y: Rad, z: Rad) -> Matrix4 {
         let (mut mx, mut my, mut mz) = (Matrix4::default(), Matrix4::default(), Matrix4::default());
+        let (rad_x, rad_y, rad_z) = (x.val, y.val, z.val);
 
         mx.data[0][0] = 1.0;     mx.data[0][1] = 0.0;           mx.data[0][2] = 0.0;            mx.data[0][3] = 0.0;
         mx.data[1][0] = 0.0;     mx.data[1][1] = rad_x.cos();    mx.data[1][2] = -rad_x.sin();    mx.data[1][3] = 0.0;
@@ -87,9 +89,10 @@ impl Matrix4 {
 
     //@todo wont have to be of type option once uvec implemented
     /// Creates a new matrix which applies rotation around an axis
-    pub fn rotation_axis<P>(axis: &P, rad: f64) -> Result<Matrix4> where
+    pub fn rotation_axis<P>(axis: &P, r: Rad) -> Result<Matrix4> where
         P: IsBuildable3D {
 
+        let rad = r.val;
         let u = axis.clone().normalized()?;
         let mut result = Matrix4::default();
         //@todo needs testing!!!
@@ -101,7 +104,8 @@ impl Matrix4 {
     }
 
     /// Creates a new matrix which applies perspective transformation
-    pub fn perspective(close: f64, away: f64, fov_rad: f64) -> Matrix4 {
+    pub fn perspective(close: f64, away: f64, fov: Rad) -> Matrix4 {
+        let fov_rad = fov.val;
         let range = close - away;
         let tan_fov_half = (fov_rad/2.0).tan();
 

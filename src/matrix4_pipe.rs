@@ -15,6 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Matrix4Pipe, which makes it easier to pipe different matrices in a defined order
 
+use strong_types::*;
 use matrix4::*;
 use traits::is_buildable_3d::*;
 
@@ -51,11 +52,11 @@ impl Matrix4Pipe {
     }
 
     /// Adds a rotation to the pipe
-    pub fn add_rotation(&mut self, rad_x: f64, rad_y: f64, rad_z: f64) {
-        self.mrotation = Matrix4::rotation(rad_x, rad_y, rad_z);
+    pub fn add_rotation(&mut self, x: Rad, y: Rad, z: Rad) {
+        self.mrotation = Matrix4::rotation(x, y, z);
     }
     /// Adds a rotation around an axis to the pipe
-    pub fn add_rotation_axis<P>(&mut self, axis: &P, rad: f64) -> bool where P: IsBuildable3D {
+    pub fn add_rotation_axis<P>(&mut self, axis: &P, rad: Rad) -> bool where P: IsBuildable3D {
         match Matrix4::rotation_axis(axis, rad) {
             Err(_) => return false,
             Ok(m) => { self.mrotation = m; return true; }
@@ -76,8 +77,8 @@ impl Matrix4Pipe {
     }
 
     /// Adds a perspective transformation to the pipe
-    pub fn add_perspective(&mut self, close: f64, away: f64, fov_rad: f64) {
-        self.mperspective = Matrix4::perspective(close, away, fov_rad);
+    pub fn add_perspective(&mut self, close: f64, away: f64, rad: Rad) {
+        self.mperspective = Matrix4::perspective(close, away, rad);
     }
     /// Removes any perspective transformation from the pipe
     pub fn remove_perspective(&mut self) {

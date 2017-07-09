@@ -18,6 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 extern crate rust_3d;
 
 use std::f64::consts;
+use rust_3d::strong_types::*;
 use rust_3d::traits::is_2d::*;
 use rust_3d::traits::is_buildable_2d::*;
 use rust_3d::traits::is_editable_2d::*;
@@ -42,8 +43,8 @@ fn point_2d_test() {
     assert!(p2.y() == 0.0);
     assert!(p2.abs() == 1.0);
 
-    assert!(p1.rad_to(&p2) == 0.0);
-    assert!(p2.rad_to(&p1) == consts::PI);
+    assert!(p1.rad_to(&p2).val == 0.0);
+    assert!(p2.rad_to(&p1).val == consts::PI);
 
     let p3 = *Point2D::new(2.0, 2.0);
     assert!(p1.cross(&p2) == 0.0);
@@ -97,16 +98,16 @@ fn point_2d_test() {
     assert!(p1.y() == 22.0);
 
     p1.set_pos(1.0, 0.0);
-    p1.rotate(0.0, &origin);
+    p1.rotate(Rad{val: 0.0}, &origin);
     assert!(p1.x() == 1.0);
     assert!(p1.y() == 0.0);
 
-    p1.rotate(2.0 * consts::PI, &origin);
+    p1.rotate(Rad{val: 2.0 * consts::PI}, &origin);
     assert!((1.0 - p1.x()).abs() < eps);
     assert!((0.0 - p1.y()).abs() < eps);
 
 
-    p1.rotate(consts::PI, &origin);
+    p1.rotate(Rad{val: consts::PI}, &origin);
     assert!((-1.0 - p1.x()).abs() < eps);
     assert!((0.0 - p1.y()).abs() < eps);
 
