@@ -18,7 +18,6 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::f64::consts::PI;
 
 use positive::*;
-use point_2d::*;
 use point_cloud_2d::*;
 use traits::is_buildable_2d::*;
 use traits::is_random_insertible::*;
@@ -30,16 +29,11 @@ use traits::is_random_insertible::*;
 //@todo correct reserving
 //@todo order parameters (e.g. center and n_points always first)
 
-/// Returns a point at the origin
-pub fn origin() -> Box<Point2D> { //@todo private?
-    Point2D::new(0.0, 0.0)
-}
-
 /// Creates a 2D rectangle from given center width and height
 pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
-    let mut pc = PointCloud2D::new();
+    let mut pc = PointCloud2D::with_capacity(4);
     let w = width.get();
     let h = height.get();
     pc.push(*P::new(center.x() - w / 2.0, center.y() - h / 2.0));
@@ -53,8 +47,7 @@ pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> Box<PointC
 pub fn involut_circle<P>(center: &P, diameter: Positive, n_points: usize, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
-    //@todo reserve
-    let mut pc = PointCloud2D::new();
+    let mut pc = PointCloud2D::with_capacity(n_points);
     let d = diameter.get();
     let p_dist = (radians_end - radians_start).abs() / (n_points - 1) as f64;
 
@@ -70,7 +63,7 @@ pub fn involut_circle<P>(center: &P, diameter: Positive, n_points: usize, radian
 pub fn arc<P>(center: &P, diameter: Positive, n_points: usize, radians_start: f64, radians_end: f64) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
-    let mut pc = PointCloud2D::new();
+    let mut pc = PointCloud2D::with_capacity(n_points);
     let d = diameter.get();
     let p_dist = (radians_end - radians_start).abs() / (n_points - 1) as f64;
 
@@ -86,7 +79,7 @@ pub fn arc<P>(center: &P, diameter: Positive, n_points: usize, radians_start: f6
 pub fn ellipse<P>(center: &P, ap: Positive, bp: Positive, n_points: usize) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
 
-    let mut pc = PointCloud2D::new();
+    let mut pc = PointCloud2D::with_capacity(n_points);
     let p_dist = PI / (n_points - 1) as f64;
     let a = ap.get();
     let b = bp.get();

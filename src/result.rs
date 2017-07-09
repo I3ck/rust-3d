@@ -117,13 +117,13 @@ pub trait ToErrorKind {
 
 impl ToErrorKind for ParseFloatError {
     fn to_error_kind(&self) -> ErrorKind {
-        ErrorKind::ParseError //@todo use new float conversion error instead?
+        ErrorKind::ParseError
     }
 }
 
 impl ToErrorKind for ParseIntError {
     fn to_error_kind(&self) -> ErrorKind {
-        ErrorKind::ParseError //@todo use new int conversion error instead?
+        ErrorKind::ParseError
     }
 }
 

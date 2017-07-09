@@ -29,7 +29,6 @@ use view::*;
 use io::xy::*;
 use io::xyz::*;
 
-//@todo maybe move directly to tests directory
 /// Ensures the content of two files is equal
 pub fn assert_files_equal(filepath1: &str, filepath2: &str) {
     let mut f1 = File::open(filepath1).unwrap();
