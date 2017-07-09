@@ -19,10 +19,8 @@ use std::cmp::Ordering;
 
 use result::*;
 use point_2d::*;
-use point_3d::*;
 use point_cloud_2d::*;
 use point_cloud_3d::*;
-use oc_node::*;
 use view::*;
 use distances_3d::*;
 use traits::is_2d::*;
@@ -171,58 +169,6 @@ pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, Point
 
     pc_3d_b.move_by(dir.x(), dir.y(), dir.z());
     (pc_3d_a, pc_3d_b)
-}
-
-/// Calculates the direction of one point to another in terms of an enum
-pub fn calc_direction<P>(reference: &Point3D, p: &Point3D) -> Direction where //@todo move to OcTree code
-    P: Is3D {
-
-    if p.x() >= reference.x() && p.y() >= reference.y() && p.z() >= reference.z() {
-        Direction::PPP
-    } else if p.x() >= reference.x() && p.y() >= reference.y() && p.z() < reference.z() {
-        Direction::PPN
-    } else if p.x() >= reference.x() && p.y() < reference.y() && p.z() >= reference.z() {
-        Direction::PNP
-    } else if p.x() >= reference.x() && p.y() < reference.y() && p.z() < reference.z() {
-        Direction::PNN
-    } else if p.x() < reference.x() && p.y() >= reference.y() && p.z() >= reference.z() {
-        Direction::NPP
-    } else if p.x() < reference.x() && p.y() >= reference.y() && p.z() < reference.z() {
-        Direction::NPN
-    } else if p.x() >= reference.x() && p.y() < reference.y() && p.z() >= reference.z() {
-        Direction::NNP
-    } else { //if p.x() < reference.x() && p.y() < reference.y() && p.z() < reference.z() {
-        Direction::NNN
-    }
-}
-
-//@todo refactor to work with IsBuildable3D?
-/// Calculates the min and max values of sub nodes of an OcTree
-pub fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where //@todo move to OcTree
-    P: IsBuildable3D + Clone { //@todo better name
-
-    let middle = center(min, max);
-
-    let px = max.x();
-    let py = max.y();
-    let pz = max.z();
-    let nx = min.x();
-    let ny = min.y();
-    let nz = min.z();
-    let mx = middle.x();
-    let my = middle.y();
-    let mz = middle.z();
-
-    match dir {
-        Direction::PPP => (*middle,               max.clone()),
-        Direction::PPN => (*P::new(mx, my, nz),   *P::new(px, py, mz)),
-        Direction::PNP => (*P::new(mx, ny, mz),   *P::new(px, my, pz)),
-        Direction::PNN => (*P::new(mx, ny, nz),   *P::new(px, my, mz)),
-        Direction::NPP => (*P::new(nx, my, mz),   *P::new(mx, py, pz)),
-        Direction::NPN => (*P::new(nx, my, nz),   *P::new(mx, py, mz)),
-        Direction::NNP => (*P::new(nx, ny, mz),   *P::new(mx, my, pz)),
-        Direction::NNN => (min.clone(),           *middle)
-    }
 }
 
 /// Checks whether a point is within a bounding box

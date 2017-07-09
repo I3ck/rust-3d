@@ -18,12 +18,13 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //@todo clean up similar to pc code
 
 use traits::is_buildable_nd::*;
+use traits::is_3d::*;
 use traits::is_buildable_3d::*;
 use traits::is_editable_3d::*;
 use traits::has_center_of_gravity_3d::*;
 use traits::is_random_insertible::*;
 use point_cloud_3d::{PointCloud3D};
-use functions::{calc_sub_min_max, in_bb};
+use functions::{center, in_bb};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
 //@todo make all private or document
 
@@ -48,7 +49,7 @@ pub struct Internal<P> where
     nnn: Option<Box<OcNode<P>>>
 }
 
-pub enum Direction { //@todo rename //@todo private?
+enum Direction {
     PPP,
     PPN,
     PNP,
@@ -58,6 +59,59 @@ pub enum Direction { //@todo rename //@todo private?
     NNP,
     NNN
 }
+
+//@todo refactor to work with IsBuildable3D?
+/// Calculates the min and max values of sub nodes of an OcTree
+fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where //@todo move to OcTree
+    P: IsBuildable3D + Clone { //@todo better name
+
+    let middle = center(min, max);
+
+    let px = max.x();
+    let py = max.y();
+    let pz = max.z();
+    let nx = min.x();
+    let ny = min.y();
+    let nz = min.z();
+    let mx = middle.x();
+    let my = middle.y();
+    let mz = middle.z();
+
+    match dir {
+        Direction::PPP => (*middle,               max.clone()),
+        Direction::PPN => (*P::new(mx, my, nz),   *P::new(px, py, mz)),
+        Direction::PNP => (*P::new(mx, ny, mz),   *P::new(px, my, pz)),
+        Direction::PNN => (*P::new(mx, ny, nz),   *P::new(px, my, mz)),
+        Direction::NPP => (*P::new(nx, my, mz),   *P::new(mx, py, pz)),
+        Direction::NPN => (*P::new(nx, my, nz),   *P::new(mx, py, mz)),
+        Direction::NNP => (*P::new(nx, ny, mz),   *P::new(mx, my, pz)),
+        Direction::NNN => (min.clone(),           *middle)
+    }
+}
+/*
+/// Calculates the direction of one point to another in terms of an enum
+pub fn calc_direction<P>(reference: &Point3D, p: &Point3D) -> Direction where
+    P: Is3D {
+
+    if p.x() >= reference.x() && p.y() >= reference.y() && p.z() >= reference.z() {
+        Direction::PPP
+    } else if p.x() >= reference.x() && p.y() >= reference.y() && p.z() < reference.z() {
+        Direction::PPN
+    } else if p.x() >= reference.x() && p.y() < reference.y() && p.z() >= reference.z() {
+        Direction::PNP
+    } else if p.x() >= reference.x() && p.y() < reference.y() && p.z() < reference.z() {
+        Direction::PNN
+    } else if p.x() < reference.x() && p.y() >= reference.y() && p.z() >= reference.z() {
+        Direction::NPP
+    } else if p.x() < reference.x() && p.y() >= reference.y() && p.z() < reference.z() {
+        Direction::NPN
+    } else if p.x() >= reference.x() && p.y() < reference.y() && p.z() >= reference.z() {
+        Direction::NNP
+    } else { //if p.x() < reference.x() && p.y() < reference.y() && p.z() < reference.z() {
+        Direction::NNN
+    }
+}
+*/
 
 //@todo define somewhere else
 fn collect_center_or_all<P>(n: &OcNode<P>, only_collect_centers: bool, depth: i8, maxdepth: i8, mut pc: &mut PointCloud3D<P>) where
