@@ -18,6 +18,10 @@ new / default for line, ray, line segment
 
 matrix multiplication -> Mul
 
+*Point::new() syntax is used too often
+
+derive as many traits as possible (e.g. Mesh currently not Clone)
+
 distance methods for ray line line segment
 
 derive where possible now (e.g. Point wasn't deriving Clone, others might be able to derive Eq e.g.)

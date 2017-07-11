@@ -27,7 +27,7 @@ use traits::is_normalized_2d::*;
 use traits::is_buildable_2d::*;
 use distances_2d::*;
 
-#[derive (PartialEq, PartialOrd)]
+#[derive (PartialEq, PartialOrd, Clone)]
 /// Norm2D, a normalized vector within 2D space
 pub struct Norm2D {
     pub x: f64,
@@ -47,15 +47,6 @@ impl Hash for Norm2D {
     fn hash<H: Hasher>(&self, state: &mut H) {
         (self.x as u64).hash(state);
         (self.y as u64).hash(state);
-    }
-}
-
-impl Clone for Norm2D {
-    fn clone(&self) -> Self {
-        Norm2D {
-            x: self.x,
-            y: self.y
-        }
     }
 }
 

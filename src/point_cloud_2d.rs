@@ -38,7 +38,7 @@ use distances_2d::*;
 use functions::{sort_vec_2d_x, sort_vec_2d_y};
 use view::*;
 
-#[derive (Default)]
+#[derive (Default, Clone)]
 /// PointCloud2D, a collection of positions within 2D space
 pub struct PointCloud2D<P> where
     P: Is2D {
@@ -98,21 +98,6 @@ impl<P> PointCloud2D<P> where
         for i in 0..n {
             self.data.push(Box::new(ra[i].clone()));
         }
-    }
-}
-
-impl<P> Clone for PointCloud2D<P> where
-    P: Is2D + Clone {
-
-    fn clone(&self) -> Self {
-        let mut data: Vec<Box<P>>;
-        data = Vec::new();
-
-        for p in &self.data {
-            data.push(p.clone());
-        }
-
-        PointCloud2D { data: data }
     }
 }
 

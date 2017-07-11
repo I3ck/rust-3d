@@ -27,7 +27,7 @@ use traits::is_normalized_3d::*;
 use traits::is_buildable_3d::*;
 use distances_3d::*;
 
-#[derive (PartialEq, PartialOrd)]
+#[derive (PartialEq, PartialOrd, Clone)]
 /// Norm3D, a normalized vector within 3D space
 pub struct Norm3D {
     pub x: f64,
@@ -49,16 +49,6 @@ impl Hash for Norm3D {
         (self.x as u64).hash(state);
         (self.y as u64).hash(state);
         (self.z as u64).hash(state);
-    }
-}
-
-impl Clone for Norm3D {
-    fn clone(&self) -> Self {
-        Norm3D {
-            x: self.x,
-            y: self.y,
-            z: self.z
-        }
     }
 }
 

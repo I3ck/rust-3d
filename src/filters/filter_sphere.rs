@@ -32,7 +32,7 @@ use distances_3d::*;
 use positive::*;
 use bounding_box_3d::*;
 
-#[derive (PartialEq, PartialOrd, Default)]
+#[derive (PartialEq, PartialOrd, Default, Clone)]
 /// FilterSphere, a sphere filter within 3D space
 pub struct FilterSphere {
     center: Point3D,
@@ -55,12 +55,6 @@ impl Hash for FilterSphere {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.center.hash(state);
         (self.radius.get() as u64).hash(state);
-    }
-}
-
-impl Clone for FilterSphere {
-    fn clone(&self) -> FilterSphere {
-        FilterSphere { center: self.center.clone(), radius: self.radius }
     }
 }
 

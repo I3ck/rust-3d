@@ -32,7 +32,7 @@ use distances_2d::*;
 use positive::*;
 use bounding_box_2d::*;
 
-#[derive (PartialEq, PartialOrd, Default)]
+#[derive (PartialEq, PartialOrd, Default, Clone)]
 /// FilterCircle, a circle filter within 2D space
 pub struct FilterCircle {
     center: Point2D,
@@ -55,12 +55,6 @@ impl Hash for FilterCircle {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.center.hash(state);
         (self.radius.get() as u64).hash(state);
-    }
-}
-
-impl Clone for FilterCircle {
-    fn clone(&self) -> FilterCircle {
-        FilterCircle { center: self.center.clone(), radius: self.radius }
     }
 }
 

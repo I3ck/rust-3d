@@ -38,7 +38,7 @@ use distances_3d::*;
 use functions::{sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z};
 use view::*;
 
-#[derive (Default)]
+#[derive (Default, Clone)]
 /// PointCloud3D, a collection of positions within 3D space
 pub struct PointCloud3D<P> where
     P: Is3D {
@@ -98,21 +98,6 @@ impl<P> PointCloud3D<P> where
         for i in 0..n {
             self.data.push(Box::new(ra[i].clone()));
         }
-    }
-}
-
-impl<P> Clone for PointCloud3D<P> where
-    P: Is3D + Clone {
-
-    fn clone(&self) -> Self {
-        let mut data: Vec<Box<P>>;
-        data = Vec::new();
-
-        for p in &self.data {
-            data.push(p.clone());
-        }
-
-        PointCloud3D { data: data }
     }
 }
 

@@ -32,7 +32,7 @@ use distances_2d::*;
 use positive::*;
 use bounding_box_2d::*;
 
-#[derive (PartialEq, PartialOrd, Default)]
+#[derive (PartialEq, PartialOrd, Default, Clone)]
 /// FilterBox2D, a box filter within 2D space
 pub struct FilterBox2D {
     center: Point2D,
@@ -60,12 +60,6 @@ impl Hash for FilterBox2D {
         self.center.hash(state);
         (self.size_x.get() as u64).hash(state);
         (self.size_y.get() as u64).hash(state);
-    }
-}
-
-impl Clone for FilterBox2D {
-    fn clone(&self) -> FilterBox2D {
-        FilterBox2D { center: self.center.clone(), size_x: self.size_x, size_y: self.size_y }
     }
 }
 

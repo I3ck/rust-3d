@@ -32,7 +32,7 @@ use distances_3d::*;
 use positive::*;
 use bounding_box_3d::*;
 
-#[derive (PartialEq, PartialOrd, Default)]
+#[derive (PartialEq, PartialOrd, Default, Clone)]
 /// FilterBox3D, a box filter within 3D space
 pub struct FilterBox3D {
     center: Point3D,
@@ -65,12 +65,6 @@ impl Hash for FilterBox3D {
         (self.size_x.get() as u64).hash(state);
         (self.size_y.get() as u64).hash(state);
         (self.size_z.get() as u64).hash(state);
-    }
-}
-
-impl Clone for FilterBox3D {
-    fn clone(&self) -> FilterBox3D {
-        FilterBox3D { center: self.center.clone(), size_x: self.size_x, size_y: self.size_y, size_z: self.size_z }
     }
 }
 
