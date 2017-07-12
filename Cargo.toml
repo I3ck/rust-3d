@@ -1,6 +1,6 @@
 [package]
 name = "rust-3d"
-version = "0.15.0"
+version = "0.16.0"
 authors = ["Martin Buck <buckmartin@buckmartin.de>"]
 description = "2D/3D library written in rust"
 documentation = "https://docs.rs/rust-3d/"
