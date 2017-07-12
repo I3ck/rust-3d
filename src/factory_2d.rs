@@ -17,11 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::f64::consts::PI;
 
-use strong_types::*;
-use positive::*;
-use point_cloud_2d::*;
-use traits::is_buildable_2d::*;
-use traits::is_random_insertible::*;
+use prelude::*;
 
 //@todo entire file has to be added to tests
 //@todo define trait for pc2d factories, later for 3d as well

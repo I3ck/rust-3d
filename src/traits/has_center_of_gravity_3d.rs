@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! HasCenterOfGravity3D trait for types which might have a center of gravity
 
-use result::*;
-use point_3d::*;
+use prelude::*;
 
 /// HasCenterOfGravity3D is a trait for types which might have a center of gravity
 pub trait HasCenterOfGravity3D {

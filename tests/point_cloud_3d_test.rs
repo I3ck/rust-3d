@@ -17,14 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 extern crate rust_3d;
 
-use rust_3d::traits::is_3d::*;
-use rust_3d::traits::is_buildable_3d::*;
-use rust_3d::traits::is_movable_3d::*;
-use rust_3d::traits::has_bounding_box_3d::*;
-use rust_3d::traits::is_random_insertible::*;
-use rust_3d::traits::is_random_accessible::*;
-use rust_3d::point_3d::*;
-use rust_3d::point_cloud_3d::*;
+use rust_3d::prelude::*;
 
 #[test]
 fn test_point_cloud_3d() {

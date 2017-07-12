@@ -15,11 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Matrix4, a matrix with 4 rows and columns
 
-use strong_types::*;
-use result::*;
-use point_3d::*;
-use traits::is_3d::*;
-use traits::is_buildable_3d::*;
+use prelude::*;
 use functions::cross;
 
 /// Matrix4, a matrix with 4 rows and columns

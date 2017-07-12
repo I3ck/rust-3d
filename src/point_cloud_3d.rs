@@ -19,24 +19,9 @@ use std::fmt;
 use std::ops::Index;
 use std::ops::IndexMut;
 
-use result::*;
-use traits::is_3d::*;
-use traits::is_random_accessible::*;
-use traits::is_random_insertible::*;
-use traits::is_movable_3d::*;
-use traits::is_buildable_3d::*;
-use traits::has_bounding_box_3d::*;
-use traits::has_center_of_gravity_3d::*;
-use traits::has_length::*;
-use traits::is_view_buildable::*;
-use traits::is_sortable_nd::*;
-use traits::is_sortable_3d::*;
-use traits::is_mergeable::*;
-use point_3d::{Point3D};
-use bounding_box_3d::*;
+use prelude::*;
 use distances_3d::*;
 use functions::{sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z};
-use view::*;
 
 #[derive (Default, Clone)]
 /// PointCloud3D, a collection of positions within 3D space

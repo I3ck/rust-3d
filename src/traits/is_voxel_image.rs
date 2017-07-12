@@ -15,7 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsVoxelImage trait used for any type of voxel image
 
-use result::*;
+use prelude::*;
 
 /// IsVoxelImage is a trait used for any type of voxel image
 pub trait IsVoxelImage<T> {

@@ -15,9 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsEditable2D trait used for types which are positioned in 2D space and their position can be changed
 
-use strong_types::*;
-use traits::is_2d::*;
-use traits::is_editable_nd::*;
+use prelude::*;
 
 /// IsEditable2D is a trait used for types which are positioned in 2D space and their position can be changed
 pub trait IsEditable2D : Is2D + IsEditableND {

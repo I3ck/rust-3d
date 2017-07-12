@@ -15,9 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsPlane3D trait used for planes within 3D space
 
-use traits::is_3d::*;
-use traits::is_normalized_3d::*;
-
+use prelude::*;
 
 /// IsPlane3D is a trait used for planes within 3D space
 pub trait IsPlane3D<P,N> where

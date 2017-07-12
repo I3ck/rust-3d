@@ -18,12 +18,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 extern crate rust_3d;
 
 use std::f64::consts;
-use rust_3d::strong_types::*;
-use rust_3d::traits::is_2d::*;
-use rust_3d::traits::is_buildable_2d::*;
-use rust_3d::traits::is_editable_2d::*;
-use rust_3d::traits::is_movable_2d::*;
-use rust_3d::point_2d::*;
+
+use rust_3d::prelude::*;
 
 #[test]
 fn point_2d_test() {

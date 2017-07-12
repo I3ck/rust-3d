@@ -20,16 +20,7 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Mul};
 
-use result::*;
-use traits::is_nd::*;
-use traits::is_3d::*;
-use traits::is_movable_3d::*;
-use traits::is_buildable_nd::*;
-use traits::is_buildable_2d::*;
-use traits::is_buildable_3d::*;
-use traits::is_editable_nd::*;
-use traits::is_editable_3d::*;
-use traits::is_transformable_to_2d::*;
+use prelude::*;
 use distances_3d::*;
 
 #[derive (PartialEq, PartialOrd, Default, Clone)]

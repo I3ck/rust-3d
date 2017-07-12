@@ -62,5 +62,6 @@ pub mod distances_3d;
 pub mod distances_nd;
 pub mod face3;
 pub mod half_edge_3d;
+pub mod prelude;
 
 mod utils;

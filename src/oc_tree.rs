@@ -20,14 +20,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::collections::HashSet;
 use std::iter::IntoIterator;
 
-use point_cloud_3d::{PointCloud3D};
-use oc_node::{OcNode};
-use traits::is_buildable_nd::*;
-use traits::is_buildable_3d::*;
-use traits::is_editable_3d::*;
-use traits::has_bounding_box_3d::*;
-use traits::is_tree_3d::*;
-use traits::is_oc_tree::*;
+use prelude::*;
 
 #[derive (Default)]
 /// OcTree

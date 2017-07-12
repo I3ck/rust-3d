@@ -15,9 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsOcTree trait used for OcTrees
 
-use traits::is_tree_3d::*;
-use traits::is_3d::*;
-use point_cloud_3d::*;
+use prelude::*;
 
 /// IsOcTree is a trait used for OcTrees
 pub trait IsOcTree<P> : IsTree3D<P> where

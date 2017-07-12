@@ -15,7 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Is3D trait used for types which are positioned within the 3D space
 
-use traits::is_nd::*;
+use prelude::*;
 
 /// Is3D is a trait used for types which are positioned within the 3D space
 pub trait Is3D : IsND {

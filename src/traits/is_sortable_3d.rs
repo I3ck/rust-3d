@@ -15,7 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsSortable3D trait used for collections which can be sorted by x,y or z
 
-use traits::is_sortable_nd::*;
+use prelude::*;
 
 /// IsSortable3D trait used for collections which can be sorted by x,y or z
 pub trait IsSortable3D : IsSortableND {

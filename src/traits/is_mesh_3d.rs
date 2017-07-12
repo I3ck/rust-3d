@@ -15,13 +15,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsMesh3D trait used for meshes in 3D space
 
-use strong_types::*;
-use result::*;
-use face3::*;
-use traits::is_buildable_3d::*;
-use traits::is_normalized_3d::*;
+use prelude::*;
 use functions::{conn, cross};
-use norm_3d::*;
 
 /// IsMesh3D is trait used for meshes in 3D space
 pub trait IsMesh3D<P> where

@@ -17,15 +17,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::io::prelude::*;
 use std::fs::File;
-use traits::is_buildable_2d::*;
-use traits::is_buildable_3d::*;
-use traits::is_filter::*;
-use traits::is_filter_random_accessible::*;
-use traits::is_view_buildable::*;
-use point_cloud_2d::*;
-use point_cloud_3d::*;
-use filters::transformers::filter_random_accessible::*;
-use view::*;
+
+use prelude::*;
 use io::xy::*;
 use io::xyz::*;
 

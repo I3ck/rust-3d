@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsEditableND trait used for types which are positioned in n-dimensional space and their position can be changed
 
-use result::*;
-use traits::is_nd::*;
+use prelude::*;
 
 /// IsEditableND is a trait used for types which are positioned in n-dimensional space and their position can be changed
 pub trait IsEditableND : IsND {

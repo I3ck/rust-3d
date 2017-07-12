@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsRandomInsertible trait used for collections of elements which are random insertible
 
-use result::*;
-use traits::is_random_accessible::*;
+use prelude::*;
 
 /// IsRandomInsertible is a trait used for collections of elements which are random insertible
 pub trait IsRandomInsertible<T> : IsRandomAccessible<T> {

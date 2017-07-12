@@ -19,24 +19,9 @@ use std::fmt;
 use std::ops::Index;
 use std::ops::IndexMut;
 
-use result::*;
-use traits::is_2d::*;
-use traits::is_random_accessible::*;
-use traits::is_random_insertible::*;
-use traits::is_movable_2d::*;
-use traits::is_buildable_2d::*;
-use traits::has_bounding_box_2d::*;
-use traits::has_center_of_gravity_2d::*;
-use traits::has_length::*;
-use traits::is_view_buildable::*;
-use traits::is_sortable_nd::*;
-use traits::is_sortable_2d::*;
-use traits::is_mergeable::*;
-use point_2d::*;
-use bounding_box_2d::*;
+use prelude::*;
 use distances_2d::*;
 use functions::{sort_vec_2d_x, sort_vec_2d_y};
-use view::*;
 
 #[derive (Default, Clone)]
 /// PointCloud2D, a collection of positions within 2D space

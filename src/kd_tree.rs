@@ -19,18 +19,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::cmp::Ordering;
 
-use result::*;
-use point_cloud_3d::{PointCloud3D};
+use prelude::*;
 use distances_3d::*;
 use functions::{dimension_compare, dimension_dist, sort_and_limit};
-use traits::is_3d::*;
-use traits::is_buildable_nd::*;
-use traits::is_buildable_3d::*;
-use traits::is_editable_3d::*;
-use traits::is_tree_3d::*;
-use traits::is_kd_tree_3d::*;
-use traits::is_random_insertible::*;
-use traits::is_random_accessible::*;
 
 #[derive (Default)]
 /// KdTree

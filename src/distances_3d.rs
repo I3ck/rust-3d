@@ -15,7 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Distances between objects in 3D space
 
-use traits::is_3d::*;
+use prelude::*;
 
 /// Returns the distance between two Is3D
 pub fn dist_3d(p1: &Is3D, p2: &Is3D) -> f64 {

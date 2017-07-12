@@ -15,16 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsProjectionToPlane trait used types which can be projected onto and from planes within 3D space
 
-use traits::is_2d::*;
-use traits::is_buildable_2d::*;
-use traits::is_3d::*;
-use traits::is_transformable_to_2d::*;
-use traits::is_transformable_to_3d::*;
-use traits::is_normalized_3d::*;
-use traits::is_plane_3d::*;
-use point_cloud_2d::*;
-use point_cloud_3d::*;
-
+use prelude::*;
 
 //@todo finish trait and add implementation
 //@todo better method names

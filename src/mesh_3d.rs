@@ -15,21 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Mesh3D, a mesh with tri-faces within 3D space
 
-use strong_types::*;
-use result::*;
-use point_3d::*;
-use face3::*;
-use traits::is_mesh_3d::*;
-use traits::is_editable_mesh_3d::*;
-use traits::is_3d::*;
-use traits::is_editable_3d::*;
-use traits::is_buildable_3d::*;
-use traits::has_bounding_box_3d::*;
-use traits::has_center_of_gravity_3d::*;
-use point_cloud_3d::*;
-use bounding_box_3d::*;
-use traits::is_random_insertible::*;
-use traits::is_random_accessible::*;
+use prelude::*;
 
 #[derive (Default)]
 /// Mesh3D, a mesh with tri-faces within 3D space

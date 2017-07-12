@@ -17,17 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::fmt;
 
-use result::*;
-use traits::is_2d::*;
-use traits::has_length::*;
-use traits::has_bounding_box_2d::*;
-use traits::has_center_of_gravity_2d::*;
-use traits::is_movable_2d::*;
-use point_2d::*;
-use bounding_box_2d::*;
-
-use line_2d::*;
-use positive::*;
+use prelude::*;
 
 #[derive (PartialEq, PartialOrd, Eq, Clone, Hash)]
 /// LineSegment2D, a line segment within 2D space

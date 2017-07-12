@@ -17,13 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::f64::consts::PI;
 
-use result::*;
-use point_cloud_2d::*;
-use traits::is_buildable_2d::*;
-use traits::has_length::*;
-use traits::is_random_insertible::*;
-use traits::is_random_accessible::*;
-
+use prelude::*;
 
 //@todo correct reserving
 //@todo some algorithms (e.g. bezier) can be ported to 3d, maybe write them directly generic over the dimension

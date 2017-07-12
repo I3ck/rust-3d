@@ -16,9 +16,10 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! Positive, a wrapper for a f64 value, ensuring it is always > 0
 
 use std::fmt;
-use result::*;
 use std::ops::Add;
 use std::hash::{Hash, Hasher};
+
+use prelude::*;
 
 #[derive (Copy, Clone, PartialEq, PartialOrd)]
 /// Positive, a wrapper for a f64 value, ensuring it is always > 0

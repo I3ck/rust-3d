@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsFilterRandomAccessible is a trait used for filters for random accessible collections
 
-use traits::is_random_accessible::*;
-use view::*;
+use prelude::*;
 
 /// IsFilterRandomAccessible is a trait used for filters for random accessible collections
 pub trait IsFilterRandomAccessible<RA, T> where

@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsViewBuildable trait used for types which can be constructed from a view / have a view applied to them
 
-use result::Result;
-use view::*;
+use prelude::*;
 
 /// IsViewBuildable trait used for types which can be constructed from a view / have a view applied to them
 pub trait IsViewBuildable {

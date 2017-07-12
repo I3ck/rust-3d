@@ -15,12 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! BoundingBox2D, an axis aligned bounding box within 2D space
 
-use result::*;
-use point_2d::*;
-use positive::*;
-use traits::is_2d::*;
-use traits::is_buildable_2d::*;
-use traits::has_bounding_box_2d::*;
+use prelude::*;
 
 /// BoundingBox2D, an axis aligned bounding box within 2D space
 pub struct BoundingBox2D {

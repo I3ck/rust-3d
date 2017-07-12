@@ -15,12 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! BoundingBox3D, an axis aligned bounding box within 3D space
 
-use result::*;
-use point_3d::*;
-use positive::*;
-use traits::is_3d::*;
-use traits::is_buildable_3d::*;
-use traits::has_bounding_box_3d::*;
+use prelude::*;
 
 /// BoundingBox3D, an axis aligned bounding box within 3D space
 pub struct BoundingBox3D {

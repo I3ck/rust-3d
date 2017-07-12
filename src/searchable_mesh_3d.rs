@@ -15,14 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! SearchableMesh3D, transforms IsMesh3D to IsSearchableMesh3D
 
-use strong_types::*;
-use result::*;
-use face3::*;
-use traits::is_3d::*;
-use traits::is_buildable_3d::*;
-use traits::is_mesh_3d::*;
-use traits::is_searchable_mesh_3d::*;
-use half_edge_3d::*;
+use prelude::*;
 
 /// SearchableMesh3D, transforms IsMesh3D to IsSearchableMesh3D
 pub struct SearchableMesh3D<'a, P> where

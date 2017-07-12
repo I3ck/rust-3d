@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsNormalized2D trait used for types which are positioned within the 2D space and normalized
 
-use result::*;
-use traits::is_2d::*;
+use prelude::*;
 
 /// IsNormalized2D is a trait used for types which are positioned within the 2D space and normalized
 pub trait IsNormalized2D : Is2D {

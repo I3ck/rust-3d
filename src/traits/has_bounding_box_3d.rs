@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! HasBoundingBox3D trait for types which might have a bounding box
 
-use result::*;
-use bounding_box_3d::*;
+use prelude::*;
 
 /// HasBoundingBox3D is a trait for types which might have a bounding box
 pub trait HasBoundingBox3D  {

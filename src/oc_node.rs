@@ -17,14 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //@todo clean up similar to pc code
 
-use traits::is_buildable_nd::*;
-use traits::is_3d::*;
-use traits::is_buildable_3d::*;
-use traits::is_editable_3d::*;
-use traits::has_center_of_gravity_3d::*;
-use traits::is_random_insertible::*;
-use bounding_box_3d::*;
-use point_cloud_3d::*;
+use prelude::*;
 use functions::{center};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
 //@todo make all private or document

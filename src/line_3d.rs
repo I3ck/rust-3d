@@ -17,11 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::fmt;
 
-use traits::is_3d::*;
-use traits::is_movable_3d::*;
-
-use point_3d::*;
-use norm_3d::*;
+use prelude::*;
 
 #[derive (PartialEq, PartialOrd, Eq, Clone, Hash)]
 /// Line2D, a line within 3D space

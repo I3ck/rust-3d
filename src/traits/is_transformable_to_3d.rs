@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsTransFormableTo3D trait used for any type which can be transformed 3D space
 
-use traits::is_2d::*;
-use traits::is_buildable_3d::*;
+use prelude::*;
 
 /// IsTransFormableTo3D is a trait used for any type which can be transformed 3D space
 pub trait IsTransFormableTo3D : Is2D {

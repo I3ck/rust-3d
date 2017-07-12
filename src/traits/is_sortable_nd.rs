@@ -15,7 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsSortableND trait used for collections which can be sorted by certain dimensions. E.g. x,y,z
 
-use result::*;
+use prelude::*;
 
 /// IsSortableND trait used for collections which can be sorted by certain dimensions. E.g. x,y,z
 pub trait IsSortableND {

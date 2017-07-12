@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsBuildableND trait used for types which are positioned in n-dimensional space and can be constructed
 
-use result::*;
-use traits::is_nd::*;
+use prelude::*;
 
 /// IsBuildableND is a trait used for types which are positioned in n-dimensional space and can be constructed
 pub trait IsBuildableND : IsND {

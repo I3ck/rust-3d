@@ -15,10 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! HalfEdge3D, the half edge data structure for 3D
 
-use result::*;
-use strong_types::*;
-use traits::is_mesh_3d::*;
-use traits::is_buildable_3d::*;
+use prelude::*;
 use utils::safe_append_at;
 
 /// Edge type used within the HalfEdge3D

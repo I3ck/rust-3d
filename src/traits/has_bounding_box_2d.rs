@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Modulecontaining the HasBoundingBox2D trait for types which might have a bounding box
 
-use result::*;
-use bounding_box_2d::*;
+use prelude::*;
 
 /// HasBoundingBox2D is a trait for types which might have a bounding box
 pub trait HasBoundingBox2D {

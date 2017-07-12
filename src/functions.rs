@@ -17,24 +17,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::cmp::Ordering;
 
-use result::*;
-use point_2d::*;
-use point_cloud_2d::*;
-use point_cloud_3d::*;
-use view::*;
+use prelude::*;
 use distances_3d::*;
-use traits::is_2d::*;
-use traits::is_3d::*;
-use traits::is_buildable_2d::*;
-use traits::is_buildable_3d::*;
-use traits::is_editable_2d::*;
-use traits::is_transformable_to_2d::*;
-use traits::is_transformable_to_3d::*;
-use traits::is_plane_3d::*;
-use traits::is_normalized_3d::*;
-use traits::is_movable_3d::*;
-use traits::is_random_accessible::*;
-use traits::is_random_insertible::*;
 
 //@todo move these functions to better fitting files or make them methods of the correct types
 

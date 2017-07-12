@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Distances between objects in ND space
 
-use traits::is_nd::*;
-use result::*;
+use prelude::*;
 
 /// Returns the distance between two IsND in case their number of dimensions match
 pub fn dist_nd<P,U>(p1: &P, p2: &U) -> Result<f64> where

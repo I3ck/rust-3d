@@ -17,9 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 extern crate rust_3d;
 
-use rust_3d::traits::is_mesh_3d::*;
-use rust_3d::point_3d::*;
-use rust_3d::mesh_3d::*;
+use rust_3d::prelude::*;
 use rust_3d::io::ply::*;
 
 #[test]

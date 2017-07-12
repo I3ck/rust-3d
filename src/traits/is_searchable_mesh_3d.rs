@@ -15,10 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsSearchableMesh3D trait used for meshes in 3D space which have extended search methods
 
-use strong_types::*;
-use result::*;
-use traits::is_mesh_3d::*;
-use traits::is_buildable_3d::*;
+use prelude::*;
 
 /// IsSearchableMesh3D trait used for meshes in 3D space which have extended search methods
 pub trait IsSearchableMesh3D<P> : IsMesh3D<P> where

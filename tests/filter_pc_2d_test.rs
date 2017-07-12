@@ -17,15 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 extern crate rust_3d;
 
-use rust_3d::traits::is_buildable_2d::*;
-use rust_3d::point_2d::*;
-use rust_3d::positive::*;
-use rust_3d::view::*;
-use rust_3d::filters::filter_box_2d::*;
-use rust_3d::point_cloud_2d::*;
-use rust_3d::traits::is_filter_random_accessible::*;
-use rust_3d::filters::transformers::filter_random_accessible::*;
-use rust_3d::traits::is_random_insertible::*;
+use rust_3d::prelude::*;
 
 #[test]
 fn filter_pc_2d_test() {

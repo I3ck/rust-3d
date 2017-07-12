@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsEditable3D trait used for types which are positioned in 3D space and their position can be changed
 
-use traits::is_3d::*;
-use traits::is_editable_nd::*;
+use prelude::*;
 
 /// IsEditable3D is a trait used for types which are positioned in 3D space and their position can be changed
 pub trait IsEditable3D : Is3D + IsEditableND {

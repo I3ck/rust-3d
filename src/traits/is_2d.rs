@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Is2D trait used for types which are positioned within the 2D space
 
-use strong_types::*;
-use traits::is_nd::*;
+use prelude::*;
 
 /// Is2D is a trait used for types which are positioned within the 2D space
 pub trait Is2D : IsND {

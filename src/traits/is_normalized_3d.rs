@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsNormalized3D trait used for types which are positioned within the 3D space and normalized
 
-use result::*;
-use traits::is_3d::*;
+use prelude::*;
 
 /// IsNormalized3D is a trait used for types which are positioned within the 3D space and normalized
 pub trait IsNormalized3D : Is3D {

@@ -15,7 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsND trait used for types which are positioned within the n-dimensional space
 
-use result::*;
+use prelude::*;
 
 /// IsND is a trait used for types which are positioned within the n-dimensional space
 pub trait IsND {

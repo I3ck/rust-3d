@@ -15,10 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsEditableMesh3D trait used for meshes in 3D space which can be edited
 
-use strong_types::*;
-use result::*;
-use traits::is_buildable_3d::*;
-use traits::is_mesh_3d::*;
+use prelude::*;
 
 /// IsEditableMesh3D is a trait used for meshes in 3D space which can be edited
 pub trait IsEditableMesh3D<P> : IsMesh3D<P> where

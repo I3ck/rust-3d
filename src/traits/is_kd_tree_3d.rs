@@ -15,10 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsKdTree3D trait used for KdTrees within 3D space
 
-use result::*;
-use traits::is_tree_3d::*;
-use traits::is_3d::*;
-use point_cloud_3d::*;
+use prelude::*;
 
 /// IsKdTree3D is atrait used for KdTrees within 3D space
 pub trait IsKdTree3D<P> : IsTree3D<P> where

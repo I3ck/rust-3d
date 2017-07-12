@@ -17,20 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 extern crate rust_3d;
 
-use rust_3d::traits::is_buildable_3d::*;
-use rust_3d::point_3d::*;
-use rust_3d::positive::*;
-use rust_3d::filters::filter_box_3d::*;
-use rust_3d::filters::filter_sphere::*;
-use rust_3d::filters::combinators::filter_negate::*;
-use rust_3d::filters::combinators::filter_or::*;
-use rust_3d::filters::combinators::filter_and::*;
-use rust_3d::filters::combinators::filter_xor::*;
-use rust_3d::filters::combinators::filter_all::*;
-use rust_3d::filters::combinators::filter_any::*;
-use rust_3d::filters::combinators::filter_outer_inner::*;
-use rust_3d::filters::combinators::filter_allow::*;
-use rust_3d::filters::combinators::filter_deny::*;
+use rust_3d::prelude::*;
 use rust_3d::test_helper::*;
 
 #[test]

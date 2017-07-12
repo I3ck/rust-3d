@@ -15,8 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsTree3D trait used for types which are any type of tree within 3D space
 
-use traits::is_3d::*;
-use point_cloud_3d::*;
+use prelude::*;
 
 /// IsTree3D is a trait used for types which are any type of tree within 3D space
 pub trait IsTree3D<P> where

@@ -16,7 +16,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! Face3, a face defined by 3 indices (e.g. used for Mesh)
 
 use std::fmt;
-use strong_types::*;
+
+use prelude::*;
 
 #[derive (PartialEq, PartialOrd, Clone, Eq, Ord, Hash)]
 /// Face3, a face defined by 3 indices (e.g. used for Mesh)

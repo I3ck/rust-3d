@@ -19,12 +19,7 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 use std::ops::{Mul};
 
-use result::*;
-use point_2d::*;
-use traits::is_nd::*;
-use traits::is_2d::*;
-use traits::is_normalized_2d::*;
-use traits::is_buildable_2d::*;
+use prelude::*;
 use distances_2d::*;
 
 #[derive (PartialEq, PartialOrd, Clone)]

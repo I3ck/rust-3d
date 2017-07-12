@@ -17,8 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::fmt;
 
-use traits::is_movable_2d::*;
-use line_2d::*;
+use prelude::*;
 
 #[derive (PartialEq, PartialOrd, Eq, Clone, Hash)]
 /// Ray2D, a ray within 2D space

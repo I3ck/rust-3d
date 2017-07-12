@@ -17,8 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::fmt;
 
-use traits::is_movable_3d::*;
-use line_3d::*;
+use prelude::*;
 
 #[derive (PartialEq, PartialOrd, Eq, Clone, Hash)]
 /// Ray3D, a ray within 3D space
