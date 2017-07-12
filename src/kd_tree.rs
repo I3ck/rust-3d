@@ -28,10 +28,10 @@ use functions::{dimension_compare, dimension_dist, sort_and_limit};
 pub struct KdTree<P> where
     P: Is3D {
 
-    pub root: Option<KdNode<P>>
+    root: Option<KdNode<P>>
 }
 
-pub struct KdNode<P> where
+struct KdNode<P> where
     P: Is3D {
 
     pub left: Option<Box<KdNode<P>>>,
@@ -111,7 +111,6 @@ impl<P> IsKdTree3D<P> for KdTree<P> where
     }
 }
 
-//@todo documentation (or make private)
 impl<P> KdNode<P> where
     P: IsBuildableND + IsBuildable3D + Clone + Default {
 
