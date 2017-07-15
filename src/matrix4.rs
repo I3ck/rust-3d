@@ -15,6 +15,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Matrix4, a matrix with 4 rows and columns
 
+use std::ops::Mul;
+
 use prelude::*;
 use functions::cross;
 
@@ -81,7 +83,7 @@ impl Matrix4 {
         mz.data[2][0] = 0.0;        mz.data[2][1] = 0.0;            mz.data[2][2] = 1.0;      mz.data[2][3] = 0.0;
         mz.data[3][0] = 0.0;        mz.data[3][1] = 0.0;            mz.data[3][2] = 0.0;      mz.data[3][3] = 1.0;
 
-        mx.multiply_m(&my.multiply_m(&mz))
+        mx * my * mz
     }
 
     //@todo wont have to be of type option once uvec implemented
@@ -134,32 +136,6 @@ impl Matrix4 {
         result.data[3][0] = 0.0;  result.data[3][1] = 0.0;  result.data[3][2] = 0.0;  result.data[3][3] = 1.0;
         Ok(result)
     }
-
-    /// Multiplies this matrix by another
-    pub fn multiply_m(&self, other: &Matrix4) -> Matrix4 {
-        let mut result = Matrix4::default();
-        for i in 0..4 {
-            for j in 0..4 {
-                result.data[i][j] =
-                    self.data[i][0] * other.data[0][j] +
-				    self.data[i][1] * other.data[1][j] +
-				    self.data[i][2] * other.data[2][j] +
-				    self.data[i][3] * other.data[3][j];
-            }
-        }
-        result
-    }
-
-    /// Multiplies all values of this matrix by the factor
-    pub fn multiply_f(&self, other: f64) -> Matrix4 {
-        let mut result = Matrix4::default();
-        for i in 0..4 {
-            for j in 0..4 {
-                result.data[i][j] = other * self.data[i][j];
-            }
-        }
-        result
-    }
 }
 
 impl Default for Matrix4 {
@@ -172,5 +148,37 @@ impl Default for Matrix4 {
                 [0.0, 0.0, 0.0, 1.0]
             ]
         }
+    }
+}
+
+impl Mul for Matrix4 {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self {
+        let mut result = Matrix4::default();
+        for i in 0..4 {
+            for j in 0..4 {
+                result.data[i][j] =
+                    self.data[i][0] * other.data[0][j] +
+                        self.data[i][1] * other.data[1][j] +
+                        self.data[i][2] * other.data[2][j] +
+                        self.data[i][3] * other.data[3][j];
+            }
+        }
+        result
+    }
+}
+
+impl Mul<f64> for Matrix4 {
+    type Output = Self;
+
+    fn mul(self, other: f64) -> Self {
+        let mut result = Matrix4::default();
+        for i in 0..4 {
+            for j in 0..4 {
+                result.data[i][j] = other * self.data[i][j];
+            }
+        }
+        result
     }
 }

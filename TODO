@@ -16,7 +16,7 @@ make mesh traits generic on the face type
 
 remove all files from src/ toplevel and add only use sub folder
 
-matrix multiplication -> Mul
+Mul and Add types where possible (Add for Matrix / Mul and Add for others
 
 filter_and_test sometimes fails
 

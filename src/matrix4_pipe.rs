@@ -33,12 +33,12 @@ impl Matrix4Pipe {
     //@todo better overload operator * for Matrix4 to gain nicer syntax
     /// Creates a new matrix as a result of all defined operations set within the pipe
     pub fn result(&self) -> Matrix4 {
-        self.mperspective
-            .multiply_m(&self.mcamlook
-                .multiply_m(&self.mcamtrans
-                    .multiply_m(&self.mtranslation
-                        .multiply_m(&self.mrotation
-                            .multiply_m(&self.mscale)))))
+              self.mperspective.clone()
+            * self.mcamlook.clone()
+            * self.mcamtrans.clone()
+            * self.mtranslation.clone()
+            * self.mrotation.clone()
+            * self.mscale.clone()
     }
     /// Adds a translation to the pipe
     pub fn add_translation(&mut self, x: f64, y: f64, z: f64) {
