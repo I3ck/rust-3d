@@ -18,7 +18,7 @@ new / default for line, ray, line segment
 
 matrix multiplication -> Mul
 
-Norm etc. should NOT have public fields
+filter_and_test sometimes fails
 
 *Point::new() syntax is used too often
 

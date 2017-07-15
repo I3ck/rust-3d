@@ -25,9 +25,9 @@ use distances_3d::*;
 #[derive (Debug, PartialEq, PartialOrd, Clone)]
 /// Norm3D, a normalized vector within 3D space
 pub struct Norm3D {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64
+    x: f64,
+    y: f64,
+    z: f64
 }
 
 impl Eq for Norm3D{}
