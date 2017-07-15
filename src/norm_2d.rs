@@ -49,7 +49,7 @@ impl Mul<f64> for Norm2D {
     type Output = Point2D; //@todo could later be another type
 
     fn mul(self, other: f64) -> Point2D {
-        *Point2D::new(other * self.x, other * self.y)
+        Point2D{x: other * self.x, y: other * self.y}
     }
 }
 

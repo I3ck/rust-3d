@@ -51,7 +51,7 @@ impl Mul<f64> for Norm3D {
     type Output = Point3D; //@todo could later be another type
 
     fn mul(self, other: f64) -> Point3D {
-        *Point3D::new(other * self.x, other * self.y, other * self.z)
+        Point3D{x: other * self.x, y: other * self.y, z: other * self.z}
     }
 }
 

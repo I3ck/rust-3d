@@ -90,7 +90,7 @@ impl IsBuildableND for FilterCircle {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterCircle::new(*Point2D::new(coords[0], coords[1]), Positive::one())))
+        Ok(Box::new(FilterCircle::new(Point2D{x: coords[0], y: coords[1]}, Positive::one())))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -108,7 +108,7 @@ impl IsBuildableND for FilterCircle {
 
 impl IsBuildable2D for FilterCircle {
     fn new(x: f64, y: f64) -> Box<Self> {
-        Box::new(FilterCircle::new(*Point2D::new(x, y), Positive::one()))
+        Box::new(FilterCircle::new(Point2D{x: x, y: y}, Positive::one()))
     }
 
     fn from<P>(&mut self, other: P)
@@ -141,8 +141,8 @@ impl IsEditable2D for FilterCircle {
 
 impl HasBoundingBox2D for FilterCircle {
     fn bounding_box(&self) -> Result<BoundingBox2D> {
-        let p_min = *Point2D::new(self.center.x() - self.radius.get(), self.center.y() - self.radius.get());
-        let p_max = *Point2D::new(self.center.x() + self.radius.get(), self.center.y() + self.radius.get());
+        let p_min = Point2D{x: self.center.x() - self.radius.get(), y: self.center.y() - self.radius.get()};
+        let p_max = Point2D{x: self.center.x() + self.radius.get(), y: self.center.y() + self.radius.get()};
         BoundingBox2D::new(&p_min, &p_max)
     }
 }

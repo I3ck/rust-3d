@@ -20,13 +20,7 @@ matrix multiplication -> Mul
 
 filter_and_test sometimes fails
 
-*Point::new() syntax is used too often
-
-derive as many traits as possible (e.g. Mesh currently not Clone)
-
 distance methods for ray line line segment
-
-derive where possible now (e.g. Point wasn't deriving Clone, others might be able to derive Eq e.g.)
 
 similar to distances, add intersections
 

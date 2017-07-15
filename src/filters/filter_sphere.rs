@@ -94,7 +94,7 @@ impl IsBuildableND for FilterSphere {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterSphere::new(*Point3D::new(coords[0], coords[1], coords[2]), Positive::one())))
+        Ok(Box::new(FilterSphere::new(Point3D{x: coords[0], y: coords[1], z: coords[2]}, Positive::one())))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -113,7 +113,7 @@ impl IsBuildableND for FilterSphere {
 
 impl IsBuildable3D for FilterSphere {
     fn new(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(FilterSphere::new(*Point3D::new(x, y, z), Positive::one()))
+        Box::new(FilterSphere::new(Point3D{x: x, y: y, z: z}, Positive::one()))
     }
 
     fn from<P>(&mut self, other: P)
@@ -151,8 +151,8 @@ impl IsEditable3D for FilterSphere {
 
 impl HasBoundingBox3D for FilterSphere {
     fn bounding_box(&self) -> Result<BoundingBox3D> {
-        let p_min = *Point3D::new(self.center.x() - self.radius.get(), self.center.y() - self.radius.get(), self.center.z() - self.radius.get());
-        let p_max = *Point3D::new(self.center.x() + self.radius.get(), self.center.y() + self.radius.get(), self.center.z() + self.radius.get());
+        let p_min = Point3D{x: self.center.x() - self.radius.get(), y: self.center.y() - self.radius.get(), z: self.center.z() - self.radius.get()};
+        let p_max = Point3D{x: self.center.x() + self.radius.get(), y: self.center.y() + self.radius.get(), z: self.center.z() + self.radius.get()};
         BoundingBox3D::new(&p_min, &p_max)
     }
 }

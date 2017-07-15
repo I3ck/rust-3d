@@ -104,7 +104,7 @@ impl IsBuildableND for FilterBox3D {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterBox3D::new(*Point3D::new(coords[0], coords[1], coords[2]), Positive::one(), Positive::one(), Positive::one())))
+        Ok(Box::new(FilterBox3D::new(Point3D{x: coords[0], y: coords[1], z: coords[2]}, Positive::one(), Positive::one(), Positive::one())))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -123,7 +123,7 @@ impl IsBuildableND for FilterBox3D {
 
 impl IsBuildable3D for FilterBox3D {
     fn new(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(FilterBox3D::new(*Point3D::new(x, y, z), Positive::one(), Positive::one(), Positive::one()))
+        Box::new(FilterBox3D::new(Point3D{x: x, y: y, z: z}, Positive::one(), Positive::one(), Positive::one()))
     }
 
     fn from<P>(&mut self, other: P)
@@ -161,8 +161,8 @@ impl IsEditable3D for FilterBox3D {
 
 impl HasBoundingBox3D for FilterBox3D {
     fn bounding_box(&self) -> Result<BoundingBox3D> {
-        let p_min = *Point3D::new(self.center.x() - self.size_x.get() / 2.0, self.center.y() - self.size_y.get() / 2.0, self.center.z() - self.size_z.get() / 2.0);
-        let p_max = *Point3D::new(self.center.x() + self.size_x.get() / 2.0, self.center.y() + self.size_y.get() / 2.0, self.center.z() + self.size_z.get() / 2.0);
+        let p_min = Point3D{x: self.center.x() - self.size_x.get() / 2.0, y: self.center.y() - self.size_y.get() / 2.0, z: self.center.z() - self.size_z.get() / 2.0};
+        let p_max = Point3D{x: self.center.x() + self.size_x.get() / 2.0, y: self.center.y() + self.size_y.get() / 2.0, z: self.center.z() + self.size_z.get() / 2.0};
         BoundingBox3D::new(&p_min, &p_max)
     }
 }
