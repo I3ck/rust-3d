@@ -13,13 +13,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! IsSearchableMesh3D trait used for meshes in 3D space which have extended search methods
+//! IsSearchableMesh trait used for meshes which have extended search methods
 
 use prelude::*;
 
-/// IsSearchableMesh3D trait used for meshes in 3D space which have extended search methods
-pub trait IsSearchableMesh3D<P> : IsMesh3D<P> where
-    P: IsBuildable3D {
+/// IsSearchableMesh trait used for meshes which have extended search methods
+pub trait IsSearchableMesh<T> : IsMesh<T> {
     /// Should return the edge ids of the given face. Error if id invalid
     fn edges_of_face(&self, faceid: FId) -> Result<(EId, EId, EId)>;
     /// Should return the edges originating at the given vertex (pointing away / having the vertex as tail). Error if id invalid

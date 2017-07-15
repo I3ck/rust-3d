@@ -76,7 +76,7 @@ impl<'a, P> IsMesh3D<P> for SearchableMesh3D<'a, P> where
 
 }
 
-impl<'a, P> IsSearchableMesh3D<P> for SearchableMesh3D<'a, P> where
+impl<'a, P> IsSearchableMesh<P> for SearchableMesh3D<'a, P> where
     P: IsBuildable3D + Clone {
 
     fn num_edges(&self) -> usize {

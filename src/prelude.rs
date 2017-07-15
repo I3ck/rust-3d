@@ -104,7 +104,7 @@ pub use point_cloud_3d::*;
 pub use traits::is_mesh::*;
 pub use traits::is_mesh_3d::*;
 pub use traits::is_editable_mesh::*;
-pub use traits::is_searchable_mesh_3d::*;
+pub use traits::is_searchable_mesh::*;
 
 pub use traits::is_filter::*;
 pub use traits::is_filter_random_accessible::*;
