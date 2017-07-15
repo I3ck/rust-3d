@@ -23,7 +23,7 @@ use std::ops::{Add, Mul};
 use prelude::*;
 use distances_3d::*;
 
-#[derive (PartialEq, PartialOrd, Default, Clone)]
+#[derive (Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Point3D, a point / position within 3D space
 pub struct Point3D {
     pub x: f64,

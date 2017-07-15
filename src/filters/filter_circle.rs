@@ -32,7 +32,7 @@ use distances_2d::*;
 use positive::*;
 use bounding_box_2d::*;
 
-#[derive (PartialEq, PartialOrd, Default, Clone)]
+#[derive (Debug, PartialEq, PartialOrd, Default, Clone)]
 /// FilterCircle, a circle filter within 2D space
 pub struct FilterCircle {
     center: Point2D,

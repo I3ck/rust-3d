@@ -19,7 +19,7 @@ use std::fmt;
 
 use prelude::*;
 
-#[derive (PartialEq, PartialOrd, Eq, Clone, Hash)]
+#[derive (Debug, PartialEq, PartialOrd, Eq, Clone, Hash)]
 /// LineSegment3D, a line segment within 3D space
 pub struct LineSegment3D {
     pub line: Line3D,

@@ -23,6 +23,7 @@ use self::num::traits::Unsigned;
 use prelude::*;
 use compressed_point_3d::*;
 
+#[derive (Debug, Clone, PartialEq, PartialOrd)]
 /// CompressedPointCloud3D
 pub struct CompressedPointCloud3D<T> where
     T: Unsigned + PrimInt {

@@ -23,7 +23,7 @@ use prelude::*;
 use distances_3d::*;
 use functions::{sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z};
 
-#[derive (Default, Clone)]
+#[derive (Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// PointCloud3D, a collection of positions within 3D space
 pub struct PointCloud3D<P> where
     P: Is3D {

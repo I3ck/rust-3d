@@ -22,6 +22,7 @@ use functions::{center};
 //@todo either merge Oct code or split KdNode and Tree into seperate files
 //@todo make all private or document
 
+#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// OcNode, which is a single node used within OcTree
 pub enum OcNode<P> where
     P: IsEditable3D + IsBuildable3D {
@@ -30,6 +31,7 @@ pub enum OcNode<P> where
     Node(Internal<P>)
 }
 
+#[derive (Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 pub struct Internal<P> where
     P: IsEditable3D + IsBuildable3D { // naming : p == positive, n == negative ||| xyz   => pnp => x positive, y negative, z positive direction from center
 

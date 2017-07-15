@@ -19,7 +19,7 @@ use std::fmt;
 
 macro_rules! strong_usize {
     ($NEW_NAME:ident) => (
-        #[derive (Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive (Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
         pub struct $NEW_NAME {
             pub val: usize
         }
@@ -33,7 +33,7 @@ macro_rules! strong_usize {
 
 macro_rules! strong_f64 {
     ($NEW_NAME:ident) => (
-        #[derive (Clone, Copy, PartialEq)]
+        #[derive (Debug, Clone, Copy, PartialEq)]
         pub struct $NEW_NAME {
             pub val: f64
         }

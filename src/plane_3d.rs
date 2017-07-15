@@ -18,6 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use prelude::*;
 
 /// Plane3D, a plane within 3D space
+#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 pub struct Plane3D<P, N> where
     P: Is3D,
     N: IsNormalized3D {

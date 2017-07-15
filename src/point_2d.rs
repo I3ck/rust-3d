@@ -23,7 +23,7 @@ use std::ops::{Add, Mul};
 use prelude::*;
 use distances_2d::*;
 
-#[derive (PartialEq, PartialOrd, Default, Clone)]
+#[derive (Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Point2D, a point / position within 2D space
 pub struct Point2D {
     pub x: f64,

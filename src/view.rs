@@ -17,7 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::collections::HashSet;
 
-#[derive(Clone)]
+#[derive (Debug, PartialEq, Eq, Clone)]
 /// View, which defines a restricted / full view onto any T. E.g. used when filtering collections of points.
 pub enum View {
     Full,

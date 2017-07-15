@@ -19,7 +19,7 @@ use std::fmt;
 
 use prelude::*;
 
-#[derive (PartialEq, PartialOrd, Eq, Clone, Hash)]
+#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Line2D, a line within 2D space
 pub struct Line2D {
     pub source: Point2D,

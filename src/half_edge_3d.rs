@@ -18,12 +18,14 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use prelude::*;
 use utils::safe_append_at;
 
+#[derive (Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Edge type used within the HalfEdge3D
 struct Edge {
     tail: VId,
     twin: Option<EId>
 }
 
+#[derive (Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// HalfEdge3D, the half edge data structure for 3D
 pub struct HalfEdge3D {
     edges: Vec<Edge>,

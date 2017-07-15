@@ -18,6 +18,8 @@ new / default for line, ray, line segment
 
 matrix multiplication -> Mul
 
+Norm etc. should NOT have public fields
+
 *Point::new() syntax is used too often
 
 derive as many traits as possible (e.g. Mesh currently not Clone)

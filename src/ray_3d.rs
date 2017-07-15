@@ -19,7 +19,7 @@ use std::fmt;
 
 use prelude::*;
 
-#[derive (PartialEq, PartialOrd, Eq, Clone, Hash)]
+#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Ray3D, a ray within 3D space
 pub struct Ray3D {
     pub line: Line3D

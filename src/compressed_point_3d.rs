@@ -20,6 +20,7 @@ extern crate num;
 use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
+#[derive (Debug, Clone, PartialEq, PartialOrd)]
 /// CompressedPoint3D
 pub struct CompressedPoint3D<T> where
     T: Unsigned + PrimInt  {

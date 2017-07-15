@@ -32,7 +32,7 @@ use distances_3d::*;
 use positive::*;
 use bounding_box_3d::*;
 
-#[derive (PartialEq, PartialOrd, Default, Clone)]
+#[derive (Debug, PartialEq, PartialOrd, Default, Clone)]
 /// FilterBox3D, a box filter within 3D space
 pub struct FilterBox3D {
     center: Point3D,

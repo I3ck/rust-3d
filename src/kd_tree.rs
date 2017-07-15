@@ -23,7 +23,7 @@ use prelude::*;
 use distances_3d::*;
 use functions::{dimension_compare, dimension_dist, sort_and_limit};
 
-#[derive (Default)]
+#[derive (Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// KdTree
 pub struct KdTree<P> where
     P: Is3D {
@@ -31,6 +31,7 @@ pub struct KdTree<P> where
     root: Option<KdNode<P>>
 }
 
+#[derive (Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct KdNode<P> where
     P: Is3D {
 

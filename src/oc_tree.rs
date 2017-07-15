@@ -22,7 +22,7 @@ use std::iter::IntoIterator;
 
 use prelude::*;
 
-#[derive (Default)]
+#[derive (Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// OcTree
 pub struct OcTree<P> where
     P: IsEditable3D + IsBuildable3D {

@@ -18,6 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use prelude::*;
 use functions::cross;
 
+#[derive (Debug, PartialEq, PartialOrd, Clone)]
 /// Matrix4, a matrix with 4 rows and columns
 pub struct Matrix4 {
     pub data: [[f64; 4]; 4]

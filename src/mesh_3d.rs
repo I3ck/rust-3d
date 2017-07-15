@@ -17,7 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use prelude::*;
 
-#[derive (Default)]
+#[derive (Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Mesh3D, a mesh with tri-faces within 3D space
 pub struct Mesh3D<P> where
     P: Is3D {

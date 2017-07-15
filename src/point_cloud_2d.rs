@@ -23,7 +23,7 @@ use prelude::*;
 use distances_2d::*;
 use functions::{sort_vec_2d_x, sort_vec_2d_y};
 
-#[derive (Default, Clone)]
+#[derive (Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// PointCloud2D, a collection of positions within 2D space
 pub struct PointCloud2D<P> where
     P: Is2D {

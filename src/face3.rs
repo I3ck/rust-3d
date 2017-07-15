@@ -19,7 +19,7 @@ use std::fmt;
 
 use prelude::*;
 
-#[derive (PartialEq, PartialOrd, Clone, Eq, Ord, Hash)]
+#[derive (Debug, PartialEq, PartialOrd, Clone, Eq, Ord, Hash)]
 /// Face3, a face defined by 3 indices (e.g. used for Mesh)
 pub struct Face3 {
     pub a: VId,

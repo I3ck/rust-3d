@@ -22,7 +22,7 @@ use std::ops::{Mul};
 use prelude::*;
 use distances_2d::*;
 
-#[derive (PartialEq, PartialOrd, Clone)]
+#[derive (Debug, PartialEq, PartialOrd, Clone)]
 /// Norm2D, a normalized vector within 2D space
 pub struct Norm2D {
     pub x: f64,

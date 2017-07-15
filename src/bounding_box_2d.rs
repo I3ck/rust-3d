@@ -17,6 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use prelude::*;
 
+#[derive (Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// BoundingBox2D, an axis aligned bounding box within 2D space
 pub struct BoundingBox2D {
     min: Point2D,

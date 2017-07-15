@@ -21,7 +21,7 @@ use std::hash::{Hash, Hasher};
 
 use prelude::*;
 
-#[derive (Copy, Clone, PartialEq, PartialOrd)]
+#[derive (Debug, PartialEq, PartialOrd, Clone)]
 /// Positive, a wrapper for a f64 value, ensuring it is always > 0
 pub struct Positive {
     val: f64
