@@ -13,17 +13,16 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! IsEditableMesh3D trait used for meshes in 3D space which can be edited
+//! IsEditableMesh trait used for meshes which can be edited
 
 use prelude::*;
 
-/// IsEditableMesh3D is a trait used for meshes in 3D space which can be edited
-pub trait IsEditableMesh3D<P> : IsMesh3D<P> where
-    P: IsBuildable3D {
+/// IsEditableMesh is a trait used for meshes which can be edited
+pub trait IsEditableMesh<T> : IsMesh<T> {
     /// Should add a vertex to the end and return its id
-    fn add_vertex(&mut self, vertex: P) -> VId;
+    fn add_vertex(&mut self, vertex: T) -> VId;
     /// Should add a face with the 3 positions. Also should return the id of the new face
-    fn add_face(&mut self, v1: P, v2: P, v3: P) -> FId;
+    fn add_face(&mut self, v1: T, v2: T, v3: T) -> FId;
     /// Should add a face to the mesh by connecting the vertices via their ids. Should return the id of the newly added face
     fn try_add_connection(&mut self, vid1: VId, vid2: VId, vid3: VId) -> Result<FId>;
 }

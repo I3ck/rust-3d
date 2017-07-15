@@ -18,6 +18,10 @@ matrix multiplication -> Mul
 
 filter_and_test sometimes fails
 
+consider removing the IsMesh3D trait
+
+IsSearchableMesh3D and SearchableMesh3D could now also be implemented without dimension constrains
+
 distance methods for ray line line segment
 
 similar to distances, add intersections

@@ -47,7 +47,7 @@ impl<'a, P> SearchableMesh3D<'a, P> where
     }
 }
 
-impl<'a, P> IsMesh3D<P> for SearchableMesh3D<'a, P> where
+impl<'a, P> IsMesh<P> for SearchableMesh3D<'a, P> where
     P: IsBuildable3D + Clone {
 
     fn num_faces(&self) -> usize {
@@ -69,6 +69,11 @@ impl<'a, P> IsMesh3D<P> for SearchableMesh3D<'a, P> where
     fn vertex(&self, vertexid: VId) -> Result<P> {
         self.mesh.vertex(vertexid)
     }
+}
+
+impl<'a, P> IsMesh3D<P> for SearchableMesh3D<'a, P> where
+    P: IsBuildable3D + Clone {
+
 }
 
 impl<'a, P> IsSearchableMesh3D<P> for SearchableMesh3D<'a, P> where

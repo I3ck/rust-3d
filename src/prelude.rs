@@ -101,8 +101,9 @@ pub use traits::is_view_buildable::*;
 pub use point_cloud_2d::*;
 pub use point_cloud_3d::*;
 
+pub use traits::is_mesh::*;
 pub use traits::is_mesh_3d::*;
-pub use traits::is_editable_mesh_3d::*;
+pub use traits::is_editable_mesh::*;
 pub use traits::is_searchable_mesh_3d::*;
 
 pub use traits::is_filter::*;
