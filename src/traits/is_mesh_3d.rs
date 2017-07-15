@@ -33,3 +33,8 @@ pub trait IsMesh3D<P> : IsMesh<P> where
         Norm3D::new(*n).and_then(|x| Ok(*x))
     }
 }
+
+impl<M,P> IsMesh3D<P> for M where
+    M: IsMesh<P>,
+    P: IsBuildable3D {
+}

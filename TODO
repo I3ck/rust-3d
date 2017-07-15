@@ -20,8 +20,6 @@ Mul and Add types where possible (Add for Matrix / Mul and Add for others
 
 filter_and_test sometimes fails
 
-consider removing the IsMesh3D trait
-
 distance methods for ray line line segment
 
 similar to distances, add intersections

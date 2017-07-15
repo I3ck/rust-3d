@@ -65,10 +65,6 @@ impl<P> IsMesh<P> for Mesh3D<P> where
     }
 }
 
-impl<P> IsMesh3D<P> for Mesh3D<P> where
-    P: IsBuildable3D + Clone {
-}
-
 impl<P> IsEditableMesh<P> for Mesh3D<P> where
     P: IsEditable3D + IsBuildable3D + Clone {
 
