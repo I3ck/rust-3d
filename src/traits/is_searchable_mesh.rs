@@ -18,7 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use prelude::*;
 
 /// IsSearchableMesh trait used for meshes which have extended search methods
-pub trait IsSearchableMesh<T> : IsMesh<T> {
+pub trait IsSearchableMesh<V, TU> : IsMesh<V, Face3> {
     /// Should return the edge ids of the given face. Error if id invalid
     fn edges_of_face(&self, faceid: FId) -> Result<(EId, EId, EId)>;
     /// Should return the edges originating at the given vertex (pointing away / having the vertex as tail). Error if id invalid

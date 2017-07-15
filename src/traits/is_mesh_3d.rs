@@ -19,7 +19,7 @@ use prelude::*;
 use functions::{conn, cross};
 
 /// IsMesh3D is trait used for meshes in 3D space
-pub trait IsMesh3D<P> : IsMesh<P> where
+pub trait IsMesh3D<P> : IsMesh<P, Face3> where
     P: IsBuildable3D {
     /// Returns the normal of a face
     fn face_normal(&self, faceid: FId) -> Result<Norm3D> {
@@ -35,6 +35,6 @@ pub trait IsMesh3D<P> : IsMesh<P> where
 }
 
 impl<M,P> IsMesh3D<P> for M where
-    M: IsMesh<P>,
+    M: IsMesh<P, Face3>,
     P: IsBuildable3D {
 }

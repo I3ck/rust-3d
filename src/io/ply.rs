@@ -17,11 +17,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 extern crate core;
 
-use strong_types::*;
-use result::*;
-use traits::is_buildable_3d::*;
-use traits::is_mesh_3d::*;
-use traits::is_editable_mesh::*;
+use prelude::*;
+
 use utils::to_words;
 
 use self::core::str::FromStr;
@@ -30,7 +27,7 @@ use std::fs::File;
 
 /// Saves an IsMesh3D in the ASCII .ply file format
 pub fn save_ply_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()> where
-    M: IsMesh3D<P>,
+    M: IsMesh<P, Face3>,
     P: IsBuildable3D {
 
     let mut f = File::create(filepath).map_err(|e| e.to_error_kind())?;
@@ -62,7 +59,7 @@ pub fn save_ply_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()> where
 // @todo allows incorrect headers and might fail on correct ones
 /// Loads an IsMesh3D from the ASCII .ply file format
 pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
-    EM: IsEditableMesh<P>,
+    EM: IsEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone {
 
         let mut f       = File::open(filepath)?;
@@ -218,7 +215,7 @@ fn collect_index_line(line: &str, indices: &mut Vec<usize>) -> Result<()> {
 }
 
 fn fill_mesh<EM, P>(vertices: &Vec<P>, indices: &Vec<usize>, mesh: &mut EM) -> Result<()> where
-    EM: IsEditableMesh<P>,
+    EM: IsEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone {
 
     let n_vertices = vertices.len();

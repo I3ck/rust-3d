@@ -38,6 +38,11 @@ mark functions and traits as tested/untested?
 
 transformers as wrappers / intermediate structures
 
+currently all meshes are tri meshes, maybe rename later (at least once quad mesh was added)
+
+searchable mesh currently only defined for tri mesh. consider making this generic / rename it
+same for HalfEdge
+
 write mesh/PC file type converter program once many IO methods are implemented?
 
 add more combinator filters to the random accessible filters

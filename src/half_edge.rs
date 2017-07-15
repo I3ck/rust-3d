@@ -37,7 +37,7 @@ impl HalfEdge {
     /// This only stays valid if IMesh3D is not changed after creation
     /// The mesh must be manifold (@todo ensure via types?)
     pub fn new<T, M>(mesh: &M) -> Self where
-        M: IsMesh<T> {
+        M: IsMesh<T, Face3> {
 
         let n_faces = mesh.num_faces();
 

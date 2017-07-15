@@ -13,21 +13,14 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! IsMesh trait used for meshes
+//! IsTopologyUnit trait used for single units of a topology. E.g. size 1 for paths, size 3 for tri meshes, size 4 for quad meshes
 
 use prelude::*;
 
-/// IsMesh is trait used for meshes
-pub trait IsMesh<V, TU> where
-    TU: IsTopologyUnit {
-    /// Should return the number of faces within the mesh
-    fn num_faces(&self) -> usize;
-    /// Should return the number of vertices within the mesh
-    fn num_vertices(&self) -> usize;
-    /// Should return the ids of vertices of the given face
-    fn face_vertex_ids(&self, faceid: FId) -> Result<TU>;
-    /// Should return the vertices of the given face
-    fn face_vertices(&self, faceid: FId) -> Result<(V, V, V)>;
-    /// Should return the vertex with the given id
-    fn vertex(&self, vertexid: VId) -> Result<V>;
+/// IsTopologyUnit trait used for single units of a topology. E.g. size 1 for paths, size 3 for tri meshes, size 4 for quad meshes
+pub trait IsTopologyUnit {
+    /// Should return the number of indices a unit is defined with. (e.g. 3 for a tri mesh)
+    fn n_vids() -> usize;
+    /// Should return the vertex id of the nth element of this unit. Failure if index out of bounds
+    fn get_vid(&self, index: usize) -> Result<VId>;
 }

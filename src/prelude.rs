@@ -103,6 +103,7 @@ pub use point_cloud_3d::*;
 
 pub use traits::is_mesh::*;
 pub use traits::is_mesh_3d::*;
+pub use traits::is_topology_unit::*;
 pub use traits::is_editable_mesh::*;
 pub use traits::is_searchable_mesh::*;
 

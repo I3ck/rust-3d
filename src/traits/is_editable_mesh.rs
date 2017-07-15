@@ -18,11 +18,12 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use prelude::*;
 
 /// IsEditableMesh is a trait used for meshes which can be edited
-pub trait IsEditableMesh<T> : IsMesh<T> {
+pub trait IsEditableMesh<V, TU> : IsMesh<V, TU> where
+    TU: IsTopologyUnit {
     /// Should add a vertex to the end and return its id
-    fn add_vertex(&mut self, vertex: T) -> VId;
+    fn add_vertex(&mut self, vertex: V) -> VId;
     /// Should add a face with the 3 positions. Also should return the id of the new face
-    fn add_face(&mut self, v1: T, v2: T, v3: T) -> FId;
+    fn add_face(&mut self, v1: V, v2: V, v3: V) -> FId;
     /// Should add a face to the mesh by connecting the vertices via their ids. Should return the id of the newly added face
     fn try_add_connection(&mut self, vid1: VId, vid2: VId, vid3: VId) -> Result<FId>;
 }

@@ -19,7 +19,7 @@ use prelude::*;
 
 /// SearchableMesh, transforms IsMesh to IsSearchableMesh
 pub struct SearchableMesh<'a, T> {
-    mesh: Box<IsMesh<T> + 'a>,
+    mesh: Box<IsMesh<T, Face3> + 'a>,
     he: HalfEdge
 }
 
@@ -28,7 +28,7 @@ impl<'a, T> SearchableMesh<'a, T> {
     /// This only stays valid if IMesh3D is not changed after creation
     /// The mesh must be manifold (@todo ensure via types?)
     pub fn new<M>(mesh: Box<M>) -> Self where
-        M: 'a + IsMesh<T> {
+        M: 'a + IsMesh<T, Face3> {
 
         let he = HalfEdge::new(&*mesh);
 
@@ -44,7 +44,7 @@ impl<'a, T> SearchableMesh<'a, T> {
     }
 }
 
-impl<'a, T> IsMesh<T> for SearchableMesh<'a, T> {
+impl<'a, T> IsMesh<T, Face3> for SearchableMesh<'a, T> {
     fn num_faces(&self) -> usize {
         self.mesh.num_faces()
     }
@@ -66,7 +66,7 @@ impl<'a, T> IsMesh<T> for SearchableMesh<'a, T> {
     }
 }
 
-impl<'a, T> IsSearchableMesh<T> for SearchableMesh<'a, T>  {
+impl<'a, T> IsSearchableMesh<T, Face3> for SearchableMesh<'a, T>  {
 
     fn num_edges(&self) -> usize {
         self.mesh.num_faces() * 3

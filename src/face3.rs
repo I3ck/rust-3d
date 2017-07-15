@@ -34,6 +34,21 @@ impl Face3 {
     }
 }
 
+impl IsTopologyUnit for Face3 {
+    fn n_vids() -> usize {
+        3
+    }
+
+    fn get_vid(&self, index: usize) -> Result<VId> {
+        match index {
+            0 => Ok(self.a),
+            1 => Ok(self.b),
+            2 => Ok(self.c),
+            _ => Err(ErrorKind::IncorrectUnitID)
+        }
+    }
+}
+
 impl fmt::Display for Face3 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({}, {}, {})", self.a.val, self.b.val, self.c.val)
