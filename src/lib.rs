@@ -48,7 +48,7 @@ pub mod compressed_point_cloud_3d;
 pub mod projection_to_plane;
 pub mod kd_tree;
 pub mod mesh_3d;
-pub mod searchable_mesh_3d;
+pub mod searchable_mesh;
 pub mod oc_node;
 pub mod oc_tree;
 pub mod factory_2d;

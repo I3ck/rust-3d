@@ -13,29 +13,26 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! SearchableMesh3D, transforms IsMesh3D to IsSearchableMesh3D
+//! SearchableMesh, transforms IsMesh to IsSearchableMesh
 
 use prelude::*;
 
-/// SearchableMesh3D, transforms IsMesh3D to IsSearchableMesh3D
-pub struct SearchableMesh3D<'a, P> where
-    P: Is3D {
-
-    mesh: Box<IsMesh3D<P> + 'a>,
+/// SearchableMesh, transforms IsMesh to IsSearchableMesh
+pub struct SearchableMesh<'a, T> {
+    mesh: Box<IsMesh<T> + 'a>,
     he: HalfEdge3D
 }
 
-impl<'a, P> SearchableMesh3D<'a, P> where
-    P: IsBuildable3D {
+impl<'a, T> SearchableMesh<'a, T> {
     /// Creates a new SearchableMesh3D from an IsMesh3D
     /// This only stays valid if IMesh3D is not changed after creation
     /// The mesh must be manifold (@todo ensure via types?)
     pub fn new<M>(mesh: Box<M>) -> Self where
-        M: 'a + IsMesh3D<P> {
+        M: 'a + IsMesh<T> {
 
         let he = HalfEdge3D::new(&*mesh);
 
-        SearchableMesh3D {mesh: mesh, he: he}
+        SearchableMesh {mesh: mesh, he: he}
     }
 
     /// Fails if the vertex ID is out of bounds
@@ -47,9 +44,7 @@ impl<'a, P> SearchableMesh3D<'a, P> where
     }
 }
 
-impl<'a, P> IsMesh<P> for SearchableMesh3D<'a, P> where
-    P: IsBuildable3D + Clone {
-
+impl<'a, T> IsMesh<T> for SearchableMesh<'a, T> {
     fn num_faces(&self) -> usize {
         self.mesh.num_faces()
     }
@@ -62,22 +57,20 @@ impl<'a, P> IsMesh<P> for SearchableMesh3D<'a, P> where
         self.mesh.face_vertex_ids(faceid)
     }
 
-    fn face_vertices(&self, faceid: FId) -> Result<(P, P, P)> {
+    fn face_vertices(&self, faceid: FId) -> Result<(T, T, T)> {
         self.mesh.face_vertices(faceid)
     }
 
-    fn vertex(&self, vertexid: VId) -> Result<P> {
+    fn vertex(&self, vertexid: VId) -> Result<T> {
         self.mesh.vertex(vertexid)
     }
 }
 
-impl<'a, P> IsMesh3D<P> for SearchableMesh3D<'a, P> where
+impl<'a, P> IsMesh3D<P> for SearchableMesh<'a, P> where
     P: IsBuildable3D + Clone {
-
 }
 
-impl<'a, P> IsSearchableMesh<P> for SearchableMesh3D<'a, P> where
-    P: IsBuildable3D + Clone {
+impl<'a, T> IsSearchableMesh<T> for SearchableMesh<'a, T>  {
 
     fn num_edges(&self) -> usize {
         self.mesh.num_faces() * 3
