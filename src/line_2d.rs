@@ -22,18 +22,25 @@ use prelude::*;
 #[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Line2D, a line within 2D space
 pub struct Line2D {
-    pub source: Point2D,
+    pub anchor: Point2D,
     pub dir: Norm2D
+}
+
+impl Line2D {
+    /// Creates a new Line2D from an anchor point and a direction
+    pub fn new(anchor: Point2D, dir: Norm2D) -> Self {
+        Line2D{anchor: anchor, dir: dir}
+    }
 }
 
 impl IsMovable2D for Line2D {
     fn move_by(&mut self, x: f64, y: f64) {
-        self.source.move_by(x, y);
+        self.anchor.move_by(x, y);
     }
 }
 
 impl fmt::Display for Line2D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({}, {} -> {}, {})", self.source.x(), self.source.y(), self.dir.x(), self.dir.y())
+        write!(f, "({}, {} -> {}, {})", self.anchor.x(), self.anchor.y(), self.dir.x(), self.dir.y())
     }
 }

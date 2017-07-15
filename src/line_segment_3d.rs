@@ -26,6 +26,13 @@ pub struct LineSegment3D {
     pub length: Positive,
 }
 
+impl LineSegment3D {
+    /// Creates a new LineSegment3D from a Line3D and a length
+    pub fn new(line: Line3D, length: Positive) -> Self {
+        LineSegment3D{line: line, length: length}
+    }
+}
+
 impl IsMovable3D for LineSegment3D {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         self.line.move_by(x, y, z);
@@ -41,20 +48,20 @@ impl HasLength for LineSegment3D {
 impl HasBoundingBox3D for LineSegment3D {
     fn bounding_box(&self) -> Result<BoundingBox3D> {
         let mut pts = Vec::new();
-        pts.push(Box::new(self.line.source.clone()));
-        pts.push(Box::new(self.line.source.clone() + self.line.dir.clone() * self.length.get()));
+        pts.push(Box::new(self.line.anchor.clone()));
+        pts.push(Box::new(self.line.anchor.clone() + self.line.dir.clone() * self.length.get()));
         BoundingBox3D::from_iterator(pts.iter())
     }
 }
 
 impl HasCenterOfGravity3D for LineSegment3D {
     fn center_of_gravity(&self) -> Result<Point3D> {
-        Ok(self.line.source.clone() + self.line.dir.clone() * 0.5 * self.length.get())
+        Ok(self.line.anchor.clone() + self.line.dir.clone() * 0.5 * self.length.get())
     }
 }
 
 impl fmt::Display for LineSegment3D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({}, {}, {} -> {} * {}, {}, {})", self.line.source.x(), self.line.source.y(), self.line.source.z(), self.length, self.line.dir.x(), self.line.dir.y(), self.line.dir.z())
+        write!(f, "({}, {}, {} -> {} * {}, {}, {})", self.line.anchor.x(), self.line.anchor.y(), self.line.anchor.z(), self.length, self.line.dir.x(), self.line.dir.y(), self.line.dir.z())
     }
 }

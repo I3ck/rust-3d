@@ -26,6 +26,13 @@ pub struct LineSegment2D {
     pub length: Positive,
 }
 
+impl LineSegment2D {
+    /// Creates a new LineSegment2D from a Line2D and a length
+    pub fn new(line: Line2D, length: Positive) -> Self {
+        LineSegment2D{line: line, length: length}
+    }
+}
+
 impl IsMovable2D for LineSegment2D {
     fn move_by(&mut self, x: f64, y: f64) {
         self.line.move_by(x, y);
@@ -41,20 +48,20 @@ impl HasLength for LineSegment2D {
 impl HasBoundingBox2D for LineSegment2D {
     fn bounding_box(&self) -> Result<BoundingBox2D> {
         let mut pts = Vec::new();
-        pts.push(Box::new(self.line.source.clone()));
-        pts.push(Box::new(self.line.source.clone() + self.line.dir.clone() * self.length.get()));
+        pts.push(Box::new(self.line.anchor.clone()));
+        pts.push(Box::new(self.line.anchor.clone() + self.line.dir.clone() * self.length.get()));
         BoundingBox2D::from_iterator(pts.iter())
     }
 }
 
 impl HasCenterOfGravity2D for LineSegment2D {
     fn center_of_gravity(&self) -> Result<Point2D> {
-        Ok(self.line.source.clone() + self.line.dir.clone() * 0.5 * self.length.get())
+        Ok(self.line.anchor.clone() + self.line.dir.clone() * 0.5 * self.length.get())
     }
 }
 
 impl fmt::Display for LineSegment2D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({}, {} -> {} * {}, {})", self.line.source.x(), self.line.source.y(), self.length, self.line.dir.x(), self.line.dir.y())
+        write!(f, "({}, {} -> {} * {}, {})", self.line.anchor.x(), self.line.anchor.y(), self.length, self.line.dir.x(), self.line.dir.y())
     }
 }

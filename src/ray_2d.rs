@@ -25,6 +25,13 @@ pub struct Ray2D {
     pub line: Line2D
 }
 
+impl Ray2D {
+    /// Creates a new Ray2D from a Line2D
+    pub fn new(line: Line2D) -> Self {
+        Ray2D {line: line}
+    }
+}
+
 impl IsMovable2D for Ray2D {
     fn move_by(&mut self, x: f64, y: f64) {
         self.line.move_by(x, y);

@@ -14,8 +14,6 @@ rename either the half edge or IsSearchableMesh methods, so the names match
 
 remove all files from src/ toplevel and add only use sub folder
 
-new / default for line, ray, line segment
-
 matrix multiplication -> Mul
 
 filter_and_test sometimes fails

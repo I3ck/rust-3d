@@ -25,6 +25,13 @@ pub struct Ray3D {
     pub line: Line3D
 }
 
+impl Ray3D {
+    /// Creates a new Ray3D from a Line3D
+    pub fn new(line: Line3D) -> Self {
+        Ray3D {line: line}
+    }
+}
+
 impl IsMovable3D for Ray3D {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         self.line.move_by(x, y, z);
