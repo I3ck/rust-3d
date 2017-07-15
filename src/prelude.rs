@@ -111,7 +111,7 @@ pub use traits::is_filter_random_accessible::*;
 
 pub use view::*;
 
-pub use half_edge_3d::*;
+pub use half_edge::*;
 
 pub use filters::filter_box_2d::*;
 pub use filters::filter_box_3d::*;

@@ -22,8 +22,6 @@ filter_and_test sometimes fails
 
 consider removing the IsMesh3D trait
 
-rename HalfEdge3D
-
 distance methods for ray line line segment
 
 similar to distances, add intersections

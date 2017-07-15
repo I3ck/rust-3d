@@ -20,7 +20,7 @@ use prelude::*;
 /// SearchableMesh, transforms IsMesh to IsSearchableMesh
 pub struct SearchableMesh<'a, T> {
     mesh: Box<IsMesh<T> + 'a>,
-    he: HalfEdge3D
+    he: HalfEdge
 }
 
 impl<'a, T> SearchableMesh<'a, T> {
@@ -30,7 +30,7 @@ impl<'a, T> SearchableMesh<'a, T> {
     pub fn new<M>(mesh: Box<M>) -> Self where
         M: 'a + IsMesh<T> {
 
-        let he = HalfEdge3D::new(&*mesh);
+        let he = HalfEdge::new(&*mesh);
 
         SearchableMesh {mesh: mesh, he: he}
     }

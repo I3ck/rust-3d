@@ -13,26 +13,26 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! HalfEdge3D, the half edge data structure for 3D
+//! HalfEdge, the half edge data structure
 
 use prelude::*;
 use utils::safe_append_at;
 
 #[derive (Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-/// Edge type used within the HalfEdge3D
+/// Edge type used within the HalfEdge
 struct Edge {
     tail: VId,
     twin: Option<EId>
 }
 
 #[derive (Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-/// HalfEdge3D, the half edge data structure for 3D
-pub struct HalfEdge3D {
+/// HalfEdge, the half edge data structure
+pub struct HalfEdge {
     edges: Vec<Edge>,
     vertices_start_edges: Vec<Vec<EId>> //@todo better name
 }
 
-impl HalfEdge3D {
+impl HalfEdge {
     /// Creates a new HalfEdge3D for the given IsMesh3D
     /// This only stays valid if IMesh3D is not changed after creation
     /// The mesh must be manifold (@todo ensure via types?)
@@ -59,7 +59,7 @@ impl HalfEdge3D {
             }
         }
 
-        let mut result = HalfEdge3D{edges: edges , vertices_start_edges: vertices_start_edges };
+        let mut result = HalfEdge{edges: edges , vertices_start_edges: vertices_start_edges };
 
         // For each edge, get tail of next
         // Of this get all edges originating
