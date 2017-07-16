@@ -91,14 +91,12 @@ impl Matrix4Pipe {
     }
 
     /// Adds a look at target to the pipe
-    pub fn add_look_at<P, N>(&mut self, target: &P, up: &N) -> bool where
+    pub fn add_look_at<P, N>(&mut self, target: &P, up: &N) -> Result<()> where
         P: IsBuildable3D,
         N: IsNormalized3D {
 
-        match Matrix4::look_at(target, up) {
-            Err(_) => return false,
-            Ok(m) => { self.mcamlook = m; return true; }
-        }
+        self.mcamlook = Matrix4::look_at(target, up)?;
+        Ok(())
     }
     /// Removes any look at target from the pipe
     pub fn remove_look_at(&mut self) {
