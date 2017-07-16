@@ -25,5 +25,5 @@ pub trait IsTree3D<P> where
     /// Should return all positions within the tree as point cloud
     fn to_pointcloud(&self) -> PointCloud3D<P>; //@todo as trait
     /// Should create a new tree from a given point cloud
-    fn build(&mut self, pc : PointCloud3D<P>) -> bool; //@todo return Result
+    fn build(&mut self, pc : PointCloud3D<P>) -> Result<()>;
 }

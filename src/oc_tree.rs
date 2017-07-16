@@ -46,24 +46,20 @@ impl<P> IsTree3D<P> for OcTree<P> where
         self.collect(-1)
     }
 
-    fn build(&mut self, pc: PointCloud3D<P>) -> bool { //@todo change to result
-        match pc.bounding_box() {
-            Err(_) => false,
-            Ok(bb) => {
-                let mut unique_data = Vec::new();
-                let mut set = HashSet::new();
-                for p in pc.data {
-                    set.insert(*p);
-                }
-                //let mut set: HashSet<P> = pc.data.into_iter().unbox().collect();
-                unique_data.extend(set.into_iter());
-                self.min = *P::new(bb.min().x, bb.min().y, bb.min().z);
-                self.max = *P::new(bb.max().x, bb.max().y, bb.max().z);
-                self.root = Some(OcNode::new(&self.min, &self.max, unique_data));
-
-                true
-            }
+    fn build(&mut self, pc: PointCloud3D<P>) -> Result<()> {
+        let bb = pc.bounding_box()?;
+        let mut unique_data = Vec::new();
+        let mut set = HashSet::new();
+        for p in pc.data {
+            set.insert(*p);
         }
+        //let mut set: HashSet<P> = pc.data.into_iter().unbox().collect();
+        unique_data.extend(set.into_iter());
+        self.min = *P::new(bb.min().x, bb.min().y, bb.min().z);
+        self.max = *P::new(bb.max().x, bb.max().y, bb.max().z);
+        self.root = Some(OcNode::new(&self.min, &self.max, unique_data));
+
+        Ok(())
     }
 }
 

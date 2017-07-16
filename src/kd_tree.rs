@@ -59,12 +59,12 @@ impl<P> IsTree3D<P> for KdTree<P> where
         result
     }
 
-    fn build(&mut self, pc: PointCloud3D<P>) -> bool {
+    fn build(&mut self, pc: PointCloud3D<P>) -> Result<()> {
         match pc.len() {
-            0 => false,
+            0 => Err(ErrorKind::TooFewPoints),
             _ => {
                 self.root = Some(KdNode::new(0, pc.data));
-                true
+                Ok(())
             }
         }
     }
