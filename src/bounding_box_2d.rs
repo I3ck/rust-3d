@@ -127,3 +127,26 @@ impl HasBoundingBox2D for BoundingBox2D {
         BoundingBox2D::new(&self.min, &self.max)
     }
 }
+
+impl HasDistanceTo<BoundingBox2D> for BoundingBox2D {
+    fn sqr_distance(&self, other: &BoundingBox2D) -> NonNegative {
+        let mut dx = 0.0;
+        let mut dy = 0.0;
+
+        if other.max().x() < self.min().x() {
+            dx = other.max().x() - self.min().x();
+        }
+        else if other.min().x() > self.max().x() {
+            dx = other.min().x() - self.max().x();
+        }
+
+        if other.max().y() < self.min().y() {
+            dy = other.max().y() - self.min().y();
+        }
+        else if other.min().y() > self.max().y() {
+            dy = other.min().y() - self.max().y();
+        }
+
+        NonNegative::new(dx*dx + dy*dy).unwrap()
+    }
+}

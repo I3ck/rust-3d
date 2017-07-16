@@ -145,3 +145,34 @@ impl HasBoundingBox3D for BoundingBox3D {
         BoundingBox3D::new(&self.min, &self.max)
     }
 }
+
+impl HasDistanceTo<BoundingBox3D> for BoundingBox3D {
+    fn sqr_distance(&self, other: &BoundingBox3D) -> NonNegative {
+        let mut dx = 0.0;
+        let mut dy = 0.0;
+        let mut dz = 0.0;
+
+        if other.max().x() < self.min().x() {
+            dx = other.max().x() - self.min().x();
+        }
+        else if other.min().x() > self.max().x() {
+            dx = other.min().x() - self.max().x();
+        }
+
+        if other.max().y() < self.min().y() {
+            dy = other.max().y() - self.min().y();
+        }
+        else if other.min().y() > self.max().y() {
+            dy = other.min().y() - self.max().y();
+        }
+
+        if other.max().z() < self.min().z() {
+            dz = other.max().z() - self.min().z();
+        }
+        else if other.min().z() > self.max().z() {
+            dz = other.min().z() - self.max().z();
+        }
+
+        NonNegative::new(dx*dx + dy*dy + dz*dz).unwrap()
+    }
+}

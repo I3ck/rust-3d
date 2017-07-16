@@ -18,6 +18,9 @@ remove all files from src/ toplevel and add only use sub folder
 
 add a "Has_Distance_To" trait
 
+basic math shapes (circle, sphere etc.)
+filters could then have e.g. a circle instead of position & radius
+
 drop conn etc. once all operators work
 
 some algorithms (e.g. bezier) can be ported to 3d, maybe write them directly generic over the dimension
