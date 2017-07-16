@@ -30,7 +30,6 @@ pub struct Matrix4Pipe {
 
 impl Matrix4Pipe {
     //@todo might be inversed order
-    //@todo better overload operator * for Matrix4 to gain nicer syntax
     /// Creates a new matrix as a result of all defined operations set within the pipe
     pub fn result(&self) -> Matrix4 {
               self.mperspective.clone()
@@ -54,11 +53,10 @@ impl Matrix4Pipe {
         self.mrotation = Matrix4::rotation(x, y, z);
     }
     /// Adds a rotation around an axis to the pipe
-    pub fn add_rotation_axis<P>(&mut self, axis: &P, rad: Rad) -> bool where P: IsBuildable3D {
-        match Matrix4::rotation_axis(axis, rad) {
-            Err(_) => return false,
-            Ok(m) => { self.mrotation = m; return true; }
-        }
+    pub fn add_rotation_axis<N>(&mut self, axis: &N, rad: Rad) where
+        N: IsNormalized3D {
+
+        self.mrotation = Matrix4::rotation_axis(axis, rad)
     }
     /// Removes any rotation from the pipe
     pub fn remove_rotation(&mut self) {
@@ -93,7 +91,10 @@ impl Matrix4Pipe {
     }
 
     /// Adds a look at target to the pipe
-    pub fn add_look_at<P>(&mut self, target: &P, up: &P) -> bool where P: IsBuildable3D {
+    pub fn add_look_at<P, N>(&mut self, target: &P, up: &N) -> bool where
+        P: IsBuildable3D,
+        N: IsNormalized3D {
+
         match Matrix4::look_at(target, up) {
             Err(_) => return false,
             Ok(m) => { self.mcamlook = m; return true; }

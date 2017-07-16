@@ -38,7 +38,6 @@ impl Matrix4 {
             ]
         }
     }
-
     /// Creates a new matrix which applies translation
     pub fn translation(x: f64, y: f64, z: f64) -> Matrix4 {
         Matrix4{
@@ -50,7 +49,6 @@ impl Matrix4 {
             ]
         }
     }
-
     /// Creates a new matrix which applies scaling
     pub fn scale(x: f64, y: f64, z: f64) -> Matrix4 {
         Matrix4{
@@ -62,7 +60,6 @@ impl Matrix4 {
             ]
         }
     }
-
     /// Creates a new matrix which applies rotation
     pub fn rotation(x: Rad, y: Rad, z: Rad) -> Matrix4 {
         let (mut mx, mut my, mut mz) = (Matrix4::default(), Matrix4::default(), Matrix4::default());
@@ -85,23 +82,20 @@ impl Matrix4 {
 
         mx * my * mz
     }
-
-    //@todo wont have to be of type option once uvec implemented
     /// Creates a new matrix which applies rotation around an axis
-    pub fn rotation_axis<P>(axis: &P, r: Rad) -> Result<Matrix4> where
-        P: IsBuildable3D {
+    pub fn rotation_axis<N>(axis: &N, r: Rad) -> Matrix4 where
+        N: IsNormalized3D {
 
-        let rad = r.val;
-        let u = axis.clone().normalized()?;
-        let mut result = Matrix4::default();
+        let rad         = r.val;
+        let ref u       = axis;
+        let mut result  = Matrix4::default();
         //@todo needs testing!!!
         result.data[0][0] = rad.cos() + u.x()*u.x()*(1.0 - rad.cos());          result.data[0][1] = u.x()*u.y()*(1.0 -rad.cos()) - u.z()*rad.sin();     result.data[0][2] = u.x()*u.z()*(1.0 - rad.cos()) + u.y()*rad.sin();    result.data[0][3] = 0.0;
         result.data[1][0] = u.y()*u.x()*(1.0 - rad.cos()) + u.z()*rad.sin();    result.data[1][1] = rad.cos() + u.y()*u.y()*(1.0 - rad.cos());          result.data[1][2] = u.y()*u.z()*(1.0 - rad.cos()) - u.x()*rad.sin();    result.data[1][3] = 0.0;
         result.data[2][0] = u.z()*u.x()*(1.0 - rad.cos()) - u.y()*rad.sin();    result.data[2][1] = u.z()*u.y()*(1.0 - rad.cos()) + u.x()*rad.sin();    result.data[2][2] = rad.cos() + u.z()*u.z()*(1.0 - rad.cos());          result.data[2][3] = 0.0;
         result.data[3][0] = 0.0;                                                result.data[3][1] = 0.0;                                                result.data[3][2] = 0.0;                                                result.data[3][3] = 1.0;
-        Ok(result)
+        result
     }
-
     /// Creates a new matrix which applies perspective transformation
     pub fn perspective(close: f64, away: f64, fov: Rad) -> Matrix4 {
         let fov_rad = fov.val;
@@ -115,18 +109,15 @@ impl Matrix4 {
         result.data[3][0] = 0.0;                        result.data[3][1] = 0.0;               result.data[3][2] = 1.0;                      result.data[3][3] = 1.0;
         result
     }
-
-    //@todo require normalized vectors in these functions
     /// Creates a new matrix which applies a look at transformation
-    pub fn look_at<P>(target: &P, up: &P) -> Result<Matrix4> where
-        P: IsBuildable3D { //@todo wont have to be an option once unitvector is defined whis is always l > 0 ( l == 1)
+    pub fn look_at<P, N>(target: &P, up: &N) -> Result<Matrix4> where
+        P: IsBuildable3D,
+        N: IsNormalized3D {
 
         let n = target.clone().normalized()?;
-        let u = up.clone().normalized().map(|x| {
-            let mut result = Point3D::default(); //@todo can be dropped?
-            result.from(*(cross(&*x, target)));
-            result
-        })?;
+        let mut u = Point3D::default(); //@todo can be dropped?
+        u.from(*(cross(&*up, target)));
+        let u = u;
         let v = cross(&*n, &u);
 
         let mut result = Matrix4::default();
