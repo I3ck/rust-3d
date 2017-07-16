@@ -19,7 +19,6 @@ use std::f64::consts::PI;
 
 use prelude::*;
 
-//@todo correct reserving
 //@todo some algorithms (e.g. bezier) can be ported to 3d, maybe write them directly generic over the dimension
 
 fn factorial(number: usize) -> usize {
@@ -62,7 +61,7 @@ pub fn interpolate_bezier<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
         return Err(ErrorKind::TooFewPoints);
     }
 
-    let mut pc = PointCloud2D::new();
+    let mut pc = PointCloud2D::with_capacity(n_points);
     let p_dist = 1.0 / (n_points as f64);
 
     for i in 0..n_points {
@@ -80,7 +79,7 @@ pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
         return Err(ErrorKind::TooFewPoints);
     }
 
-    let mut pc = PointCloud2D::new();
+    let mut pc = PointCloud2D::with_capacity(n_points);
     let p_dist = base_points.length() / (n_points - 1) as f64;
 
     for i in 0..n_points {
@@ -114,7 +113,7 @@ pub fn interpolation_linear<P>(base_points: &PointCloud2D<P>, n_points: usize) -
         return Err(ErrorKind::TooFewPoints);
     }
 
-    let mut pc = PointCloud2D::new();
+    let mut pc = PointCloud2D::with_capacity(n_points);
     let p_dist = base_points.length() / (n_points - 1) as f64;
 
     for i in 0..n_points {
