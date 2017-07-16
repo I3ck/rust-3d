@@ -39,10 +39,13 @@ impl Positive {
     pub fn one() -> Positive {
         Positive {val : 1.0}
     }
-
     /// Returns the wrapped value
     pub fn get(&self) -> f64 {
         self.val
+    }
+    /// Returns the square root
+    pub fn sqrt(&self) -> Positive {
+        Positive{val: self.val.sqrt()}
     }
 }
 
