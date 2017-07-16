@@ -50,3 +50,11 @@ pub trait Is3D : IsND {
         sx + " " + &sy + " " + &sz
     }
 }
+
+impl<P> HasDistanceTo<P> for Is3D where
+    P: Is3D {
+
+    fn sqr_distance(&self, other: &P) -> NonNegative {
+        NonNegative::new((self.x() - other.x()).powi(2) + (self.y() - other.y()).powi(2) + (self.z() - other.z()).powi(2)).unwrap()
+    }
+}

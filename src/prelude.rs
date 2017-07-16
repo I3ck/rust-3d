@@ -20,6 +20,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 pub use result::*;
 pub use strong_types::*;
 pub use positive::*;
+pub use non_negative::*;
 
 pub use bounding_box_2d::*;
 pub use bounding_box_3d::*;
@@ -109,6 +110,8 @@ pub use traits::is_searchable_mesh::*;
 
 pub use traits::is_filter::*;
 pub use traits::is_filter_random_accessible::*;
+
+pub use traits::has_distance_to::*;
 
 pub use view::*;
 

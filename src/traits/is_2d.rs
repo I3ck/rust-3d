@@ -52,3 +52,11 @@ pub trait Is2D : IsND {
         sx + " " + &sy
     }
 }
+
+impl<P> HasDistanceTo<P> for Is2D where
+    P: Is2D {
+
+    fn sqr_distance(&self, other: &P) -> NonNegative {
+        NonNegative::new((self.x() - other.x()).powi(2) + (self.y() - other.y()).powi(2)).unwrap()
+    }
+}

@@ -56,7 +56,6 @@ enum Direction {
     NNN
 }
 
-//@todo refactor to work with IsBuildable3D?
 /// Calculates the min and max values of sub nodes of an OcTree
 fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where //@todo move to OcTree
     P: IsBuildable3D + Clone { //@todo better name

@@ -55,3 +55,4 @@ pub mod is_sortable_nd;
 pub mod is_sortable_2d;
 pub mod is_sortable_3d;
 pub mod is_mergeable;
+pub mod has_distance_to;

@@ -55,6 +55,7 @@ pub mod factory_2d;
 pub mod interpolation_2d;
 pub mod view;
 pub mod positive;
+pub mod non_negative;
 pub mod test_helper;
 pub mod result;
 pub mod distances_2d;

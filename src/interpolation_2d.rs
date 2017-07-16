@@ -42,7 +42,6 @@ fn control_polygon<P>(path: &PointCloud2D<P>, n_points: usize, t: f64) -> Box<P>
     let mut x : f64 = 0.0;
     let mut y : f64 = 0.0;
 
-    //@todo possible bug with +1, c++ version had this, tho. Check again
     for i in 0..n_points+1 {
         let bp = bernstein_polynomial(n_points, i, t);
         x += bp * path.data[i].x();
