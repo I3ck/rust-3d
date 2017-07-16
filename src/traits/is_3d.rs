@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! Is3D trait used for types which are positioned within the 3D space
 
 use prelude::*;
+use utils::max_f64_3;
 
 /// Is3D is a trait used for types which are positioned within the 3D space
 pub trait Is3D : IsND {
@@ -56,5 +57,14 @@ impl<P> HasDistanceTo<P> for Is3D where
 
     fn sqr_distance(&self, other: &P) -> NonNegative {
         NonNegative::new((self.x() - other.x()).powi(2) + (self.y() - other.y()).powi(2) + (self.z() - other.z()).powi(2)).unwrap()
+    }
+}
+
+impl HasDistanceTo<BoundingBox3D> for Is3D {
+    fn sqr_distance(&self, other: &BoundingBox3D) -> NonNegative {
+        let dx = max_f64_3(other.min().x() - self.x(), 0.0, self.x() - other.max().x());
+        let dy = max_f64_3(other.min().y() - self.y(), 0.0, self.y() - other.max().y());
+        let dz = max_f64_3(other.min().z() - self.z(), 0.0, self.z() - other.max().z());
+        NonNegative::new(dx*dx + dy*dy + dz*dz).unwrap()
     }
 }

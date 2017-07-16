@@ -13,16 +13,26 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! HasDistanceTo trait used for types which have a defined distance towards another T
+//! HasDistanceTo trait used for types which have a defined distance towards another T.
+//! Implementing HasDistanceTo<T> for U also implements HasDistanceTo<U> for T
 
 use prelude::*;
 
-/// HasDistanceTo trait used for types which have a defined distance towards another T
+/// HasDistanceTo trait used for types which have a defined distance towards another T.
+/// Implementing HasDistanceTo<T> for U also implements HasDistanceTo<U> for T
 pub trait HasDistanceTo<T> {
     /// Should return the sqr distance to other
     fn sqr_distance(&self, other: &T) -> NonNegative;
     /// The distance to other
     fn distance(&self, other: &T) -> NonNegative {
         self.sqr_distance(other).sqrt()
+    }
+}
+
+impl<T, U> HasDistanceTo<T> for U where
+    T: HasDistanceTo<U> {
+
+    fn sqr_distance(&self, other: &T) -> NonNegative {
+        other.sqr_distance(self)
     }
 }

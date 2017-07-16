@@ -32,3 +32,14 @@ pub fn safe_append_at<T>(vec: &mut Vec<Vec<T>>, i: usize, val: T) where
     vec[i].push(val);
 }
 
+/// Max of two f64 values
+pub fn max_f64(a: f64, b: f64) -> f64 {
+    if a > b { return a; }
+    b
+}
+
+/// Max of three f64 values
+pub fn max_f64_3(a: f64, b: f64, c: f64) -> f64 {
+    max_f64(max_f64(a, b), c)
+}
+

@@ -18,7 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use prelude::*;
 
 /// HasBoundingBox3D is a trait for types which might have a bounding box
-pub trait HasBoundingBox3D  {
+pub trait HasBoundingBox3D {
     /// Should return the bounding box as a pair of two points. The first point should be the minimum for all coordinates, the second the maximum for all coordinates
     fn bounding_box(&self) -> Result<BoundingBox3D>;
 }

@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! Is2D trait used for types which are positioned within the 2D space
 
 use prelude::*;
+use utils::max_f64_3;
 
 /// Is2D is a trait used for types which are positioned within the 2D space
 pub trait Is2D : IsND {
@@ -58,5 +59,13 @@ impl<P> HasDistanceTo<P> for Is2D where
 
     fn sqr_distance(&self, other: &P) -> NonNegative {
         NonNegative::new((self.x() - other.x()).powi(2) + (self.y() - other.y()).powi(2)).unwrap()
+    }
+}
+
+impl HasDistanceTo<BoundingBox2D> for Is2D {
+    fn sqr_distance(&self, other: &BoundingBox2D) -> NonNegative {
+        let dx = max_f64_3(other.min().x() - self.x(), 0.0, self.x() - other.max().x());
+        let dy = max_f64_3(other.min().y() - self.y(), 0.0, self.y() - other.max().y());
+        NonNegative::new(dx*dx + dy*dy).unwrap()
     }
 }
