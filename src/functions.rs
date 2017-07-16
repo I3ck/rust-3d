@@ -156,7 +156,7 @@ pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, Point
 }
 
 //@todo rename or overload operators
-//@todo implement for 2D aswell, maybe move to traits
+//@todo implement for 2D as well, maybe move to traits
 /// Calculates the vector between two positions
 pub fn conn<P>(p_from: &P, p_to: &P) -> P where
     P: IsBuildable3D {

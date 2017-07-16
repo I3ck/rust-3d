@@ -131,12 +131,12 @@ impl ToErrorKind for ParseIntError {
 
 impl ToErrorKind for ioError {
     fn to_error_kind(&self) -> ErrorKind {
-        ErrorKind::IOError //@todo improve reporting
+        ErrorKind::IOError
     }
 }
 
 impl From<ioError> for ErrorKind {
     fn from(_error: ioError) -> Self {
-        ErrorKind::IOError //@todo improve reporting
+        ErrorKind::IOError
     }
 }

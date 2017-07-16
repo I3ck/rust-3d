@@ -16,6 +16,8 @@ make mesh traits generic on the face type
 
 remove all files from src/ toplevel and add only use sub folder
 
+some algorithms (e.g. bezier) can be ported to 3d, maybe write them directly generic over the dimension
+
 Mul and Add types where possible (Add for Matrix / Mul and Add for others
 
 filter_and_test sometimes fails

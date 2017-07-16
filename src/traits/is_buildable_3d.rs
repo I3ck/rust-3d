@@ -50,7 +50,7 @@ pub trait IsBuildable3D :
                     1 => m.data[i][j] * self.y(),
                     _ => m.data[i][j] * self.z()
                 };
-                match i { //@todo can be simplified
+                match i {
                     0 => {let newx = result_x + addition; result_x = newx;},
                     1 => {let newy = result_y + addition; result_y = newy;},
                     _ => {let newz = result_z + addition; result_z = newz;},

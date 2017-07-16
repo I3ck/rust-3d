@@ -19,8 +19,6 @@ use std::f64::consts::PI;
 
 use prelude::*;
 
-//@todo some algorithms (e.g. bezier) can be ported to 3d, maybe write them directly generic over the dimension
-
 fn factorial(number: usize) -> usize {
     let mut result = 1;
 
@@ -35,7 +33,7 @@ fn binominal_coefficient(n: usize, k: usize) -> usize {
 }
 
 fn bernstein_polynomial(n: usize, i: usize, t: f64) -> f64 {
-    (binominal_coefficient(n, i) as f64) * t.powi(i as i32) * (1.0 - t).powi((n-i) as i32) //@todo get rid of casts
+    (binominal_coefficient(n, i) as f64) * t.powi(i as i32) * (1.0 - t).powi((n-i) as i32)
 }
 
 fn control_polygon<P>(path: &PointCloud2D<P>, n_points: usize, t: f64) -> Box<P> where

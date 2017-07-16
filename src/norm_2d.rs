@@ -46,7 +46,7 @@ impl Hash for Norm2D {
 }
 
 impl Mul<f64> for Norm2D {
-    type Output = Point2D; //@todo could later be another type
+    type Output = Point2D;
 
     fn mul(self, other: f64) -> Point2D {
         Point2D{x: other * self.x, y: other * self.y}
