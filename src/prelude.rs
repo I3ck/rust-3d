@@ -99,6 +99,9 @@ pub use traits::is_mergeable::*;
 
 pub use traits::is_view_buildable::*;
 
+pub use traits::is_direction_field_2d::*;
+pub use traits::is_direction_field_3d::*;
+
 pub use point_cloud_2d::*;
 pub use point_cloud_3d::*;
 

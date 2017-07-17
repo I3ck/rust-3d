@@ -56,3 +56,5 @@ pub mod is_sortable_2d;
 pub mod is_sortable_3d;
 pub mod is_mergeable;
 pub mod has_distance_to;
+pub mod is_direction_field_2d;
+pub mod is_direction_field_3d;
