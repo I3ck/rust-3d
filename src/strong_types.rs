@@ -33,7 +33,7 @@ macro_rules! strong_usize {
 
 macro_rules! strong_f64 {
     ($NEW_NAME:ident) => (
-        #[derive (Debug, Clone, Copy, PartialEq)]
+        #[derive (Debug, Clone, Copy, PartialEq, PartialOrd)]
         pub struct $NEW_NAME {
             pub val: f64
         }

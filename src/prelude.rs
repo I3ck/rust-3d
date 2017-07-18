@@ -137,6 +137,9 @@ pub use filters::combinators::filter_or::*;
 pub use filters::combinators::filter_outer_inner::*;
 pub use filters::combinators::filter_xor::*;
 
+pub use filters::transformers::filter_direction_field_2d::*;
+pub use filters::transformers::filter_direction_field_3d::*;
+
 pub use algorithms::convex_hull_2d::*;
 
 

@@ -18,6 +18,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use prelude::*;
 use utils::max_f64_3;
 
+use std::f64::consts::PI;
+
 /// Is3D is a trait used for types which are positioned within the 3D space
 pub trait Is3D : IsND {
     /// Should return the x-coordinate
@@ -31,17 +33,21 @@ pub trait Is3D : IsND {
     fn pos(&self) -> (f64, f64, f64) {
         ( self.x(), self.y(), self.z() )
     }
-
     /// Calculates the dot product with another Is3D
     fn dot(&self, other: &Is3D) -> f64 {
         self.x() * other.x() + self.y() * other.y() + self.z() * other.z()
     }
-
     /// The absolute / length of this position
-    fn abs(&self) -> f64 {
+    fn abs(&self) -> f64 { //@todo NonNegative (also for 2D)
         ((self.x()).powi(2) + (self.y()).powi(2) + (self.z()).powi(2)).sqrt()
     }
-
+    /// Calculates the angle to the other Is3D in radians
+    fn rad_to(&self, other: &Is3D) -> Rad {
+        if self.abs() == 0.0 || other.abs() == 0.0 {
+            return Rad { val: PI } //@todo consider returning something else on error
+        }
+        Rad{ val: (self.dot(other) / (self.abs() * other.abs()) ) }
+    }
     /// Transforms the position in a "x y z" string. E.g. "3.72 5.99 1.01"
     fn to_str(&self) -> String {
         let sx: String = self.x().to_string();

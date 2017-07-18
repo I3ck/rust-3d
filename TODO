@@ -94,3 +94,19 @@ octree is missing many query methods
 (also implement quad tree once these are implemented)
 
 new filter type for directions/normals or positions & normals
+
+pub use bounding_box_2d::BB2D; instead of pub mod bounding_box_2d
+for all modules only containing a single type
+
+
+Direction / Normal field (Is2D/Is3D -> Norm2D/Norm3D)
+could be used for filtering / movement later on
+
+
+
+
+
+
+
+
+
