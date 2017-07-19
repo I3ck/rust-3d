@@ -8,15 +8,9 @@ some Hash impls might lose precision
 
 many more distance functions
 
-mesh trait could be defined in general (non-3d) and have another trait for the 3D version
-
 rename either the half edge or IsSearchableMesh methods, so the names match
 
-make mesh traits generic on the face type
-
 remove all files from src/ toplevel and add only use sub folder
-
-add a "Has_Distance_To" trait
 
 basic math shapes (circle, sphere etc.)
 filters could then have e.g. a circle instead of position & radius
@@ -71,8 +65,6 @@ for impls and structs only require as few traits as possible
 
 drop the distances files, once the DistanceTo traits are implemented
 
-some structs / traits have 2d/3d specification even if they can only exist in one of the spaces. e.g. filter_circle can't have a 3d version, rename accordingly
-
 write tutorial / examples / example program
 
 within the README create a small summary (currently one has to check out the entire docs, which is also not good)
@@ -92,6 +84,8 @@ octree is missing many query methods
 (also implement quad tree once these are implemented)
 
 better tags for the crate (search related ones to find them)
+
+write as generic as possible helpers for operators and call these in the concrete types
 
 
 

@@ -33,7 +33,6 @@ pub trait IsBuildable3D :
 
     /// Should build an object from x, y and z coordinates
     fn new(x: f64, y: f64, z: f64) -> Box<Self>;
-
     /// Should use the coordinates of another as its own
     fn from<P>(&mut self, other: P) where
         P: Is3D;
@@ -59,7 +58,6 @@ pub trait IsBuildable3D :
         }
         Self::new(result_x, result_y, result_z)
     }
-
     /// Returns this with normalized values
     fn normalized(&self) -> Result<Box<Self>> {
         let l = self.abs();
@@ -68,7 +66,6 @@ pub trait IsBuildable3D :
         }
         Ok(Self::new(self.x() / l, self.y() / l, self.z() / l))
     }
-
     /// Creates this from a "x y z" string. E.g. "32.2 14.7 1.90"
     fn parse(text: String) -> Result<Box<Self>> {
         let split = text.trim().split(" ");

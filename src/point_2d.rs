@@ -18,7 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::fmt;
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
-use std::ops::{Add, Mul};
+use std::ops::{Add, Mul, Sub};
 
 use prelude::*;
 use distances_2d::*;
@@ -46,11 +46,21 @@ impl Hash for Point2D {
     }
 }
 
-impl Add for Point2D {
+impl<P> Add<P> for Point2D where
+    P: Is2D {
     type Output = Point2D;
 
-    fn add(self, other: Point2D) -> Point2D {
-        Point2D {x: self.x + other.x, y: self.y + other.y}
+    fn add(self, other: P) -> Point2D {
+        Point2D {x: self.x + other.x(), y: self.y + other.y()}
+    }
+}
+
+impl<P> Sub<P> for Point2D where
+    P: Is2D {
+    type Output = Point2D;
+
+    fn sub(self, other: P) -> Point2D {
+        Point2D {x: self.x - other.x(), y: self.y - other.y()}
     }
 }
 
