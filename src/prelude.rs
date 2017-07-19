@@ -19,104 +19,46 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 pub use result::*;
 pub use strong_types::*;
-pub use positive::*;
-pub use non_negative::*;
-
-pub use bounding_box_2d::*;
-pub use bounding_box_3d::*;
-
-pub use face3::*;
-
-pub use line_2d::*;
-pub use line_3d::*;
-
-pub use line_segment_2d::*;
-pub use line_segment_3d::*;
-
-pub use ray_2d::*;
-pub use ray_3d::*;
-
-pub use norm_2d::*;
-pub use norm_3d::*;
-
-pub use point_2d::*;
-pub use point_3d::*;
-
-pub use matrix4::*;
-
-pub use oc_node::*;
-pub use oc_tree::*;
-
-pub use mesh_3d::*;
-
 pub use interpolation_2d::*;
+pub use traits::*;
+pub use algorithms::*;
 
-pub use traits::is_nd::*;
-pub use traits::is_2d::*;
-pub use traits::is_3d::*;
+pub use Positive;
+pub use NonNegative;
 
-pub use traits::is_movable_2d::*;
-pub use traits::is_movable_3d::*;
+pub use BoundingBox2D;
+pub use BoundingBox3D;
 
-pub use traits::is_buildable_nd::*;
-pub use traits::is_buildable_2d::*;
-pub use traits::is_buildable_3d::*;
+pub use Face3;
 
-pub use traits::is_editable_nd::*;
-pub use traits::is_editable_2d::*;
-pub use traits::is_editable_3d::*;
+pub use Line2D;
+pub use Line3D;
 
-pub use traits::is_normalized_2d::*;
-pub use traits::is_normalized_3d::*;
+pub use LineSegment2D;
+pub use LineSegment3D;
 
-pub use traits::is_transformable_to_2d::*;
-pub use traits::is_transformable_to_3d::*;
+pub use Ray2D;
+pub use Ray3D;
 
-pub use traits::is_sortable_nd::*;
-pub use traits::is_sortable_2d::*;
-pub use traits::is_sortable_3d::*;
+pub use Norm2D;
+pub use Norm3D;
 
-pub use traits::is_plane_3d::*;
+pub use Point2D;
+pub use Point3D;
 
-pub use traits::has_length::*;
+pub use Matrix4;
 
-pub use traits::is_tree_3d::*;
-pub use traits::is_kd_tree_3d::*;
-pub use traits::is_oc_tree::*;
+pub use OcNode;
+pub use OcTree;
 
-pub use traits::is_random_accessible::*;
-pub use traits::is_random_insertible::*;
+pub use Mesh3D;
 
-pub use traits::has_bounding_box_2d::*;
-pub use traits::has_bounding_box_3d::*;
+pub use PointCloud2D;
+pub use PointCloud3D;
 
-pub use traits::has_center_of_gravity_2d::*;
-pub use traits::has_center_of_gravity_3d::*;
+pub use View;
 
-pub use traits::is_mergeable::*;
-
-pub use traits::is_view_buildable::*;
-
-pub use traits::is_direction_field_2d::*;
-pub use traits::is_direction_field_3d::*;
-
-pub use point_cloud_2d::*;
-pub use point_cloud_3d::*;
-
-pub use traits::is_mesh::*;
-pub use traits::is_mesh_3d::*;
-pub use traits::is_topology_unit::*;
-pub use traits::is_editable_mesh::*;
-pub use traits::is_searchable_mesh::*;
-
-pub use traits::is_filter::*;
-pub use traits::is_filter_random_accessible::*;
-
-pub use traits::has_distance_to::*;
-
-pub use view::*;
-
-pub use half_edge::*;
+pub use HalfEdge;
 
 pub use filters::FilterBox2D;
 pub use filters::FilterBox3D;
@@ -126,7 +68,6 @@ pub use filters::FilterSphere;
 pub use filters::combinators::*;
 pub use filters::transformers::*;
 
-pub use algorithms::*;
 
 
 

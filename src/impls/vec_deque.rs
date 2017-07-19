@@ -17,11 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::collections::VecDeque;
 
-use result::*;
-use view::*;
-use traits::is_random_accessible::*;
-use traits::is_random_insertible::*;
-use traits::is_view_buildable::*;
+use prelude::*;
 
 impl<T> IsRandomAccessible<T> for VecDeque<T> {
     fn len(&self) -> usize {

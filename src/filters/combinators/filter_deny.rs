@@ -15,7 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! FilterDeny, a filter which always returns false
 
-use traits::is_filter::*;
+use traits::IsFilter;
 
 /// FilterDeny, a filter which always returns false
 pub struct FilterDeny {

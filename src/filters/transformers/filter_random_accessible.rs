@@ -18,10 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::marker::PhantomData;
 use std::collections::HashSet;
 
-use view::*;
-use traits::is_filter::*;
-use traits::is_random_accessible::*;
-use traits::is_filter_random_accessible::*;
+use prelude::*;
 
 /// FilterRandomAccessible, a filter which can transform any IsFilter into an IsFilterRandomAccessible
 pub struct FilterRandomAccessible<F, T> where

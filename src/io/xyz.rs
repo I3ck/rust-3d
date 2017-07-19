@@ -17,11 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 extern crate core;
 
-use result::*;
-use traits::is_3d::*;
-use traits::is_buildable_3d::*;
-use traits::is_random_accessible::*;
-use traits::is_random_insertible::*;
+use prelude::*;
 
 use self::core::str::FromStr;
 use std::io::prelude::*;

@@ -15,11 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Module for IO operations of the stl file format
 
-use strong_types::*;
-use result::*;
-use traits::is_3d::*;
-use traits::is_buildable_3d::*;
-use traits::is_mesh_3d::*;
+use prelude::*;
 
 use std::io::prelude::*;
 use std::fs::File;

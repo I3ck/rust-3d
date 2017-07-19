@@ -17,9 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::collections::LinkedList;
 
-use result::*;
-use view::*;
-use traits::is_view_buildable::*;
+use prelude::*;
 
 impl<T> IsViewBuildable for LinkedList<T> where
     T: Clone {

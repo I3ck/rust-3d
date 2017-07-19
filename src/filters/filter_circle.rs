@@ -18,19 +18,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
-use result::*;
-use traits::is_nd::*;
-use traits::is_2d::*;
-use traits::is_buildable_nd::*;
-use traits::is_buildable_2d::*;
-use traits::is_editable_nd::*;
-use traits::is_editable_2d::*;
-use traits::has_bounding_box_2d::*;
-use traits::is_filter::*;
-use point_2d::*;
+use prelude::*;
 use distances_2d::*;
-use positive::*;
-use bounding_box_2d::*;
 
 #[derive (Debug, PartialEq, PartialOrd, Default, Clone)]
 /// FilterCircle, a circle filter within 2D space

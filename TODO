@@ -91,9 +91,6 @@ IO methods for PC and mesh for all general file formats
 octree is missing many query methods
 (also implement quad tree once these are implemented)
 
-pub use bounding_box_2d::BB2D; instead of pub mod bounding_box_2d
-for all modules only containing a single type
-
 better tags for the crate (search related ones to find them)
 
 

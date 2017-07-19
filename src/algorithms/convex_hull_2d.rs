@@ -16,11 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! Convex hull algorithm returning a Vec of the hull where the points are ordered according to the hull
 //! Using Andrew's monotone chain convex hull algorithm https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
 
-use point_cloud_2d::*;
-use traits::is_2d::*;
-use traits::is_buildable_2d::*;
-use traits::is_sortable_2d::*;
-use traits::is_random_accessible::*;
+use prelude::*;
 
 /// Convex hull algorithm returning a Vec of the hull where the points are ordered according to the hull
 /// Using Andrew's monotone chain convex hull algorithm https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain

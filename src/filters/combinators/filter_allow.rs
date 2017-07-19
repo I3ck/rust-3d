@@ -15,7 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! FilterAllow, a filter which always returns true
 
-use traits::is_filter::*;
+use traits::IsFilter;
 
 /// FilterAllow, a filter which always returns true
 pub struct FilterAllow {

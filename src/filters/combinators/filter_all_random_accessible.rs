@@ -15,9 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! FilterAllRandomAccessible, a filter to chain multiple IsFilterRandomAccessible with the and condition => must pass all filters to pass this filter
 
-use traits::is_random_accessible::*;
-use traits::is_filter_random_accessible::*;
-use view::*;
+use prelude::*;
 
 #[derive (Default)]
 /// FilterAllRandomAccessible, a filter to chain multiple IsFilterRandomAccessible with the and condition => must pass all filters to pass this filter

@@ -18,19 +18,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 
-use result::*;
-use traits::is_nd::*;
-use traits::is_3d::*;
-use traits::is_buildable_nd::*;
-use traits::is_buildable_3d::*;
-use traits::is_editable_nd::*;
-use traits::is_editable_3d::*;
-use traits::has_bounding_box_3d::*;
-use traits::is_filter::*;
-use point_3d::*;
+use prelude::*;
 use distances_3d::*;
-use positive::*;
-use bounding_box_3d::*;
 
 #[derive (Debug, PartialEq, PartialOrd, Default, Clone)]
 /// FilterBox3D, a box filter within 3D space

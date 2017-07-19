@@ -15,10 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! rust-3d trait implementations for the standard Box
 
-use traits::is_nd::*;
-use traits::is_2d::*;
-use traits::is_3d::*;
-use result::*;
+use prelude::*;
 
 impl<P> IsND for Box<P> where
     P: IsND {

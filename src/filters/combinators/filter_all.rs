@@ -16,7 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! FilterAll, a filter to chain multiple filters with the and condition => must pass all filters to pass this filter
 
 use std::marker::PhantomData;
-use traits::is_filter::*;
+use traits::IsFilter;
 
 /// FilterAll, a filter to chain multiple filters with the and condition => must pass all filters to pass this filter
 pub struct FilterAll<T> {

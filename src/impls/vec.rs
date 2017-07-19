@@ -15,11 +15,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! rust-3d trait implementations for the standard Vec
 
-use result::*;
-use view::*;
-use traits::is_random_accessible::*;
-use traits::is_random_insertible::*;
-use traits::is_view_buildable::*;
+use prelude::*;
 
 impl<T> IsRandomAccessible<T> for Vec<T> {
     fn len(&self) -> usize {

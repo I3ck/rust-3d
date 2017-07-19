@@ -16,7 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! FilterNegate, a filter which negates another filter
 
 use std::marker::PhantomData;
-use traits::is_filter::*;
+use traits::IsFilter;
 
 /// FilterNegate, a filter which negates another filter
 pub struct FilterNegate<F, T> where
