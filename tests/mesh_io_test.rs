@@ -18,7 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 extern crate rust_3d;
 
 use rust_3d::prelude::*;
-use rust_3d::io::ply::*;
+use rust_3d::io::*;
 
 #[test]
 fn mesh_io_test() {

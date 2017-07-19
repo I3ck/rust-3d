@@ -15,7 +15,11 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Containing filter transformers
 
-pub mod filter_random_accessible;
+mod           filter_random_accessible;
+pub use self::filter_random_accessible::FilterRandomAccessible;
 
-pub mod filter_direction_field_2d;
-pub mod filter_direction_field_3d;
+mod           filter_direction_field_2d;
+pub use self::filter_direction_field_2d::FilterDirectionField2D;
+
+mod           filter_direction_field_3d;
+pub use self::filter_direction_field_3d::FilterDirectionField3D;

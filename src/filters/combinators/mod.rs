@@ -15,14 +15,35 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Containing filter combinators
 
-pub mod filter_all_random_accessible;
-pub mod filter_any_random_accessible;
-pub mod filter_all;
-pub mod filter_any;
-pub mod filter_negate;
-pub mod filter_and;
-pub mod filter_or;
-pub mod filter_xor;
-pub mod filter_outer_inner;
-pub mod filter_allow;
-pub mod filter_deny;
+mod           filter_all_random_accessible;
+pub use self::filter_all_random_accessible::FilterAllRandomAccessible;
+
+mod           filter_any_random_accessible;
+pub use self::filter_any_random_accessible::FilterAnyRandomAccessible;
+
+mod           filter_all;
+pub use self::filter_all::FilterAll;
+
+mod           filter_any;
+pub use self::filter_any::FilterAny;
+
+mod           filter_negate;
+pub use self::filter_negate::FilterNegate;
+
+mod           filter_and;
+pub use self::filter_and::FilterAND;
+
+mod           filter_or;
+pub use self::filter_or::FilterOR;
+
+mod           filter_xor;
+pub use self::filter_xor::FilterXOR;
+
+mod           filter_outer_inner;
+pub use self::filter_outer_inner::FilterOuterInner;
+
+mod           filter_allow;
+pub use self::filter_allow::FilterAllow;
+
+mod           filter_deny;
+pub use self::filter_deny::FilterDeny;

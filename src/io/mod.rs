@@ -15,7 +15,14 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Containing IO functions / traits / types
 
-pub mod stl;
-pub mod ply;
-pub mod xy;
-pub mod xyz;
+mod           stl;
+pub use self::stl::*;
+
+mod           ply;
+pub use self::ply::*;
+
+mod           xy;
+pub use self::xy::*;
+
+mod           xyz;
+pub use self::xyz::*;

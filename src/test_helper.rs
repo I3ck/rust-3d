@@ -19,8 +19,7 @@ use std::io::prelude::*;
 use std::fs::File;
 
 use prelude::*;
-use io::xy::*;
-use io::xyz::*;
+use io::*;
 
 /// Ensures the content of two files is equal
 pub fn assert_files_equal(filepath1: &str, filepath2: &str) {

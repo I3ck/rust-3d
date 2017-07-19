@@ -16,7 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 #![deny(warnings)]
 
 use rust_3d::prelude::*;
-use rust_3d::io::xyz::*;
+use rust_3d::io::*;
 use rust_3d::test_helper::*;
 
 extern crate rust_3d;

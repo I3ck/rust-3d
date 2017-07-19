@@ -15,4 +15,5 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Containing algorithms
 
-pub mod convex_hull_2d;
+mod           convex_hull_2d;
+pub use self::convex_hull_2d::convex_hull_2d;

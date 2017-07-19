@@ -17,7 +17,15 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 pub mod combinators;
 pub mod transformers;
-pub mod filter_box_2d;
-pub mod filter_box_3d;
-pub mod filter_circle;
-pub mod filter_sphere;
+
+mod           filter_box_2d;
+pub use self::filter_box_2d::FilterBox2D;
+
+mod           filter_box_3d;
+pub use self::filter_box_3d::FilterBox3D;
+
+mod           filter_circle;
+pub use self::filter_circle::FilterCircle;
+
+mod           filter_sphere;
+pub use self::filter_sphere::FilterSphere;
