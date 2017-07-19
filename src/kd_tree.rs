@@ -28,11 +28,12 @@ use functions::{dimension_compare, dimension_dist, sort_and_limit};
 pub struct KdTree<P> where
     P: Is3D {
 
-    root: Option<KdNode<P>>
+    pub root: Option<KdNode<P>> //@todo make priv and add proper new method
 }
 
+//@todo make priv again, once KdTree has new()
 #[derive (Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-struct KdNode<P> where
+pub struct KdNode<P> where
     P: Is3D {
 
     pub left: Option<Box<KdNode<P>>>,

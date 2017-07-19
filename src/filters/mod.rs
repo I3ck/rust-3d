@@ -29,3 +29,6 @@ pub use self::filter_circle::FilterCircle;
 
 mod           filter_sphere;
 pub use self::filter_sphere::FilterSphere;
+
+mod           filter_outlier_3d;
+pub use self::filter_outlier_3d::FilterOutlier3D;

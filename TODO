@@ -57,8 +57,6 @@ many tests are missing
 
 make kd-tree n-dimensional   (maybe the octree as well, but might be easier to implement quadtree)
 
-make trees referencing via ids
-
 filters should be directed (this could be dropped and a TransFormed wrapper applied [which inverse transformes incoming points first])
 
 for impls and structs only require as few traits as possible
@@ -70,6 +68,12 @@ write tutorial / examples / example program
 within the README create a small summary (currently one has to check out the entire docs, which is also not good)
 
 try to avoid dynamic traits
+
+make trees referencing via ids
+also consider writing wrapper types which e.g. take a PC and parse the tree internally
+this way, the tree and pc can never get async
+
+should be possible to generalize the OutlierFilter to nd
 
 outlier removal (filter which holds a kdtree of the reference structure, calc median / medium distance to k-nearest
 neighbours remove which are further than x, furthest x percent further than x times
@@ -86,12 +90,4 @@ octree is missing many query methods
 better tags for the crate (search related ones to find them)
 
 write as generic as possible helpers for operators and call these in the concrete types
-
-
-
-
-
-
-
-
 
