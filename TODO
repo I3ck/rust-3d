@@ -37,20 +37,16 @@ implement all operators for vec / pt etc. for both directions Mul<f64> for Foo ,
 
 maybe more trim().split() usages required
 
-some way to define a prelude or include everything (some files are basically only includes)
-
 support more ply formats or properly throw on error
 
 one of the filter tests managed to fail (possibly race condition within the test files)
 
 mark functions and traits as tested/untested?
 
-transformers as wrappers / intermediate structures
-
 currently all meshes are tri meshes, maybe rename later (at least once quad mesh was added)
 
 searchable mesh currently only defined for tri mesh. consider making this generic / rename it
-same for HalfEdge
+same for HalfEdge (likely that the specific version can be optimized better)
 
 write mesh/PC file type converter program once many IO methods are implemented?
 
@@ -59,8 +55,6 @@ add more combinator filters to the random accessible filters
 consider removing the new() from is buildable nd
 
 trait for type with one or many normals (normal() or normal(id))
-
-the filter code is now very generic, consider moving it into its own crate
 
 make the tests folder of the exact same structure and file names as src,
 this way it becomes very easy to ensure everything is tested
@@ -75,9 +69,13 @@ filters should be directed (this could be dropped and a TransFormed wrapper appl
 
 for impls and structs only require as few traits as possible
 
+drop the distances files, once the DistanceTo traits are implemented
+
 some structs / traits have 2d/3d specification even if they can only exist in one of the spaces. e.g. filter_circle can't have a 3d version, rename accordingly
 
 write tutorial / examples / example program
+
+within the README create a small summary (currently one has to check out the entire docs, which is also not good)
 
 try to avoid dynamic traits
 
@@ -93,14 +91,10 @@ IO methods for PC and mesh for all general file formats
 octree is missing many query methods
 (also implement quad tree once these are implemented)
 
-new filter type for directions/normals or positions & normals
-
 pub use bounding_box_2d::BB2D; instead of pub mod bounding_box_2d
 for all modules only containing a single type
 
-
-Direction / Normal field (Is2D/Is3D -> Norm2D/Norm3D)
-could be used for filtering / movement later on
+better tags for the crate (search related ones to find them)
 
 
 

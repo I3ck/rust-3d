@@ -46,7 +46,7 @@ pub trait Is3D : IsND {
         if self.abs() == 0.0 || other.abs() == 0.0 {
             return Rad { val: PI } //@todo consider returning something else on error
         }
-        Rad{ val: (self.dot(other) / (self.abs() * other.abs()) ) }
+        Rad{ val: (self.dot(other) / (self.abs() * other.abs())).acos() }
     }
     /// Transforms the position in a "x y z" string. E.g. "3.72 5.99 1.01"
     fn to_str(&self) -> String {
