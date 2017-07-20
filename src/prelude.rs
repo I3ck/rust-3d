@@ -64,6 +64,7 @@ pub use filters::FilterBox2D;
 pub use filters::FilterBox3D;
 pub use filters::FilterCircle;
 pub use filters::FilterSphere;
+pub use filters::FilterOutlier3D;
 
 pub use filters::combinators::*;
 pub use filters::transformers::*;

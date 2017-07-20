@@ -65,6 +65,8 @@ drop the distances files, once the DistanceTo traits are implemented
 
 write tutorial / examples / example program
 
+search values of the trees (e.g. in_sphere) should require a Positive
+
 within the README create a small summary (currently one has to check out the entire docs, which is also not good)
 
 try to avoid dynamic traits
