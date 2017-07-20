@@ -17,6 +17,8 @@ filters could then have e.g. a circle instead of position & radius
 
 drop conn etc. once all operators work
 
+add categories to cargo file
+
 some algorithms (e.g. bezier) can be ported to 3d, maybe write them directly generic over the dimension
 
 Mul and Add types where possible (Add for Matrix / Mul and Add for others
