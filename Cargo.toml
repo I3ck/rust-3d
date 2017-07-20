@@ -7,7 +7,7 @@ documentation = "https://docs.rs/rust-3d/"
 homepage = "https://github.com/I3ck/rust-3d"
 repository = "https://github.com/I3ck/rust-3d"
 readme = "README.md"
-keywords = ["2d", "3d", "pointcloud", "mesh", "filters"]
+keywords = ["2d", "3d", "pointcloud", "mesh", "filters", "half edge", "graphics", "ply", "stl"]
 license-file = "LICENSE"
 
 [dependencies]
