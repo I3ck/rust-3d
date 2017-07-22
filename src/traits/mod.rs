@@ -62,9 +62,6 @@ pub use self::is_random_insertible::IsRandomInsertible;
 mod           is_editable_mesh;
 pub use self::is_editable_mesh::IsEditableMesh;
 
-mod           is_kd_tree_3d;
-pub use self::is_kd_tree_3d::IsKdTree3D;
-
 mod           is_k_nearest_searchable;
 pub use self::is_k_nearest_searchable::IsKNearestSearchable;
 
