@@ -68,6 +68,12 @@ pub use self::is_kd_tree_3d::IsKdTree3D;
 mod           is_k_nearest_searchable;
 pub use self::is_k_nearest_searchable::IsKNearestSearchable;
 
+mod           is_sphere_searchable;
+pub use self::is_sphere_searchable::IsSphereSearchable;
+
+mod           is_box_3d_searchable;
+pub use self::is_box_3d_searchable::IsBox3DSearchable;
+
 mod           is_mesh;
 pub use self::is_mesh::IsMesh;
 

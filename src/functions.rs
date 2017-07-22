@@ -45,8 +45,9 @@ pub fn cross<P,U>(first: &P, other: &U) -> Box<U> where
 }
 
 /// Compares two IsBuildable3D at a given dimensions
-pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Result<Ordering> where
-    P: Is3D {
+pub fn dimension_compare<P1, P2>(lhs: &P1, rhs: &P2, dim: i8) -> Result<Ordering> where
+    P1: Is3D,
+    P2: Is3D {
 
     match dim {
         0 => lhs.x().partial_cmp(&rhs.x()).ok_or(ErrorKind::ComparisionFailed),
@@ -57,8 +58,9 @@ pub fn dimension_compare<P>(lhs: &P, rhs: &P, dim: i8) -> Result<Ordering> where
 }
 
 /// Calculates the distance within a given dimension between two IsBuildable3D
-pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Result<f64> where
-    P: Is3D {
+pub fn dimension_dist<P1, P2>(lhs: &P1, rhs: &P2, dim: i8) -> Result<f64> where
+    P1: Is3D,
+    P2: Is3D {
 
     match dim {
         0 => Ok((lhs.x() - rhs.x()).abs()),
@@ -69,12 +71,13 @@ pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Result<f64> where
 }
 
 /// Helper function to keep a collection of positions limited in size and sorted
-pub fn sort_and_limit<'a, P>(mut pc: &'a mut Vec<P>, search: &P, max_size: usize) where //@todo move to KdTree
-    P: Is3D + Clone {
+pub fn sort_and_limit<'a, PSearch, PFind>(mut pc: &'a mut Vec<PFind>, search: &PSearch, max_size: usize) where //@todo move to KdTree
+    PSearch: Is3D,
+    PFind: Is3D + Clone {
 
     if pc.len() > max_size {
         pc.sort_by(|a, b| sqr_dist_3d(search, a).partial_cmp(&sqr_dist_3d(search, b)).unwrap_or(Ordering::Equal));
-        let mut result : Vec<P>;
+        let mut result : Vec<PFind>;
         result = Vec::new();
         for i in pc.iter().take(max_size) {
             result.push(i.clone());

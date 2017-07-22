@@ -16,12 +16,11 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! IsKdTree3D trait used for KdTrees within 3D space
 
 use prelude::*;
+//@todo remove trait
 
 /// IsKdTree3D trait used for KdTrees within 3D space
-pub trait IsKdTree3D<P> : IsTree3D<P> + IsKNearestSearchable<P> where
-    P: Is3D {
-    /// Should return all positions within a sphere around search
-    fn in_sphere(&self, search: &P, radius: f64) -> PointCloud3D<P>;
-    /// Should return all positions within a box around search
-    fn in_box(&self, search: &P, x_size: f64, y_size: f64, z_size: f64) -> PointCloud3D<P>;
+pub trait IsKdTree3D<PSearch, PFind> : IsTree3D<PFind> + IsKNearestSearchable<PSearch, PFind> + IsBox3DSearchable<PSearch, PFind> + IsSphereSearchable<PSearch, PFind> where
+    PSearch: Is3D,
+    PFind: Is3D {
+
 }

@@ -68,10 +68,11 @@ impl<P> IsTree3D<P> for KdTree<P> where
     }
 }
 
-impl<P> IsKNearestSearchable<P> for KdTree<P> where
-    P: Is3D + Clone {
+impl<PSearch, PFind> IsKNearestSearchable<PSearch, PFind> for KdTree<PFind> where
+    PSearch: Is3D,
+    PFind:   Is3D + Clone {
 
-    fn knearest(&self, search: &P, n: usize) -> Vec<P> {
+    fn knearest(&self, search: &PSearch, n: usize) -> Vec<PFind> {
         let mut result = Vec::new();
         if n < 1 { return result; }
         if let Some(ref node) = self.root {
@@ -80,7 +81,7 @@ impl<P> IsKNearestSearchable<P> for KdTree<P> where
         return result;
     }
 
-    fn nearest(&self, search: &P) -> Result<P> { //@todo implemented on its own, since the code can be faster without vecs
+    fn nearest(&self, search: &PSearch) -> Result<PFind> { //@todo implemented on its own, since the code can be faster without vecs
         let result = self.knearest(search, 1);
         match result.len() {
             0 => Err(ErrorKind::TooFewPoints),
@@ -92,20 +93,26 @@ impl<P> IsKNearestSearchable<P> for KdTree<P> where
     }
 }
 
-impl<P> IsKdTree3D<P> for KdTree<P> where
-    P: Is3D + Clone {
+impl<PSearch, PFind> IsSphereSearchable<PSearch, PFind> for KdTree<PFind> where
+    PSearch: Is3D,
+    PFind:   Is3D + Clone {
 
-    fn in_sphere(&self, search: &P, radius: f64) -> PointCloud3D<P> {
-        let mut result = PointCloud3D::new();
+    fn in_sphere(&self, search: &PSearch, radius: f64) -> Vec<PFind> {
+        let mut result = Vec::new();
         if radius <= 0.0 { return result; }
         if let Some(ref node) = self.root {
             node.in_sphere(search, radius, &mut result);
         }
         return result;
     }
+}
 
-    fn in_box(&self, search: &P, x_size: f64, y_size: f64, z_size: f64) -> PointCloud3D<P> {
-        let mut result = PointCloud3D::new();
+impl<PSearch, PFind> IsBox3DSearchable<PSearch, PFind> for KdTree<PFind> where
+    PSearch: Is3D,
+    PFind:   Is3D + Clone {
+
+    fn in_box(&self, search: &PSearch, x_size: f64, y_size: f64, z_size: f64) -> Vec<PFind> {
+        let mut result = Vec::new();
         if x_size <= 0.0 || y_size <= 0.0 || z_size <= 0.0 { return result; }
         if let Some(ref node) = self.root {
             node.in_box(search, x_size, y_size, z_size, &mut result);
@@ -132,7 +139,6 @@ impl<P> KdNode<P> where
 
 impl<P> KdNode<P> where
     P: Is3D + Clone {
-
     pub fn to_pointcloud_3d(&self, pc: &mut PointCloud3D<P>) {
         if let Some(ref n) = (&self).left { n.to_pointcloud_3d(pc); }
         pc.push(self.val.clone());
@@ -163,18 +169,17 @@ impl<P> KdNode<P> where
         let val = *pc[median].clone();
 
         for (i, p) in pc.into_iter().enumerate() {
-            if      i < median  { pc_left.push(p); }
-            else if i > median  { pc_right.push(p); }
+            if i < median { pc_left.push(p); } else if i > median { pc_right.push(p); }
         }
 
         let left = match pc_left.len() {
             0 => None,
-            _ => Some(Box::new(KdNode::new(dimension+1, pc_left)))
+            _ => Some(Box::new(KdNode::new(dimension + 1, pc_left)))
         };
 
         let right = match pc_right.len() {
             0 => None,
-            _ => Some(Box::new(KdNode::new(dimension+1, pc_right)))
+            _ => Some(Box::new(KdNode::new(dimension + 1, pc_right)))
         };
 
         KdNode {
@@ -184,8 +189,14 @@ impl<P> KdNode<P> where
             dimension: dimension
         }
     }
+}
 
-    pub fn knearest(&self, search: &P, n: usize, pc: &mut Vec<P>) {
+impl<PFind> KdNode<PFind> where
+    PFind: Is3D + Clone {
+
+    pub fn knearest<PSearch>(&self, search: &PSearch, n: usize, pc: &mut Vec<PFind>) where
+        PSearch: Is3D {
+
         if pc.len() < n || sqr_dist_3d(search, &self.val) < sqr_dist_3d(search, &pc[&pc.len() -1 ]) {
             pc.push(self.val.clone());
         }
@@ -232,7 +243,9 @@ impl<P> KdNode<P> where
         sort_and_limit(pc, search, n);
     }
 
-    pub fn in_sphere(&self, search: &P, radius: f64, pc: &mut PointCloud3D<P>) {
+    pub fn in_sphere<PSearch>(&self, search: &PSearch, radius: f64, pc: &mut Vec<PFind>) where
+        PSearch: Is3D {
+
         if radius <= 0.0 { return; }
 
         if dist_3d(search, &self.val) <= radius {
@@ -280,7 +293,9 @@ impl<P> KdNode<P> where
         }
     }
 
-    pub fn in_box(&self, search: &P, x_size: f64, y_size: f64, z_size: f64, pc: &mut PointCloud3D<P>) {
+    pub fn in_box<PSearch>(&self, search: &PSearch, x_size: f64, y_size: f64, z_size: f64, pc: &mut Vec<PFind>) where
+        PSearch: Is3D {
+
         if x_size <= 0.0 || y_size <= 0.0 || z_size <= 0.0 { return; }
 
         if let (Ok(dist_x), Ok(dist_y), Ok(dist_z)) = (dimension_dist(search, &self.val, 0), dimension_dist(search, &self.val, 1), dimension_dist(search, &self.val, 2)) {

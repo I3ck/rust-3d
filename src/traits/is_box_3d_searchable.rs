@@ -13,16 +13,16 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! IsKNearestSearchable trait used for search structures which can be queried for nearest neighbours.
+//! IsBox3DSearchable trait used for search structures which can be queried for elements within a 3D box
 //! You should only implement this, if your solution is rather efficient
 
 use prelude::*;
 
-/// IsKNearestSearchable trait used for search structures which can be queried for nearest neighbours.
+/// IsBox3DSearchable trait used for search structures which can be queried for elements within a 3D box
 /// You should only implement this, if your solution is rather efficient
-pub trait IsKNearestSearchable<Search, Find> {
-    /// Should return the nearest neighbour to search, if there is any
-    fn nearest(&self, search: &Search) -> Result<Find>;
-    /// Should return the k nearest neighbours to search
-    fn knearest(&self, search: &Search, n: usize) -> Vec<Find>;
+pub trait IsBox3DSearchable<PSearch, PFind> where
+    PSearch: Is3D,
+    PFind:   Is3D {
+    /// Should return all positions within a box around search
+    fn in_box(&self, search: &PSearch, x_size: f64, y_size: f64, z_size: f64) -> Vec<PFind>;
 }

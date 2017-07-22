@@ -45,7 +45,7 @@ pub struct FilterOutlier3D<P> where
 
 impl<P> FilterOutlier3D<P> where
     P: Is3D + Clone + Default {
-    ///Creates a new FilterOutlier3D from a search distance and the min number of neighbours to be found in this distance
+    /// Creates a new FilterOutlier3D from a search distance and the min number of neighbours to be found in this distance
     pub fn new(pc: PointCloud3D<P>, search_distance: Positive, min_neighbours: usize) -> Result<Self> {
         let mut tree = KdTree::default();
         tree.build(pc)?;

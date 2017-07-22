@@ -19,6 +19,8 @@ drop conn etc. once all operators work
 
 remove / change IsTree trait
 
+search for "///@todo" and remove, since this displays within the docs
+
 add categories to cargo file
 
 some algorithms (e.g. bezier) can be ported to 3d, maybe write them directly generic over the dimension
