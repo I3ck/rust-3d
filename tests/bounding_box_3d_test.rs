@@ -43,19 +43,19 @@ fn test_bounding_box_3d() {
     let bb3 = pc3.bounding_box().unwrap();
     let bb4 = pc4.bounding_box().unwrap();
 
-    assert!(bb1.min().x() == 0.0);
-    assert!(bb1.min().y() == 0.0);
-    assert!(bb1.min().z() == 0.0);
-    assert!(bb1.max().x() == 1.0);
-    assert!(bb1.max().y() == 1.0);
-    assert!(bb1.max().z() == 1.0);
+    assert!(bb1.min_p().x() == 0.0);
+    assert!(bb1.min_p().y() == 0.0);
+    assert!(bb1.min_p().z() == 0.0);
+    assert!(bb1.max_p().x() == 1.0);
+    assert!(bb1.max_p().y() == 1.0);
+    assert!(bb1.max_p().z() == 1.0);
 
-    assert!(bb3.min().x() == -1.0);
-    assert!(bb3.min().y() == -1.0);
-    assert!(bb3.min().z() == -1.0);
-    assert!(bb3.max().x() == 2.0);
-    assert!(bb3.max().y() == 2.0);
-    assert!(bb3.max().z() == 2.0);
+    assert!(bb3.min_p().x() == -1.0);
+    assert!(bb3.min_p().y() == -1.0);
+    assert!(bb3.min_p().z() == -1.0);
+    assert!(bb3.max_p().x() == 2.0);
+    assert!(bb3.max_p().y() == 2.0);
+    assert!(bb3.max_p().z() == 2.0);
 
     assert!(!bb4.is_inside(&bb1));
     assert!(!bb4.is_inside(&bb2));
