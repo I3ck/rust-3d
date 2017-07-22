@@ -68,17 +68,32 @@ impl<P> IsTree3D<P> for KdTree<P> where
     }
 }
 
-impl<P> IsKdTree3D<P> for KdTree<P> where
+impl<P> IsKNearestSearchable<P> for KdTree<P> where
     P: Is3D + Clone {
 
-    fn knearest(&self, search: &P, n: usize) -> PointCloud3D<P> {
-        let mut result = PointCloud3D::new();
+    fn knearest(&self, search: &P, n: usize) -> Vec<P> {
+        let mut result = Vec::new();
         if n < 1 { return result; }
         if let Some(ref node) = self.root {
             node.knearest(search, n, &mut result);
         }
         return result;
     }
+
+    fn nearest(&self, search: &P) -> Result<P> { //@todo implemented on its own, since the code can be faster without vecs
+        let result = self.knearest(search, 1);
+        match result.len() {
+            0 => Err(ErrorKind::TooFewPoints),
+            _ => {
+                let p = result[0].clone();
+                Ok(p)
+            }
+        }
+    }
+}
+
+impl<P> IsKdTree3D<P> for KdTree<P> where
+    P: Is3D + Clone {
 
     fn in_sphere(&self, search: &P, radius: f64) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();
@@ -96,17 +111,6 @@ impl<P> IsKdTree3D<P> for KdTree<P> where
             node.in_box(search, x_size, y_size, z_size, &mut result);
         }
         return result;
-    }
-
-    fn nearest(&self, search: &P) -> Result<P> { //@todo implemented on its own, since the code can be faster without vecs
-        let result = self.knearest(search, 1);
-        match result.len() {
-            0 => Err(ErrorKind::TooFewPoints),
-            _ => {
-                let p = *result.data[0].clone();
-                Ok(p)
-            }
-        }
     }
 }
 
@@ -181,8 +185,8 @@ impl<P> KdNode<P> where
         }
     }
 
-    pub fn knearest(&self, search: &P, n: usize, pc: &mut PointCloud3D<P>) {
-        if pc.len() < n || sqr_dist_3d(search, &self.val) < sqr_dist_3d(search, &**&pc.data[&pc.len() -1 ]) { //@todo reference weird
+    pub fn knearest(&self, search: &P, n: usize, pc: &mut Vec<P>) {
+        if pc.len() < n || sqr_dist_3d(search, &self.val) < sqr_dist_3d(search, &pc[&pc.len() -1 ]) {
             pc.push(self.val.clone());
         }
 
@@ -204,7 +208,7 @@ impl<P> KdNode<P> where
             _ => (search.z(), self.val.z())
         };
 
-        let distance_best = dist_3d(search, &**&pc.data[&pc.len() -1 ]); //@todo reference weird
+        let distance_best = dist_3d(search, &pc[&pc.len() -1 ]);
         let border_left = current_search - distance_best;
         let border_right = current_search + distance_best;
 

@@ -69,17 +69,17 @@ pub fn dimension_dist<P>(lhs: &P, rhs: &P, dim: i8) -> Result<f64> where
 }
 
 /// Helper function to keep a collection of positions limited in size and sorted
-pub fn sort_and_limit<P>(mut pc: &mut PointCloud3D<P>, search: &P, max_size: usize) where //@todo move to KdTree
+pub fn sort_and_limit<'a, P>(mut pc: &'a mut Vec<P>, search: &P, max_size: usize) where //@todo move to KdTree
     P: Is3D + Clone {
 
     if pc.len() > max_size {
-        pc.data.sort_by(|a, b| sqr_dist_3d(search, &**a).partial_cmp(&sqr_dist_3d(search, &**b)).unwrap_or(Ordering::Equal));
-        let mut result : Vec<Box<P>>;
+        pc.sort_by(|a, b| sqr_dist_3d(search, a).partial_cmp(&sqr_dist_3d(search, b)).unwrap_or(Ordering::Equal));
+        let mut result : Vec<P>;
         result = Vec::new();
-        for i in pc.data.iter().take(max_size) {
+        for i in pc.iter().take(max_size) {
             result.push(i.clone());
         }
-        pc.data = result;
+        *pc = result;
     }
 }
 

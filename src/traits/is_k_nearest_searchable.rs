@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Martin Buck
+Copyright 2017 Martin Buck
 This file is part of rust-3d.
 rust-3d is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -13,15 +13,16 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! IsKdTree3D trait used for KdTrees within 3D space
+//! IsKNearestSearchable trait used for search structures which can be queried for nearest neighbours.
+//! You should only implement this, if your solution is rather efficient
 
 use prelude::*;
 
-/// IsKdTree3D trait used for KdTrees within 3D space
-pub trait IsKdTree3D<P> : IsTree3D<P> + IsKNearestSearchable<P> where
-    P: Is3D {
-    /// Should return all positions within a sphere around search
-    fn in_sphere(&self, search: &P, radius: f64) -> PointCloud3D<P>;
-    /// Should return all positions within a box around search
-    fn in_box(&self, search: &P, x_size: f64, y_size: f64, z_size: f64) -> PointCloud3D<P>;
+/// IsKNearestSearchable trait used for search structures which can be queried for nearest neighbours.
+/// You should only implement this, if your solution is rather efficient
+pub trait IsKNearestSearchable<T> {
+    /// Should return the nearest neighbour to search, if there is any
+    fn nearest(&self, search: &T) -> Result<T>;
+    /// Should return the k nearest neighbours to search
+    fn knearest(&self, search: &T, n: usize) -> Vec<T>;
 }
