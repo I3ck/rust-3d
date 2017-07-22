@@ -36,7 +36,7 @@ use kd_tree::KdTree;
 /// Points will find themselves, so increase the required count by 1
 #[derive (Debug, PartialEq, PartialOrd, Default, Clone)]
 pub struct FilterOutlier3D<P> where
-    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone + Default { //@todo these can be reduced once KdTree is split properly
+    P: Is3D {
 
     search_distance: Positive,
     min_neighbours: usize, //@todo should be usize >= 1 add new type for that?
@@ -44,7 +44,7 @@ pub struct FilterOutlier3D<P> where
 }
 
 impl<P> FilterOutlier3D<P> where
-    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone + Default { //@todo these can be reduced once KdTree is split properly
+    P: Is3D + Clone + Default {
     ///Creates a new FilterOutlier3D from a search distance and the min number of neighbours to be found in this distance
     pub fn new(pc: PointCloud3D<P>, search_distance: Positive, min_neighbours: usize) -> Result<Self> {
         let mut tree = KdTree::default();
@@ -53,9 +53,8 @@ impl<P> FilterOutlier3D<P> where
     }
 }
 
-//@todo this impl requires way too many traits for the searched point, make sure "in_sphere()" and similar only require Is3D
 impl<P> IsFilter<P> for FilterOutlier3D<P> where
-    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone + Default { //@todo these can be reduced once KdTree is split properly
+    P: Is3D + Clone {
 
     fn is_allowed(&self, p: &P) -> bool {
         let pts = self.tree.in_sphere(p, self.search_distance.get());
