@@ -8,7 +8,8 @@ Meant as basis for numeric algorithms, viewers, game engines, ...
 Notes
 -----
 `rust-3d` is still in really early stages, there might come breaking changes with each update.  
-The test coverage is far from perfect, so you might find some bugs (please report them).
+The test coverage is far from perfect, so you might find some bugs (please report them).  
+Compiling with `stable`.
  
  
 Tour
