@@ -16,7 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! NonNegative, a wrapper for a f64 value, ensuring it is always >= 0
 
 use std::fmt;
-use std::ops::Add;
+use std::ops::{Add, Mul, Div};
 use std::hash::{Hash, Hasher};
 
 use prelude::*;
@@ -72,6 +72,46 @@ impl Add for NonNegative {
 
     fn add(self, other: NonNegative) -> NonNegative {
         NonNegative {val: self.val + other.val}
+    }
+}
+
+impl Add<Positive> for NonNegative {
+    type Output = NonNegative;
+
+    fn add(self, other: Positive) -> NonNegative {
+        NonNegative {val: self.val + other.get()}
+    }
+}
+
+impl Mul for NonNegative {
+    type Output = NonNegative;
+
+    fn mul(self, other: NonNegative) -> NonNegative {
+        NonNegative {val: self.val * other.val}
+    }
+}
+
+impl Mul<Positive> for NonNegative {
+    type Output = NonNegative;
+
+    fn mul(self, other: Positive) -> NonNegative {
+        NonNegative {val: self.val * other.get()}
+    }
+}
+
+impl Div for NonNegative {
+    type Output = NonNegative;
+
+    fn div(self, other: NonNegative) -> NonNegative {
+        NonNegative {val: self.val / other.val}
+    }
+}
+
+impl Div<Positive> for NonNegative {
+    type Output = NonNegative;
+
+    fn div(self, other: Positive) -> NonNegative {
+        NonNegative {val: self.val / other.get()}
     }
 }
 

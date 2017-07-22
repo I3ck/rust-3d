@@ -65,6 +65,14 @@ impl Add for Positive {
     }
 }
 
+impl Add<NonNegative> for Positive {
+    type Output = Positive;
+
+    fn add(self, other: NonNegative) -> Positive {
+        Positive { val: self.val + other.get() }
+    }
+}
+
 impl Default for Positive {
     fn default() -> Self {
         Self::one()
