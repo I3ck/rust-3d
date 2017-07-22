@@ -13,9 +13,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! KdTree
-
-//@todo clean up traits like done with the pcs
+//! KdTree https://en.wikipedia.org/wiki/K-d_tree
 
 use std::cmp::Ordering;
 
@@ -24,16 +22,15 @@ use distances_3d::*;
 use functions::{dimension_compare, dimension_dist, sort_and_limit};
 
 #[derive (Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-/// KdTree
+/// KdTree https://en.wikipedia.org/wiki/K-d_tree
 pub struct KdTree<P> where
     P: Is3D {
 
-    pub root: Option<KdNode<P>> //@todo make priv and add proper new method
+    root: Option<KdNode<P>>
 }
 
-//@todo make priv again, once KdTree has new()
 #[derive (Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct KdNode<P> where
+struct KdNode<P> where
     P: Is3D {
 
     pub left: Option<Box<KdNode<P>>>,
@@ -43,7 +40,7 @@ pub struct KdNode<P> where
 }
 
 impl<P> IsTree3D<P> for KdTree<P> where
-    P: IsBuildableND + IsBuildable3D + Clone {
+    P: Is3D + Clone {
 
     fn size(&self) -> usize {
         match self.root {
@@ -72,7 +69,7 @@ impl<P> IsTree3D<P> for KdTree<P> where
 }
 
 impl<P> IsKdTree3D<P> for KdTree<P> where
-    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
+    P: Is3D + Clone {
 
     fn knearest(&self, search: &P, n: usize) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();
@@ -114,7 +111,29 @@ impl<P> IsKdTree3D<P> for KdTree<P> where
 }
 
 impl<P> KdNode<P> where
-    P: IsBuildableND + IsBuildable3D + Clone {
+    P: Is3D {
+
+    pub fn size(&self) -> usize {
+        let mut result: usize = 0;
+        if let Some(ref n) = (&self).left { result += n.size(); }
+        result += 1;
+        if let Some(ref n) = (&self).right { result += n.size(); }
+        result
+    }
+
+    fn is_leaf(&self) -> bool {
+        self.left.is_none() && self.right.is_none()
+    }
+}
+
+impl<P> KdNode<P> where
+    P: Is3D + Clone {
+
+    pub fn to_pointcloud_3d(&self, pc: &mut PointCloud3D<P>) {
+        if let Some(ref n) = (&self).left { n.to_pointcloud_3d(pc); }
+        pc.push(self.val.clone());
+        if let Some(ref n) = (&self).right { n.to_pointcloud_3d(pc); }
+    }
 
     pub fn new(dim: i8, mut pc: Vec<Box<P>>) -> KdNode<P> {
         let dimension = dim % 2;
@@ -137,12 +156,11 @@ impl<P> KdNode<P> where
         let mut pc_left = Vec::new();
         let mut pc_right = Vec::new();
 
-        let mut val = *P::new(0.0, 0.0, 0.0);
+        let val = *pc[median].clone();
 
         for (i, p) in pc.into_iter().enumerate() {
             if      i < median  { pc_left.push(p); }
             else if i > median  { pc_right.push(p); }
-            else                { val = *p; }
         }
 
         let left = match pc_left.len() {
@@ -161,20 +179,6 @@ impl<P> KdNode<P> where
             val: val,
             dimension: dimension
         }
-    }
-
-    pub fn size(&self) -> usize {
-        let mut result: usize = 0;
-        if let Some(ref n) = (&self).left { result += n.size(); }
-        result += 1;
-        if let Some(ref n) = (&self).right { result += n.size(); }
-        result
-    }
-
-    pub fn to_pointcloud_3d(&self, pc: &mut PointCloud3D<P>) {
-        if let Some(ref n) = (&self).left { n.to_pointcloud_3d(pc); }
-        pc.push(self.val.clone());
-        if let Some(ref n) = (&self).right { n.to_pointcloud_3d(pc); }
     }
 
     pub fn knearest(&self, search: &P, n: usize, pc: &mut PointCloud3D<P>) {
@@ -318,9 +322,5 @@ impl<P> KdNode<P> where
                 Err(_) => {}
             }
         }
-    }
-
-    fn is_leaf(&self) -> bool {
-        self.left.is_none() && self.right.is_none()
     }
 }

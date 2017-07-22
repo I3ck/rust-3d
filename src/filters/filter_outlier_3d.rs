@@ -47,7 +47,7 @@ impl<P> FilterOutlier3D<P> where
     P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone + Default { //@todo these can be reduced once KdTree is split properly
     ///Creates a new FilterOutlier3D from a search distance and the min number of neighbours to be found in this distance
     pub fn new(pc: PointCloud3D<P>, search_distance: Positive, min_neighbours: usize) -> Result<Self> {
-        let mut tree = KdTree { root: None };
+        let mut tree = KdTree::default();
         tree.build(pc)?;
         Ok(FilterOutlier3D { search_distance: search_distance, min_neighbours: min_neighbours, tree: tree})
     }
