@@ -17,7 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use prelude::*;
 
-/// IsKdTree3D is atrait used for KdTrees within 3D space
+/// IsKdTree3D trait used for KdTrees within 3D space
 pub trait IsKdTree3D<P> : IsTree3D<P> where
     P: Is3D {
     /// Should return the nearest neighbour to search, if there is any

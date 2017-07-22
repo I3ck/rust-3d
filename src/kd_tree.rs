@@ -43,7 +43,7 @@ pub struct KdNode<P> where
 }
 
 impl<P> IsTree3D<P> for KdTree<P> where
-    P: IsBuildableND + IsBuildable3D + Clone + Default {
+    P: IsBuildableND + IsBuildable3D + Clone {
 
     fn size(&self) -> usize {
         match self.root {
@@ -72,7 +72,7 @@ impl<P> IsTree3D<P> for KdTree<P> where
 }
 
 impl<P> IsKdTree3D<P> for KdTree<P> where
-    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone + Default {
+    P: IsEditable3D + IsBuildableND + IsBuildable3D + Clone {
 
     fn knearest(&self, search: &P, n: usize) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();
@@ -114,7 +114,7 @@ impl<P> IsKdTree3D<P> for KdTree<P> where
 }
 
 impl<P> KdNode<P> where
-    P: IsBuildableND + IsBuildable3D + Clone + Default {
+    P: IsBuildableND + IsBuildable3D + Clone {
 
     pub fn new(dim: i8, mut pc: Vec<Box<P>>) -> KdNode<P> {
         let dimension = dim % 2;
@@ -137,7 +137,7 @@ impl<P> KdNode<P> where
         let mut pc_left = Vec::new();
         let mut pc_right = Vec::new();
 
-        let mut val = P::default();
+        let mut val = *P::new(0.0, 0.0, 0.0);
 
         for (i, p) in pc.into_iter().enumerate() {
             if      i < median  { pc_left.push(p); }
