@@ -89,11 +89,11 @@ impl IsNormalized3D for Norm3D {
         P: Is3D {
 
         let l = p.abs();
-        if l <= 0.0 {
+        if l.get() <= 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
         }
 
-        Ok(Box::new(Norm3D { x: p.x() / l, y: p.y() / l, z: p.z() / l, }))
+        Ok(Box::new(Norm3D { x: p.x() / l.get(), y: p.y() / l.get(), z: p.z() / l.get(), }))
     }
 
     fn norm_x() -> Self {

@@ -38,15 +38,15 @@ pub trait Is3D : IsND {
         self.x() * other.x() + self.y() * other.y() + self.z() * other.z()
     }
     /// The absolute / length of this position
-    fn abs(&self) -> f64 { //@todo NonNegative (also for 2D)
-        ((self.x()).powi(2) + (self.y()).powi(2) + (self.z()).powi(2)).sqrt()
+    fn abs(&self) -> NonNegative {
+        NonNegative::new(((self.x()).powi(2) + (self.y()).powi(2) + (self.z()).powi(2)).sqrt()).unwrap()
     }
     /// Calculates the angle to the other Is3D in radians
     fn rad_to(&self, other: &Is3D) -> Rad {
-        if self.abs() == 0.0 || other.abs() == 0.0 {
+        if self.abs().get() == 0.0 || other.abs().get() == 0.0 {
             return Rad { val: PI } //@todo consider returning something else on error
         }
-        Rad{ val: (self.dot(other) / (self.abs() * other.abs())).acos() }
+        Rad{ val: (self.dot(other) / (self.abs() * other.abs()).get()).acos() }
     }
     /// Transforms the position in a "x y z" string. E.g. "3.72 5.99 1.01"
     fn to_str(&self) -> String {

@@ -82,11 +82,11 @@ impl IsNormalized2D for Norm2D {
         P: Is2D {
 
         let l = p.abs();
-        if l <= 0.0 {
+        if l.get() <= 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
         }
 
-        Ok(Box::new(Norm2D { x: p.x() / l, y: p.y() / l }))
+        Ok(Box::new(Norm2D { x: p.x() / l.get(), y: p.y() / l.get() }))
     }
 
     fn norm_x() -> Self {

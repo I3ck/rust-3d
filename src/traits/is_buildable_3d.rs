@@ -61,10 +61,10 @@ pub trait IsBuildable3D :
     /// Returns this with normalized values
     fn normalized(&self) -> Result<Box<Self>> {
         let l = self.abs();
-        if l <= 0.0 {
+        if l.get() == 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
         }
-        Ok(Self::new(self.x() / l, self.y() / l, self.z() / l))
+        Ok(Self::new(self.x() / l.get(), self.y() / l.get(), self.z() / l.get()))
     }
     /// Creates this from a "x y z" string. E.g. "32.2 14.7 1.90"
     fn parse(text: String) -> Result<Box<Self>> {

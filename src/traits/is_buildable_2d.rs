@@ -42,10 +42,10 @@ pub trait IsBuildable2D :
     /// Returns this with normalized values
     fn normalized(&self) -> Result<Box<Self>> {
         let l = self.abs();
-        if l <= 0.0 {
+        if l.get() == 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
         }
-        Ok(Self::new(self.x() / l, self.y() / l))
+        Ok(Self::new(self.x() / l.get(), self.y() / l.get()))
     }
 
     /// Creates this from a "x y" string. E.g. "4.3 17.29"

@@ -38,8 +38,8 @@ pub trait Is2D : IsND {
         self.x() * other.y() - self.y() * other.x()
     }
     /// The absolute / length of this position
-    fn abs(&self) -> f64 {
-        ((self.x()).powi(2) + (self.y()).powi(2)).sqrt()
+    fn abs(&self) -> NonNegative {
+        NonNegative::new(((self.x()).powi(2) + (self.y()).powi(2)).sqrt()).unwrap()
     }
     /// Calculates the angle to the other Is2D in radians
     fn rad_to(&self, other: &Is2D) -> Rad {
