@@ -64,8 +64,8 @@ impl<P> HasDistanceTo<P> for Is2D where
 
 impl HasDistanceTo<BoundingBox2D> for Is2D {
     fn sqr_distance(&self, other: &BoundingBox2D) -> NonNegative {
-        let dx = max_f64_3(other.min().x() - self.x(), 0.0, self.x() - other.max().x());
-        let dy = max_f64_3(other.min().y() - self.y(), 0.0, self.y() - other.max().y());
+        let dx = max_f64_3(other.min_p().x() - self.x(), 0.0, self.x() - other.max_p().x());
+        let dy = max_f64_3(other.min_p().y() - self.y(), 0.0, self.y() - other.max_p().y());
         NonNegative::new(dx*dx + dy*dy).unwrap()
     }
 }

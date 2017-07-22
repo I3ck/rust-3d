@@ -55,8 +55,8 @@ impl<P> IsTree3D<P> for OcTree<P> where
         }
         //let mut set: HashSet<P> = pc.data.into_iter().unbox().collect();
         unique_data.extend(set.into_iter());
-        self.min = *P::new(bb.min().x, bb.min().y, bb.min().z);
-        self.max = *P::new(bb.max().x, bb.max().y, bb.max().z);
+        self.min = *P::new(bb.min_p().x, bb.min_p().y, bb.min_p().z);
+        self.max = *P::new(bb.max_p().x, bb.max_p().y, bb.max_p().z);
         self.root = Some(OcNode::new(&self.min, &self.max, unique_data));
 
         Ok(())

@@ -68,9 +68,9 @@ impl<P> HasDistanceTo<P> for Is3D where
 
 impl HasDistanceTo<BoundingBox3D> for Is3D {
     fn sqr_distance(&self, other: &BoundingBox3D) -> NonNegative {
-        let dx = max_f64_3(other.min().x() - self.x(), 0.0, self.x() - other.max().x());
-        let dy = max_f64_3(other.min().y() - self.y(), 0.0, self.y() - other.max().y());
-        let dz = max_f64_3(other.min().z() - self.z(), 0.0, self.z() - other.max().z());
+        let dx = max_f64_3(other.min_p().x() - self.x(), 0.0, self.x() - other.max_p().x());
+        let dy = max_f64_3(other.min_p().y() - self.y(), 0.0, self.y() - other.max_p().y());
+        let dz = max_f64_3(other.min_p().z() - self.z(), 0.0, self.z() - other.max_p().z());
         NonNegative::new(dx*dx + dy*dy + dz*dz).unwrap()
     }
 }

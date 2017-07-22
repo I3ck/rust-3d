@@ -78,11 +78,11 @@ impl BoundingBox3D {
         }
     }
     /// Returns the minimum position of the bounding box
-    pub fn min(&self) -> Point3D {
+    pub fn min_p(&self) -> Point3D {
         self.min.clone()
     }
     /// Returns the maximum position of the bounding box
-    pub fn max(&self) -> Point3D {
+    pub fn max_p(&self) -> Point3D {
         self.max.clone()
     }
     /// Returns the size the bounding box within the x-dimension
@@ -152,25 +152,25 @@ impl HasDistanceTo<BoundingBox3D> for BoundingBox3D {
         let mut dy = 0.0;
         let mut dz = 0.0;
 
-        if other.max().x() < self.min().x() {
-            dx = other.max().x() - self.min().x();
+        if other.max_p().x() < self.min_p().x() {
+            dx = other.max_p().x() - self.min_p().x();
         }
-        else if other.min().x() > self.max().x() {
-            dx = other.min().x() - self.max().x();
-        }
-
-        if other.max().y() < self.min().y() {
-            dy = other.max().y() - self.min().y();
-        }
-        else if other.min().y() > self.max().y() {
-            dy = other.min().y() - self.max().y();
+        else if other.min_p().x() > self.max_p().x() {
+            dx = other.min_p().x() - self.max_p().x();
         }
 
-        if other.max().z() < self.min().z() {
-            dz = other.max().z() - self.min().z();
+        if other.max_p().y() < self.min_p().y() {
+            dy = other.max_p().y() - self.min_p().y();
         }
-        else if other.min().z() > self.max().z() {
-            dz = other.min().z() - self.max().z();
+        else if other.min_p().y() > self.max_p().y() {
+            dy = other.min_p().y() - self.max_p().y();
+        }
+
+        if other.max_p().z() < self.min_p().z() {
+            dz = other.max_p().z() - self.min_p().z();
+        }
+        else if other.min_p().z() > self.max_p().z() {
+            dz = other.min_p().z() - self.max_p().z();
         }
 
         NonNegative::new(dx*dx + dy*dy + dz*dz).unwrap()
