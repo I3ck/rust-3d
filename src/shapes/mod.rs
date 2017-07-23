@@ -13,21 +13,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! Containing basic 2D shape data types used by other types / algorithms
+//! Containing basic shapes used in other structures or algorithms
 
-use prelude::*;
+mod           shapes_2d;
+pub use self::shapes_2d::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Clone, Hash)]
-/// Circle, a circle in 2D space
-pub struct Circle {
-    pub center: Point2D,
-    pub radius: Positive
-}
-
-#[derive (Debug, PartialEq, PartialOrd, Clone, Hash)]
-/// Box2D, a box in 2D space
-pub struct Box2D {
-    pub center: Point2D,
-    pub size_x: Positive,
-    pub size_y: Positive
-}
+mod           shapes_3d;
+pub use self::shapes_3d::*;

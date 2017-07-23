@@ -207,10 +207,7 @@ pub use self::face3::Face3;
 mod           half_edge;
 pub use self::half_edge::HalfEdge;
 
-mod           shapes_2d;
-pub use self::shapes_2d::*;
-
-mod           shapes_3d;
-pub use self::shapes_3d::*;
+mod           shapes;
+pub use self::shapes::*;
 
 mod utils;

@@ -17,14 +17,15 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Clone, Hash)]
+#[derive (Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
 /// Sphere, a sphere in 3D space
 pub struct Sphere {
     pub center: Point2D,
     pub radius: Positive
 }
+impl Eq for Sphere {}
 
-#[derive (Debug, PartialEq, PartialOrd, Clone, Hash)]
+#[derive (Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
 /// Box3D, a box in 3D space
 pub struct Box3D {
     pub center: Point3D,
@@ -32,3 +33,4 @@ pub struct Box3D {
     pub size_y: Positive,
     pub size_z: Positive
 }
+impl Eq for Box3D {}
