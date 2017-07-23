@@ -15,66 +15,43 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! FilterSphere, a sphere filter within 3D space
 
-use std::cmp::{Eq, Ordering};
-use std::hash::{Hash, Hasher};
-
 use prelude::*;
 use distances_3d::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Default, Clone)]
+#[derive (Debug, PartialEq, PartialOrd, Default, Clone, Hash, Eq, Ord)]
 /// FilterSphere, a sphere filter within 3D space
 pub struct FilterSphere {
-    center: Point3D,
-    radius: Positive
-}
-
-impl Eq for FilterSphere {}
-
-impl Ord for FilterSphere {
-    fn cmp(&self, other: &Self) -> Ordering {
-        let origin = Point3D::default();
-        match sqr_dist_3d(&origin, &self.center).partial_cmp(&sqr_dist_3d(&origin, &other.center)) {
-            Some(x) => x,
-            None => self.radius.partial_cmp(&other.radius).unwrap_or(Ordering::Equal)
-        }
-    }
-}
-
-impl Hash for FilterSphere {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.center.hash(state);
-        (self.radius.get() as u64).hash(state);
-    }
+    sphere: Sphere
 }
 
 impl FilterSphere {
     /// Creates a new FilterSphere with the given parameters
-    pub fn new(center: Point3D, p_radius: Positive) -> Self {
-        FilterSphere {center: center, radius: p_radius}
+    pub fn new(sphere: Sphere) -> Self {
+        FilterSphere {sphere: sphere}
     }
 }
 
 impl IsND for FilterSphere {
     fn n_dimensions() -> usize {
-        3
+        Sphere::n_dimensions()
     }
 
     fn get_position(&self, dimension: usize) -> Result<f64> {
-        self.center.get_position(dimension)
+        self.sphere.get_position(dimension)
     }
 }
 
 impl Is3D for FilterSphere {
     fn x(&self) -> f64 {
-        self.center.x()
+        self.sphere.x()
     }
 
     fn y(&self) -> f64 {
-        self.center.y()
+        self.sphere.y()
     }
 
     fn z(&self) -> f64 {
-        self.center.y()
+        self.sphere.y()
     }
 }
 
@@ -83,66 +60,51 @@ impl IsBuildableND for FilterSphere {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterSphere::new(Point3D{x: coords[0], y: coords[1], z: coords[2]}, Positive::one())))
+        Ok(Box::new(FilterSphere::new(*Sphere::new_nd(coords)?)))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
         P: IsBuildableND {
 
-        if P::n_dimensions() != 3 {
-            return Err(ErrorKind::DimensionsDontMatch);
-        }
-
-        self.center.set_x(other.get_position(0)?);
-        self.center.set_y(other.get_position(1)?);
-        self.center.set_z(other.get_position(2)?);
-        Ok(())
+        self.sphere.from_nd(other)
     }
 }
 
 impl IsBuildable3D for FilterSphere {
     fn new(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(FilterSphere::new(Point3D{x: x, y: y, z: z}, Positive::one()))
+        Box::new(FilterSphere::new(*Sphere::new(x, y, z)))
     }
 
     fn from<P>(&mut self, other: P)
         where P: Is3D {
 
-        self.center.from(other)
+        self.sphere.from(other)
     }
 }
 
 impl IsEditableND for FilterSphere {
     fn set_position(&mut self, dimension: usize, val: f64) -> Result<()> {
-        match dimension {
-            0 => self.center.set_x(val),
-            1 => self.center.set_y(val),
-            2 => self.center.set_z(val),
-            _ => return Err(ErrorKind::DimensionsDontMatch),
-        }
-        Ok(())
+        self.sphere.set_position(dimension, val)
     }
 }
 
 impl IsEditable3D for FilterSphere {
     fn set_x(&mut self, val: f64) {
-        self.center.set_x(val);
+        self.sphere.set_x(val);
     }
 
     fn set_y(&mut self, val: f64) {
-        self.center.set_y(val);
+        self.sphere.set_y(val);
     }
 
     fn set_z(&mut self, val: f64) {
-        self.center.set_z(val);
+        self.sphere.set_z(val);
     }
 }
 
 impl HasBoundingBox3D for FilterSphere {
     fn bounding_box(&self) -> Result<BoundingBox3D> {
-        let p_min = Point3D{x: self.center.x() - self.radius.get(), y: self.center.y() - self.radius.get(), z: self.center.z() - self.radius.get()};
-        let p_max = Point3D{x: self.center.x() + self.radius.get(), y: self.center.y() + self.radius.get(), z: self.center.z() + self.radius.get()};
-        BoundingBox3D::new(&p_min, &p_max)
+        self.sphere.bounding_box()
     }
 }
 
@@ -150,6 +112,6 @@ impl<T> IsFilter<T> for FilterSphere
     where T: Is3D {
 
     fn is_allowed(&self, p: &T) -> bool {
-        dist_3d(p, &self.center) <= self.radius.get()
+        dist_3d(p, &self.sphere.center) <= self.sphere.radius.get()
     }
 }
