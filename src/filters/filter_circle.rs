@@ -15,62 +15,38 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! FilterCircle, a circle filter within 2D space
 
-use std::cmp::{Eq, Ordering};
-use std::hash::{Hash, Hasher};
-
 use prelude::*;
 use distances_2d::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Default, Clone)]
+#[derive (Debug, PartialEq, PartialOrd, Default, Clone, Eq, Ord, Hash)]
 /// FilterCircle, a circle filter within 2D space
 pub struct FilterCircle {
-    center: Point2D,
-    radius: Positive
+    circle: Circle
 }
-
-impl Eq for FilterCircle {}
-
-impl Ord for FilterCircle {
-    fn cmp(&self, other: &Self) -> Ordering {
-        let origin = Point2D::default();
-        match sqr_dist_2d(&origin, &self.center).partial_cmp(&sqr_dist_2d(&origin, &other.center)) {
-            Some(x) => x,
-            None => self.radius.partial_cmp(&other.radius).unwrap_or(Ordering::Equal)
-        }
-    }
-}
-
-impl Hash for FilterCircle {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.center.hash(state);
-        (self.radius.get() as u64).hash(state);
-    }
-}
-
 impl FilterCircle {
     /// Creates a new FilterCircle with the given parameters
-    pub fn new(center: Point2D, p_radius: Positive) -> Self {
-        FilterCircle {center: center, radius: p_radius}
+    pub fn new(circle: Circle) -> Self {
+        FilterCircle {circle: circle}
     }
 }
 
 impl IsND for FilterCircle {
     fn n_dimensions() -> usize {
-        2
+        Circle::n_dimensions()
     }
 
     fn get_position(&self, dimension: usize) -> Result<f64> {
-        self.center.get_position(dimension)
+        self.circle.get_position(dimension)
     }
 }
 
 impl Is2D for FilterCircle {
     fn x(&self) -> f64 {
-        self.center.x()
+        self.circle.x()
     }
 
     fn y(&self) -> f64 {
-        self.center.y()
+        self.circle.y()
     }
 }
 
@@ -79,60 +55,47 @@ impl IsBuildableND for FilterCircle {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(FilterCircle::new(Point2D{x: coords[0], y: coords[1]}, Positive::one())))
+        Ok(Box::new(FilterCircle::new(*Circle::new_nd(coords)?)))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
         P: IsBuildableND {
 
-        if P::n_dimensions() != 2 {
-            return Err(ErrorKind::DimensionsDontMatch);
-        }
-
-        self.center.set_x(other.get_position(0)?);
-        self.center.set_y(other.get_position(1)?);
-        Ok(())
+        self.circle.from_nd(other)
     }
 }
 
 impl IsBuildable2D for FilterCircle {
     fn new(x: f64, y: f64) -> Box<Self> {
-        Box::new(FilterCircle::new(Point2D{x: x, y: y}, Positive::one()))
+        Box::new(FilterCircle::new(*Circle::new(x, y)))
     }
 
     fn from<P>(&mut self, other: P)
         where P: Is2D {
 
-        self.center.from(other)
+        self.circle.from(other)
     }
 }
 
 impl IsEditableND for FilterCircle {
     fn set_position(&mut self, dimension: usize, val: f64) -> Result<()> {
-        match dimension {
-            0 => self.center.set_x(val),
-            1 => self.center.set_y(val),
-            _ => return Err(ErrorKind::DimensionsDontMatch),
-        }
-        Ok(())
+        self.circle.set_position(dimension, val)
     }
 }
 
 impl IsEditable2D for FilterCircle {
     fn set_x(&mut self, val: f64) {
-        self.center.set_x(val);
+        self.circle.set_x(val);
     }
 
     fn set_y(&mut self, val: f64) {
-        self.center.set_y(val);
+        self.circle.set_y(val);
     }
 }
 
 impl HasBoundingBox2D for FilterCircle {
     fn bounding_box(&self) -> Result<BoundingBox2D> {
-        let p_min = Point2D{x: self.center.x() - self.radius.get(), y: self.center.y() - self.radius.get()};
-        let p_max = Point2D{x: self.center.x() + self.radius.get(), y: self.center.y() + self.radius.get()};
-        BoundingBox2D::new(&p_min, &p_max)
+        self.circle.bounding_box()
     }
 }
 
@@ -140,6 +103,6 @@ impl<T> IsFilter<T> for FilterCircle where
     T: Is2D {
 
     fn is_allowed(&self, p: &T) -> bool {
-        dist_2d(p, &self.center) <= self.radius.get()
+        dist_2d(p, &self.circle.center) <= self.circle.radius.get()
     }
 }

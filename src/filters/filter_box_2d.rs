@@ -15,22 +15,12 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! FilterBox2D, a box filter within 2D space
 
-use std::cmp::{Eq, Ordering};
-
 use prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Default, Clone, Hash)]
+#[derive (Debug, PartialEq, PartialOrd, Default, Clone, Hash, Eq, Ord)]
 /// FilterBox2D, a box filter within 2D space
 pub struct FilterBox2D {
     box_2d: Box2D
-}
-
-impl Eq for FilterBox2D {}
-
-impl Ord for FilterBox2D {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.box_2d.cmp(&other.box_2d)
-    }
 }
 
 impl FilterBox2D {
