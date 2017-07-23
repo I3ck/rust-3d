@@ -23,7 +23,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //@todo or even prevent copy once KdTree is referencing
 //@todo KdTree needs constructor (best would be to directly build from IsRandomAcc)
 //@todo write 2D version once KdTree also supports 2D
-///@todo fix docs
+//@todo fix docs
 
 use prelude::*;
 

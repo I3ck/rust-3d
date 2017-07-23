@@ -55,7 +55,7 @@ pub fn load_xy<RI, P>(ri: &mut RI, filepath: &str, delim_coord: &str, delim_pos:
         if line == "" {
             continue;
         }
-        ///@todo write util for this (change the buildable method to support custom delimiter)
+        //@todo write util for this (change the buildable method to support custom delimiter)
         let split = line.split(delim_coord);
         let words = split.collect::<Vec<&str>>();
         match words.len() {
