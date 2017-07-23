@@ -21,11 +21,11 @@ use rust_3d::prelude::*;
 
 #[test]
 fn filter_pc_3d_test() {
-    let center = *Point3D::new(10.0, -5.0, 1.0);
+    let center = Point3D{x: 10.0, y: -5.0, z: 1.0};
     let size_x = Positive::new(3.0).unwrap();
     let size_y = Positive::new(5.0).unwrap();
     let size_z = Positive::new(10.0).unwrap();
-    let filter = FilterBox3D::new(center, size_x, size_y, size_z);
+    let filter = FilterBox3D::new(Box3D{center: center, size_x: size_x, size_y: size_y, size_z: size_z});
 
     let mut pc = PointCloud3D::<Point3D>::new();
     let mut view = View::Full;
