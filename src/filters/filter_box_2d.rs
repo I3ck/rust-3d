@@ -52,9 +52,6 @@ impl Is2D for FilterBox2D {
 
 impl IsBuildableND for FilterBox2D {
     fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
-        if coords.len() != 2 {
-            return Err(ErrorKind::DimensionsDontMatch);
-        }
         Ok(Box::new(FilterBox2D::new(*Box2D::new_nd(coords)?)))
     }
 
