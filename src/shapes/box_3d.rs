@@ -28,8 +28,8 @@ pub struct Box3D {
     pub size_y: Positive,
     pub size_z: Positive
 }
-impl Eq for Box3D {}
 
+impl Eq for Box3D {}
 
 impl Ord for Box3D {
     fn cmp(&self, other: &Self) -> Ordering {
@@ -49,7 +49,7 @@ impl Ord for Box3D {
 
 impl IsND for Box3D {
     fn n_dimensions() -> usize {
-        3
+        Point3D::n_dimensions()
     }
 
     fn get_position(&self, dimension: usize) -> Result<f64> {
@@ -73,23 +73,13 @@ impl Is3D for Box3D {
 
 impl IsBuildableND for Box3D {
     fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
-        if coords.len() != 3 {
-            return Err(ErrorKind::DimensionsDontMatch);
-        }
-        Ok(Box::new(Box3D{center: Point3D{x: coords[0], y: coords[1], z: coords[2]}, size_x: Positive::one(), size_y: Positive::one(), size_z: Positive::one()}))
+        Ok(Box::new(Box3D{center: *Point3D::new_nd(coords)?, size_x: Positive::one(), size_y: Positive::one(), size_z: Positive::one()}))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
         P: IsBuildableND {
 
-        if P::n_dimensions() != 3 {
-            return Err(ErrorKind::DimensionsDontMatch);
-        }
-
-        self.center.set_x(other.get_position(0)?);
-        self.center.set_y(other.get_position(1)?);
-        self.center.set_z(other.get_position(2)?);
-        Ok(())
+        self.center.from_nd(other)
     }
 }
 
@@ -107,13 +97,7 @@ impl IsBuildable3D for Box3D {
 
 impl IsEditableND for Box3D {
     fn set_position(&mut self, dimension: usize, val: f64) -> Result<()> {
-        match dimension {
-            0 => self.center.set_x(val),
-            1 => self.center.set_y(val),
-            2 => self.center.set_z(val),
-            _ => return Err(ErrorKind::DimensionsDontMatch),
-        }
-        Ok(())
+        self.center.set_position(dimension, val)
     }
 }
 

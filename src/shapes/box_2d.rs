@@ -27,6 +27,7 @@ pub struct Box2D {
     pub size_x: Positive,
     pub size_y: Positive
 }
+
 impl Eq for Box2D {}
 
 impl Ord for Box2D {
@@ -44,7 +45,7 @@ impl Ord for Box2D {
 
 impl IsND for Box2D {
     fn n_dimensions() -> usize {
-        2
+        Point2D::n_dimensions()
     }
 
     fn get_position(&self, dimension: usize) -> Result<f64> {
@@ -64,22 +65,13 @@ impl Is2D for Box2D {
 
 impl IsBuildableND for Box2D {
     fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
-        if coords.len() != 2 {
-            return Err(ErrorKind::DimensionsDontMatch);
-        }
-        Ok(Box::new(Box2D{center: Point2D{x: coords[0], y: coords[1]}, size_x: Positive::one(), size_y: Positive::one()}))
+        Ok(Box::new(Box2D{center: *Point2D::new_nd(coords)?,  size_x: Positive::one(), size_y: Positive::one()}))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
         P: IsBuildableND {
 
-        if P::n_dimensions() != 2 {
-            return Err(ErrorKind::DimensionsDontMatch);
-        }
-
-        self.center.set_x(other.get_position(0)?);
-        self.center.set_y(other.get_position(1)?);
-        Ok(())
+        self.center.from_nd(other)
     }
 }
 
@@ -97,12 +89,7 @@ impl IsBuildable2D for Box2D {
 
 impl IsEditableND for Box2D {
     fn set_position(&mut self, dimension: usize, val: f64) -> Result<()> {
-        match dimension {
-            0 => self.center.set_x(val),
-            1 => self.center.set_y(val),
-            _ => return Err(ErrorKind::DimensionsDontMatch),
-        }
-        Ok(())
+        self.center.set_position(dimension, val)
     }
 }
 

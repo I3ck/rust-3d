@@ -41,7 +41,7 @@ impl Ord for Sphere {
 
 impl IsND for Sphere {
     fn n_dimensions() -> usize {
-        3
+        Point3D::n_dimensions()
     }
 
     fn get_position(&self, dimension: usize) -> Result<f64> {
@@ -65,23 +65,13 @@ impl Is3D for Sphere {
 
 impl IsBuildableND for Sphere {
     fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
-        if coords.len() != 3 {
-            return Err(ErrorKind::DimensionsDontMatch);
-        }
-        Ok(Box::new(Sphere{center: Point3D{x: coords[0], y: coords[1], z: coords[2]}, radius: Positive::one()}))
+        Ok(Box::new(Sphere{center: *Point3D::new_nd(coords)?, radius: Positive::one()}))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
         P: IsBuildableND {
 
-        if P::n_dimensions() != 3 {
-            return Err(ErrorKind::DimensionsDontMatch);
-        }
-
-        self.center.set_x(other.get_position(0)?);
-        self.center.set_y(other.get_position(1)?);
-        self.center.set_z(other.get_position(2)?);
-        Ok(())
+        self.center.from_nd(other)
     }
 }
 
@@ -99,13 +89,7 @@ impl IsBuildable3D for Sphere {
 
 impl IsEditableND for Sphere {
     fn set_position(&mut self, dimension: usize, val: f64) -> Result<()> {
-        match dimension {
-            0 => self.center.set_x(val),
-            1 => self.center.set_y(val),
-            2 => self.center.set_z(val),
-            _ => return Err(ErrorKind::DimensionsDontMatch),
-        }
-        Ok(())
+        self.center.set_position(dimension, val)
     }
 }
 

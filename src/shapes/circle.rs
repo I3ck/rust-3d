@@ -26,6 +26,7 @@ pub struct Circle {
     pub center: Point2D,
     pub radius: Positive
 }
+
 impl Eq for Circle {}
 
 impl Ord for Circle {
@@ -40,7 +41,7 @@ impl Ord for Circle {
 
 impl IsND for Circle {
     fn n_dimensions() -> usize {
-        2
+        Point2D::n_dimensions()
     }
 
     fn get_position(&self, dimension: usize) -> Result<f64> {
@@ -60,22 +61,13 @@ impl Is2D for Circle {
 
 impl IsBuildableND for Circle {
     fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
-        if coords.len() != 2 {
-            return Err(ErrorKind::DimensionsDontMatch);
-        }
-        Ok(Box::new(Circle{ center: Point2D{x: coords[0], y: coords[1]}, radius: Positive::one()}))
+        Ok(Box::new(Circle{ center: *Point2D::new_nd(coords)?, radius: Positive::one()}))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
         P: IsBuildableND {
 
-        if P::n_dimensions() != 2 {
-            return Err(ErrorKind::DimensionsDontMatch);
-        }
-
-        self.center.set_x(other.get_position(0)?);
-        self.center.set_y(other.get_position(1)?);
-        Ok(())
+        self.center.from_nd(other)
     }
 }
 
@@ -93,12 +85,7 @@ impl IsBuildable2D for Circle {
 
 impl IsEditableND for Circle {
     fn set_position(&mut self, dimension: usize, val: f64) -> Result<()> {
-        match dimension {
-            0 => self.center.set_x(val),
-            1 => self.center.set_y(val),
-            _ => return Err(ErrorKind::DimensionsDontMatch),
-        }
-        Ok(())
+        self.center.set_position(dimension, val)
     }
 }
 
