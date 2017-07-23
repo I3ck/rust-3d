@@ -15,8 +15,11 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! Containing basic shapes used in other structures or algorithms
 
-mod           shapes_2d;
-pub use self::shapes_2d::*;
+mod           circle;
+pub use self::circle::Circle;
+
+mod           box_2d;
+pub use self::box_2d::Box2D;
 
 mod           shapes_3d;
 pub use self::shapes_3d::*;
