@@ -27,7 +27,8 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use prelude::*;
 
-use kd_tree::KdTree;
+use std::marker::PhantomData;
+
 
 /// FilterOutlier3D, a filter which removes outliers by counting their neighbours in a search radius
 /// This can be used to compare two sets of points by removing those in A which aren't close enough to B
@@ -35,29 +36,35 @@ use kd_tree::KdTree;
 /// For this use the same input to build this filter as to filter against
 /// Points will find themselves, so increase the required count by 1
 #[derive (Debug, PartialEq, PartialOrd, Default, Clone)]
-pub struct FilterOutlier3D<P> where
-    P: Is3D {
+pub struct FilterOutlier3D<S, PSearch, PFind> where
+    PSearch: Is3D,
+    PFind: Is3D,
+    S: IsSphereSearchable<PSearch, PFind> {
 
     search_distance: Positive,
     min_neighbours: usize, //@todo should be usize >= 1 add new type for that?
-    tree: KdTree<P>
+    searchable: S,
+    phantom_search: PhantomData<PSearch>,
+    phantom_find: PhantomData<PFind>
 }
 
-impl<P> FilterOutlier3D<P> where
-    P: Is3D + Clone + Default {
+impl<S, PSearch, PFind> FilterOutlier3D<S, PSearch, PFind> where
+    PSearch: Is3D,
+    PFind: Is3D,
+    S: IsSphereSearchable<PSearch, PFind> {
     /// Creates a new FilterOutlier3D from a search distance and the min number of neighbours to be found in this distance
-    pub fn new(pc: PointCloud3D<P>, search_distance: Positive, min_neighbours: usize) -> Result<Self> {
-        let mut tree = KdTree::default();
-        tree.build(pc)?;
-        Ok(FilterOutlier3D { search_distance: search_distance, min_neighbours: min_neighbours, tree: tree})
+    pub fn new(searchable: S, search_distance: Positive, min_neighbours: usize) -> Result<Self> {
+        Ok(FilterOutlier3D { search_distance: search_distance, min_neighbours: min_neighbours, searchable: searchable, phantom_search: PhantomData, phantom_find: PhantomData})
     }
 }
 
-impl<P> IsFilter<P> for FilterOutlier3D<P> where
-    P: Is3D + Clone {
+impl<S, PSearch, PFind> IsFilter<PSearch> for FilterOutlier3D <S, PSearch, PFind>where
+    PSearch: Is3D,
+    PFind: Is3D,
+    S: IsSphereSearchable<PSearch, PFind> {
 
-    fn is_allowed(&self, p: &P) -> bool {
-        let pts = self.tree.in_sphere(p, self.search_distance.get());
+    fn is_allowed(&self, p: &PSearch) -> bool {
+        let pts = self.searchable.in_sphere(p, self.search_distance.get());
         pts.len() >= self.min_neighbours
     }
 }
