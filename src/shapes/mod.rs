@@ -21,5 +21,8 @@ pub use self::circle::Circle;
 mod           box_2d;
 pub use self::box_2d::Box2D;
 
-mod           shapes_3d;
-pub use self::shapes_3d::*;
+mod           sphere;
+pub use self::sphere::Sphere;
+
+mod           box_3d;
+pub use self::box_3d::Box3D;
