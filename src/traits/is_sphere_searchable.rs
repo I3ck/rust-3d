@@ -20,9 +20,7 @@ use prelude::*;
 
 /// IsSphereSearchable trait used for search structures which can be queried for elements within a sphere
 /// You should only implement this, if your solution is rather efficient
-pub trait IsSphereSearchable<PSearch, PFind> where
-    PSearch: Is3D,
-    PFind:   Is3D {
-    /// Should return all positions within a sphere around search
-    fn in_sphere(&self, search: &PSearch, radius: f64) -> Vec<PFind>;
+pub trait IsSphereSearchable<T> {
+    /// Should return all elements within a sphere
+    fn in_sphere(&self, sphere: &Sphere) -> Vec<T>;
 }

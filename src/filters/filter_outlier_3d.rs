@@ -36,35 +36,32 @@ use std::marker::PhantomData;
 /// For this use the same input to build this filter as to filter against
 /// Points will find themselves, so increase the required count by 1
 #[derive (Debug, PartialEq, PartialOrd, Default, Clone)]
-pub struct FilterOutlier3D<S, PSearch, PFind> where
-    PSearch: Is3D,
-    PFind: Is3D,
-    S: IsSphereSearchable<PSearch, PFind> {
+pub struct FilterOutlier3D<S, P> where
+    P: Is3D,
+    S: IsSphereSearchable<P> {
 
     search_distance: Positive,
     min_neighbours: usize, //@todo should be usize >= 1 add new type for that?
     searchable: S,
-    phantom_search: PhantomData<PSearch>,
-    phantom_find: PhantomData<PFind>
+    phantom_search: PhantomData<P>
 }
 
-impl<S, PSearch, PFind> FilterOutlier3D<S, PSearch, PFind> where
-    PSearch: Is3D,
-    PFind: Is3D,
-    S: IsSphereSearchable<PSearch, PFind> {
+impl<S, P> FilterOutlier3D<S, P> where
+    P: Is3D,
+    S: IsSphereSearchable<P> {
     /// Creates a new FilterOutlier3D from a search distance and the min number of neighbours to be found in this distance
     pub fn new(searchable: S, search_distance: Positive, min_neighbours: usize) -> Result<Self> {
-        Ok(FilterOutlier3D { search_distance: search_distance, min_neighbours: min_neighbours, searchable: searchable, phantom_search: PhantomData, phantom_find: PhantomData})
+        Ok(FilterOutlier3D { search_distance: search_distance, min_neighbours: min_neighbours, searchable: searchable, phantom_search: PhantomData})
     }
 }
 
-impl<S, PSearch, PFind> IsFilter<PSearch> for FilterOutlier3D <S, PSearch, PFind>where
+impl<S, P, PSearch> IsFilter<PSearch> for FilterOutlier3D <S, P>where
+    P: Is3D,
     PSearch: Is3D,
-    PFind: Is3D,
-    S: IsSphereSearchable<PSearch, PFind> {
+    S: IsSphereSearchable<P> {
 
     fn is_allowed(&self, p: &PSearch) -> bool {
-        let pts = self.searchable.in_sphere(p, self.search_distance.get());
+        let pts = self.searchable.in_sphere(&Sphere{center: Point3D{x: p.x(), y: p.y(), z: p.z()}, radius: self.search_distance.clone()});
         pts.len() >= self.min_neighbours
     }
 }

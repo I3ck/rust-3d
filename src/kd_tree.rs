@@ -93,29 +93,25 @@ impl<PSearch, PFind> IsKNearestSearchable<PSearch, PFind> for KdTree<PFind> wher
     }
 }
 
-impl<PSearch, PFind> IsSphereSearchable<PSearch, PFind> for KdTree<PFind> where
-    PSearch: Is3D,
-    PFind:   Is3D + Clone {
+impl<P> IsSphereSearchable<P> for KdTree<P> where
+    P: Is3D + Clone {
 
-    fn in_sphere(&self, search: &PSearch, radius: f64) -> Vec<PFind> {
+    fn in_sphere(&self, sphere: &Sphere) -> Vec<P> {
         let mut result = Vec::new();
-        if radius <= 0.0 { return result; }
         if let Some(ref node) = self.root {
-            node.in_sphere(search, radius, &mut result);
+            node.in_sphere(sphere, &mut result);
         }
         return result;
     }
 }
 
-impl<PSearch, PFind> IsBox3DSearchable<PSearch, PFind> for KdTree<PFind> where
-    PSearch: Is3D,
-    PFind:   Is3D + Clone {
+impl<P> IsBox3DSearchable<P> for KdTree<P> where
+    P: Is3D + Clone {
 
-    fn in_box(&self, search: &PSearch, x_size: f64, y_size: f64, z_size: f64) -> Vec<PFind> {
+    fn in_box(&self, box_3d: &Box3D) -> Vec<P> {
         let mut result = Vec::new();
-        if x_size <= 0.0 || y_size <= 0.0 || z_size <= 0.0 { return result; }
         if let Some(ref node) = self.root {
-            node.in_box(search, x_size, y_size, z_size, &mut result);
+            node.in_box(box_3d, &mut result);
         }
         return result;
     }
@@ -191,10 +187,10 @@ impl<P> KdNode<P> where
     }
 }
 
-impl<PFind> KdNode<PFind> where
-    PFind: Is3D + Clone {
+impl<P> KdNode<P> where
+    P: Is3D + Clone {
 
-    pub fn knearest<PSearch>(&self, search: &PSearch, n: usize, pc: &mut Vec<PFind>) where
+    pub fn knearest<PSearch>(&self, search: &PSearch, n: usize, pc: &mut Vec<P>) where
         PSearch: Is3D {
 
         if pc.len() < n || sqr_dist_3d(search, &self.val) < sqr_dist_3d(search, &pc[&pc.len() -1 ]) {
@@ -243,35 +239,32 @@ impl<PFind> KdNode<PFind> where
         sort_and_limit(pc, search, n);
     }
 
-    pub fn in_sphere<PSearch>(&self, search: &PSearch, radius: f64, pc: &mut Vec<PFind>) where
-        PSearch: Is3D {
+    pub fn in_sphere(&self, sphere: &Sphere, pc: &mut Vec<P>) {
 
-        if radius <= 0.0 { return; }
-
-        if dist_3d(search, &self.val) <= radius {
+        if dist_3d(&sphere.center, &self.val) <= sphere.radius.get() {
             pc.push(self.val.clone());
         }
 
         if self.is_leaf() { return; }
 
-        let comp = dimension_compare(search, &self.val, self.dimension);
+        let comp = dimension_compare(&sphere.center, &self.val, self.dimension);
 
         match comp {
             Ok(res) => match res {
-                Ordering::Less  => if let Some(ref node) = (&self).left { node.in_sphere(search, radius, pc); },
-                _               => if let Some(ref node) = (&self).right { node.in_sphere(search, radius, pc); }
+                Ordering::Less  => if let Some(ref node) = (&self).left { node.in_sphere(sphere, pc); },
+                _               => if let Some(ref node) = (&self).right { node.in_sphere(sphere, pc); }
             },
             Err(_) => {}
         }
 
         let (current_search, current_val) = match self.dimension {
-            0 => (search.x(), self.val.x()),
-            1 => (search.y(), self.val.y()),
-            _ => (search.z(), self.val.z())
+            0 => (sphere.x(), self.val.x()),
+            1 => (sphere.y(), self.val.y()),
+            _ => (sphere.z(), self.val.z())
         };
 
-        let border_left = current_search - radius;
-        let border_right = current_search + radius;
+        let border_left  = current_search - sphere.radius.get();
+        let border_right = current_search + sphere.radius.get();
 
 
 
@@ -279,12 +272,12 @@ impl<PFind> KdNode<PFind> where
             Ok(res) => match res {
                 Ordering::Less => if let Some(ref node) = (&self).right {
                     if border_right >= current_val {
-                        node.in_sphere(search, radius, pc);
+                        node.in_sphere(sphere, pc);
                     }
                 },
                 Ordering::Greater => if let Some(ref node) = (&self).left {
                     if border_left <= current_val {
-                        node.in_sphere(search, radius, pc);
+                        node.in_sphere(sphere, pc);
                     }
                 },
                 Ordering::Equal => {}
@@ -293,47 +286,44 @@ impl<PFind> KdNode<PFind> where
         }
     }
 
-    pub fn in_box<PSearch>(&self, search: &PSearch, x_size: f64, y_size: f64, z_size: f64, pc: &mut Vec<PFind>) where
-        PSearch: Is3D {
+    pub fn in_box(&self, box_3d: &Box3D, pc: &mut Vec<P>) {
 
-        if x_size <= 0.0 || y_size <= 0.0 || z_size <= 0.0 { return; }
-
-        if let (Ok(dist_x), Ok(dist_y), Ok(dist_z)) = (dimension_dist(search, &self.val, 0), dimension_dist(search, &self.val, 1), dimension_dist(search, &self.val, 2)) {
-            if dist_x <= 0.5 * x_size && dist_y <= 0.5 * y_size && dist_z <= 0.5 * z_size {
+        if let (Ok(dist_x), Ok(dist_y), Ok(dist_z)) = (dimension_dist(&box_3d.center, &self.val, 0), dimension_dist(&box_3d.center, &self.val, 1), dimension_dist(&box_3d.center, &self.val, 2)) {
+            if dist_x <= 0.5 * box_3d.size_x.get() && dist_y <= 0.5 * box_3d.size_y.get() && dist_z <= 0.5 * box_3d.size_z.get() {
                 pc.push(self.val.clone());
             }
 
             if self.is_leaf()  { return; }
 
-            let comp = dimension_compare(search, &self.val, self.dimension);
+            let comp = dimension_compare(&box_3d.center, &self.val, self.dimension);
 
             match comp {
                 Ok(res) => match res {
-                    Ordering::Less  => if let Some(ref node) = (&self).left { node.in_box(search, x_size, y_size, z_size, pc); },
-                    _               => if let Some(ref node) = (&self).right { node.in_box(search, x_size, y_size, z_size, pc); }
+                    Ordering::Less  => if let Some(ref node) = (&self).left { node.in_box(box_3d, pc); },
+                    _               => if let Some(ref node) = (&self).right{ node.in_box(box_3d, pc); }
                 },
                 Err(_) => {}
             }
 
-            let (current_search, current_val, current_size) = match self.dimension {
-                0 => (search.x(), self.val.x(), x_size),
-                1 => (search.y(), self.val.y(), y_size),
-                _ => (search.z(), self.val.z(), z_size)
+            let (current_search, current_val, ref current_size) = match self.dimension {
+                0 => (box_3d.x(), self.val.x(), &box_3d.size_x),
+                1 => (box_3d.y(), self.val.y(), &box_3d.size_y),
+                _ => (box_3d.z(), self.val.z(), &box_3d.size_z)
             };
 
-            let border_left = current_search - 0.5 * current_size;
-            let border_right = current_search + 0.5 * current_size;
+            let border_left = current_search - 0.5 * current_size.get();
+            let border_right = current_search + 0.5 * current_size.get();
 
             match comp {
                 Ok(res) => match res {
                     Ordering::Less => if let Some(ref node) = (&self).right {
                         if border_right >= current_val {
-                            node.in_box(search, x_size, y_size, z_size, pc);
+                            node.in_box(box_3d, pc);
                         }
                     },
                     Ordering::Greater => if let Some(ref node) = (&self).left {
                         if border_left <= current_val {
-                            node.in_box(search, x_size, y_size, z_size, pc);
+                            node.in_box(box_3d, pc);
                         }
                     },
                     Ordering::Equal => {}
