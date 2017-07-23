@@ -60,6 +60,12 @@ pub use View;
 
 pub use HalfEdge;
 
+pub use Circle;
+pub use Box2D;
+
+pub use Sphere;
+pub use Box3D;
+
 pub use filters::FilterBox2D;
 pub use filters::FilterBox3D;
 pub use filters::FilterCircle;
