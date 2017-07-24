@@ -57,8 +57,8 @@ enum Direction {
 }
 
 /// Calculates the min and max values of sub nodes of an OcTree
-fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where //@todo move to OcTree
-    P: IsBuildable3D + Clone { //@todo better name
+fn calc_sub_min_max<P>(dir: Direction, min: &P, max: &P) -> (P, P) where
+    P: IsBuildable3D + Clone {
 
     let middle = center(min, max);
 
@@ -232,9 +232,8 @@ impl<P> OcNode<P> where
         }
     }
 
-//@todo define helpers here to simplify code (and in other areas)
     pub fn collect(&self, depth: i8, maxdepth: i8, pc: &mut PointCloud3D<P>) {
-        let only_collect_centers = maxdepth >= 0 && depth > maxdepth; //@todo make this depend on a setting?
+        let only_collect_centers = maxdepth >= 0 && depth > maxdepth;
         match self {
             &OcNode::Leaf(ref p) => pc.push(p.clone()),
 

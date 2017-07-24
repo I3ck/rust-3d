@@ -19,7 +19,7 @@ use std::cmp::Ordering;
 
 use prelude::*;
 use distances_3d::*;
-use functions::{dimension_compare, dimension_dist, sort_and_limit};
+use functions::{dimension_compare, dimension_dist};
 
 #[derive (Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// KdTree https://en.wikipedia.org/wiki/K-d_tree
@@ -207,7 +207,7 @@ impl<P> KdNode<P> where
             Err(_) => {}
         }
 
-        sort_and_limit(pc, search, n);
+        Self::sort_and_limit(pc, search, n);
 
         let (current_search, current_val) = match self.dimension {
             0 => (search.x(), self.val.x()),
@@ -236,7 +236,7 @@ impl<P> KdNode<P> where
             Err(_) => {}
         }
 
-        sort_and_limit(pc, search, n);
+        Self::sort_and_limit(pc, search, n);
     }
 
     pub fn in_sphere(&self, sphere: &Sphere, pc: &mut Vec<P>) {
@@ -330,6 +330,21 @@ impl<P> KdNode<P> where
                 },
                 Err(_) => {}
             }
+        }
+    }
+
+    fn sort_and_limit<'a, PSearch, PFind>(mut pc: &'a mut Vec<PFind>, search: &PSearch, max_size: usize) where
+        PSearch: Is3D,
+        PFind: Is3D + Clone {
+
+        if pc.len() > max_size {
+            pc.sort_by(|a, b| sqr_dist_3d(search, a).partial_cmp(&sqr_dist_3d(search, b)).unwrap_or(Ordering::Equal));
+            let mut result : Vec<PFind>;
+            result = Vec::new();
+            for i in pc.iter().take(max_size) {
+                result.push(i.clone());
+            }
+            *pc = result;
         }
     }
 }

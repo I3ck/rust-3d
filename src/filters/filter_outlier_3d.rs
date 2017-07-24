@@ -19,11 +19,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! For this use the same input to build this filter as to filter against
 //! Points will find themselves, so increase the required count by 1
 
-//@todo make this work for IsRandomAccessible once KdTree supports it
-//@todo or even prevent copy once KdTree is referencing
-//@todo KdTree needs constructor (best would be to directly build from IsRandomAcc)
 //@todo write 2D version once KdTree also supports 2D
-//@todo fix docs
 
 use prelude::*;
 

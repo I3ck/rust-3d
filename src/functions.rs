@@ -18,7 +18,6 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::cmp::Ordering;
 
 use prelude::*;
-use distances_3d::*;
 
 //@todo move these functions to better fitting files or make them methods of the correct types
 
@@ -67,22 +66,6 @@ pub fn dimension_dist<P1, P2>(lhs: &P1, rhs: &P2, dim: i8) -> Result<f64> where
         1 => Ok((lhs.y() - rhs.y()).abs()),
         2 => Ok((lhs.z() - rhs.z()).abs()),
         _ => Err(ErrorKind::DimensionsDontMatch)
-    }
-}
-
-/// Helper function to keep a collection of positions limited in size and sorted
-pub fn sort_and_limit<'a, PSearch, PFind>(mut pc: &'a mut Vec<PFind>, search: &PSearch, max_size: usize) where //@todo move to KdTree
-    PSearch: Is3D,
-    PFind: Is3D + Clone {
-
-    if pc.len() > max_size {
-        pc.sort_by(|a, b| sqr_dist_3d(search, a).partial_cmp(&sqr_dist_3d(search, b)).unwrap_or(Ordering::Equal));
-        let mut result : Vec<PFind>;
-        result = Vec::new();
-        for i in pc.iter().take(max_size) {
-            result.push(i.clone());
-        }
-        *pc = result;
     }
 }
 

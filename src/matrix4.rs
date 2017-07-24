@@ -114,9 +114,7 @@ impl Matrix4 {
         N: IsNormalized3D {
 
         let n = target.clone().normalized()?;
-        let mut u = Point3D::default(); //@todo can be dropped?
-        u.from(*(cross(&*up, target)));
-        let u = u;
+        let u = *cross(&*up, target);
         let v = cross(&*n, &u);
 
         let mut result = Matrix4::default();

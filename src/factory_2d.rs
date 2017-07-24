@@ -19,9 +19,6 @@ use std::f64::consts::PI;
 
 use prelude::*;
 
-//@todo entire file has to be added to tests
-//@todo define trait for pc2d factories, later for 3d as well
-
 /// Creates a 2D rectangle from given center width and height
 pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> Box<PointCloud2D<P>> where
     P: IsBuildable2D {
