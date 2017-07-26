@@ -56,7 +56,8 @@ impl<P> IsTree3D<P> for OcTree<P> where
         unique_data.extend(set.into_iter());
         self.min = *P::new(bb.min_p().x, bb.min_p().y, bb.min_p().z);
         self.max = *P::new(bb.max_p().x, bb.max_p().y, bb.max_p().z);
-        self.root = Some(OcNode::new(&self.min, &self.max, unique_data));
+        let bb = BoundingBox3D::new(&self.min, &self.max)?;
+        self.root = Some(OcNode::new(&bb, unique_data)?);
 
         Ok(())
     }
@@ -154,20 +155,13 @@ impl<P> OcNode<P> where
             }
         }
     }
-    /// Checks whether a position is inside a bounding box
-    fn in_bb(p: &P, min: &P, max: &P) -> bool {
-        match BoundingBox3D::new(min, max) {
-            Err(_) => return false,
-            Ok(x) => return x.contains(p)
-        }
-    }
 }
 
 impl<P> OcNode<P> where
     P: IsBuildable3D + Clone {
     /// Creates a new OcNode from a min and max position and the data it should hold
-    pub fn new(min: &P, max: &P, pc: Vec<P>) -> OcNode<P> {
-        if pc.len() == 1 { return OcNode::Leaf(pc[0].clone()); };
+    pub fn new(bb: &BoundingBox3D, pc: Vec<P>) -> Result<OcNode<P>> {
+        if pc.len() == 1 { return Ok(OcNode::Leaf(pc[0].clone())); };
         let mut pcppp = Vec::new();
         let mut pcppn = Vec::new();
         let mut pcpnp = Vec::new();
@@ -177,43 +171,43 @@ impl<P> OcNode<P> where
         let mut pcnnp = Vec::new();
         let mut pcnnn = Vec::new();
 
-        let bbppp = Self::calc_sub_min_max(Direction::PPP, min, max);
-        let bbppn = Self::calc_sub_min_max(Direction::PPN, min, max);
-        let bbpnp = Self::calc_sub_min_max(Direction::PNP, min, max);
-        let bbpnn = Self::calc_sub_min_max(Direction::PNN, min, max);
-        let bbnpp = Self::calc_sub_min_max(Direction::NPP, min, max);
-        let bbnpn = Self::calc_sub_min_max(Direction::NPN, min, max);
-        let bbnnp = Self::calc_sub_min_max(Direction::NNP, min, max);
-        let bbnnn = Self::calc_sub_min_max(Direction::NNN, min, max);
+        let bbppp = Self::calc_sub_min_max(Direction::PPP, bb)?;
+        let bbppn = Self::calc_sub_min_max(Direction::PPN, bb)?;
+        let bbpnp = Self::calc_sub_min_max(Direction::PNP, bb)?;
+        let bbpnn = Self::calc_sub_min_max(Direction::PNN, bb)?;
+        let bbnpp = Self::calc_sub_min_max(Direction::NPP, bb)?;
+        let bbnpn = Self::calc_sub_min_max(Direction::NPN, bb)?;
+        let bbnnp = Self::calc_sub_min_max(Direction::NNP, bb)?;
+        let bbnnn = Self::calc_sub_min_max(Direction::NNN, bb)?;
 
         for p in pc {
-            if Self::in_bb(&p, &bbppp.0, &bbppp.1) {
+            if        bbppp.contains(&p) {
                 pcppp.push(p);
-            } else if Self::in_bb(&p, &bbppn.0, &bbppn.1) {
+            } else if bbppn.contains(&p) {
                 pcppn.push(p);
-            } else if Self::in_bb(&p, &bbpnp.0, &bbpnp.1) {
+            } else if bbpnp.contains(&p) {
                 pcpnp.push(p);
-            } else if Self::in_bb(&p, &bbpnn.0, &bbpnn.1) {
+            } else if bbpnn.contains(&p) {
                 pcpnn.push(p);
-            } else if Self::in_bb(&p, &bbnpp.0, &bbnpp.1) {
+            } else if bbnpp.contains(&p) {
                 pcnpp.push(p);
-            } else if Self::in_bb(&p, &bbnpn.0, &bbnpn.1) {
+            } else if bbnpn.contains(&p) {
                 pcnpn.push(p);
-            } else if Self::in_bb(&p, &bbnnp.0, &bbnnp.1) {
+            } else if bbnnp.contains(&p) {
                 pcnnp.push(p);
-            } else if Self::in_bb(&p, &bbnnn.0, &bbnnn.1) {
+            } else if bbnnn.contains(&p) {
                 pcnnn.push(p);
             }
         }
 
-        let ppp = Self::build_subnode(pcppp, bbppp);
-        let ppn = Self::build_subnode(pcppn, bbppn);
-        let pnp = Self::build_subnode(pcpnp, bbpnp);
-        let pnn = Self::build_subnode(pcpnn, bbpnn);
-        let npp = Self::build_subnode(pcnpp, bbnpp);
-        let npn = Self::build_subnode(pcnpn, bbnpn);
-        let nnp = Self::build_subnode(pcnnp, bbnnp);
-        let nnn = Self::build_subnode(pcnnn, bbnnn);
+        let ppp = Self::build_subnode(pcppp, &bbppp);
+        let ppn = Self::build_subnode(pcppn, &bbppn);
+        let pnp = Self::build_subnode(pcpnp, &bbpnp);
+        let pnn = Self::build_subnode(pcpnn, &bbpnn);
+        let npp = Self::build_subnode(pcnpp, &bbnpp);
+        let npn = Self::build_subnode(pcnpn, &bbnpn);
+        let nnp = Self::build_subnode(pcnnp, &bbnnp);
+        let nnn = Self::build_subnode(pcnnn, &bbnnn);
 
         let result: Internal<P> = Internal {
             ppp: ppp,
@@ -226,12 +220,13 @@ impl<P> OcNode<P> where
             nnn: nnn
         };
 
-        OcNode::Node(result)
+        Ok(OcNode::Node(result))
     }
     /// Calculates the min and max values of sub nodes of an OcTree
-    fn calc_sub_min_max(dir: Direction, min: &P, max: &P) -> (P, P) {
+    fn calc_sub_min_max(dir: Direction, bb: &BoundingBox3D) -> Result<BoundingBox3D> {
 
-        let middle = center(min, max);
+        let (min, max) = (bb.min_p(), bb.max_p());
+        let middle = center(&min, &max);
 
         let px = max.x();
         let py = max.y();
@@ -243,24 +238,25 @@ impl<P> OcNode<P> where
         let my = middle.y();
         let mz = middle.z();
 
+        //@todo get rid of unwrapping
         match dir {
-            Direction::PPP => (*middle,               max.clone()),
-            Direction::PPN => (*P::new(mx, my, nz),   *P::new(px, py, mz)),
-            Direction::PNP => (*P::new(mx, ny, mz),   *P::new(px, my, pz)),
-            Direction::PNN => (*P::new(mx, ny, nz),   *P::new(px, my, mz)),
-            Direction::NPP => (*P::new(nx, my, mz),   *P::new(mx, py, pz)),
-            Direction::NPN => (*P::new(nx, my, nz),   *P::new(mx, py, mz)),
-            Direction::NNP => (*P::new(nx, ny, mz),   *P::new(mx, my, pz)),
-            Direction::NNN => (min.clone(),           *middle)
+            Direction::PPP => BoundingBox3D::new(&*middle,               &max),
+            Direction::PPN => BoundingBox3D::new(&*P::new(mx, my, nz),   &*P::new(px, py, mz)),
+            Direction::PNP => BoundingBox3D::new(&*P::new(mx, ny, mz),   &*P::new(px, my, pz)),
+            Direction::PNN => BoundingBox3D::new(&*P::new(mx, ny, nz),   &*P::new(px, my, mz)),
+            Direction::NPP => BoundingBox3D::new(&*P::new(nx, my, mz),   &*P::new(mx, py, pz)),
+            Direction::NPN => BoundingBox3D::new(&*P::new(nx, my, nz),   &*P::new(mx, py, mz)),
+            Direction::NNP => BoundingBox3D::new(&*P::new(nx, ny, mz),   &*P::new(mx, my, pz)),
+            Direction::NNN => BoundingBox3D::new(&min.clone(),           &*middle)
         }
     }
     /// Creates a child node
-    fn build_subnode(pc: Vec<P>,bb: (P, P)) -> Option<Box<OcNode<P>>> {
+    fn build_subnode(pc: Vec<P>,bb: &BoundingBox3D) -> Option<Box<OcNode<P>>> {
         match pc.len() {
             0 => None,
-            _ => {
-                let (new_min, new_max) = bb;
-                Some(Box::new(OcNode::new(&new_min, &new_max, pc)))
+            _ => match OcNode::new(bb, pc) {
+                Err(_) => None,
+                Ok(x)  => Some(Box::new(x))
             }
         }
     }
