@@ -48,7 +48,6 @@ pub use Point3D;
 
 pub use Matrix4;
 
-pub use OcNode;
 pub use OcTree;
 
 pub use Mesh3D;

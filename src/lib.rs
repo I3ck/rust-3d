@@ -183,9 +183,6 @@ pub use self::mesh_3d::Mesh3D;
 mod           searchable_mesh;
 pub use self::searchable_mesh::SearchableMesh;
 
-mod           oc_node;
-pub use self::oc_node::OcNode;
-
 mod           oc_tree;
 pub use self::oc_tree::OcTree;
 
