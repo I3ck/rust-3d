@@ -122,6 +122,12 @@ impl BoundingBox2D {
     }
 }
 
+impl Default for BoundingBox2D {
+    fn default() -> Self {
+        BoundingBox2D {min: Point2D {x: -0.5, y: -0.5}, max: Point2D {x: 0.5, y: 0.5}}
+    }
+}
+
 impl HasBoundingBox2D for BoundingBox2D {
     fn bounding_box(&self) -> Result<BoundingBox2D> {
         BoundingBox2D::new(&self.min, &self.max)

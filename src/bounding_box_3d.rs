@@ -140,6 +140,12 @@ impl BoundingBox3D {
     }
 }
 
+impl Default for BoundingBox3D {
+    fn default() -> Self {
+        BoundingBox3D {min: Point3D {x: -0.5, y: -0.5, z: -0.5}, max: Point3D {x: 0.5, y: 0.5, z: 0.5}}
+    }
+}
+
 impl HasBoundingBox3D for BoundingBox3D {
     fn bounding_box(&self) -> Result<BoundingBox3D> {
         BoundingBox3D::new(&self.min, &self.max)

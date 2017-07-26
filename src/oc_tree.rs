@@ -27,8 +27,7 @@ pub struct OcTree<P> where
     P: Is3D {
 
     root: Option<OcNode<P>>,
-    min: P,
-    max: P
+    bb: BoundingBox3D
 }
 
 impl<P> IsTree3D<P> for OcTree<P> where
@@ -46,7 +45,7 @@ impl<P> IsTree3D<P> for OcTree<P> where
     }
 
     fn build(&mut self, pc: PointCloud3D<P>) -> Result<()> {
-        let bb = pc.bounding_box()?;
+        self.bb = pc.bounding_box()?;
         let mut unique_data = Vec::new();
         let mut set = HashSet::new();
         for p in pc.data {
@@ -54,10 +53,7 @@ impl<P> IsTree3D<P> for OcTree<P> where
         }
 
         unique_data.extend(set.into_iter());
-        self.min = *P::new(bb.min_p().x, bb.min_p().y, bb.min_p().z);
-        self.max = *P::new(bb.max_p().x, bb.max_p().y, bb.max_p().z);
-        let bb = BoundingBox3D::new(&self.min, &self.max)?;
-        self.root = Some(OcNode::new(&bb, unique_data)?);
+        self.root = Some(OcNode::new(&self.bb, unique_data)?);
 
         Ok(())
     }
