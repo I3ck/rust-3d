@@ -26,17 +26,17 @@ fn test_bounding_box_3d() {
     let mut pc3 = PointCloud3D::<Point3D>::new();
     let mut pc4 = PointCloud3D::<Point3D>::new();
 
-    pc1.push(*Point3D::new(0.0, 0.0, 0.0));
-    pc1.push(*Point3D::new(1.0, 1.0, 1.0));
+    pc1.push(Point3D::new(0.0, 0.0, 0.0));
+    pc1.push(Point3D::new(1.0, 1.0, 1.0));
 
-    pc2.push(*Point3D::new(0.0, 0.0, 0.0));
-    pc2.push(*Point3D::new(0.5, 0.5, 0.5));
+    pc2.push(Point3D::new(0.0, 0.0, 0.0));
+    pc2.push(Point3D::new(0.5, 0.5, 0.5));
 
-    pc3.push(*Point3D::new(-1.0, -1.0, -1.0));
-    pc3.push(*Point3D::new(2.0, 2.0, 2.0));
+    pc3.push(Point3D::new(-1.0, -1.0, -1.0));
+    pc3.push(Point3D::new(2.0, 2.0, 2.0));
 
-    pc4.push(*Point3D::new(-10.0, -10.0, -10.0));
-    pc4.push(*Point3D::new(-11.0, -11.0, -11.0));
+    pc4.push(Point3D::new(-10.0, -10.0, -10.0));
+    pc4.push(Point3D::new(-11.0, -11.0, -11.0));
 
     let bb1 = pc1.bounding_box().unwrap();
     let bb2 = pc2.bounding_box().unwrap();
@@ -75,6 +75,6 @@ fn test_bounding_box_3d() {
     assert!(bb3.collides_with(&bb1));
     assert!(bb3.collides_with(&bb2));
 
-    assert!(!bb1.contains(&*Point3D::new(5.0, 5.0, 5.0)));
-    assert!(bb1.contains(&*Point3D::new(0.5, 0.5, 0.5)));
+    assert!(!bb1.contains(&Point3D::new(5.0, 5.0, 5.0)));
+    assert!(bb1.contains(&Point3D::new(0.5, 0.5, 0.5)));
 }

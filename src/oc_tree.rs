@@ -236,14 +236,14 @@ impl<P> OcNode<P> where
 
         //@todo get rid of unwrapping
         match dir {
-            Direction::PPP => BoundingBox3D::new(&*middle,               &max),
-            Direction::PPN => BoundingBox3D::new(&*P::new(mx, my, nz),   &*P::new(px, py, mz)),
-            Direction::PNP => BoundingBox3D::new(&*P::new(mx, ny, mz),   &*P::new(px, my, pz)),
-            Direction::PNN => BoundingBox3D::new(&*P::new(mx, ny, nz),   &*P::new(px, my, mz)),
-            Direction::NPP => BoundingBox3D::new(&*P::new(nx, my, mz),   &*P::new(mx, py, pz)),
-            Direction::NPN => BoundingBox3D::new(&*P::new(nx, my, nz),   &*P::new(mx, py, mz)),
-            Direction::NNP => BoundingBox3D::new(&*P::new(nx, ny, mz),   &*P::new(mx, my, pz)),
-            Direction::NNN => BoundingBox3D::new(&min.clone(),           &*middle)
+            Direction::PPP => BoundingBox3D::new(&*middle,                  &max),
+            Direction::PPN => BoundingBox3D::new(&Point3D::new(mx, my, nz), &Point3D::new(px, py, mz)),
+            Direction::PNP => BoundingBox3D::new(&Point3D::new(mx, ny, mz), &Point3D::new(px, my, pz)),
+            Direction::PNN => BoundingBox3D::new(&Point3D::new(mx, ny, nz), &Point3D::new(px, my, mz)),
+            Direction::NPP => BoundingBox3D::new(&Point3D::new(nx, my, mz), &Point3D::new(mx, py, pz)),
+            Direction::NPN => BoundingBox3D::new(&Point3D::new(nx, my, nz), &Point3D::new(mx, py, mz)),
+            Direction::NNP => BoundingBox3D::new(&Point3D::new(nx, ny, mz), &Point3D::new(mx, my, pz)),
+            Direction::NNN => BoundingBox3D::new(&min.clone(),              &*middle)
         }
     }
     /// Creates a child node

@@ -31,7 +31,7 @@ fn point_cloud_3d_io_test() {
         let mut pc = PointCloud3D::<Point3D>::new();
 
         for i in 0..10 {
-            let p = *Point3D::new(0.1 * i as f64, 0.2 * i as f64, 0.3 * i as f64);
+            let p = Point3D::new(0.1 * i as f64, 0.2 * i as f64, 0.3 * i as f64);
             pc.push(p);
         }
 

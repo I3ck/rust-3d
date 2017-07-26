@@ -29,10 +29,10 @@ fn interpolate_bezier_test() {
     let path_tmp = "tests/tmp/interpolate_bezier_save1.tmp";
     let mut pc = PointCloud2D::<Point2D>::new();
 
-    pc.push(*Point2D::new(0.0, 0.0));
-    pc.push(*Point2D::new(1.0, 0.0));
-    pc.push(*Point2D::new(1.0, 1.0));
-    pc.push(*Point2D::new(0.5, 1.0));
+    pc.push(Point2D::new(0.0, 0.0));
+    pc.push(Point2D::new(1.0, 0.0));
+    pc.push(Point2D::new(1.0, 1.0));
+    pc.push(Point2D::new(0.5, 1.0));
 
     let result = *(interpolate_bezier(&pc, 50).unwrap());
 
@@ -53,10 +53,10 @@ fn interpolate_cosine_test() {
     let path_tmp = "tests/tmp/interpolate_cosine_save1.tmp";
     let mut pc = PointCloud2D::<Point2D>::new();
 
-    pc.push(*Point2D::new(0.0, 0.2));
-    pc.push(*Point2D::new(1.0, 0.7));
-    pc.push(*Point2D::new(1.3, 1.0));
-    pc.push(*Point2D::new(0.5, 6.0));
+    pc.push(Point2D::new(0.0, 0.2));
+    pc.push(Point2D::new(1.0, 0.7));
+    pc.push(Point2D::new(1.3, 1.0));
+    pc.push(Point2D::new(0.5, 6.0));
 
     let result = *(interpolate_cosine(&pc, 50).unwrap());
 
@@ -77,10 +77,10 @@ fn interpolate_linear_test() {
     let path_tmp = "tests/tmp/interpolate_linear_save1.tmp";
     let mut pc = PointCloud2D::<Point2D>::new();
 
-    pc.push(*Point2D::new(0.0, 0.0));
-    pc.push(*Point2D::new(1.0, 0.0));
-    pc.push(*Point2D::new(1.0, 1.0));
-    pc.push(*Point2D::new(0.5, 1.0));
+    pc.push(Point2D::new(0.0, 0.0));
+    pc.push(Point2D::new(1.0, 0.0));
+    pc.push(Point2D::new(1.0, 1.0));
+    pc.push(Point2D::new(0.5, 1.0));
 
     let result = *(interpolation_linear(&pc, 50).unwrap());
 

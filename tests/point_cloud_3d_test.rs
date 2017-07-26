@@ -25,7 +25,7 @@ fn test_point_cloud_3d() {
 
     assert!(pc.len() == 0);
 
-    let p = *Point3D::new(0.1, 0.2, 0.3);
+    let p = Point3D::new(0.1, 0.2, 0.3);
     pc.push(p);
 
     assert!(pc.len() == 1);
@@ -35,7 +35,7 @@ fn test_point_cloud_3d() {
 
     assert!(pc.bounding_box().is_err());
 
-    let p = *Point3D::new(0.2, 0.3, 0.4);
+    let p = Point3D::new(0.2, 0.3, 0.4);
     pc.push(p);
     assert!(pc.len() == 2);
 

@@ -31,6 +31,12 @@ pub struct Point3D {
     pub z: f64
 }
 
+impl Point3D {
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Point3D {x: x, y: y, z: z}
+    }
+}
+
 impl Eq for Point3D {}
 
 impl Ord for Point3D {

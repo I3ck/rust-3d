@@ -27,17 +27,17 @@ fn filter_pc_2d_test() {
     let filter = FilterBox2D::new(Box2D{center: center, size_x: size_x,size_y: size_y});
     let mut pc = PointCloud2D::<Point2D>::new();
     let mut view = View::Full;
-    pc.push(*Point2D::new(10.0, -5.0)); // 0  YES
-    pc.push(*Point2D::new(9.0, -5.0));  // 1  YES
-    pc.push(*Point2D::new(8.0, -5.0));  // 2  NO
-    pc.push(*Point2D::new(11.0, -5.0)); // 3  YES
-    pc.push(*Point2D::new(12.0, -5.0)); // 4  NO
-    pc.push(*Point2D::new(10.0, -4.0)); // 5  YES
-    pc.push(*Point2D::new(10.0, -3.0)); // 6  YES
-    pc.push(*Point2D::new(10.0, -2.0)); // 7  NO
-    pc.push(*Point2D::new(10.0, -6.0)); // 8  YES
-    pc.push(*Point2D::new(10.0, -7.0)); // 9  YES
-    pc.push(*Point2D::new(10.0, -8.0)); // 10 NO
+    pc.push(Point2D::new(10.0, -5.0)); // 0  YES
+    pc.push(Point2D::new(9.0, -5.0));  // 1  YES
+    pc.push(Point2D::new(8.0, -5.0));  // 2  NO
+    pc.push(Point2D::new(11.0, -5.0)); // 3  YES
+    pc.push(Point2D::new(12.0, -5.0)); // 4  NO
+    pc.push(Point2D::new(10.0, -4.0)); // 5  YES
+    pc.push(Point2D::new(10.0, -3.0)); // 6  YES
+    pc.push(Point2D::new(10.0, -2.0)); // 7  NO
+    pc.push(Point2D::new(10.0, -6.0)); // 8  YES
+    pc.push(Point2D::new(10.0, -7.0)); // 9  YES
+    pc.push(Point2D::new(10.0, -8.0)); // 10 NO
     // => 0 1 3 5 6 8 9 in => len = 7
 
     let filter_pc = FilterRandomAccessible::new(filter);

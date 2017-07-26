@@ -31,13 +31,13 @@ fn point_3d_test() {
     assert!(p1.z() == 0.0);
     assert!(p1.abs().get() == 0.0);
 
-    let mut p2 = *Point3D::new(1.0, 0.0, 0.0);
+    let mut p2 = Point3D::new(1.0, 0.0, 0.0);
     assert!(p2.x() == 1.0);
     assert!(p2.y() == 0.0);
     assert!(p2.z() == 0.0);
     assert!(p2.abs().get() == 1.0);
 
-    let p3 = *Point3D::new(2.0, 2.0, 2.0);
+    let p3 = Point3D::new(2.0, 2.0, 2.0);
 
     let cross12 = cross(&p1, &p2);
     assert!(cross12.x() == 0.0);
