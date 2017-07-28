@@ -226,12 +226,11 @@ impl<P> KdNode<P> where
                         node.knearest(search, n, pc);
                     }
                 },
-                Ordering::Greater => if let Some(ref node) = (&self).left {
+                _              => if let Some(ref node) = (&self).left {
                     if pc.len() < n || border_left <= current_val {
                         node.knearest(search, n, pc);
                     }
-                },
-                Ordering::Equal => {}
+                }
             },
             Err(_) => {}
         }
@@ -275,12 +274,11 @@ impl<P> KdNode<P> where
                         node.in_sphere(sphere, pc);
                     }
                 },
-                Ordering::Greater => if let Some(ref node) = (&self).left {
+                _              => if let Some(ref node) = (&self).left {
                     if border_left <= current_val {
                         node.in_sphere(sphere, pc);
                     }
-                },
-                Ordering::Equal => {}
+                }
             },
             Err(_) => {}
         }
@@ -321,12 +319,11 @@ impl<P> KdNode<P> where
                             node.in_box(box_3d, pc);
                         }
                     },
-                    Ordering::Greater => if let Some(ref node) = (&self).left {
+                    _              => if let Some(ref node) = (&self).left {
                         if border_left <= current_val {
                             node.in_box(box_3d, pc);
                         }
-                    },
-                    Ordering::Equal => {}
+                    }
                 },
                 Err(_) => {}
             }
