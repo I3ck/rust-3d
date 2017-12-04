@@ -18,50 +18,53 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::fmt;
 
 use prelude::*;
+use distances_2d::dist_2d;
+use functions::center_2d;
 
 #[derive (Debug, PartialEq, PartialOrd, Eq, Clone, Hash)]
 /// LineSegment2D, a line segment within 2D space
 pub struct LineSegment2D {
-    pub line: Line2D,
-    pub length: Positive,
+    pub start: Point2D,
+    pub end: Point2D
 }
 
 impl LineSegment2D {
-    /// Creates a new LineSegment2D from a Line2D and a length
-    pub fn new(line: Line2D, length: Positive) -> Self {
-        LineSegment2D{line: line, length: length}
+    /// Creates a new LineSegment2D from a start and end Point
+    pub fn new(start: Point2D, end: Point2D) -> Self {
+        LineSegment2D{start: start, end: end}
     }
 }
 
 impl IsMovable2D for LineSegment2D {
     fn move_by(&mut self, x: f64, y: f64) {
-        self.line.move_by(x, y);
+        self.start.move_by(x, y);
+        self.end.move_by(x, y);
     }
 }
 
 impl HasLength for LineSegment2D {
     fn length(&self) -> f64 {
-        self.length.get()
+       dist_2d(&self.start, &self.end)
     }
 }
 
 impl HasBoundingBox2D for LineSegment2D {
     fn bounding_box(&self) -> Result<BoundingBox2D> {
         let mut pts = Vec::new();
-        pts.push(Box::new(self.line.anchor.clone()));
-        pts.push(Box::new(self.line.anchor.clone() + self.line.dir.clone() * self.length.get()));
+        pts.push(Box::new(self.start.clone()));
+        pts.push(Box::new(self.end.clone()));
         BoundingBox2D::from_iterator(pts.iter())
     }
 }
 
 impl HasCenterOfGravity2D for LineSegment2D {
     fn center_of_gravity(&self) -> Result<Point2D> {
-        Ok(self.line.anchor.clone() + self.line.dir.clone() * 0.5 * self.length.get())
+        Ok(*center_2d(&self.start, &self.end))
     }
 }
 
 impl fmt::Display for LineSegment2D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({}, {} -> {} * {}, {})", self.line.anchor.x(), self.line.anchor.y(), self.length, self.line.dir.x(), self.line.dir.y())
+        write!(f, "({}, {} -> {}, {})", self.start.x(), self.start.y(), self.end.x(), self.end.y())
     }
 }

@@ -19,7 +19,7 @@ use std::collections::HashSet;
 use std::iter::IntoIterator;
 
 use prelude::*;
-use functions::{center};
+use functions::{center_3d};
 
 #[derive (Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// OcTree https://en.wikipedia.org/wiki/Octree
@@ -222,7 +222,7 @@ impl<P> OcNode<P> where
     fn calc_sub_min_max(dir: Direction, bb: &BoundingBox3D) -> Result<BoundingBox3D> {
 
         let (min, max) = (bb.min_p(), bb.max_p());
-        let middle = center(&min, &max);
+        let middle = center_3d(&min, &max);
 
         let px = max.x();
         let py = max.y();

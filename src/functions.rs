@@ -21,8 +21,18 @@ use prelude::*;
 
 //@todo move these functions to better fitting files or make them methods of the correct types
 
+/// Returns the center of two IsBuildable2D
+pub fn center_2d<P>(p1: &P, p2: &P) -> Box<P> where
+    P: IsBuildable2D {
+
+    P::new(
+        p1.x() + (p2.x() - p1.x()) / 2.0,
+        p1.y() + (p2.y() - p1.y()) / 2.0
+    )
+}
+
 /// Returns the center of two IsBuildable3D
-pub fn center<P>(p1: &P, p2: &P) -> Box<P> where
+pub fn center_3d<P>(p1: &P, p2: &P) -> Box<P> where
     P: IsBuildable3D {
 
     P::new(

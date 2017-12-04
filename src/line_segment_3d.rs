@@ -18,50 +18,53 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::fmt;
 
 use prelude::*;
+use distances_3d::dist_3d;
+use functions::center_3d;
 
 #[derive (Debug, PartialEq, PartialOrd, Eq, Clone, Hash)]
 /// LineSegment3D, a line segment within 3D space
 pub struct LineSegment3D {
-    pub line: Line3D,
-    pub length: Positive,
+    pub start: Point3D,
+    pub end: Point3D
 }
 
 impl LineSegment3D {
-    /// Creates a new LineSegment3D from a Line3D and a length
-    pub fn new(line: Line3D, length: Positive) -> Self {
-        LineSegment3D{line: line, length: length}
+    /// Creates a new LineSegment3D from a start and end point
+    pub fn new(start: Point3D, end: Point3D) -> Self {
+        LineSegment3D{start: start, end: end}
     }
 }
 
 impl IsMovable3D for LineSegment3D {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
-        self.line.move_by(x, y, z);
+        self.start.move_by(x, y, z);
+        self.end.move_by(x, y, z);
     }
 }
 
 impl HasLength for LineSegment3D {
     fn length(&self) -> f64 {
-        self.length.get()
+        dist_3d(&self.start, &self.end)
     }
 }
 
 impl HasBoundingBox3D for LineSegment3D {
     fn bounding_box(&self) -> Result<BoundingBox3D> {
         let mut pts = Vec::new();
-        pts.push(Box::new(self.line.anchor.clone()));
-        pts.push(Box::new(self.line.anchor.clone() + self.line.dir.clone() * self.length.get()));
+        pts.push(Box::new(self.start.clone()));
+        pts.push(Box::new(self.end.clone()));
         BoundingBox3D::from_iterator(pts.iter())
     }
 }
 
 impl HasCenterOfGravity3D for LineSegment3D {
     fn center_of_gravity(&self) -> Result<Point3D> {
-        Ok(self.line.anchor.clone() + self.line.dir.clone() * 0.5 * self.length.get())
+        Ok(*center_3d(&self.start, &self.end))
     }
 }
 
 impl fmt::Display for LineSegment3D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({}, {}, {} -> {} * {}, {}, {})", self.line.anchor.x(), self.line.anchor.y(), self.line.anchor.z(), self.length, self.line.dir.x(), self.line.dir.y(), self.line.dir.z())
+        write!(f, "({}, {}, {} -> {}, {}, {})", self.start.x(), self.start.y(), self.start.z(), self.end.x(), self.end.y(), self.end.z())
     }
 }
