@@ -66,3 +66,23 @@ impl<T> IsViewBuildable for Vec<T> where
         Ok(Box::new(cloned))
     }
 }
+
+impl<T> IsMovable2D for Vec<T> where
+    T: IsMovable2D {
+    
+    fn move_by(&mut self, x: f64, y: f64) {
+        for ref mut p in self.iter_mut() {
+            p.move_by(x, y);
+        }
+    }
+}
+
+impl<T> IsMovable3D for Vec<T> where
+    T: IsMovable3D {
+
+    fn move_by(&mut self, x: f64, y: f64, z: f64) {
+        for ref mut p in self.iter_mut() {
+            p.move_by(x, y, z);
+        }
+    }
+}
