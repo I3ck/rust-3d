@@ -46,6 +46,7 @@ pub use Norm3D;
 pub use Point2D;
 pub use Point3D;
 
+pub use Matrix3;
 pub use Matrix4;
 
 pub use OcTree;

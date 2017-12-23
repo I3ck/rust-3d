@@ -159,8 +159,14 @@ pub use self::bounding_box_2d::BoundingBox2D;
 mod           bounding_box_3d;
 pub use self::bounding_box_3d::BoundingBox3D;
 
+mod           matrix3;
+pub use self::matrix3::Matrix3;
+
 mod           matrix4;
 pub use self::matrix4::Matrix4;
+
+mod           matrix3_pipe;
+pub use self::matrix3_pipe::Matrix3Pipe;
 
 mod           matrix4_pipe;
 pub use self::matrix4_pipe::Matrix4Pipe;
