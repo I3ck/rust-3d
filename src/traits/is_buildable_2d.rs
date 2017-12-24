@@ -50,21 +50,9 @@ pub trait IsBuildable2D :
     
     /// Applies a matrix to this
     fn multiply_m(&self, m: &Matrix3) -> Box<Self> {
-        let mut result_x = 0.0;
-        let mut result_y = 0.0;
-        for i in 0..3 {
-            for j in 0..3 {
-                let addition = match j {
-                    0 => m.data[i][j] * self.x(),
-                    _ => m.data[i][j] * self.y()
-                };
-                match i {
-                    0 => {let newx = result_x + addition; result_x = newx;},
-                    _ => {let newy = result_y + addition; result_y = newy;}
-                }
-            }
-        }
-        Self::new(result_x, result_y)
+        let x = self.x() * m.data[0][0] + self.y() * m.data[0][1] + m.data[0][2];
+        let y = self.x() * m.data[1][0] + self.y() * m.data[1][1] + m.data[1][2];
+        Self::new(x, y)
     }
 
     /// Creates this from a "x y" string. E.g. "4.3 17.29"

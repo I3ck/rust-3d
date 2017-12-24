@@ -39,24 +39,10 @@ pub trait IsBuildable3D :
 
     /// Applies a matrix to this
     fn multiply_m(&self, m: &Matrix4) -> Box<Self> {
-        let mut result_x = 0.0;
-        let mut result_y = 0.0;
-        let mut result_z = 0.0;
-        for i in 0..4 {
-            for j in 0..4 {
-                let addition = match j {
-                    0 => m.data[i][j] * self.x(),
-                    1 => m.data[i][j] * self.y(),
-                    _ => m.data[i][j] * self.z()
-                };
-                match i {
-                    0 => {let newx = result_x + addition; result_x = newx;},
-                    1 => {let newy = result_y + addition; result_y = newy;},
-                    _ => {let newz = result_z + addition; result_z = newz;},
-                }
-            }
-        }
-        Self::new(result_x, result_y, result_z)
+        let x = self.x() * m.data[0][0] + self.y() * m.data[0][1] + self.z() * m.data[0][2] + m.data[0][3];
+        let y = self.x() * m.data[1][0] + self.y() * m.data[1][1] + self.z() * m.data[1][2] + m.data[1][3];
+        let z = self.x() * m.data[2][0] + self.y() * m.data[2][1] + self.z() * m.data[2][2] + m.data[2][3];
+        Self::new(x, y, z)
     }
     /// Returns this with normalized values
     fn normalized(&self) -> Result<Box<Self>> {
