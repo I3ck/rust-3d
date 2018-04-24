@@ -330,7 +330,7 @@ impl<P> KdNode<P> where
         }
     }
 
-    fn sort_and_limit<'a, PSearch, PFind>(mut pc: &'a mut Vec<PFind>, search: &PSearch, max_size: usize) where
+    fn sort_and_limit<'a, PSearch, PFind>(pc: &'a mut Vec<PFind>, search: &PSearch, max_size: usize) where
         PSearch: Is3D,
         PFind: Is3D + Clone {
 

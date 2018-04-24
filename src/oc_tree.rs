@@ -295,7 +295,7 @@ impl<P> OcNode<P> where
         }
     }
     /// Depending on a flag either returns the child points or the center of gravity
-    fn collect_center_or_all(n: &OcNode<P>, only_collect_centers: bool, depth: i8, maxdepth: i8, mut pc: &mut PointCloud3D<P>) {
+    fn collect_center_or_all(n: &OcNode<P>, only_collect_centers: bool, depth: i8, maxdepth: i8, pc: &mut PointCloud3D<P>) {
         if only_collect_centers {
             let mut sub_pc = PointCloud3D::new();
             n.collect(depth+1, maxdepth, &mut sub_pc);

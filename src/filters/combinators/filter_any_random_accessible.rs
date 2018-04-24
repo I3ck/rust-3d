@@ -28,7 +28,7 @@ pub struct FilterAnyRandomAccessible<RA, T> where
 impl<RA, T> IsFilterRandomAccessible<RA, T> for FilterAnyRandomAccessible<RA, T> where
     RA: IsRandomAccessible<T> {
 
-    fn filter(&self, ra: &RA, mut view: &mut View) {
+    fn filter(&self, ra: &RA, view: &mut View) {
         let view_initial = view.clone();
         for f in &self.filters {
             let mut view_now = view_initial.clone();
