@@ -22,6 +22,8 @@ pub trait IsEditableMesh<V, TU> : IsMesh<V, TU> where
     TU: IsTopologyUnit {
     /// Should add a vertex to the end and return its id
     fn add_vertex(&mut self, vertex: V) -> VId;
+    /// Should change vertex at vId to the given vertex returning an error on failure
+    fn change_vertex(&mut self, vid: VId, vertex: V) -> Result<()>;
     /// Should add a face with the 3 positions. Also should return the id of the new face
     fn add_face(&mut self, v1: V, v2: V, v3: V) -> FId;
     /// Should add a face to the mesh by connecting the vertices via their ids. Should return the id of the newly added face

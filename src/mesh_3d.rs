@@ -72,6 +72,15 @@ impl<P> IsEditableMesh<P, Face3> for Mesh3D<P> where
         self.pc.push(vertex);
         VId{val: self.pc.len() - 1}
     }
+    
+    fn change_vertex(&mut self, vid: VId, vertex: P) -> Result<()> {
+        if vid.val < self.pc.len() {
+            self.pc[vid.val] = vertex;
+            Ok(())
+        } else {
+            Err(ErrorKind::IncorrectVertexID)
+        }
+    }
 
     fn add_face(&mut self, v1: P, v2: P, v3: P) -> FId {
         let vid1 = self.add_vertex(v1);
