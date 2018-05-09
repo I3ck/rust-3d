@@ -194,7 +194,7 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
             }
         }
 
-        fill_mesh(&vertices, &indices, mesh)
+        fill_mesh(vertices, indices, mesh)
     }
 
 fn collect_index_line(line: &str, indices: &mut Vec<usize>) -> Result<()> {
@@ -214,11 +214,9 @@ fn collect_index_line(line: &str, indices: &mut Vec<usize>) -> Result<()> {
     }
 }
 
-fn fill_mesh<EM, P>(vertices: &Vec<P>, indices: &Vec<usize>, mesh: &mut EM) -> Result<()> where
+fn fill_mesh<EM, P>(vertices: Vec<P>, indices: Vec<usize>, mesh: &mut EM) -> Result<()> where
     EM: IsEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone {
-
-    let n_vertices = vertices.len();
 
     if indices.len() == 0 {
         return Err(ErrorKind::PlyError(PlyError::LoadVerticesIncorrect));
@@ -227,14 +225,14 @@ fn fill_mesh<EM, P>(vertices: &Vec<P>, indices: &Vec<usize>, mesh: &mut EM) -> R
     if indices.len() % 3 != 0 {
         return Err(ErrorKind::PlyError(PlyError::LoadVerticesIncorrect));
     }
-
+    
+    for vertex in vertices {
+        mesh.add_vertex(vertex);
+    }
+    
     for chunk in indices.chunks(3) {
         if chunk.len() == 3 {
-            if chunk[0] < n_vertices && chunk[1] < n_vertices && chunk[2] < n_vertices {
-                mesh.add_face(vertices[chunk[0]].clone(), vertices[chunk[1]].clone(), vertices[chunk[2]].clone());
-            } else {
-                return Err(ErrorKind::PlyError(PlyError::LoadVerticesIncorrect));
-            }
+                mesh.try_add_connection(VId{val:chunk[0]}, VId{val:chunk[1]}, VId{val:chunk[2]})?;
         } else {
             return Err(ErrorKind::PlyError(PlyError::LoadVerticesIncorrect));
         }
