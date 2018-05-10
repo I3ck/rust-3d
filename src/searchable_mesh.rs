@@ -17,22 +17,27 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use prelude::*;
 
+use std::marker::PhantomData;
+
 /// SearchableMesh, transforms IsMesh to IsSearchableMesh
-pub struct SearchableMesh<'a, T> {
-    mesh: Box<IsMesh<T, Face3> + 'a>,
-    he: HalfEdge
+pub struct SearchableMesh<M, T> where 
+    M: IsMesh<T, Face3> {
+    
+    mesh: Box<M>,
+    he: HalfEdge,
+    phantomt: PhantomData<T>
 }
 
-impl<'a, T> SearchableMesh<'a, T> {
+impl<M, T> SearchableMesh<M, T> where
+    M: IsMesh<T, Face3> {
     /// Creates a new SearchableMesh3D from an IsMesh3D
     /// This only stays valid if IMesh3D is not changed after creation
     /// The mesh must be manifold (@todo ensure via types?)
-    pub fn new<M>(mesh: Box<M>) -> Self where
-        M: 'a + IsMesh<T, Face3> {
+    pub fn new(mesh: Box<M>) -> Self {
 
         let he = HalfEdge::new(&*mesh);
 
-        SearchableMesh {mesh: mesh, he: he}
+        SearchableMesh {mesh, he, phantomt: PhantomData}
     }
 
     /// Fails if the vertex ID is out of bounds
@@ -44,7 +49,9 @@ impl<'a, T> SearchableMesh<'a, T> {
     }
 }
 
-impl<'a, T> IsMesh<T, Face3> for SearchableMesh<'a, T> {
+impl<M, T> IsMesh<T, Face3> for SearchableMesh<M, T> where
+    M: IsMesh<T, Face3> {
+    
     fn num_faces(&self) -> usize {
         self.mesh.num_faces()
     }
@@ -66,7 +73,8 @@ impl<'a, T> IsMesh<T, Face3> for SearchableMesh<'a, T> {
     }
 }
 
-impl<'a, T> IsSearchableMesh<T, Face3> for SearchableMesh<'a, T>  {
+impl<M, T> IsSearchableMesh<T, Face3> for SearchableMesh<M, T> where
+    M: IsMesh<T, Face3> {
 
     fn num_edges(&self) -> usize {
         self.mesh.num_faces() * 3
@@ -114,6 +122,22 @@ impl<'a, T> IsSearchableMesh<T, Face3> for SearchableMesh<'a, T>  {
 
     fn edge_face(&self, edgeid: EId) -> Result<FId> {
         self.he.face(edgeid)
+    }
+}
+
+impl<M, T> HasBoundingBox3D for SearchableMesh<M, T> where
+    M: IsMesh<T, Face3> + HasBoundingBox3D {
+
+    fn bounding_box(&self) -> Result<BoundingBox3D> {
+        self.mesh.bounding_box()
+    }
+}
+
+impl<M, T> HasCenterOfGravity3D for SearchableMesh<M, T> where
+    M: IsMesh<T, Face3> + HasCenterOfGravity3D {
+
+    fn center_of_gravity(&self) -> Result<Point3D> {
+        self.mesh.center_of_gravity()
     }
 }
 
