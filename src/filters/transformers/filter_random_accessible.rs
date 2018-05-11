@@ -46,7 +46,7 @@ impl<F, T, RA> IsFilterRandomAccessible<RA, T> for FilterRandomAccessible<F, T> 
             return;
         }
         match view {
-            &mut View::Full => {
+            View::Full => {
                 let mut indices = HashSet::new();
                 let n = ra.len();
                 for i in 0..n {
@@ -56,7 +56,7 @@ impl<F, T, RA> IsFilterRandomAccessible<RA, T> for FilterRandomAccessible<F, T> 
                 }
                 *view = View::Restricted(indices);
             }
-            &mut View::Restricted(ref mut indices) => {
+            View::Restricted(indices) => {
                 let mut indices_to_remove = Vec::<usize>::new();
                 let max = ra.len() - 1;
                 for index in indices.iter() {

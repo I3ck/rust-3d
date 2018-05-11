@@ -31,8 +31,8 @@ impl View {
             View::Full => { *self = other }
             View::Restricted(indices_other) => {
                 match self {
-                    &mut View::Full => {}
-                    &mut View::Restricted(ref mut indices_source) => {
+                    View::Full => {}
+                    View::Restricted(indices_source) => {
                         indices_source.extend(&indices_other);
                     }
                 }

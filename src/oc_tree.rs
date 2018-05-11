@@ -136,8 +136,8 @@ impl<P> OcNode<P> where
     /// Returns the size of the oc node
     pub fn size(&self) -> usize {
         match self {
-            &OcNode::Leaf(_) => 1,
-            &OcNode::Node(ref internal) => {
+            OcNode::Leaf(_) => 1,
+            OcNode::Node(internal) => {
                 let mut result: usize = 0;
                 if let Some(ref n) = internal.ppp { result += n.size(); }
                 if let Some(ref n) = internal.ppn { result += n.size(); }

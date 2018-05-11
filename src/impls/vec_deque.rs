@@ -44,8 +44,8 @@ impl<T> IsViewBuildable for VecDeque<T> where
 
     fn apply_view(&mut self, view: &View) -> Result<()> {
         match view {
-            &View::Full => { Ok(()) }
-            &View::Restricted(ref indices) => {
+            View::Full => { Ok(()) }
+            View::Restricted(indices) => {
                 let n = self.len();
                 if indices.iter().any(|x| x >= &n) {
                     return Err(ErrorKind::IndexOutOfBounds);

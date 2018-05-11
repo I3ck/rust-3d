@@ -60,7 +60,7 @@ pub enum PlyError {
 impl ErrorKind {
     /// Returns readable text for the ErrorKind
     pub fn as_str(&self) -> &'static str {
-        match *self {
+        match self {
             ErrorKind::MinMaxSwapped             => "Passed min/max values are swapped (min > max)",
             ErrorKind::MinMaxEqual               => "Passed min/max values are equal",
             ErrorKind::TooFewPoints              => "Container had too few points for the operation",
@@ -79,7 +79,7 @@ impl ErrorKind {
             ErrorKind::NumberConversionError     => "Failed converting one number type to another",
             ErrorKind::NumberInWrongRange        => "Passed number is within the wrong range",
             ErrorKind::ComparisionFailed         => "Comparision between two values failed",
-            ErrorKind::PlyError(ref x)           => x.as_str()
+            ErrorKind::PlyError(x)               => x.as_str()
         }
     }
 }
@@ -87,7 +87,7 @@ impl ErrorKind {
 impl PlyError {
     /// Returns readable text for the PlyError
     pub fn as_str(&self) -> &'static str {
-        match *self {
+        match self {
             PlyError::LoadError                 => "Error while loading .ply",
             PlyError::LoadStartNotFound         => "Start of .ply header not found",
             PlyError::LoadFormatNotFound        => "Format of .ply missing or not supported",
