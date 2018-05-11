@@ -60,10 +60,10 @@ impl<T> IsViewBuildable for Vec<T> where
         }
     }
 
-    fn from_view(&self, view: &View) -> Result<Box<Self>> {
+    fn from_view(&self, view: &View) -> Result<Self> {
         let mut cloned = self.clone();
         cloned.apply_view(view)?;
-        Ok(Box::new(cloned))
+        Ok(cloned)
     }
 }
 

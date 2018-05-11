@@ -22,15 +22,15 @@ use prelude::*;
 //@todo maybe implement projection methods within the pc
 //@todo transformable traits required later on?
 /// IsProjectionToPlane is a trait used types which can be projected onto and from planes within 3D space
-pub trait IsProjectionToPlane<P2,P3,N> where
+pub trait IsProjectionToPlane<P2,P3,N> : Sized where
     P2: Is2D + IsBuildable2D + IsTransFormableTo3D,
     P3: Is3D + IsTransFormableTo2D,
     N: IsNormalized3D {
     /// Should create a projection of the given 2d points on the given plane
-    fn from_2d<PL>(plane: PL, pc: PointCloud2D<P2>) -> Box<Self> where
+    fn from_2d<PL>(plane: PL, pc: PointCloud2D<P2>) -> Self where
         PL: IsPlane3D<P3,N>; //places 2d pc on plane, assuming plane 0/0 == pc2d 0/0
     /// Should project the given 3d points onto the plane
-    fn from_3d<PL>(plane: PL, pc: PointCloud3D<P3>) -> Box<Self> where
+    fn from_3d<PL>(plane: PL, pc: PointCloud3D<P3>) -> Self where
         PL: IsPlane3D<P3,N>; //projects 3d pc onto plane from global coords
     /// Should return the projected positions as 3d positions in the global coordinate system
     fn projected_pointcloud_3d_global(&self) -> PointCloud3D<P3>;

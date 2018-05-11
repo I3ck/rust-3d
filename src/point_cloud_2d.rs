@@ -28,7 +28,7 @@ use functions::{sort_vec_2d_x, sort_vec_2d_y};
 pub struct PointCloud2D<P> where
     P: Is2D {
 
-    pub data: Vec<Box<P>>
+    pub data: Vec<P>
 }
 
 impl<P> PointCloud2D<P> where
@@ -54,7 +54,7 @@ impl<P> PointCloud2D<P> where
         F: FnMut(&mut P) {
 
         for p in &mut self.data {
-            f(&mut **p);
+            f(&mut *p);
         }
     }
 }
@@ -81,7 +81,7 @@ impl<P> PointCloud2D<P> where
         self.data.reserve(n);
 
         for i in 0..n {
-            self.data.push(Box::new(ra[i].clone()));
+            self.data.push(ra[i].clone());
         }
     }
 }
@@ -115,14 +115,14 @@ impl<P> IsRandomInsertible<P> for PointCloud2D<P> where
     P: Is2D {
 
     fn push(&mut self, point: P) {
-        self.data.push(Box::new(point))
+        self.data.push(point)
     }
 
     fn insert(&mut self, index: usize, point: P) -> Result<()> {
         if index > self.len() {
             Err(ErrorKind::IncorrectVertexID)
         } else {
-            self.data.insert(index, Box::new(point));
+            self.data.insert(index, point);
             Ok(())
         }
     }
@@ -179,7 +179,7 @@ impl<P> HasLength for PointCloud2D<P> where
         if self.data.len() < 2 { return length; }
 
         for i in 1..self.data.len() {
-            length += dist_2d(&*self.data[i], &*self.data[i-1]);
+            length += dist_2d(&self.data[i], &self.data[i-1]);
         }
         length
     }
@@ -193,10 +193,10 @@ impl<P> IsViewBuildable for PointCloud2D<P> where
         Ok(())
     }
 
-    fn from_view(&self, view: &View) -> Result<Box<Self>> {
+    fn from_view(&self, view: &View) -> Result<Self> {
         let mut cloned = self.clone();
         cloned.apply_view(view)?;
-        Ok(Box::new(cloned))
+        Ok(cloned)
     }
 }
 
@@ -233,7 +233,7 @@ impl<P> IsMergeable for PointCloud2D<P> where
 
     fn consume(&mut self, other: Self) {
         for p in other.data {
-            self.data.push(Box::new((*p).clone()));
+            self.data.push(p.clone());
         }
     }
 

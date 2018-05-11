@@ -141,13 +141,13 @@ impl<P> KdNode<P> where
         if let Some(ref n) = (&self).right { n.to_pointcloud_3d(pc); }
     }
 
-    pub fn new(dim: i8, mut pc: Vec<Box<P>>) -> KdNode<P> {
+    pub fn new(dim: i8, mut pc: Vec<P>) -> KdNode<P> {
         let dimension = dim % 2;
         if pc.len() == 1 {
             return KdNode {
                 left: None,
                 right: None,
-                val: *pc[0].clone(),
+                val: pc[0].clone(),
                 dimension: dimension
             }
         }
@@ -162,7 +162,7 @@ impl<P> KdNode<P> where
         let mut pc_left = Vec::new();
         let mut pc_right = Vec::new();
 
-        let val = *pc[median].clone();
+        let val = pc[median].clone();
 
         for (i, p) in pc.into_iter().enumerate() {
             if i < median { pc_left.push(p); } else if i > median { pc_right.push(p); }

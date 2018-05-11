@@ -18,9 +18,9 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use prelude::*;
 
 /// IsViewBuildable trait used for types which can be constructed from a view / have a view applied to them
-pub trait IsViewBuildable {
+pub trait IsViewBuildable : Sized {
     /// Should apply the view and only keep items indexed within the view. Should return an error if any index is out of bounds
     fn apply_view(&mut self, view: &View) -> Result<()>;
     /// Should create a new object consisting only of items indexed within the view. Should return an error if any index is out of bounds
-    fn from_view(&self, view: &View) -> Result<Box<Self>>;
+    fn from_view(&self, view: &View) -> Result<Self>;
 }

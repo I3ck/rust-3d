@@ -20,7 +20,7 @@ use std::f64::consts::PI;
 use prelude::*;
 
 /// Creates a 2D rectangle from given center width and height
-pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> Box<PointCloud2D<P>> where
+pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> PointCloud2D<P> where
     P: IsBuildable2D {
 
     let mut pc = PointCloud2D::with_capacity(4);
@@ -30,11 +30,11 @@ pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> Box<PointC
     pc.push(P::new(center.x() + w / 2.0, center.y() - h / 2.0));
     pc.push(P::new(center.x() + w / 2.0, center.y() + h / 2.0));
     pc.push(P::new(center.x() - w / 2.0, center.y() + h / 2.0));
-    Box::new(pc)
+    pc
 }
 
 /// Creates a involut circle with the given center, diameter, resolution and start and end angles in radians
-pub fn involut_circle<P>(center: &P, n_points: usize, diameter: Positive, start: Rad, end: Rad) -> Box<PointCloud2D<P>> where
+pub fn involut_circle<P>(center: &P, n_points: usize, diameter: Positive, start: Rad, end: Rad) -> PointCloud2D<P> where
     P: IsBuildable2D {
 
     let mut pc = PointCloud2D::with_capacity(n_points);
@@ -46,11 +46,11 @@ pub fn involut_circle<P>(center: &P, n_points: usize, diameter: Positive, start:
         pc.push(P::new(center.x() + d/2.0 * (current.cos() + current * current.sin()),
                        center.y() + d/2.0 * (current.sin() - current * current.cos())));
     }
-    Box::new(pc)
+    pc
 }
 
 /// Creates an arc with the given center, diameter, resolution and start and end angles in radians
-pub fn arc<P>(center: &P, n_points: usize, diameter: Positive, start: Rad, end: Rad) -> Box<PointCloud2D<P>> where
+pub fn arc<P>(center: &P, n_points: usize, diameter: Positive, start: Rad, end: Rad) -> PointCloud2D<P> where
     P: IsBuildable2D {
 
     let mut pc = PointCloud2D::with_capacity(n_points);
@@ -62,11 +62,11 @@ pub fn arc<P>(center: &P, n_points: usize, diameter: Positive, start: Rad, end: 
         pc.push(P::new(center.x() + d/2.0 * radians.cos(),
                        center.y() + d/2.0 * radians.sin()));
     }
-    Box::new(pc)
+    pc
 }
 
 /// Creates an ellipse with the given center, a, b and resolution
-pub fn ellipse<P>(center: &P, n_points: usize, ap: Positive, bp: Positive) -> Box<PointCloud2D<P>> where
+pub fn ellipse<P>(center: &P, n_points: usize, ap: Positive, bp: Positive) -> PointCloud2D<P> where
     P: IsBuildable2D {
 
     let mut pc = PointCloud2D::with_capacity(n_points);
@@ -80,5 +80,5 @@ pub fn ellipse<P>(center: &P, n_points: usize, ap: Positive, bp: Positive) -> Bo
         pc.push(P::new(center.x() + a * radians.cos() * angle.cos() - b * radians.sin() * angle.sin(),
                        center.y() + a * radians.cos() * angle.sin() + b * radians.sin() * angle.cos()));
     }
-    Box::new(pc)
+    pc
 }

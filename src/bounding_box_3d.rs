@@ -40,7 +40,7 @@ impl BoundingBox3D {
     }
     /// Creates a new BoundBox3D which contains all the given positions
     pub fn from_iterator<'a, It3D,P>(source: It3D) -> Result<BoundingBox3D> where
-        It3D: IntoIterator<Item=&'a Box<P>>,
+        It3D: IntoIterator<Item=&'a P>,
         P: 'a + Is3D + Sized {
 
         let mut count = 0;

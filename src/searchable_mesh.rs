@@ -23,7 +23,7 @@ use std::marker::PhantomData;
 pub struct SearchableMesh<M, T> where 
     M: IsMesh<T, Face3> {
     
-    mesh: Box<M>,
+    mesh: M,
     he: HalfEdge,
     phantomt: PhantomData<T>
 }
@@ -33,9 +33,9 @@ impl<M, T> SearchableMesh<M, T> where
     /// Creates a new SearchableMesh3D from an IsMesh3D
     /// This only stays valid if IMesh3D is not changed after creation
     /// The mesh must be manifold (@todo ensure via types?)
-    pub fn new(mesh: Box<M>) -> Self {
+    pub fn new(mesh: M) -> Self {
 
-        let he = HalfEdge::new(&*mesh);
+        let he = HalfEdge::new(&mesh);
 
         SearchableMesh {mesh, he, phantomt: PhantomData}
     }

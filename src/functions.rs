@@ -134,7 +134,7 @@ pub fn sort_vec_3d_z<P>(xs: &mut Vec<P>) where
 
 //@todo move to plane or use there
 /// Extrudes a 2D point cloud into 3D space with a given center and direction
-pub fn extrude<P2,P3>(pc2d: &Vec<Box<P2>>, dir: &P3) -> (PointCloud3D<P3>, PointCloud3D<P3>) where
+pub fn extrude<P2,P3>(pc2d: &Vec<P2>, dir: &P3) -> (PointCloud3D<P3>, PointCloud3D<P3>) where
     P2: IsTransFormableTo3D,
     P3: IsBuildable3D + IsMovable3D + Clone {
 

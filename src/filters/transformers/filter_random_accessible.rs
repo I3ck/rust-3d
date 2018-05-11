@@ -24,7 +24,7 @@ use prelude::*;
 pub struct FilterRandomAccessible<F, T> where
     F: IsFilter<T> {
 
-    filter: Box<F>,
+    filter: F,
     _marker: PhantomData<T>
 }
 
@@ -32,7 +32,7 @@ impl<F, T> FilterRandomAccessible<F, T> where
     F: IsFilter<T> {
 
     pub fn new(filter: F) -> Self {
-        FilterRandomAccessible {filter: Box::new(filter), _marker: PhantomData}
+        FilterRandomAccessible {filter, _marker: PhantomData}
     }
 }
 

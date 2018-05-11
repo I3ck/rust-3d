@@ -51,7 +51,7 @@ fn control_polygon<P>(path: &PointCloud2D<P>, n_points: usize, t: f64) -> P wher
 }
 
 /// Returns the Bezier interpolation of the given base points
-pub fn interpolate_bezier<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Result<Box<PointCloud2D<P>>> where
+pub fn interpolate_bezier<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Result<PointCloud2D<P>> where
     P: IsBuildable2D {
 
     if base_points.len() < 2 {
@@ -64,12 +64,12 @@ pub fn interpolate_bezier<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
     for i in 0..n_points {
         pc.push(control_polygon(base_points, base_points.len()-1, (i as f64) * p_dist));
     }
-    Ok(Box::new(pc))
+    Ok(pc)
 }
 
 //@todo function names dont match interpolate vs interpolation...
 /// Returns the Cosine interpolation of the given base points
-pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Result<Box<PointCloud2D<P>>> where
+pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Result<PointCloud2D<P>> where
     P : IsBuildable2D {
 
     if base_points.len() < 2 {
@@ -99,11 +99,11 @@ pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
             traveled_before = traveled;
         }
     }
-    Ok(Box::new(pc))
+    Ok(pc)
 }
 
 /// Returns the linear interpolation of the given base points
-pub fn interpolation_linear<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Result<Box<PointCloud2D<P>>> where
+pub fn interpolation_linear<P>(base_points: &PointCloud2D<P>, n_points: usize) -> Result<PointCloud2D<P>> where
     P : IsBuildable2D {
 
     if base_points.len() < 2 {
@@ -132,5 +132,5 @@ pub fn interpolation_linear<P>(base_points: &PointCloud2D<P>, n_points: usize) -
             traveled_before = traveled;
         }
     }
-    Ok(Box::new(pc))
+    Ok(pc)
 }

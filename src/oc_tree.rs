@@ -49,7 +49,7 @@ impl<P> IsTree3D<P> for OcTree<P> where
         let mut unique_data = Vec::new();
         let mut set = HashSet::new();
         for p in pc.data {
-            set.insert(*p);
+            set.insert(p);
         }
 
         unique_data.extend(set.into_iter());

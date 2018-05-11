@@ -21,7 +21,7 @@ use prelude::*;
 pub struct FilterDirectionField3D<DF> where
     DF: IsDirectionField3D {
 
-    field: Box<DF>,
+    field: DF,
     eps: Rad
 }
 
@@ -29,7 +29,7 @@ impl<DF> FilterDirectionField3D<DF> where
     DF: IsDirectionField3D {
 
     pub fn new(field: DF, eps: Rad ) -> Self {
-        FilterDirectionField3D {field: Box::new(field), eps: eps}
+        FilterDirectionField3D {field, eps}
     }
 }
 

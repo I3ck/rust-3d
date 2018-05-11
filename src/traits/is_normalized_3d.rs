@@ -18,8 +18,11 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use prelude::*;
 
 /// IsNormalized3D is a trait used for types which are positioned within the 3D space and normalized
-pub trait IsNormalized3D : Is3D {
-    fn new<P>(p: P) -> Result<Box<Self>> where
+pub trait IsNormalized3D : 
+    Sized + 
+    Is3D {
+    
+    fn new<P>(p: P) -> Result<Self> where
         P: Is3D;
     /// Should return a new normalized object which only points in the x-Direction
     fn norm_x() -> Self;

@@ -40,7 +40,7 @@ impl BoundingBox2D {
     }
     /// Creates a new BoundBox2D which contains all the given positions
     pub fn from_iterator<'a, It2D,P>(source: It2D) -> Result<BoundingBox2D> where
-        It2D: IntoIterator<Item=&'a Box<P>>,
+        It2D: IntoIterator<Item=&'a P>,
         P: 'a + Is2D + Sized {
 
         let mut count = 0;

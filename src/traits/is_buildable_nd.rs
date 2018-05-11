@@ -21,6 +21,7 @@ use prelude::*;
 pub trait IsBuildableND : 
     Sized +
     IsND {
+    
     /// Should build an object from the correct number of coordinates
     fn new_nd(coords: &Vec<f64>) -> Result<Self>;
     /// Should use the coordinates of another as its own

@@ -22,7 +22,7 @@ use traits::IsFilter;
 pub struct FilterNegate<F, T> where
     F: IsFilter<T> {
 
-    filter: Box<F>,
+    filter: F,
     _marker: PhantomData<T>
 }
 
@@ -30,7 +30,7 @@ impl<F, T> FilterNegate<F, T> where
     F: IsFilter<T> {
     /// Creates a new FilterNegate from another IsFilter which will be negated
     pub fn new(filter: F) -> Self {
-        FilterNegate {filter: Box::new(filter), _marker: PhantomData}
+        FilterNegate {filter, _marker: PhantomData}
     }
 }
 

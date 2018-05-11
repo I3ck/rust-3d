@@ -23,8 +23,8 @@ pub struct FilterXOR<F1, F2, T> where
     F1: IsFilter<T>,
     F2: IsFilter<T> {
 
-    filter1: Box<F1>,
-    filter2: Box<F2>,
+    filter1: F1,
+    filter2: F2,
     _marker: PhantomData<T>
 }
 
@@ -34,7 +34,7 @@ impl<F1, F2, T> FilterXOR<F1, F2, T> where
 
     /// Creates a new FilterXOR from two other IsFilter
     pub fn new(filter1: F1, filter2: F2) -> Self {
-        FilterXOR {filter1: Box::new(filter1), filter2: Box::new(filter2), _marker: PhantomData}
+        FilterXOR {filter1, filter2, _marker: PhantomData}
     }
 }
 

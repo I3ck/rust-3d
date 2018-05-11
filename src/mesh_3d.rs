@@ -61,7 +61,7 @@ impl<P> IsMesh<P, Face3> for Mesh3D<P> where
         if vertexid.val >= self.pc.len() {
             return Err(ErrorKind::IncorrectVertexID);
         }
-        Ok(*self.pc.data[vertexid.val].clone())
+        Ok(self.pc.data[vertexid.val].clone())
     }
 }
 

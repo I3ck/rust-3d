@@ -21,7 +21,7 @@ use prelude::*;
 pub struct FilterDirectionField2D<DF> where
     DF: IsDirectionField2D {
 
-    field: Box<DF>,
+    field: DF,
     eps: Rad
 }
 
@@ -29,7 +29,7 @@ impl<DF> FilterDirectionField2D<DF> where
     DF: IsDirectionField2D {
 
     pub fn new(field: DF, eps: Rad ) -> Self {
-        FilterDirectionField2D {field: Box::new(field), eps: eps}
+        FilterDirectionField2D {field, eps}
     }
 }
 

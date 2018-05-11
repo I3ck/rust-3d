@@ -23,8 +23,8 @@ pub struct FilterOR<F1, F2, T> where
     F1: IsFilter<T>,
     F2: IsFilter<T> {
 
-    filter1: Box<F1>,
-    filter2: Box<F2>,
+    filter1: F1,
+    filter2: F2,
     _marker: PhantomData<T>
 }
 
@@ -34,7 +34,7 @@ impl<F1, F2, T> FilterOR<F1, F2, T> where
 
     /// Creates a new FilterOR from two other IsFilter
     pub fn new(filter1: F1, filter2: F2) -> Self {
-        FilterOR {filter1: Box::new(filter1), filter2: Box::new(filter2), _marker: PhantomData}
+        FilterOR {filter1, filter2, _marker: PhantomData}
     }
 }
 

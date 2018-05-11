@@ -85,7 +85,7 @@ impl Is3D for Norm3D {
 }
 
 impl IsNormalized3D for Norm3D {
-    fn new<P>(p: P) -> Result<Box<Self>> where
+    fn new<P>(p: P) -> Result<Self> where
         P: Is3D {
 
         let l = p.abs();
@@ -93,7 +93,7 @@ impl IsNormalized3D for Norm3D {
             return Err(ErrorKind::NormalizeVecWithoutLength);
         }
 
-        Ok(Box::new(Norm3D { x: p.x() / l.get(), y: p.y() / l.get(), z: p.z() / l.get(), }))
+        Ok(Norm3D { x: p.x() / l.get(), y: p.y() / l.get(), z: p.z() / l.get(), })
     }
 
     fn norm_x() -> Self {
