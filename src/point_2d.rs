@@ -110,11 +110,11 @@ impl Is2D for Point2D {
 }
 
 impl IsBuildableND for Point2D {
-    fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
+    fn new_nd(coords: &Vec<f64>) -> Result<Self> {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Box::new(Point2D{x: coords[0], y: coords[1]}))
+        Ok(Point2D{x: coords[0], y: coords[1]})
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -131,8 +131,8 @@ impl IsBuildableND for Point2D {
 }
 
 impl IsBuildable2D for Point2D {
-    fn new(x: f64, y: f64) -> Box<Self> {
-        Box::new(Point2D{x: x, y: y})
+    fn new(x: f64, y: f64) -> Self {
+        Point2D{x: x, y: y}
     }
 
     fn from<P>(&mut self, other: P)
@@ -168,7 +168,7 @@ impl IsTransFormableTo3D for Point2D {
     fn transform_to_3d<P>(&self, z: f64) -> P where
         P: IsBuildable3D {
 
-        *P::new(self.x, self.y, z)
+        P::new(self.x, self.y, z)
     }
 }
 

@@ -30,7 +30,7 @@ pub trait IsMesh3D<P> : IsMesh<P, Face3> where
 
         let n = cross(&v12, &v23);
 
-        Norm3D::new(*n).and_then(|x| Ok(*x))
+        Norm3D::new(n).and_then(|x| Ok(*x))
     }
 }
 

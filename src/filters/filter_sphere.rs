@@ -56,8 +56,8 @@ impl Is3D for FilterSphere {
 }
 
 impl IsBuildableND for FilterSphere {
-    fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
-        Ok(Box::new(FilterSphere::new(*Sphere::new_nd(coords)?)))
+    fn new_nd(coords: &Vec<f64>) -> Result<Self> {
+        Ok(FilterSphere::new(Sphere::new_nd(coords)?))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -68,8 +68,8 @@ impl IsBuildableND for FilterSphere {
 }
 
 impl IsBuildable3D for FilterSphere {
-    fn new(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(FilterSphere::new(*Sphere::new(x, y, z)))
+    fn new(x: f64, y: f64, z: f64) -> Self {
+        FilterSphere::new(Sphere::new(x, y, z))
     }
 
     fn from<P>(&mut self, other: P)

@@ -114,8 +114,8 @@ impl Matrix4 {
         N: IsNormalized3D {
 
         let n = target.clone().normalized()?;
-        let u = *cross(&*up, target);
-        let v = cross(&*n, &u);
+        let u = cross(&*up, target);
+        let v = cross(&n, &u);
 
         let mut result = Matrix4::default();
         result.data[0][0] = u.x();  result.data[0][1] = u.y();  result.data[0][2] = u.z();  result.data[0][3] = 0.0;

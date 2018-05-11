@@ -64,7 +64,7 @@ pub fn load_xyz<RI, P>(ri: &mut RI, filepath: &str, delim_coord: &str, delim_pos
                 let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
                 let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
                 let z = f64::from_str(words[2]).map_err(|e| e.to_error_kind())?;
-                ri.push(*P::new(x,y,z))
+                ri.push(P::new(x,y,z))
             },
             _ => return Err(ErrorKind::ParseError)
         }

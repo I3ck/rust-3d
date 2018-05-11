@@ -26,10 +26,10 @@ pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> Box<PointC
     let mut pc = PointCloud2D::with_capacity(4);
     let w = width.get();
     let h = height.get();
-    pc.push(*P::new(center.x() - w / 2.0, center.y() - h / 2.0));
-    pc.push(*P::new(center.x() + w / 2.0, center.y() - h / 2.0));
-    pc.push(*P::new(center.x() + w / 2.0, center.y() + h / 2.0));
-    pc.push(*P::new(center.x() - w / 2.0, center.y() + h / 2.0));
+    pc.push(P::new(center.x() - w / 2.0, center.y() - h / 2.0));
+    pc.push(P::new(center.x() + w / 2.0, center.y() - h / 2.0));
+    pc.push(P::new(center.x() + w / 2.0, center.y() + h / 2.0));
+    pc.push(P::new(center.x() - w / 2.0, center.y() + h / 2.0));
     Box::new(pc)
 }
 
@@ -43,8 +43,8 @@ pub fn involut_circle<P>(center: &P, n_points: usize, diameter: Positive, start:
 
     for i in 0..n_points {
         let current = (i as f64) * p_dist;
-        pc.push(*P::new(center.x() + d/2.0 * (current.cos() + current * current.sin()),
-                        center.y() + d/2.0 * (current.sin() - current * current.cos())));
+        pc.push(P::new(center.x() + d/2.0 * (current.cos() + current * current.sin()),
+                       center.y() + d/2.0 * (current.sin() - current * current.cos())));
     }
     Box::new(pc)
 }
@@ -59,8 +59,8 @@ pub fn arc<P>(center: &P, n_points: usize, diameter: Positive, start: Rad, end: 
 
     for i in 0..n_points {
         let radians = start.val + (i as f64) * p_dist;
-        pc.push(*P::new(center.x() + d/2.0 * radians.cos(),
-                        center.y() + d/2.0 * radians.sin()));
+        pc.push(P::new(center.x() + d/2.0 * radians.cos(),
+                       center.y() + d/2.0 * radians.sin()));
     }
     Box::new(pc)
 }
@@ -77,8 +77,8 @@ pub fn ellipse<P>(center: &P, n_points: usize, ap: Positive, bp: Positive) -> Bo
 
     for i in 0..n_points {
         let radians = (i as f64) * p_dist;
-        pc.push(*P::new(center.x() + a * radians.cos() * angle.cos() - b * radians.sin() * angle.sin(),
-                        center.y() + a * radians.cos() * angle.sin() + b * radians.sin() * angle.cos()));
+        pc.push(P::new(center.x() + a * radians.cos() * angle.cos() - b * radians.sin() * angle.sin(),
+                       center.y() + a * radians.cos() * angle.sin() + b * radians.sin() * angle.cos()));
     }
     Box::new(pc)
 }

@@ -51,8 +51,8 @@ impl Is2D for FilterBox2D {
 }
 
 impl IsBuildableND for FilterBox2D {
-    fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
-        Ok(Box::new(FilterBox2D::new(*Box2D::new_nd(coords)?)))
+    fn new_nd(coords: &Vec<f64>) -> Result<Self> {
+        Ok(FilterBox2D::new(Box2D::new_nd(coords)?))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -63,8 +63,8 @@ impl IsBuildableND for FilterBox2D {
 }
 
 impl IsBuildable2D for FilterBox2D {
-    fn new(x: f64, y: f64) -> Box<Self> {
-        Box::new(FilterBox2D::new(*Box2D::new(x, y)))
+    fn new(x: f64, y: f64) -> Self {
+        FilterBox2D::new(Box2D::new(x, y))
     }
 
     fn from<P>(&mut self, other: P) where

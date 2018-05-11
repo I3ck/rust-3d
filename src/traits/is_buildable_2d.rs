@@ -24,6 +24,7 @@ use prelude::*;
 
 /// IsBuildable2D is a trait used for types which are positioned in 2D space and can be constructed
 pub trait IsBuildable2D :
+    Sized +
     Is2D +
     IsBuildableND +
     Eq +
@@ -33,14 +34,14 @@ pub trait IsBuildable2D :
     Hash {
 
     /// Should build an object from x and y coordinates
-    fn new(x: f64, y: f64) -> Box<Self>;
+    fn new(x: f64, y: f64) -> Self;
 
     /// Should use the coordinates of another as its own
     fn from<P>(&mut self, other: P) where
         P: Is2D;
 
     /// Returns this with normalized values
-    fn normalized(&self) -> Result<Box<Self>> {
+    fn normalized(&self) -> Result<Self> {
         let l = self.abs();
         if l.get() == 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
@@ -49,14 +50,14 @@ pub trait IsBuildable2D :
     }
     
     /// Applies a matrix to this
-    fn multiply_m(&self, m: &Matrix3) -> Box<Self> {
+    fn multiply_m(&self, m: &Matrix3) -> Self {
         let x = self.x() * m.data[0][0] + self.y() * m.data[0][1] + m.data[0][2];
         let y = self.x() * m.data[1][0] + self.y() * m.data[1][1] + m.data[1][2];
         Self::new(x, y)
     }
 
     /// Creates this from a "x y" string. E.g. "4.3 17.29"
-    fn parse(text: String) -> Result<Box<Self>> {
+    fn parse(text: String) -> Result<Self> {
         let split = text.trim().split(" ");
         let words = split.collect::<Vec<&str>>();
         match words.len() {

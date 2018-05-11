@@ -55,8 +55,8 @@ impl Is3D for FilterBox3D {
 }
 
 impl IsBuildableND for FilterBox3D {
-    fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
-        Ok(Box::new(FilterBox3D::new(*Box3D::new_nd(coords)?)))
+    fn new_nd(coords: &Vec<f64>) -> Result<Self> {
+        Ok(FilterBox3D::new(Box3D::new_nd(coords)?))
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -67,8 +67,8 @@ impl IsBuildableND for FilterBox3D {
 }
 
 impl IsBuildable3D for FilterBox3D {
-    fn new(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(FilterBox3D::new(*Box3D::new(x, y, z)))
+    fn new(x: f64, y: f64, z: f64) -> Self {
+        FilterBox3D::new(Box3D::new(x, y, z))
     }
 
     fn from<P>(&mut self, other: P)

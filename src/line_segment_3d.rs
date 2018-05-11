@@ -59,7 +59,7 @@ impl HasBoundingBox3D for LineSegment3D {
 
 impl HasCenterOfGravity3D for LineSegment3D {
     fn center_of_gravity(&self) -> Result<Point3D> {
-        Ok(*center_3d(&self.start, &self.end))
+        Ok(center_3d(&self.start, &self.end))
     }
 }
 

@@ -168,7 +168,7 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
                 Some(x) => {
                     if x > vertices.len() {
                         let p = P::parse(line.to_string())?;
-                        vertices.push(*p);
+                        vertices.push(p);
                         continue;
                     }
                 }

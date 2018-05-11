@@ -72,8 +72,8 @@ impl Is3D for Box3D {
 }
 
 impl IsBuildableND for Box3D {
-    fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
-        Ok(Box::new(Box3D{center: *Point3D::new_nd(coords)?, size_x: Positive::one(), size_y: Positive::one(), size_z: Positive::one()}))
+    fn new_nd(coords: &Vec<f64>) -> Result<Self> {
+        Ok(Box3D{center: Point3D::new_nd(coords)?, size_x: Positive::one(), size_y: Positive::one(), size_z: Positive::one()})
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -84,8 +84,8 @@ impl IsBuildableND for Box3D {
 }
 
 impl IsBuildable3D for Box3D {
-    fn new(x: f64, y: f64, z: f64) -> Box<Self> {
-        Box::new(Box3D{center: Point3D{x: x, y: y, z: z}, size_x: Positive::one(), size_y: Positive::one(), size_z: Positive::one()})
+    fn new(x: f64, y: f64, z: f64) -> Self {
+        Box3D{center: Point3D{x: x, y: y, z: z}, size_x: Positive::one(), size_y: Positive::one(), size_z: Positive::one()}
     }
 
     fn from<P>(&mut self, other: P)

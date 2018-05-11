@@ -24,6 +24,7 @@ use prelude::*;
 
 /// IsBuildable3D is a trait used for types which are positioned in 3D space and can be constructed
 pub trait IsBuildable3D :
+    Sized +
     Is3D +
     Eq +
     PartialEq +
@@ -32,20 +33,20 @@ pub trait IsBuildable3D :
     Hash {
 
     /// Should build an object from x, y and z coordinates
-    fn new(x: f64, y: f64, z: f64) -> Box<Self>;
+    fn new(x: f64, y: f64, z: f64) -> Self;
     /// Should use the coordinates of another as its own
     fn from<P>(&mut self, other: P) where
         P: Is3D;
 
     /// Applies a matrix to this
-    fn multiply_m(&self, m: &Matrix4) -> Box<Self> {
+    fn multiply_m(&self, m: &Matrix4) -> Self {
         let x = self.x() * m.data[0][0] + self.y() * m.data[0][1] + self.z() * m.data[0][2] + m.data[0][3];
         let y = self.x() * m.data[1][0] + self.y() * m.data[1][1] + self.z() * m.data[1][2] + m.data[1][3];
         let z = self.x() * m.data[2][0] + self.y() * m.data[2][1] + self.z() * m.data[2][2] + m.data[2][3];
         Self::new(x, y, z)
     }
     /// Returns this with normalized values
-    fn normalized(&self) -> Result<Box<Self>> {
+    fn normalized(&self) -> Result<Self> {
         let l = self.abs();
         if l.get() == 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
@@ -53,7 +54,7 @@ pub trait IsBuildable3D :
         Ok(Self::new(self.x() / l.get(), self.y() / l.get(), self.z() / l.get()))
     }
     /// Creates this from a "x y z" string. E.g. "32.2 14.7 1.90"
-    fn parse(text: String) -> Result<Box<Self>> {
+    fn parse(text: String) -> Result<Self> {
         let split = text.trim().split(" ");
         let words = split.collect::<Vec<&str>>();
         match words.len() {

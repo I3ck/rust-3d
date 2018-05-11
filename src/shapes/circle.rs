@@ -60,8 +60,8 @@ impl Is2D for Circle {
 }
 
 impl IsBuildableND for Circle {
-    fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>> {
-        Ok(Box::new(Circle{ center: *Point2D::new_nd(coords)?, radius: Positive::one()}))
+    fn new_nd(coords: &Vec<f64>) -> Result<Self> {
+        Ok(Circle{ center: Point2D::new_nd(coords)?, radius: Positive::one()})
     }
 
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
@@ -72,8 +72,8 @@ impl IsBuildableND for Circle {
 }
 
 impl IsBuildable2D for Circle {
-    fn new(x: f64, y: f64) -> Box<Self> {
-        Box::new(Circle{ center: Point2D{x: x, y: y}, radius: Positive::one()})
+    fn new(x: f64, y: f64) -> Self {
+        Circle{ center: Point2D{x: x, y: y}, radius: Positive::one()}
     }
 
     fn from<P>(&mut self, other: P)

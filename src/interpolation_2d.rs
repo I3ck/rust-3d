@@ -36,7 +36,7 @@ fn bernstein_polynomial(n: usize, i: usize, t: f64) -> f64 {
     (binominal_coefficient(n, i) as f64) * t.powi(i as i32) * (1.0 - t).powi((n-i) as i32)
 }
 
-fn control_polygon<P>(path: &PointCloud2D<P>, n_points: usize, t: f64) -> Box<P> where
+fn control_polygon<P>(path: &PointCloud2D<P>, n_points: usize, t: f64) -> P where
     P: IsBuildable2D {
 
     let mut x : f64 = 0.0;
@@ -62,7 +62,7 @@ pub fn interpolate_bezier<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
     let p_dist = 1.0 / (n_points as f64);
 
     for i in 0..n_points {
-        pc.push(*control_polygon(base_points, base_points.len()-1, (i as f64) * p_dist));
+        pc.push(control_polygon(base_points, base_points.len()-1, (i as f64) * p_dist));
     }
     Ok(Box::new(pc))
 }
@@ -92,8 +92,8 @@ pub fn interpolate_cosine<P>(base_points: &PointCloud2D<P>, n_points: usize) -> 
             if traveled >= p_dist*(i as f64) {
                 let proportion = ((i as f64)*p_dist - traveled_before) / (traveled - traveled_before);
                 let proportion2 = (1.0 - (proportion*PI).cos() ) / 2.0;
-                pc.push(*P::new(p_prev.x() + proportion * (p_now.x() - p_prev.x()),
-                                p_prev.y() * (1.0 - proportion2) + p_now.y()*proportion2));
+                pc.push(P::new(p_prev.x() + proportion * (p_now.x() - p_prev.x()),
+                               p_prev.y() * (1.0 - proportion2) + p_now.y()*proportion2));
                 break;
             }
             traveled_before = traveled;
@@ -125,8 +125,8 @@ pub fn interpolation_linear<P>(base_points: &PointCloud2D<P>, n_points: usize) -
 
             if traveled >= p_dist*(i as f64) {
                 let proportion = ((i as f64)*p_dist - traveled_before) / (traveled - traveled_before);
-                pc.push(*P::new(p_prev.x() + proportion * (p_now.x() - p_prev.x()),
-                                p_prev.y() + proportion * (p_now.y() - p_prev.y())));
+                pc.push(P::new(p_prev.x() + proportion * (p_now.x() - p_prev.x()),
+                               p_prev.y() + proportion * (p_now.y() - p_prev.y())));
                 break;
             }
             traveled_before = traveled;

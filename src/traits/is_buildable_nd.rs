@@ -18,9 +18,11 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use prelude::*;
 
 /// IsBuildableND is a trait used for types which are positioned in n-dimensional space and can be constructed
-pub trait IsBuildableND : IsND {
+pub trait IsBuildableND : 
+    Sized +
+    IsND {
     /// Should build an object from the correct number of coordinates
-    fn new_nd(coords: &Vec<f64>) -> Result<Box<Self>>;
+    fn new_nd(coords: &Vec<f64>) -> Result<Self>;
     /// Should use the coordinates of another as its own
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
         P: IsBuildableND;
