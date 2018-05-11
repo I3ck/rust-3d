@@ -31,7 +31,7 @@ impl Positive {
     /// Creates a new Positive if input > 0, fails otherwise
     pub fn new(val: f64) -> Result<Positive> {
         if val > 0.0 {
-            return Ok(Positive {val: val});
+            return Ok(Positive {val});
         }
         Err(ErrorKind::NumberInWrongRange)
     }

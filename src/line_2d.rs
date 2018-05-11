@@ -29,7 +29,7 @@ pub struct Line2D {
 impl Line2D {
     /// Creates a new Line2D from an anchor point and a direction
     pub fn new(anchor: Point2D, dir: Norm2D) -> Self {
-        Line2D{anchor: anchor, dir: dir}
+        Line2D{anchor, dir}
     }
 }
 

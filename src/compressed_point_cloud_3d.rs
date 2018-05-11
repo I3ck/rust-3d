@@ -65,12 +65,12 @@ impl<T> CompressedPointCloud3D<T> where
             let unitsz = T::from(distz / unitsizez).ok_or(ErrorKind::NumberConversionError)?;
 
             data.push(CompressedPoint3D{
-                unitsx: unitsx,
-                unitsy: unitsy,
-                unitsz: unitsz
+                unitsx,
+                unitsy,
+                unitsz
             })
         }
-        Ok(CompressedPointCloud3D::<T>{start: bb.min_p(), unitsizex: unitsizex, unitsizey: unitsizey, unitsizez: unitsizez, data: data})
+        Ok(CompressedPointCloud3D::<T>{start: bb.min_p(), unitsizex, unitsizey, unitsizez, data})
     }
 
     /// Creates a new point cloud from this

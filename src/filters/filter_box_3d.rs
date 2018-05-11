@@ -26,7 +26,7 @@ pub struct FilterBox3D {
 impl FilterBox3D {
     /// Creates a new FilterBox3D with the given parameters
     pub fn new(box_3d: Box3D) -> Self {
-        FilterBox3D {box_3d: box_3d}
+        FilterBox3D {box_3d}
     }
 }
 

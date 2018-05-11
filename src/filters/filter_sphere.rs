@@ -27,7 +27,7 @@ pub struct FilterSphere {
 impl FilterSphere {
     /// Creates a new FilterSphere with the given parameters
     pub fn new(sphere: Sphere) -> Self {
-        FilterSphere {sphere: sphere}
+        FilterSphere {sphere}
     }
 }
 

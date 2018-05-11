@@ -26,7 +26,7 @@ pub struct FilterCircle {
 impl FilterCircle {
     /// Creates a new FilterCircle with the given parameters
     pub fn new(circle: Circle) -> Self {
-        FilterCircle {circle: circle}
+        FilterCircle {circle}
     }
 }
 

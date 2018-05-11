@@ -30,7 +30,7 @@ pub struct Face3 {
 impl Face3 {
     /// Creates a new Face3 from 3 indices
     pub fn new(a: VId, b: VId, c: VId) -> Self {
-        Face3 {a: a, b: b, c: c}
+        Face3 {a, b, c}
     }
 }
 

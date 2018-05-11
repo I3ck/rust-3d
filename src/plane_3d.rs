@@ -46,11 +46,7 @@ impl<P, N> IsPlane3D<P,N> for Plane3D<P,N> where
     N: IsNormalized3D + Clone {
 
     fn new(origin: P, u: N, v: N) -> Self {
-        Plane3D {
-            origin: origin,
-            u: u,
-            v: v
-        }
+        Plane3D { origin, u, v }
     }
 
     fn origin(&self) -> P {

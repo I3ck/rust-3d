@@ -28,7 +28,7 @@ pub struct Ray2D {
 impl Ray2D {
     /// Creates a new Ray2D from a Line2D
     pub fn new(line: Line2D) -> Self {
-        Ray2D {line: line}
+        Ray2D {line}
     }
 }
 

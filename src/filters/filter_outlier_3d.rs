@@ -47,7 +47,7 @@ impl<S, P> FilterOutlier3D<S, P> where
     S: IsSphereSearchable<P> {
     /// Creates a new FilterOutlier3D from a search distance and the min number of neighbours to be found in this distance
     pub fn new(searchable: S, search_distance: Positive, min_neighbours: usize) -> Result<Self> {
-        Ok(FilterOutlier3D { search_distance: search_distance, min_neighbours: min_neighbours, searchable: searchable, phantom_search: PhantomData})
+        Ok(FilterOutlier3D { search_distance, min_neighbours, searchable, phantom_search: PhantomData})
     }
 }
 

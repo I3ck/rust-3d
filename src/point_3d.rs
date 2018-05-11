@@ -33,7 +33,7 @@ pub struct Point3D {
 
 impl Point3D {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
-        Point3D {x: x, y: y, z: z}
+        Point3D {x, y, z}
     }
 }
 

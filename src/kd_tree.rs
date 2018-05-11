@@ -179,10 +179,10 @@ impl<P> KdNode<P> where
         };
 
         KdNode {
-            left: left,
-            right: right,
-            val: val,
-            dimension: dimension
+            left,
+            right,
+            val,
+            dimension
         }
     }
 }

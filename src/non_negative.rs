@@ -31,7 +31,7 @@ impl NonNegative {
     /// Creates a new NonNegative if input >= 0, fails otherwise
     pub fn new(val: f64) -> Result<NonNegative> {
         if val >= 0.0 {
-            return Ok(NonNegative {val: val});
+            return Ok(NonNegative {val});
         }
         Err(ErrorKind::NumberInWrongRange)
     }

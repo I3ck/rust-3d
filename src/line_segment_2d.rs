@@ -31,7 +31,7 @@ pub struct LineSegment2D {
 impl LineSegment2D {
     /// Creates a new LineSegment2D from a start and end Point
     pub fn new(start: Point2D, end: Point2D) -> Self {
-        LineSegment2D{start: start, end: end}
+        LineSegment2D{start, end}
     }
 }
 
