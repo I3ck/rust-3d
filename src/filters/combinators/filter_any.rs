@@ -19,22 +19,19 @@ use std::marker::PhantomData;
 use traits::IsFilter;
 
 /// FilterAny, a filter to chain multiple filters with the or condition => must pass any filter to pass this filter
-pub struct FilterAny<F, T> where
-    F: IsFilter<T> {
-    pub filters: Vec<F>,
+pub struct FilterAny<T> {
+    pub filters: Vec<Box<IsFilter<T>>>,
     _marker: PhantomData<T>
 }
 
-impl<F, T> FilterAny<F, T> where
-    F: IsFilter<T> {    
+impl<T> FilterAny<T> {    
     /// Creates a new FilterAny
     pub fn new() -> Self {
         FilterAny {filters: Vec::new(), _marker: PhantomData}
     }
 }
 
-impl<F, T> IsFilter<T> for FilterAny<F, T> where 
-    F: IsFilter<T> {
+impl<T> IsFilter<T> for FilterAny<T> {
     
     fn is_allowed(&self, x: &T) -> bool {
         for f in &self.filters {

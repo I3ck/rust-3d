@@ -17,21 +17,15 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use prelude::*;
 
-use std::marker::PhantomData;
-
 #[derive (Default)]
 /// FilterAllRandomAccessible, a filter to chain multiple IsFilterRandomAccessible with the and condition => must pass all filters to pass this filter
-pub struct FilterAllRandomAccessible<F, RA, T> where
-    F: IsFilterRandomAccessible<RA, T>,
+pub struct FilterAllRandomAccessible<RA, T> where
     RA: IsRandomAccessible<T> {
 
-    pub filters: Vec<F>,
-    _marker_ra: PhantomData<RA>,
-    _marker_t: PhantomData<T>
+    pub filters: Vec<Box<IsFilterRandomAccessible<RA, T>>>
 }
 
-impl<F, RA, T> IsFilterRandomAccessible<RA, T> for FilterAllRandomAccessible<F, RA, T> where
-    F: IsFilterRandomAccessible<RA, T>,
+impl<RA, T> IsFilterRandomAccessible<RA, T> for FilterAllRandomAccessible<RA, T> where
     RA: IsRandomAccessible<T> {
 
     fn filter(&self, ra: &RA, mut view: &mut View) {

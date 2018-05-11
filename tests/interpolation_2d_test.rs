@@ -34,7 +34,7 @@ fn interpolate_bezier_test() {
     pc.push(Point2D::new(1.0, 1.0));
     pc.push(Point2D::new(0.5, 1.0));
 
-    let result = *(interpolate_bezier(&pc, 50).unwrap());
+    let result = interpolate_bezier(&pc, 50).unwrap();
 
     if GENERATE_EXCEPTED_RESULT_FILES {
         save_xy(&result, &path_expected, ";", "\n").unwrap();
@@ -58,7 +58,7 @@ fn interpolate_cosine_test() {
     pc.push(Point2D::new(1.3, 1.0));
     pc.push(Point2D::new(0.5, 6.0));
 
-    let result = *(interpolate_cosine(&pc, 50).unwrap());
+    let result = interpolate_cosine(&pc, 50).unwrap();
 
     if GENERATE_EXCEPTED_RESULT_FILES {
         save_xy(&result, &path_expected, ";", "\n").unwrap();
@@ -82,7 +82,7 @@ fn interpolate_linear_test() {
     pc.push(Point2D::new(1.0, 1.0));
     pc.push(Point2D::new(0.5, 1.0));
 
-    let result = *(interpolation_linear(&pc, 50).unwrap());
+    let result = interpolation_linear(&pc, 50).unwrap();
 
     if GENERATE_EXCEPTED_RESULT_FILES {
         save_xy(&result, &path_expected, ";", "\n").unwrap();
