@@ -27,4 +27,22 @@ pub trait IsBuildableND :
     /// Should use the coordinates of another as its own
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
         P: IsBuildableND;
+    
+    /// Returns the center between this and other
+    fn center<P>(&self, other:& P) -> Result<Self> where
+        P: IsND {
+        
+        let n = Self::n_dimensions();
+        
+        if n != P::n_dimensions() {
+            return Err(ErrorKind::IncorrectDimension);
+        }
+        
+        let mut v = Vec::with_capacity(n);
+        for i in 0..n {
+            v.push(0.5 * (self.get_position(i)? + other.get_position(i)?));
+        }
+        
+        Self::new_nd(&v)
+    }
 }
