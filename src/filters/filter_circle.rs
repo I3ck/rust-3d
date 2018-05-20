@@ -51,7 +51,7 @@ impl Is2D for FilterCircle {
 }
 
 impl IsBuildableND for FilterCircle {
-    fn new_nd(coords: &Vec<f64>) -> Result<Self> {
+    fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(FilterCircle::new(Circle::new_nd(coords)?))
     }
 

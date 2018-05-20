@@ -23,7 +23,7 @@ pub trait IsBuildableND :
     IsND {
     
     /// Should build an object from the correct number of coordinates
-    fn new_nd(coords: &Vec<f64>) -> Result<Self>;
+    fn new_nd(coords: &[f64]) -> Result<Self>;
     /// Should use the coordinates of another as its own
     fn from_nd<P>(&mut self, other: P) -> Result<()> where
         P: IsBuildableND;

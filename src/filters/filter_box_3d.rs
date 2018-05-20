@@ -55,7 +55,7 @@ impl Is3D for FilterBox3D {
 }
 
 impl IsBuildableND for FilterBox3D {
-    fn new_nd(coords: &Vec<f64>) -> Result<Self> {
+    fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(FilterBox3D::new(Box3D::new_nd(coords)?))
     }
 

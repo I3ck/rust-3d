@@ -60,7 +60,7 @@ impl Is2D for Circle {
 }
 
 impl IsBuildableND for Circle {
-    fn new_nd(coords: &Vec<f64>) -> Result<Self> {
+    fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(Circle{ center: Point2D::new_nd(coords)?, radius: Positive::one()})
     }
 

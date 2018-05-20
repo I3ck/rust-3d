@@ -64,7 +64,7 @@ impl Is2D for Box2D {
 }
 
 impl IsBuildableND for Box2D {
-    fn new_nd(coords: &Vec<f64>) -> Result<Self> {
+    fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(Box2D{center: Point2D::new_nd(coords)?,  size_x: Positive::one(), size_y: Positive::one()})
     }
 

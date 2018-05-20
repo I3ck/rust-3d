@@ -64,7 +64,7 @@ impl Is3D for Sphere {
 }
 
 impl IsBuildableND for Sphere {
-    fn new_nd(coords: &Vec<f64>) -> Result<Self> {
+    fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(Sphere{center: Point3D::new_nd(coords)?, radius: Positive::one()})
     }
 
@@ -77,7 +77,7 @@ impl IsBuildableND for Sphere {
 
 impl IsBuildable3D for Sphere {
     fn new(x: f64, y: f64, z: f64) -> Self {
-        Sphere{center: Point3D{x: x, y: y, z: z}, radius: Positive::one()}
+        Sphere{center: Point3D{x, y, z}, radius: Positive::one()}
     }
 
     fn from<P>(&mut self, other: P)

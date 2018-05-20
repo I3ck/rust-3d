@@ -72,7 +72,7 @@ impl Is3D for Box3D {
 }
 
 impl IsBuildableND for Box3D {
-    fn new_nd(coords: &Vec<f64>) -> Result<Self> {
+    fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(Box3D{center: Point3D::new_nd(coords)?, size_x: Positive::one(), size_y: Positive::one(), size_z: Positive::one()})
     }
 

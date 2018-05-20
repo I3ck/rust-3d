@@ -56,7 +56,7 @@ impl Is3D for FilterSphere {
 }
 
 impl IsBuildableND for FilterSphere {
-    fn new_nd(coords: &Vec<f64>) -> Result<Self> {
+    fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(FilterSphere::new(Sphere::new_nd(coords)?))
     }
 
