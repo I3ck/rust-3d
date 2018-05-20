@@ -244,6 +244,18 @@ impl<P> IsMergeable for PointCloud2D<P> where
     }
 }
 
+impl<P> IsScalable for PointCloud2D<P> where
+    P : IsEditable2D {
+    
+    fn scale(&mut self, factor: Positive) {
+        if let Ok(c) = self.center_of_gravity() {
+            for p in &mut self.data {
+                p.increase_distance_to_by(&c, factor);
+            }
+        }
+    }
+}
+
 impl<P> fmt::Display for PointCloud2D<P> where
     P: Is2D + fmt::Display {
 

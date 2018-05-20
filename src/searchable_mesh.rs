@@ -141,4 +141,13 @@ impl<M, T> HasCenterOfGravity3D for SearchableMesh<M, T> where
     }
 }
 
+impl<M, T> IsScalable for SearchableMesh<M, T> where
+    M: IsMesh<T, Face3> + IsScalable {
+    
+    fn scale(&mut self, factor: Positive) {
+        self.mesh.scale(factor);
+    }
+}
+    
+
 

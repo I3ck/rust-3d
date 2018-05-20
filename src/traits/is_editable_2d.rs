@@ -31,7 +31,7 @@ pub trait IsEditable2D : Is2D + IsEditableND {
     }
     
     /// Increases distance towards other by factor
-    fn increase_distance_to_by<P>(&mut self, other: P, factor: Positive) where
+    fn increase_distance_to_by<P>(&mut self, other: &P, factor: Positive) where
         P: Is2D {
         
         let x = other.x() + factor.get() * (self.x() - other.x());

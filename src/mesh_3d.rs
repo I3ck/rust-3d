@@ -118,3 +118,11 @@ impl<P> HasCenterOfGravity3D for Mesh3D<P> where
         self.pc.center_of_gravity()
     }
 }
+
+impl<P> IsScalable for Mesh3D<P> where
+    P: IsEditable3D {
+    
+    fn scale(&mut self, factor: Positive) {
+        self.pc.scale(factor);
+    }
+}

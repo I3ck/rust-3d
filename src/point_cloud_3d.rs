@@ -251,6 +251,18 @@ impl<P> IsMergeable for PointCloud3D<P> where
     }
 }
 
+impl<P> IsScalable for PointCloud3D<P> where
+    P : IsEditable3D {
+    
+    fn scale(&mut self, factor: Positive) {
+        if let Ok(c) = self.center_of_gravity() {
+            for p in &mut self.data {
+                p.increase_distance_to_by(&c, factor);
+            }
+        }
+    }
+}
+
 impl<P> fmt::Display for PointCloud3D<P> where
     P: Is3D + fmt::Display {
 

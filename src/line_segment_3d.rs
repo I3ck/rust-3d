@@ -63,6 +63,15 @@ impl HasCenterOfGravity3D for LineSegment3D {
     }
 }
 
+impl IsScalable for LineSegment3D {
+    fn scale(&mut self, factor: Positive) {
+        let c = self.center_of_gravity().unwrap(); //always known
+
+        self.start.increase_distance_to_by(&c, factor);
+        self.end.increase_distance_to_by(&c, factor);
+    }
+}
+
 impl fmt::Display for LineSegment3D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({}, {}, {} -> {}, {}, {})", self.start.x(), self.start.y(), self.start.z(), self.end.x(), self.end.y(), self.end.z())
