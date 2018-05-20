@@ -24,6 +24,7 @@ use utils::to_words;
 
 use self::core::str::FromStr;
 use std::io::prelude::*;
+use std::io::{BufReader, BufWriter};
 use std::fs::File;
 use self::byteorder::{BigEndian, WriteBytesExt};
 
@@ -34,7 +35,7 @@ pub fn save_ply_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()> where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D {
 
-    let mut f = File::create(filepath).map_err(|e| e.to_error_kind())?;
+    let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
 
     let header = "ply\n".to_string()
                    + "format ascii 1.0\n"
@@ -65,7 +66,7 @@ pub fn save_ply_binary<M, P>(mesh: &M, filepath: &str, precision: &Precision) ->
     M: IsMesh<P, Face3>,
     P: IsBuildable3D {
 
-    let mut f = File::create(filepath).map_err(|e| e.to_error_kind())?;
+    let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
     
     let header = match precision {
         Precision::P32 => {
@@ -133,7 +134,7 @@ pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
     EM: IsEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone {
 
-        let mut f       = File::open(filepath)?;
+        let mut f       = BufReader::new(File::open(filepath)?);
         let mut content = String::new();
         f.read_to_string(&mut content)?;
         let lines       = content.split("\n");

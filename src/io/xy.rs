@@ -21,6 +21,7 @@ use prelude::*;
 
 use self::core::str::FromStr;
 use std::io::prelude::*;
+use std::io::{BufReader, BufWriter};
 use std::fs::File;
 
 /// Saves an IsRandomAccessible<Is2D> as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xy file format or .csv files
@@ -28,7 +29,7 @@ pub fn save_xy<RA, P>(ra: &RA, filepath: &str, delim_coord: &str, delim_pos: &st
     RA: IsRandomAccessible<P>,
     P: Is2D {
 
-    let mut f = File::create(filepath).map_err(|e| e.to_error_kind())?;
+    let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
     let n = ra.len();
     for i in 0..n {
         let ref p = ra[i];
@@ -45,7 +46,7 @@ pub fn load_xy<RI, P>(ri: &mut RI, filepath: &str, delim_coord: &str, delim_pos:
     RI: IsRandomInsertible<P>,
     P: Is2D + IsBuildable2D {
 
-    let mut f = File::open(filepath)?;
+    let mut f = BufReader::new(File::open(filepath)?);
 
     let mut content = String::new();
     f.read_to_string(&mut content)?;
