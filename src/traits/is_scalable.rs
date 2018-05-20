@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Martin Buck
+Copyright 2018 Martin Buck
 This file is part of rust-3d.
 rust-3d is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -13,14 +13,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! IsSortable2D trait used for collections which can be sorted by x or y
+//! IsScalable trait used for types that can have their size scaled by a factor
 
 use prelude::*;
 
-/// IsSortable2D trait used for collections which can be sorted by x or y
-pub trait IsSortable2D : IsSortableND {
-    /// Should sort all elements by x
-    fn sort_x(&mut self);
-    /// Should sort all elements by y
-    fn sort_y(&mut self);
+/// IsScalable trait used for types that can have their size scaled by a factor
+pub trait IsScalable {
+    /// Should scale by the given factor. 0.5 -> half size, 2.0 double the size without moving the position/center
+    fn scale(&mut self, factor: Positive); 
 }

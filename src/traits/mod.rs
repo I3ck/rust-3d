@@ -122,6 +122,9 @@ pub use self::is_filter::IsFilter;
 mod           is_filter_random_accessible;
 pub use self::is_filter_random_accessible::IsFilterRandomAccessible;
 
+mod           is_scalable;
+pub use self::is_scalable::IsScalable;
+
 mod           is_view_buildable;
 pub use self::is_view_buildable::IsViewBuildable;
 
