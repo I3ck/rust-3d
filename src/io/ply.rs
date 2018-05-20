@@ -16,6 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! Module for IO operations of the ply file format
 
 extern crate core;
+extern crate byteorder;
 
 use prelude::*;
 
@@ -24,6 +25,9 @@ use utils::to_words;
 use self::core::str::FromStr;
 use std::io::prelude::*;
 use std::fs::File;
+use self::byteorder::{BigEndian, WriteBytesExt};
+
+pub enum Precision { P32, P64 }
 
 /// Saves an IsMesh3D in the ASCII .ply file format
 pub fn save_ply_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()> where
@@ -53,6 +57,73 @@ pub fn save_ply_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()> where
         let face = mesh.face_vertex_ids(FId{val: i})?;
         f.write_all(("3 ".to_string() + &face.a.to_string() + " " + &face.b.to_string() + " " + &face.c.to_string() + "\n").as_bytes()).map_err(|e| e.to_error_kind())?;
     }
+    Ok(())
+}
+
+/// Saves an IsMesh3D in the binary .ply file format
+pub fn save_ply_binary<M, P>(mesh: &M, filepath: &str, precision: &Precision) -> Result<()> where
+    M: IsMesh<P, Face3>,
+    P: IsBuildable3D {
+
+    let mut f = File::create(filepath).map_err(|e| e.to_error_kind())?;
+    
+    let header = match precision {
+        Precision::P32 => {
+            "ply\n".to_string() 
+                + "format binary_big_endian 1.0\n"
+                + "comment Created by rust-3d\n"
+                + "element vertex " + &mesh.num_vertices().to_string() + "\n"
+                + "property float32 x\n"
+                + "property float32 y\n"
+                + "property float32 z\n"
+                + "element face " + &mesh.num_faces().to_string() + "\n"
+                + "property list uint8 uint32 vertex_indices\n"
+                + "end_header\n"
+        },
+        Precision::P64 => {
+            "ply\n".to_string()
+                + "format binary_big_endian 1.0\n"
+                + "comment Created by rust-3d\n"
+                + "element vertex " + &mesh.num_vertices().to_string() + "\n"
+                + "property float64 x\n"
+                + "property float64 y\n"
+                + "property float64 z\n"
+                + "element face " + &mesh.num_faces().to_string() + "\n"
+                + "property list uint8 uint32 vertex_indices\n"
+                + "end_header\n"
+        }
+    };
+    
+    f.write_all(header.as_bytes()).map_err(|e| e.to_error_kind())?;
+    
+    match precision {
+        Precision::P32 => {
+            for i in 0..mesh.num_vertices() {
+                let vertex = mesh.vertex(VId{val: i})?;
+                f.write_f32::<BigEndian>(vertex.get_position(0)? as f32).map_err(|e| e.to_error_kind())?;
+                f.write_f32::<BigEndian>(vertex.get_position(1)? as f32).map_err(|e| e.to_error_kind())?;
+                f.write_f32::<BigEndian>(vertex.get_position(2)? as f32).map_err(|e| e.to_error_kind())?;
+            }
+        },
+
+        Precision::P64 => {
+            for i in 0..mesh.num_vertices() {
+                let vertex = mesh.vertex(VId{val: i})?;
+                f.write_f64::<BigEndian>(vertex.get_position(0)?).map_err(|e| e.to_error_kind())?;
+                f.write_f64::<BigEndian>(vertex.get_position(1)?).map_err(|e| e.to_error_kind())?;
+                f.write_f64::<BigEndian>(vertex.get_position(2)?).map_err(|e| e.to_error_kind())?;
+            }
+        }
+    }
+    
+    for i in 0..mesh.num_faces() {
+        let face = mesh.face_vertex_ids(FId{val: i})?;
+        f.write_u8(3).map_err(|e| e.to_error_kind())?;
+        f.write_u32::<BigEndian>(face.a.val as u32).map_err(|e| e.to_error_kind())?;
+        f.write_u32::<BigEndian>(face.b.val as u32).map_err(|e| e.to_error_kind())?;
+        f.write_u32::<BigEndian>(face.c.val as u32).map_err(|e| e.to_error_kind())?;
+    }
+
     Ok(())
 }
 

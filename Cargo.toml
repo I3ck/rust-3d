@@ -12,3 +12,4 @@ license-file = "LICENSE"
 
 [dependencies]
 num = "0.1.32"
+byteorder = "1.2.3"
