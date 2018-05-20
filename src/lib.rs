@@ -213,4 +213,7 @@ pub use self::half_edge::HalfEdge;
 mod           shapes;
 pub use self::shapes::*;
 
+mod enums;
+pub use self::enums::*;
+
 mod utils;

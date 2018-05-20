@@ -28,8 +28,6 @@ use std::io::{BufReader, BufWriter};
 use std::fs::File;
 use self::byteorder::{BigEndian, WriteBytesExt};
 
-pub enum Precision { P32, P64 }
-
 /// Saves an IsMesh3D in the ASCII .ply file format
 pub fn save_ply_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()> where
     M: IsMesh<P, Face3>,
