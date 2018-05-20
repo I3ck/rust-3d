@@ -16,7 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! Positive, a wrapper for a f64 value, ensuring it is always > 0
 
 use std::fmt;
-use std::ops::Add;
+use std::ops::{Add, AddAssign, Mul, MulAssign};
 use std::hash::{Hash, Hasher};
 
 use prelude::*;
@@ -70,6 +70,32 @@ impl Add<NonNegative> for Positive {
 
     fn add(self, other: NonNegative) -> Positive {
         Positive { val: self.val + other.get() }
+    }
+}
+
+impl AddAssign for Positive {
+    fn add_assign(&mut self, other: Positive) {
+        self.val += other.val;
+    }
+} 
+
+impl AddAssign<NonNegative> for Positive {
+    fn add_assign(&mut self, other: NonNegative) {
+        self.val += other.get();
+    }
+}
+
+impl Mul for Positive {
+    type Output = Positive;
+    
+    fn mul(self, other: Positive) -> Positive {
+        Positive {val: self.val * other.val }
+    }
+}
+
+impl MulAssign for Positive {
+    fn mul_assign(&mut self, other: Positive) {
+        self.val *= other.get();
     }
 }
 

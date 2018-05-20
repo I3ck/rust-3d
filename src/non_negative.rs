@@ -16,7 +16,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 //! NonNegative, a wrapper for a f64 value, ensuring it is always >= 0
 
 use std::fmt;
-use std::ops::{Add, Mul, Div};
+use std::ops::{Add, AddAssign, Mul, MulAssign, Div, DivAssign};
 use std::hash::{Hash, Hasher};
 
 use prelude::*;
@@ -83,6 +83,18 @@ impl Add<Positive> for NonNegative {
     }
 }
 
+impl AddAssign for NonNegative {
+    fn add_assign(&mut self, other: NonNegative) {
+        self.val += other.val;
+    }
+}
+
+impl AddAssign<Positive> for NonNegative {
+    fn add_assign(&mut self, other: Positive) {
+        self.val += other.get();
+    }
+}
+
 impl Mul for NonNegative {
     type Output = NonNegative;
 
@@ -99,6 +111,18 @@ impl Mul<Positive> for NonNegative {
     }
 }
 
+impl MulAssign for NonNegative {
+    fn mul_assign(&mut self, other: NonNegative) {
+        self.val *= other.val;
+    }
+}
+
+impl MulAssign<Positive> for NonNegative {
+    fn mul_assign(&mut self, other: Positive) {
+        self.val *= other.get();
+    }
+}
+
 impl Div for NonNegative {
     type Output = NonNegative;
 
@@ -112,6 +136,18 @@ impl Div<Positive> for NonNegative {
 
     fn div(self, other: Positive) -> NonNegative {
         NonNegative {val: self.val / other.get()}
+    }
+}
+
+impl DivAssign for NonNegative {
+    fn div_assign(&mut self, other: NonNegative) {
+        self.val /= other.val;
+    }
+}
+
+impl DivAssign<Positive> for NonNegative {
+    fn div_assign(&mut self, other: Positive) {
+        self.val /= other.get();
     }
 }
 
