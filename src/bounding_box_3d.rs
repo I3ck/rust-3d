@@ -182,3 +182,18 @@ impl HasDistanceTo<BoundingBox3D> for BoundingBox3D {
         NonNegative::new(dx*dx + dy*dy + dz*dz).unwrap()
     }
 }
+
+impl IsScalable for BoundingBox3D {
+    fn scale(&mut self, factor: Positive) {
+        let c = self.center_bb();
+        let min_x = c.x - (0.5 * factor.get() * self.size_x().get());
+        let max_x = c.x + (0.5 * factor.get() * self.size_x().get());
+        let min_y = c.y - (0.5 * factor.get() * self.size_y().get());
+        let max_y = c.y + (0.5 * factor.get() * self.size_y().get());
+        let min_z = c.z - (0.5 * factor.get() * self.size_z().get());
+        let max_z = c.z + (0.5 * factor.get() * self.size_z().get());
+
+        self.min.set_pos(min_x, min_y, min_z);
+        self.max.set_pos(max_x, max_y, max_z);
+    }
+}

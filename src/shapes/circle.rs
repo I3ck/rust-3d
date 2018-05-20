@@ -106,3 +106,9 @@ impl HasBoundingBox2D for Circle {
         BoundingBox2D::new(&p_min, &p_max)
     }
 }
+
+impl IsScalable for Circle {
+    fn scale(&mut self, factor: Positive) {
+        self.radius *= factor;
+    }
+}

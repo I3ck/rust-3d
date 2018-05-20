@@ -117,6 +117,12 @@ impl<T> IsFilter<T> for FilterBox3D where
     }
 }
 
+impl IsScalable for FilterBox3D {
+    fn scale(&mut self, factor: Positive) {
+        self.box_3d.scale(factor);
+    }
+}
+
 impl From<BoundingBox3D> for FilterBox3D {
     fn from(x: BoundingBox3D) -> Self {
         Self::new(Box3D{center: x.center_bb(), size_x: x.size_x(), size_y: x.size_y(), size_z: x.size_z()})

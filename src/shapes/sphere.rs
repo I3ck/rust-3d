@@ -114,3 +114,9 @@ impl HasBoundingBox3D for Sphere {
         BoundingBox3D::new(&p_min, &p_max)
     }
 }
+
+impl IsScalable for Sphere {
+    fn scale(&mut self, factor: Positive) {
+        self.radius *= factor;
+    }
+}

@@ -112,3 +112,9 @@ impl<T> IsFilter<T> for FilterSphere
         dist_3d(p, &self.sphere.center) <= self.sphere.radius.get()
     }
 }
+
+impl IsScalable for FilterSphere {
+    fn scale(&mut self, factor: Positive) {
+        self.sphere.scale(factor);
+    }
+}

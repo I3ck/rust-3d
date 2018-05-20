@@ -123,6 +123,14 @@ impl HasBoundingBox3D for Box3D {
     }
 }
 
+impl IsScalable for Box3D {
+    fn scale(&mut self, factor: Positive) {
+        self.size_x *= factor;
+        self.size_y *= factor;
+        self.size_z *= factor;
+    }
+}
+
 impl From<BoundingBox3D> for Box3D {
     fn from(x: BoundingBox3D) -> Self {
         Box3D{center: x.center_bb(), size_x: x.size_x(), size_y: x.size_y(), size_z: x.size_z()}

@@ -107,6 +107,12 @@ impl<T> IsFilter<T> for FilterBox2D where
     }
 }
 
+impl IsScalable for FilterBox2D {
+    fn scale(&mut self, factor: Positive) {
+        self.box_2d.scale(factor);
+    }
+}
+
 impl From<BoundingBox2D> for FilterBox2D {
     fn from(x: BoundingBox2D) -> Self {
         Self::new(Box2D{center: x.center_bb(), size_x: x.size_x(), size_y: x.size_y()})

@@ -2,6 +2,12 @@ octree for voxel image
 kdtree for 2d or generic
 quadtree
 
+implement FooAssign where possible
+
+IsScalable impl missing for LineSegment (and others?)
+
+ensure as many traits as possible implemented
+
 more filter shapes
 
 some Hash impls might lose precision

@@ -51,7 +51,7 @@ impl<S, P> FilterOutlier3D<S, P> where
     }
 }
 
-impl<S, P, PSearch> IsFilter<PSearch> for FilterOutlier3D <S, P>where
+impl<S, P, PSearch> IsFilter<PSearch> for FilterOutlier3D<S, P> where
     P: Is3D,
     PSearch: Is3D,
     S: IsSphereSearchable<P> {
@@ -59,6 +59,15 @@ impl<S, P, PSearch> IsFilter<PSearch> for FilterOutlier3D <S, P>where
     fn is_allowed(&self, p: &PSearch) -> bool {
         let pts = self.searchable.in_sphere(&Sphere{center: Point3D{x: p.x(), y: p.y(), z: p.z()}, radius: self.search_distance.clone()});
         pts.len() >= self.min_neighbours
+    }
+}
+
+impl<S, P> IsScalable for FilterOutlier3D<S, P> where 
+    P: Is3D, 
+    S: IsSphereSearchable<P> {
+    
+    fn scale(&mut self, factor: Positive) {
+        self.search_distance *= factor;
     }
 }
 

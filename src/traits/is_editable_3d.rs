@@ -58,7 +58,7 @@ pub trait IsEditable3D : Is3D + IsEditableND {
     }
 
     /// Scales the coordinates by applying a factor to all of them
-    fn scale(&mut self, val: f64) {
+    fn scale_pos(&mut self, val: f64) {
         let x = val * self.x();
         let y = val * self.y();
         let z = val * self.z();

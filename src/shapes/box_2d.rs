@@ -111,6 +111,13 @@ impl HasBoundingBox2D for Box2D {
     }
 }
 
+impl IsScalable for Box2D {
+    fn scale(&mut self, factor: Positive) {
+        self.size_x *= factor;
+        self.size_y *= factor;
+    }
+}
+
 impl From<BoundingBox2D> for Box2D {
     fn from(x: BoundingBox2D) -> Self {
         Box2D{center: x.center_bb(), size_x: x.size_x(), size_y: x.size_y()}

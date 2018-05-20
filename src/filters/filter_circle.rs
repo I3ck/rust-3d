@@ -103,3 +103,9 @@ impl<T> IsFilter<T> for FilterCircle where
         dist_2d(p, &self.circle.center) <= self.circle.radius.get()
     }
 }
+
+impl IsScalable for FilterCircle {
+    fn scale(&mut self, factor: Positive) {
+        self.circle.scale(factor);
+    }
+}
