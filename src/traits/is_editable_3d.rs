@@ -32,6 +32,17 @@ pub trait IsEditable3D : Is3D + IsEditableND {
         self.set_y(y);
         self.set_z(z);
     }
+    
+    /// Increases distance towards other by factor
+    fn increase_distance_to_by<P>(&mut self, other: P, factor: Positive) where
+        P: Is3D {
+
+        let x = other.x() + factor.get() * (self.x() - other.x());
+        let y = other.y() + factor.get() * (self.y() - other.y());
+        let z = other.z() + factor.get() * (self.z() - other.z());
+
+        self.set_pos(x, y, z);
+    }
 
     /// Adds the coordinates of other onto this. x = x + other.x ...
     fn add<P>(&mut self, other: &P) where

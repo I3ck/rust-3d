@@ -29,6 +29,16 @@ pub trait IsEditable2D : Is2D + IsEditableND {
         self.set_x(x);
         self.set_y(y);
     }
+    
+    /// Increases distance towards other by factor
+    fn increase_distance_to_by<P>(&mut self, other: P, factor: Positive) where
+        P: Is2D {
+        
+        let x = other.x() + factor.get() * (self.x() - other.x());
+        let y = other.y() + factor.get() * (self.y() - other.y());
+        
+        self.set_pos(x, y);
+    }
 
     /// Adds the coordinates of other onto this. x = x + other.x ...
     fn add<P>(&mut self, other: &P) where
