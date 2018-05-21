@@ -248,7 +248,8 @@ impl<P> IsScalable for PointCloud2D<P> where
     P : IsEditable2D {
     
     fn scale(&mut self, factor: Positive) {
-        if let Ok(c) = self.center_of_gravity() {
+        if let Ok(bb) = self.bounding_box() {
+            let c = bb.center_bb();
             for p in &mut self.data {
                 p.increase_distance_to_by(&c, factor);
             }

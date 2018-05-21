@@ -65,7 +65,7 @@ impl HasCenterOfGravity2D for LineSegment2D {
 
 impl IsScalable for LineSegment2D {
     fn scale(&mut self, factor: Positive) {
-        let c = self.center_of_gravity().unwrap(); //always known
+        let c = self.bounding_box().unwrap().center_bb(); //always known
         
         self.start.increase_distance_to_by(&c, factor);
         self.end.increase_distance_to_by(&c, factor);
