@@ -101,6 +101,9 @@ pub use self::is_oc_tree::IsOcTree;
 mod           is_plane_3d;
 pub use self::is_plane_3d::IsPlane3D;
 
+mod           is_polygon;
+pub use self::is_polygon::IsPolygon;
+
 mod           is_projection_to_plane;
 pub use self::is_projection_to_plane::IsProjectionToPlane;
 

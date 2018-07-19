@@ -48,6 +48,7 @@ macro_rules! strong_f64 {
 strong_usize!(VId);
 strong_usize!(FId);
 strong_usize!(EId);
+strong_usize!(SId);
 
 strong_f64!(Deg);
 strong_f64!(Rad);
