@@ -38,6 +38,9 @@ pub use self::is_editable_3d::IsEditable3D;
 mod           is_editable_nd;
 pub use self::is_editable_nd::IsEditableND;
 
+mod           is_editable_polygon;
+pub use self::is_editable_polygon::IsEditablePolygon;
+
 mod           is_buildable_2d;
 pub use self::is_buildable_2d::IsBuildable2D;
 
