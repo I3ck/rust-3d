@@ -147,6 +147,9 @@ pub use self::point_cloud_2d::PointCloud2D;
 mod           point_cloud_3d;
 pub use self::point_cloud_3d::PointCloud3D;
 
+mod           polygon_2d;
+pub use self::polygon_2d::Polygon2D;
+
 mod           norm_2d;
 pub use self::norm_2d::Norm2D;
 
