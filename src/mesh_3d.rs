@@ -27,7 +27,7 @@ pub struct Mesh3D<P> where
 }
 
 impl<P> IsMesh<P, Face3> for Mesh3D<P> where
-    P: IsBuildable3D + Clone {
+    P: Is3D + Clone {
 
     fn num_faces(&self) -> usize {
         self.topology.len() / 3
@@ -72,7 +72,7 @@ impl<P> IsEditableMesh<P, Face3> for Mesh3D<P> where
         self.pc.push(vertex);
         VId{val: self.pc.len() - 1}
     }
-    
+
     fn change_vertex(&mut self, vid: VId, vertex: P) -> Result<()> {
         if vid.val < self.pc.len() {
             self.pc[vid.val] = vertex;
@@ -121,7 +121,7 @@ impl<P> HasCenterOfGravity3D for Mesh3D<P> where
 
 impl<P> IsScalable for Mesh3D<P> where
     P: IsEditable3D {
-    
+
     fn scale(&mut self, factor: Positive) {
         self.pc.scale(factor);
     }
