@@ -130,3 +130,11 @@ impl<P> fmt::Display for Polygon2D<P> where
         self.pc.fmt(f) //@todo consider output similar to Line2D
     }
 }
+
+impl<P> From<PointCloud2D<P>> for Polygon2D<P> where
+    P: Is2D {
+
+    fn from(pc: PointCloud2D<P>) -> Self {
+        Polygon2D{pc}
+    }
+}
