@@ -36,9 +36,9 @@ impl<P> IsPolygon<P> for Polygon2D<P> where
     }
 
     fn segment_vertex_ids(&self, segmentid: SId) -> Result<(VId, VId)> {
-        if segmentid.val > self.pc.len() {
+        if segmentid.val >= self.pc.len() {
             Err(ErrorKind::IncorrectSegmentID)
-        } else if segmentid.val == self.pc.len() {
+        } else if segmentid.val == self.pc.len() -1 {
             Ok((VId{val: segmentid.val}, VId{val: 0}))
         } else {
             Ok((VId{val: segmentid.val}, VId{val: segmentid.val + 1}))
