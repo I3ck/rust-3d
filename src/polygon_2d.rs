@@ -93,7 +93,6 @@ impl<P> HasBoundingBox2D for Polygon2D<P>
     }
 }
 
-
 impl<P> HasCenterOfGravity2D for Polygon2D<P>
     where P: Is2D {
 

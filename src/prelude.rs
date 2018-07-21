@@ -56,6 +56,8 @@ pub use Mesh3D;
 pub use PointCloud2D;
 pub use PointCloud3D;
 
+pub use Polygon2D;
+
 pub use View;
 
 pub use HalfEdge;
@@ -76,9 +78,3 @@ pub use filters::FilterOutlier3D;
 
 pub use filters::combinators::*;
 pub use filters::transformers::*;
-
-
-
-
-
-
