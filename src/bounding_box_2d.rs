@@ -120,6 +120,14 @@ impl BoundingBox2D {
            2.0 * self.center_bb().x - other.center_bb().x < ((self.size_x() + other.size_x()).get())
         && 2.0 * self.center_bb().y - other.center_bb().y < ((self.size_y() + other.size_y()).get())
     }
+    /// Tests whether this bounding box crosses a certain x value
+    pub fn crossing_x_value(&self, x: f64) -> bool {
+        self.min.x() < x && self.max.x() > x
+    }
+    /// Tests whether this bounding box crosses a certain y value
+    pub fn crossing_y_value(&self, y: f64) -> bool {
+        self.min.y() < y && self.max.y() > y
+    }
 }
 
 impl Default for BoundingBox2D {

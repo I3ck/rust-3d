@@ -47,6 +47,22 @@ impl<HB> AABBTree2D<HB> where
         }
     }
 
+    pub fn crossing_x_value(&self, x: f64) -> Vec<&HB> {
+        match self {
+            AABBTree2D::Empty          => Vec::new(),
+            AABBTree2D::Leaf(leaf)     => leaf.crossing_x_value(x),
+            AABBTree2D::Branch(branch) => branch.crossing_x_value(x)
+        }
+    }
+
+    pub fn crossing_y_value(&self, y: f64) -> Vec<&HB> {
+        match self {
+            AABBTree2D::Empty          => Vec::new(),
+            AABBTree2D::Leaf(leaf)     => leaf.crossing_y_value(y),
+            AABBTree2D::Branch(branch) => branch.crossing_y_value(y)
+        }
+    }
+
     fn new_rec(data: Vec<HB>, maxdepth: usize, depth: usize) -> Self {
         match data.len() {
             0 => AABBTree2D::Empty,
@@ -132,6 +148,32 @@ impl<HB> AABBTree2DLeaf<HB> where
         }
         result
     }
+
+    pub fn crossing_x_value(&self, x: f64) -> Vec<&HB> {
+        let mut result = Vec::new();
+        if !self.bb.crossing_x_value(x) {
+            return result;
+        }
+        for d in self.data.iter() {
+            if d.bounding_box().unwrap().crossing_x_value(x) { //unwrap fine due to early return in new
+                result.push(d)
+            }
+        }
+        result
+    }
+
+    pub fn crossing_y_value(&self, y: f64) -> Vec<&HB> {
+        let mut result = Vec::new();
+        if !self.bb.crossing_y_value(y) {
+            return result;
+        }
+        for d in self.data.iter() {
+            if d.bounding_box().unwrap().crossing_y_value(y) { //unwrap fine due to early return in new
+                result.push(d)
+            }
+        }
+        result
+    }
 }
 
 //todo describe
@@ -158,6 +200,26 @@ impl<HB> AABBTree2DBranch<HB> where
 
         let mut result = self.left.bb_colliding(bb);
         result.append(&mut self.right.bb_colliding(bb));
+        result
+    }
+
+    pub fn crossing_x_value(&self, x: f64) -> Vec<&HB> {
+        if !self.bb.crossing_x_value(x) {
+            return Vec::new();
+        }
+
+        let mut result = self.left.crossing_x_value(x);
+        result.append(&mut self.right.crossing_x_value(x));
+        result
+    }
+
+    pub fn crossing_y_value(&self, y: f64) -> Vec<&HB> {
+        if !self.bb.crossing_y_value(y) {
+            return Vec::new();
+        }
+
+        let mut result = self.left.crossing_y_value(y);
+        result.append(&mut self.right.crossing_y_value(y));
         result
     }
 }

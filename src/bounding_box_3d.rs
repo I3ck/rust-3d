@@ -138,6 +138,18 @@ impl BoundingBox3D {
         && 2.0 * self.center_bb().y - other.center_bb().y < ((self.size_y() + other.size_y()).get())
         && 2.0 * self.center_bb().z - other.center_bb().z < ((self.size_z() + other.size_z()).get())
     }
+    /// Tests whether this bounding box crosses a certain x value
+    pub fn crossing_x_value(&self, x: f64) -> bool {
+        self.min.x() < x && self.max.x() > x
+    }
+    /// Tests whether this bounding box crosses a certain y value
+    pub fn crossing_y_value(&self, y: f64) -> bool {
+        self.min.y() < y && self.max.y() > y
+    }
+    /// Tests whether this bounding box crosses a certain z value
+    pub fn crossing_z_value(&self, z: f64) -> bool {
+        self.min.z() < z && self.max.z() > z
+    }
 }
 
 impl Default for BoundingBox3D {
