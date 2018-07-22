@@ -114,6 +114,9 @@ pub mod distances_3d;
 pub mod distances_nd;
 pub mod test_helper;
 
+mod           aa_bb_tree_2d;
+pub use self::aa_bb_tree_2d::AABBTree2D;
+
 mod           point_2d;
 pub use self::point_2d::Point2D;
 

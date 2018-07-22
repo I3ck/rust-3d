@@ -23,6 +23,8 @@ pub use interpolation_2d::*;
 pub use traits::*;
 pub use algorithms::*;
 
+pub use AABBTree2D;
+
 pub use Positive;
 pub use NonNegative;
 

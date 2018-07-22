@@ -169,3 +169,35 @@ impl IsScalable for BoundingBox2D {
         self.max.set_pos(max_x, max_y);
     }
 }
+
+impl IsMergeable for BoundingBox2D {
+    fn consume(&mut self, other: Self) {
+        let (mut min_x, mut min_y) = (self.min.x(), self.min.y());
+        let (mut max_x, mut max_y) = (self.max.x(), self.max.y());
+
+        if other.min.x() < min_x { min_x = other.min.x() }
+        if other.min.y() < min_y { min_y = other.min.y() }
+
+        if other.max.x() < max_x { max_x = other.max.x() }
+        if other.max.y() < max_y { max_y = other.max.y() }
+
+        self.min.set_pos(min_x, min_y);
+        self.max.set_pos(max_x, max_y);
+    }
+
+    fn combine(&self, other: &Self) -> Self {
+        let (mut min_x, mut min_y) = (self.min.x(), self.min.y());
+        let (mut max_x, mut max_y) = (self.max.x(), self.max.y());
+
+        if other.min.x() < min_x { min_x = other.min.x() }
+        if other.min.y() < min_y { min_y = other.min.y() }
+
+        if other.max.x() < max_x { max_x = other.max.x() }
+        if other.max.y() < max_y { max_y = other.max.y() }
+
+        let min = Point2D::new(min_x, min_y);
+        let max = Point2D::new(max_x, max_y);
+
+        BoundingBox2D{min, max}
+    }
+}
