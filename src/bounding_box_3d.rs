@@ -219,9 +219,9 @@ impl IsMergeable for BoundingBox3D {
         if other.min.y() < min_y { min_y = other.min.y() }
         if other.min.z() < min_z { min_z = other.min.z() }
 
-        if other.max.x() < max_x { max_x = other.max.x() }
-        if other.max.y() < max_y { max_y = other.max.y() }
-        if other.max.z() < max_z { max_z = other.max.z() }
+        if other.max.x() > max_x { max_x = other.max.x() }
+        if other.max.y() > max_y { max_y = other.max.y() }
+        if other.max.z() > max_z { max_z = other.max.z() }
 
         self.min.set_pos(min_x, min_y, min_z);
         self.max.set_pos(max_x, max_y, max_z);
@@ -235,9 +235,9 @@ impl IsMergeable for BoundingBox3D {
         if other.min.y() < min_y { min_y = other.min.y() }
         if other.min.z() < min_z { min_z = other.min.z() }
 
-        if other.max.x() < max_x { max_x = other.max.x() }
-        if other.max.y() < max_y { max_y = other.max.y() }
-        if other.max.z() < max_z { max_z = other.max.z() }
+        if other.max.x() > max_x { max_x = other.max.x() }
+        if other.max.y() > max_y { max_y = other.max.y() }
+        if other.max.z() > max_z { max_z = other.max.z() }
 
         let min = Point3D::new(min_x, min_y, min_z);
         let max = Point3D::new(max_x, max_y, max_z);

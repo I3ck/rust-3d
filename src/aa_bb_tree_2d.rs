@@ -79,13 +79,17 @@ impl<HB> AABBTree2D<HB> where
                     let mut bb = Self::bb_of(&data).unwrap(); //unwrap fine due to early return in new and data not empty
                     let center = bb.center_bb();
 
-                    let dleft  = data.iter().cloned().filter(|x| Self::is_left_of(compx,  &x.bounding_box().unwrap(), &center)).collect(); //unwrap fine due to early return in new
-                    let dright = data.iter().cloned().filter(|x| Self::is_right_of(compx, &x.bounding_box().unwrap(), &center)).collect(); //unwrap fine due to early return in new
+                    let dleft  = data.iter().cloned().filter(|x| Self::is_left_of(compx,  &x.bounding_box().unwrap(), &center)).collect::<Vec<_>>(); //unwrap fine due to early return in new
+                    let dright = data.iter().cloned().filter(|x| Self::is_right_of(compx, &x.bounding_box().unwrap(), &center)).collect::<Vec<_>>(); //unwrap fine due to early return in new
 
-                    let left   = Box::new(Self::new_rec(dleft, maxdepth, depth+1));
-                    let right  = Box::new(Self::new_rec(dright, maxdepth, depth+1));
+                    if (dleft.len() == dright.len()) && dleft.len() == data.len() {
+                        AABBTree2D::Leaf(AABBTree2DLeaf::new(data, bb))
+                    } else {
+                        let left  = Box::new(Self::new_rec(dleft, maxdepth, depth+1));
+                        let right = Box::new(Self::new_rec(dright, maxdepth, depth+1));
 
-                    AABBTree2D::Branch(AABBTree2DBranch::new(left, right, bb))
+                        AABBTree2D::Branch(AABBTree2DBranch::new(left, right, bb))
+                    }
                 }
             }
         }
