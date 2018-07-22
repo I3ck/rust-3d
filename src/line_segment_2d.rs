@@ -50,10 +50,7 @@ impl HasLength for LineSegment2D {
 
 impl HasBoundingBox2D for LineSegment2D {
     fn bounding_box(&self) -> Result<BoundingBox2D> {
-        let mut pts = Vec::new();
-        pts.push(Box::new(self.start.clone()));
-        pts.push(Box::new(self.end.clone()));
-        BoundingBox2D::from_iterator(pts.iter())
+        BoundingBox2D::from_iterator(&[self.start.clone(), self.end.clone()])
     }
 }
 
@@ -66,7 +63,7 @@ impl HasCenterOfGravity2D for LineSegment2D {
 impl IsScalable for LineSegment2D {
     fn scale(&mut self, factor: Positive) {
         let c = self.bounding_box().unwrap().center_bb(); //always known
-        
+
         self.start.increase_distance_to_by(&c, factor);
         self.end.increase_distance_to_by(&c, factor);
     }

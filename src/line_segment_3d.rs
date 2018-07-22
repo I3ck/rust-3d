@@ -50,10 +50,7 @@ impl HasLength for LineSegment3D {
 
 impl HasBoundingBox3D for LineSegment3D {
     fn bounding_box(&self) -> Result<BoundingBox3D> {
-        let mut pts = Vec::new();
-        pts.push(Box::new(self.start.clone()));
-        pts.push(Box::new(self.end.clone()));
-        BoundingBox3D::from_iterator(pts.iter())
+        BoundingBox3D::from_iterator(&[self.start.clone(), self.end.clone()])
     }
 }
 
