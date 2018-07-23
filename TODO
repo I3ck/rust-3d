@@ -108,3 +108,6 @@ write as generic as possible helpers for operators and call these in the concret
 3d version of AABBTree
 
 new types such as AABBTree missing docs
+
+douglas peucker 3D version (or generic?) also consider rewriting it to not require PC as type
+proper docs / cleanup of douglas peucker
