@@ -59,6 +59,7 @@ pub use PointCloud2D;
 pub use PointCloud3D;
 
 pub use Polygon2D;
+pub use Polygon3D;
 
 pub use View;
 
