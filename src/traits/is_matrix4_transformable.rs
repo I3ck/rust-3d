@@ -15,7 +15,6 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsMatrix4Transformable trait used for types that can be transformed by a 4x4 Matrix
 
-
 use prelude::*;
 
 /// IsMatrix4Transformable trait used for types that can be transformed by a 4x4 Matrix

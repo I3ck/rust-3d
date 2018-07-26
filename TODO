@@ -111,3 +111,5 @@ new types such as AABBTree missing docs
 
 douglas peucker 3D version (or generic?) also consider rewriting it to not require PC as type
 proper docs / cleanup of douglas peucker
+
+implement IsMatrix4Transformable and 3 for more types

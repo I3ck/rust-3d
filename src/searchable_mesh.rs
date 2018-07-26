@@ -20,9 +20,9 @@ use prelude::*;
 use std::marker::PhantomData;
 
 /// SearchableMesh, transforms IsMesh to IsSearchableMesh
-pub struct SearchableMesh<M, T> where 
+pub struct SearchableMesh<M, T> where
     M: IsMesh<T, Face3> {
-    
+
     mesh: M,
     he: HalfEdge,
     phantomt: PhantomData<T>
@@ -51,7 +51,7 @@ impl<M, T> SearchableMesh<M, T> where
 
 impl<M, T> IsMesh<T, Face3> for SearchableMesh<M, T> where
     M: IsMesh<T, Face3> {
-    
+
     fn num_faces(&self) -> usize {
         self.mesh.num_faces()
     }
@@ -143,11 +143,8 @@ impl<M, T> HasCenterOfGravity3D for SearchableMesh<M, T> where
 
 impl<M, T> IsScalable for SearchableMesh<M, T> where
     M: IsMesh<T, Face3> + IsScalable {
-    
+
     fn scale(&mut self, factor: Positive) {
         self.mesh.scale(factor);
     }
 }
-    
-
-

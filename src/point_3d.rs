@@ -187,6 +187,16 @@ impl IsTransFormableTo2D for Point3D {
     }
 }
 
+impl IsMatrix4Transformable for Point3D {
+    fn transformed(&self, m: &Matrix4) -> Self {
+        self.multiply_m(m)
+    }
+    fn transform(&mut self, m: &Matrix4) {
+        let new = self.multiply_m(m);
+        *self = new;
+    }
+}
+
 impl fmt::Display for Point3D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({}, {}, {})", self.x, self.y, self.z)

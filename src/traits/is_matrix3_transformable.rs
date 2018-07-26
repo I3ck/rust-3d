@@ -15,7 +15,6 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 //! IsMatrix3Transformable trait used for types that can be transformed by a 3x3 Matrix
 
-
 use prelude::*;
 
 /// IsMatrix3Transformable trait used for types that can be transformed by a 3x3 Matrix

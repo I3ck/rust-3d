@@ -123,6 +123,20 @@ impl<P> IsScalable for Polygon3D<P> where
     }
 }
 
+impl<P> IsMatrix4Transformable for Polygon3D<P> where
+    P: Is3D + IsMatrix4Transformable + Clone {
+
+    fn transformed(&self, m: &Matrix4) -> Self {
+        let mut new = self.clone();
+        new.transform(m);
+        new
+    }
+
+    fn transform(&mut self, m: &Matrix4) {
+        self.pc.transform(m);
+    }
+}
+
 impl<P> fmt::Display for Polygon3D<P> where
     P: Is3D + fmt::Display {
 

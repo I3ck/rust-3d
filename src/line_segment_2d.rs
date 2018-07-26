@@ -69,6 +69,19 @@ impl IsScalable for LineSegment2D {
     }
 }
 
+impl IsMatrix3Transformable for LineSegment2D {
+    fn transformed(&self, m: &Matrix3) -> Self {
+        let mut new = self.clone();
+        new.transform(m);
+        new
+    }
+
+    fn transform(&mut self, m: &Matrix3) {
+        self.start.transform(m);
+        self.end.transform(m);
+    }
+}
+
 impl fmt::Display for LineSegment2D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({}, {} -> {}, {})", self.start.x(), self.start.y(), self.end.x(), self.end.y())

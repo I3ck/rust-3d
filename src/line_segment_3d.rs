@@ -69,6 +69,19 @@ impl IsScalable for LineSegment3D {
     }
 }
 
+impl IsMatrix4Transformable for LineSegment3D {
+    fn transformed(&self, m: &Matrix4) -> Self {
+        let mut new = self.clone();
+        new.transform(m);
+        new
+    }
+
+    fn transform(&mut self, m: &Matrix4) {
+        self.start.transform(m);
+        self.end.transform(m);
+    }
+}
+
 impl fmt::Display for LineSegment3D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({}, {}, {} -> {}, {}, {})", self.start.x(), self.start.y(), self.start.z(), self.end.x(), self.end.y(), self.end.z())

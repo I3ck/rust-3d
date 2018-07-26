@@ -253,13 +253,29 @@ impl<P> IsMergeable for PointCloud3D<P> where
 
 impl<P> IsScalable for PointCloud3D<P> where
     P : IsEditable3D {
-    
+
     fn scale(&mut self, factor: Positive) {
         if let Ok(bb) = self.bounding_box() {
             let c = bb.center_bb();
             for p in &mut self.data {
                 p.increase_distance_to_by(&c, factor);
             }
+        }
+    }
+}
+
+impl<P> IsMatrix4Transformable for PointCloud3D<P> where
+    P: Is3D + IsMatrix4Transformable + Clone {
+
+    fn transformed(&self, m: &Matrix4) -> Self {
+        let mut new = self.clone();
+        new.transform(m);
+        new
+    }
+
+    fn transform(&mut self, m: &Matrix4) {
+        for p in &mut self.data {
+            p.transform(m);
         }
     }
 }

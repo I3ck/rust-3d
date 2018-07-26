@@ -126,3 +126,17 @@ impl<P> IsScalable for Mesh3D<P> where
         self.pc.scale(factor);
     }
 }
+
+impl<P> IsMatrix4Transformable for Mesh3D<P> where
+    P: Is3D + IsMatrix4Transformable + Clone {
+
+    fn transformed(&self, m: &Matrix4) -> Self {
+        let mut new = self.clone();
+        new.transform(m);
+        new
+    }
+
+    fn transform(&mut self, m: &Matrix4) {
+        self.pc.transform(m);
+    }
+}

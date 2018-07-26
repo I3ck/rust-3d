@@ -128,7 +128,6 @@ impl<P> IsRandomInsertible<P> for PointCloud2D<P> where
     }
 }
 
-
 impl<P> IsMovable2D for PointCloud2D<P> where
     P: Is2D + IsMovable2D {
 
@@ -246,13 +245,29 @@ impl<P> IsMergeable for PointCloud2D<P> where
 
 impl<P> IsScalable for PointCloud2D<P> where
     P : IsEditable2D {
-    
+
     fn scale(&mut self, factor: Positive) {
         if let Ok(bb) = self.bounding_box() {
             let c = bb.center_bb();
             for p in &mut self.data {
                 p.increase_distance_to_by(&c, factor);
             }
+        }
+    }
+}
+
+impl<P> IsMatrix3Transformable for PointCloud2D<P> where
+    P: Is2D + IsMatrix3Transformable + Clone {
+
+    fn transformed(&self, m: &Matrix3) -> Self {
+        let mut new = self.clone();
+        new.transform(m);
+        new
+    }
+
+    fn transform(&mut self, m: &Matrix3) {
+        for p in &mut self.data {
+            p.transform(m);
         }
     }
 }
