@@ -117,6 +117,9 @@ pub mod test_helper;
 mod           aa_bb_tree_2d;
 pub use self::aa_bb_tree_2d::AABBTree2D;
 
+mod           aa_bb_tree_3d;
+pub use self::aa_bb_tree_3d::AABBTree3D;
+
 mod           point_2d;
 pub use self::point_2d::Point2D;
 
