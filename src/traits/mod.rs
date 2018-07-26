@@ -68,6 +68,12 @@ pub use self::is_editable_mesh::IsEditableMesh;
 mod           is_k_nearest_searchable;
 pub use self::is_k_nearest_searchable::IsKNearestSearchable;
 
+mod           is_matrix3_transformable;
+pub use self::is_matrix3_transformable::IsMatrix3Transformable;
+
+mod           is_matrix4_transformable;
+pub use self::is_matrix4_transformable::IsMatrix4Transformable;
+
 mod           is_sphere_searchable;
 pub use self::is_sphere_searchable::IsSphereSearchable;
 
