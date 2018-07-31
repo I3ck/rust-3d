@@ -20,7 +20,7 @@ use std::fmt;
 use prelude::*;
 use distances_2d::*;
 
-#[derive (Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
+#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Polygon2D, a polygon within 2D space
 pub struct Polygon2D<P> where
     P: Is2D {
@@ -142,6 +142,15 @@ impl<P> fmt::Display for Polygon2D<P> where
 
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.pc.fmt(f) //@todo consider output similar to Line2D
+    }
+}
+
+impl<P> Default for Polygon2D<P> where //https://github.com/rust-lang/rust/issues/26925
+    P: Is2D {
+
+    fn default() -> Self {
+        let pc = PointCloud2D::default();
+        Polygon2D{pc}
     }
 }
 

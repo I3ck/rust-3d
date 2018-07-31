@@ -23,7 +23,7 @@ use prelude::*;
 use distances_3d::*;
 use functions::{sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z};
 
-#[derive (Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
+#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// PointCloud3D, a collection of positions within 3D space
 pub struct PointCloud3D<P> where
     P: Is3D {
@@ -277,6 +277,15 @@ impl<P> IsMatrix4Transformable for PointCloud3D<P> where
         for p in &mut self.data {
             p.transform(m);
         }
+    }
+}
+
+impl<P> Default for PointCloud3D<P> where //https://github.com/rust-lang/rust/issues/26925
+    P: Is3D {
+
+    fn default() -> Self {
+        let data = Vec::new();
+        PointCloud3D{data}
     }
 }
 

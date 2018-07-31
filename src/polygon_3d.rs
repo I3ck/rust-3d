@@ -20,7 +20,7 @@ use std::fmt;
 use prelude::*;
 use distances_3d::*;
 
-#[derive (Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
+#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Polygon3D, a polygon within 3D space
 pub struct Polygon3D<P> where
     P: Is3D {
@@ -134,6 +134,15 @@ impl<P> IsMatrix4Transformable for Polygon3D<P> where
 
     fn transform(&mut self, m: &Matrix4) {
         self.pc.transform(m);
+    }
+}
+
+impl<P> Default for Polygon3D<P> where //https://github.com/rust-lang/rust/issues/26925
+    P: Is3D {
+
+    fn default() -> Self {
+        let pc = PointCloud3D::default();
+        Polygon3D{pc}
     }
 }
 

@@ -23,7 +23,7 @@ use prelude::*;
 use distances_2d::*;
 use functions::{sort_vec_2d_x, sort_vec_2d_y};
 
-#[derive (Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
+#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// PointCloud2D, a collection of positions within 2D space
 pub struct PointCloud2D<P> where
     P: Is2D {
@@ -269,6 +269,15 @@ impl<P> IsMatrix3Transformable for PointCloud2D<P> where
         for p in &mut self.data {
             p.transform(m);
         }
+    }
+}
+
+impl<P> Default for PointCloud2D<P> where //https://github.com/rust-lang/rust/issues/26925
+    P: Is2D {
+
+    fn default() -> Self {
+        let data = Vec::new();
+        PointCloud2D{data}
     }
 }
 
