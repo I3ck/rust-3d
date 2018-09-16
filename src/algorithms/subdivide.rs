@@ -24,7 +24,7 @@ use std::collections::HashMap;
 /// This will not smoothen the input mesh, since new vertices are placed only on existing edges
 pub fn linear<V, MI, MO>(mi: &MI) -> Result<(MO)> where
     MI: IsMesh<V, Face3>,
-    MO: IsEditableMesh<V, Face3> + Default,
+    MO: IsFaceEditableMesh<V, Face3> + IsVertexEditableMesh<V, Face3> + Default,
     V:  IsBuildableND {
     
     let mut mo = MO::default();

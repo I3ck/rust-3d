@@ -62,8 +62,11 @@ pub use self::is_random_accessible::IsRandomAccessible;
 mod           is_random_insertible;
 pub use self::is_random_insertible::IsRandomInsertible;
 
-mod           is_editable_mesh;
-pub use self::is_editable_mesh::IsEditableMesh;
+mod           is_face_editable_mesh;
+pub use self::is_face_editable_mesh::IsFaceEditableMesh;
+
+mod           is_vertex_editable_mesh;
+pub use self::is_vertex_editable_mesh::IsVertexEditableMesh;
 
 mod           is_k_nearest_searchable;
 pub use self::is_k_nearest_searchable::IsKNearestSearchable;

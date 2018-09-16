@@ -129,7 +129,7 @@ pub fn save_ply_binary<M, P>(mesh: &M, filepath: &str, precision: &Precision) ->
 // @todo allows incorrect headers and might fail on correct ones
 /// Loads an IsMesh3D from the ASCII .ply file format
 pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()> where
-    EM: IsEditableMesh<P, Face3>,
+    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone {
 
         let mut f       = BufReader::new(File::open(filepath)?);
@@ -285,7 +285,7 @@ fn collect_index_line(line: &str, indices: &mut Vec<usize>) -> Result<()> {
 }
 
 fn fill_mesh<EM, P>(vertices: Vec<P>, indices: Vec<usize>, mesh: &mut EM) -> Result<()> where
-    EM: IsEditableMesh<P, Face3>,
+    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone {
 
     if indices.len() == 0 {

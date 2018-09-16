@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Martin Buck
+Copyright 2018 Martin Buck
 This file is part of rust-3d.
 rust-3d is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -13,19 +13,15 @@ You should have received a copy of the GNU Lesser General Public License
 along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//! IsEditableMesh trait used for meshes which can be edited
+//! IsVertexEditableMesh trait used for meshes with editable vertex data
 
 use prelude::*;
 
-/// IsEditableMesh is a trait used for meshes which can be edited
-pub trait IsEditableMesh<V, TU> : IsMesh<V, TU> where
+/// IsVertexEditableMesh trait used for meshes with editable vertex data
+pub trait IsVertexEditableMesh<V, TU> : IsMesh<V, TU> where
     TU: IsTopologyUnit {
     /// Should add a vertex to the end and return its id
     fn add_vertex(&mut self, vertex: V) -> VId;
     /// Should change vertex at vId to the given vertex returning an error on failure
     fn change_vertex(&mut self, vid: VId, vertex: V) -> Result<()>;
-    /// Should add a face with the 3 positions. Also should return the id of the new face
-    fn add_face(&mut self, v1: V, v2: V, v3: V) -> FId;
-    /// Should add a face to the mesh by connecting the vertices via their ids. Should return the id of the newly added face
-    fn try_add_connection(&mut self, vid1: VId, vid2: VId, vid3: VId) -> Result<FId>;
 }

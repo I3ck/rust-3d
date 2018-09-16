@@ -65,22 +65,8 @@ impl<P> IsMesh<P, Face3> for Mesh3D<P> where
     }
 }
 
-impl<P> IsEditableMesh<P, Face3> for Mesh3D<P> where
+impl<P> IsFaceEditableMesh<P, Face3> for Mesh3D<P> where
     P: IsEditable3D + IsBuildable3D + Clone {
-
-    fn add_vertex(&mut self, vertex: P) -> VId {
-        self.pc.push(vertex);
-        VId{val: self.pc.len() - 1}
-    }
-
-    fn change_vertex(&mut self, vid: VId, vertex: P) -> Result<()> {
-        if vid.val < self.pc.len() {
-            self.pc[vid.val] = vertex;
-            Ok(())
-        } else {
-            Err(ErrorKind::IncorrectVertexID)
-        }
-    }
 
     fn add_face(&mut self, v1: P, v2: P, v3: P) -> FId {
         let vid1 = self.add_vertex(v1);
@@ -100,6 +86,24 @@ impl<P> IsEditableMesh<P, Face3> for Mesh3D<P> where
         self.topology.push(vid2);
         self.topology.push(vid3);
         Ok(FId{val: self.topology.len() / 3 - 1})
+    }
+}
+
+impl<P> IsVertexEditableMesh<P, Face3> for Mesh3D<P> where
+    P: IsEditable3D + IsBuildable3D + Clone {
+
+    fn add_vertex(&mut self, vertex: P) -> VId {
+        self.pc.push(vertex);
+        VId{val: self.pc.len() - 1}
+    }
+
+    fn change_vertex(&mut self, vid: VId, vertex: P) -> Result<()> {
+        if vid.val < self.pc.len() {
+            self.pc[vid.val] = vertex;
+            Ok(())
+        } else {
+            Err(ErrorKind::IncorrectVertexID)
+        }
     }
 }
 
