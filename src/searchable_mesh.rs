@@ -73,6 +73,19 @@ impl<M, T> IsMesh<T, Face3> for SearchableMesh<M, T> where
     }
 }
 
+impl<M, T> IsVertexEditableMesh<T, Face3> for SearchableMesh<M, T> where
+    M: IsMesh<T, Face3> + IsVertexEditableMesh<T, Face3>,
+    T: IsEditable3D + IsBuildable3D + Clone {
+
+    fn add_vertex(&mut self, vertex: T) -> VId {
+        self.mesh.add_vertex(vertex)
+    }
+
+    fn change_vertex(&mut self, vid: VId, vertex: T) -> Result<()> {
+        self.mesh.change_vertex(vid, vertex)
+    }
+}
+
 impl<M, T> IsSearchableMesh<T, Face3> for SearchableMesh<M, T> where
     M: IsMesh<T, Face3> {
 
