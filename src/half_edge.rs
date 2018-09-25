@@ -67,7 +67,11 @@ impl HalfEdge {
         // @todo could let this fail if there is more than one valid candidate (not manifold)
         for i in 0..result.edges.len() {
             let _ = result.next(EId{val: i})
-                .and_then(|next_id| result.edges_originating(result.edges[next_id.val].tail))
+                .and_then(|next_id| {
+                    let mut cache = Vec::new(); //@todo try doing this in outer scope
+                    result.edges_originating(result.edges[next_id.val].tail, &mut cache)?;
+                    Ok(cache)
+                })
                 .map(|originating_ids| for originating_id in originating_ids {
                     let _ = result.next(originating_id)
                         .map(|candidate_id| if result.edges[candidate_id.val].tail == result.edges[i].tail {
@@ -108,47 +112,51 @@ impl HalfEdge {
         }
         Ok(EId{val: id.val - 1})
     }
-    /// Returns all edges originating (pointing away) from the given vertex (error if id out of bounds)
-    pub fn edges_originating(&self, id: VId) -> Result<Vec<EId>> {
+    /// Appends all edges originating (pointing away) from the given vertex (error if id out of bounds)
+    pub fn edges_originating(&self, id: VId, result: &mut Vec<EId>) -> Result<()> {
         self.ensure_vertex_id(id)?;
-        Ok(self.vertices_start_edges[id.val].clone())
+        result.extend(self.vertices_start_edges[id.val].iter().cloned());
+        Ok(())
     }
-    /// Returns all edges ending (pointing at) the given vertex (error if id out of bounds)
-    pub fn edges_ending(&self, id: VId) -> Result<Vec<EId>> {
-        let originatings = self.edges_originating(id)?;
-        let mut result = Vec::with_capacity(originatings.len());
-        for edge in originatings {
-            match self.prev(edge) {
+    /// Appends all edges ending (pointing at) the given vertex (error if id out of bounds)
+    /// cache is used to avoid allocations, pass any Vec
+    pub fn edges_ending(&self, id: VId, cache: &mut Vec<EId>, result: &mut Vec<EId>) -> Result<()> {
+        cache.clear();
+        self.edges_originating(id, cache)?;
+        for edge in cache {
+            match self.prev(*edge) {
                 Err(_) => {},
                 Ok(id) => result.push(id)
             }
         }
-        Ok(result)
+        Ok(())
     }
-    /// Returns all edges connected to the vertex (both originating and ending) (error if id out of bounds)
-    pub fn edges_all(&self, id: VId) -> Result<Vec<EId>> {
-        let originatings = self.edges_originating(id)?;
-        let mut result = Vec::with_capacity(originatings.len());
-        for edge in originatings {
-            result.push(edge);
-            match self.prev(edge) {
+    /// Appends all edges connected to the vertex (both originating and ending) (error if id out of bounds)
+    /// cache is used to avoid allocations, pass any Vec
+    pub fn edges_all(&self, id: VId, cache: &mut Vec<EId>, result: &mut Vec<EId>) -> Result<()> {
+        cache.clear();
+        self.edges_originating(id, cache)?;
+        for edge in cache {
+            result.push(*edge);
+            match self.prev(*edge) {
                 Err(_) => {},
                 Ok(id) => result.push(id)
             }
         }
-        Ok(result)
+        Ok(())
     }
-    /// Returns all faces a vertex is part of (error if id out of bounds)
-    pub fn faces(&self, id: VId) -> Result<Vec<FId>> {
-        let originatings = self.edges_originating(id)?;
-        let mut result = Vec::with_capacity(originatings.len());
-        for edge in originatings {
-            match self.face(edge) {
+    /// Appends all faces a vertex is part of (error if id out of bounds)
+    /// cache is used to avoid allocations, pass any Vec
+    pub fn faces(&self, id: VId, cache: &mut Vec<EId>, result: &mut Vec<FId>) -> Result<()> {
+        cache.clear();
+        self.edges_originating(id, cache)?;
+        for edge in cache {
+            match self.face(*edge) {
                 Err(_) => {}
                 Ok(id) => result.push(id)
             }
         }
-        Ok(result)
+        Ok(())
     }
     /// Returns true if the give edge is the first within a face
     fn first_in_face(id: EId) -> bool {
@@ -173,4 +181,3 @@ impl HalfEdge {
         Ok(())
     }
 }
-

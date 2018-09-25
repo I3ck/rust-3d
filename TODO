@@ -113,3 +113,5 @@ douglas peucker 3D version (or generic?) also consider rewriting it to not requi
 proper docs / cleanup of douglas peucker
 
 implement IsMatrix4Transformable and 3 for more types
+
+avoid allocations (return of Vec)

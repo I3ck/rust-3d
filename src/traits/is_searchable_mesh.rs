@@ -21,12 +21,12 @@ use prelude::*;
 pub trait IsSearchableMesh<V, TU> : IsMesh<V, Face3> {
     /// Should return the edge ids of the given face. Error if id invalid
     fn edges_of_face(&self, faceid: FId) -> Result<(EId, EId, EId)>;
-    /// Should return the edges originating at the given vertex (pointing away / having the vertex as tail). Error if id invalid
-    fn edges_originating_from_vertex(&self, vertexid: VId) -> Result<Vec<EId>>;
-    /// Should return the edges ending at the given vertex (pointing to / having the vertex as head). Error if id invalid
-    fn edges_ending_at_vertex(&self, vertexid: VId) -> Result<Vec<EId>>;
-    /// Should return the edges connecting with the vertex. Error if id invalid
-    fn edges_of_vertex(&self, vertexid: VId) -> Result<Vec<EId>>;
+    /// Should append the edges originating at the given vertex (pointing away / having the vertex as tail). Error if id invalid
+    fn edges_originating_from_vertex(&self, vertexid: VId, result: &mut Vec<EId>) -> Result<()>;
+    /// Should append the edges ending at the given vertex (pointing to / having the vertex as head). Error if id invalid
+    fn edges_ending_at_vertex(&self, vertexid: VId, result: &mut Vec<EId>) -> Result<()>;
+    /// Should append the edges connecting with the vertex. Error if id invalid
+    fn edges_of_vertex(&self, vertexid: VId, result: &mut Vec<EId>) -> Result<()>;
     /// Should return the vertex id of the edge's tail. Error if id invalid
     fn edge_tail(&self, edgeid: EId) -> Result<VId>;
     /// Should return the vertex id of the edge's head. Error if id invalid
@@ -44,21 +44,20 @@ pub trait IsSearchableMesh<V, TU> : IsMesh<V, Face3> {
     fn num_edges(&self) -> usize {
         self.num_faces() * 3
     }
-    /// Returns faces a vertex is part of. Error if id invalid
-    fn faces_of_vertex(&self, vertexid: VId) -> Result<Vec<FId>> {
-        let edgeids = self.edges_originating_from_vertex(vertexid)?;
+    /// Appends faces a vertex is part of. Error if id invalid
+    fn faces_of_vertex(&self, vertexid: VId, result: &mut Vec<FId>) -> Result<()> {
+        let mut edgeids = Vec::new(); //@todo try to avoid this
+        self.edges_originating_from_vertex(vertexid, &mut edgeids)?;
 
-        let mut result = Vec::with_capacity(edgeids.len());
         for edgeid in edgeids {
             self.edge_face(edgeid).map(|faceid| result.push(faceid))?;
         }
-        Ok(result)
+        Ok(())
     }
-    /// Returns the neighbouring faces of the given face which share the same edges. Error if id invalid
-    fn face_edge_neighbours(&self, faceid: FId) -> Result<Vec<FId>> {
+    /// Appends the neighbouring faces of the given face which share the same edges. Error if id invalid
+    fn face_edge_neighbours(&self, faceid: FId, result: &mut Vec<FId>) -> Result<()> {
         let (e1, e2, e3) = self.edges_of_face(faceid)?;
 
-        let mut result = Vec::new();
         {
             let mut add_twin_face = |edgeid| self.edge_twin(edgeid).map(|option| match option {
                 None => {}
@@ -69,18 +68,14 @@ pub trait IsSearchableMesh<V, TU> : IsMesh<V, Face3> {
             add_twin_face(e2)?;
             add_twin_face(e3)?;
         }
-        Ok(result)
+        Ok(())
     }
-    /// Returns the neighbouring faces of the given face which share the same vertices. Error if id invalid
-    fn face_vertex_neighbours(&self, faceid: FId) -> Result<Vec<FId>> {
+    /// Appends the neighbouring faces of the given face which share the same vertices. Sorts and dedups the result. Error if id invalid
+    fn face_vertex_neighbours(&self, faceid: FId, result: &mut Vec<FId>) -> Result<()> {
         let vids = self.face_vertex_ids(faceid)?;
 
-        let mut result = Vec::new();
         {
-            let mut add_vertex_faces = |vertexid| self.faces_of_vertex(vertexid)
-                .map(|fids| for fid in fids {
-                    result.push(fid);
-                });
+            let mut add_vertex_faces = |vertexid| self.faces_of_vertex(vertexid, result);
 
             add_vertex_faces(vids.a)?;
             add_vertex_faces(vids.b)?;
@@ -88,6 +83,6 @@ pub trait IsSearchableMesh<V, TU> : IsMesh<V, Face3> {
         }
         result.sort();
         result.dedup();
-        Ok(result)
+        Ok(())
     }
 }
