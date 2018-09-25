@@ -104,14 +104,12 @@ impl<M, T> IsSearchableMesh<T, Face3> for SearchableMesh<M, T> where
         self.he.edges_originating(vertexid, result)
     }
 
-    fn edges_ending_at_vertex(&self, vertexid: VId, result: &mut Vec<EId>) -> Result<()> {
-        let mut cache = Vec::new(); //@todo avoid
-        self.he.edges_ending(vertexid, &mut cache, result)
+    fn edges_ending_at_vertex(&self, vertexid: VId, cache: &mut Vec<EId>, result: &mut Vec<EId>) -> Result<()> {
+        self.he.edges_ending(vertexid, cache, result)
     }
 
-    fn edges_of_vertex(&self, vertexid: VId, result: &mut Vec<EId>) -> Result<()> {
-        let mut cache = Vec::new(); //@todo avoid
-        self.he.edges_all(vertexid, &mut cache, result)
+    fn edges_of_vertex(&self, vertexid: VId, cache: &mut Vec<EId>, result: &mut Vec<EId>) -> Result<()> {
+        self.he.edges_all(vertexid, cache, result)
     }
 
     fn edge_tail(&self, edgeid: EId) -> Result<VId> {
