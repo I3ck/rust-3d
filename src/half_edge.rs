@@ -115,7 +115,7 @@ impl HalfEdge {
     /// Appends all edges originating (pointing away) from the given vertex (error if id out of bounds)
     pub fn edges_originating(&self, id: VId, result: &mut Vec<EId>) -> Result<()> {
         self.ensure_vertex_id(id)?;
-        result.extend(self.vertices_start_edges[id.val].iter().cloned());
+        result.extend(&self.vertices_start_edges[id.val]);
         Ok(())
     }
     /// Appends all edges ending (pointing at) the given vertex (error if id out of bounds)
