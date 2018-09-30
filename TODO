@@ -115,3 +115,5 @@ proper docs / cleanup of douglas peucker
 implement IsMatrix4Transformable and 3 for more types
 
 avoid allocations (return of Vec)
+
+trait Colorized? or somehow offer the option to add colors to a type instead of carrying the colors extra

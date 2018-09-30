@@ -216,6 +216,9 @@ pub use self::non_negative::NonNegative;
 mod           result;
 pub use self::result::Result;
 
+mod           rgb;
+pub use self::rgb::Rgb;
+
 mod           face3;
 pub use self::face3::Face3;
 

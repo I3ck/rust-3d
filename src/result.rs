@@ -42,6 +42,7 @@ pub enum ErrorKind {
     NumberConversionError,
     NumberInWrongRange,
     ComparisionFailed,
+    ColorArrayIncorrectLength,
     PlyError(PlyError)
 }
 
@@ -81,6 +82,7 @@ impl ErrorKind {
             ErrorKind::NumberConversionError     => "Failed converting one number type to another",
             ErrorKind::NumberInWrongRange        => "Passed number is within the wrong range",
             ErrorKind::ComparisionFailed         => "Comparision between two values failed",
+            ErrorKind::ColorArrayIncorrectLength => "The provided color array has an incorrect length",
             ErrorKind::PlyError(x)               => x.as_str()
         }
     }

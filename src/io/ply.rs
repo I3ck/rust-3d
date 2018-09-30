@@ -21,6 +21,7 @@ extern crate byteorder;
 use prelude::*;
 
 use utils::to_words;
+use rgb::Rgb;
 
 use self::core::str::FromStr;
 use std::io::prelude::*;
@@ -59,16 +60,56 @@ pub fn save_ply_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()> where
     Ok(())
 }
 
+/// Saves an IsMesh3D in the ASCII .ply file format with additional colors
+pub fn save_ply_ascii_colored<M, P>(mesh: &M, filepath: &str, colors: &Vec<Rgb>) -> Result<()> where
+    M: IsMesh<P, Face3>,
+    P: IsBuildable3D {
+
+    let n_vertices = mesh.num_vertices();
+    let n_faces    = mesh.num_faces();
+
+    if n_vertices != colors.len() { return Err(ErrorKind::ColorArrayIncorrectLength) }
+
+    let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
+
+    let header = "ply\n".to_string()
+                   + "format ascii 1.0\n"
+                   + "comment Created by rust-3d\n"
+                   + "element vertex " + &n_vertices.to_string() + "\n"
+                   + "property float x\n"
+                   + "property float y\n"
+                   + "property float z\n"
+                   + "property uchar red\n"
+                   + "property uchar green\n"
+                   + "property uchar blue\n"
+                   + "element face " + &n_faces.to_string() + "\n"
+                   + "property list uchar uint vertex_indices\n"
+                   + "end_header\n";
+    f.write_all(header.as_bytes()).map_err(|e| e.to_error_kind())?;
+
+    for i in 0..n_vertices {
+        let vertex = mesh.vertex(VId{val: i})?;
+        let color = &colors[i];
+        f.write_all(format!("{} {} {} {} {} {}\n", vertex.x(), vertex.y(), vertex.z(), color.r, color.g, color.b).as_bytes()).map_err(|e| e.to_error_kind())?;
+    }
+
+    for i in 0..n_faces {
+        let face = mesh.face_vertex_ids(FId{val: i})?;
+        f.write_all(("3 ".to_string() + &face.a.to_string() + " " + &face.b.to_string() + " " + &face.c.to_string() + "\n").as_bytes()).map_err(|e| e.to_error_kind())?;
+    }
+    Ok(())
+}
+
 /// Saves an IsMesh3D in the binary .ply file format
 pub fn save_ply_binary<M, P>(mesh: &M, filepath: &str, precision: &Precision) -> Result<()> where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D {
 
     let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
-    
+
     let header = match precision {
         Precision::P32 => {
-            "ply\n".to_string() 
+            "ply\n".to_string()
                 + "format binary_big_endian 1.0\n"
                 + "comment Created by rust-3d\n"
                 + "element vertex " + &mesh.num_vertices().to_string() + "\n"
@@ -92,9 +133,9 @@ pub fn save_ply_binary<M, P>(mesh: &M, filepath: &str, precision: &Precision) ->
                 + "end_header\n"
         }
     };
-    
+
     f.write_all(header.as_bytes()).map_err(|e| e.to_error_kind())?;
-    
+
     match precision {
         Precision::P32 => {
             for i in 0..mesh.num_vertices() {
@@ -114,8 +155,94 @@ pub fn save_ply_binary<M, P>(mesh: &M, filepath: &str, precision: &Precision) ->
             }
         }
     }
-    
+
     for i in 0..mesh.num_faces() {
+        let face = mesh.face_vertex_ids(FId{val: i})?;
+        f.write_u8(3).map_err(|e| e.to_error_kind())?;
+        f.write_u32::<BigEndian>(face.a.val as u32).map_err(|e| e.to_error_kind())?;
+        f.write_u32::<BigEndian>(face.b.val as u32).map_err(|e| e.to_error_kind())?;
+        f.write_u32::<BigEndian>(face.c.val as u32).map_err(|e| e.to_error_kind())?;
+    }
+
+    Ok(())
+}
+
+/// Saves an IsMesh3D in the binary .ply file format with additional colors
+pub fn save_ply_binary_colored<M, P>(mesh: &M, filepath: &str, precision: &Precision, colors: &Vec<Rgb>) -> Result<()> where
+    M: IsMesh<P, Face3>,
+    P: IsBuildable3D {
+
+    let n_vertices = mesh.num_vertices();
+    let n_faces    = mesh.num_faces();
+
+    if n_vertices != colors.len() { return Err(ErrorKind::ColorArrayIncorrectLength) }
+
+    let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
+
+    let header = match precision {
+        Precision::P32 => {
+            "ply\n".to_string()
+                + "format binary_big_endian 1.0\n"
+                + "comment Created by rust-3d\n"
+                + "element vertex " + &n_vertices.to_string() + "\n"
+                + "property float32 x\n"
+                + "property float32 y\n"
+                + "property float32 z\n"
+                + "property uchar red\n"
+                + "property uchar green\n"
+                + "property uchar blue\n"
+                + "element face " + &n_faces.to_string() + "\n"
+                + "property list uint8 uint32 vertex_indices\n"
+                + "end_header\n"
+        },
+        Precision::P64 => {
+            "ply\n".to_string()
+                + "format binary_big_endian 1.0\n"
+                + "comment Created by rust-3d\n"
+                + "element vertex " + &n_vertices.to_string() + "\n"
+                + "property float64 x\n"
+                + "property float64 y\n"
+                + "property float64 z\n"
+                + "property uchar red\n"
+                + "property uchar green\n"
+                + "property uchar blue\n"
+                + "element face " + &n_faces.to_string() + "\n"
+                + "property list uint8 uint32 vertex_indices\n"
+                + "end_header\n"
+        }
+    };
+
+    f.write_all(header.as_bytes()).map_err(|e| e.to_error_kind())?;
+
+    match precision {
+        Precision::P32 => {
+            for i in 0..n_vertices {
+                let vertex = mesh.vertex(VId{val: i})?;
+                let color  = &colors[i];
+                f.write_f32::<BigEndian>(vertex.get_position(0)? as f32).map_err(|e| e.to_error_kind())?;
+                f.write_f32::<BigEndian>(vertex.get_position(1)? as f32).map_err(|e| e.to_error_kind())?;
+                f.write_f32::<BigEndian>(vertex.get_position(2)? as f32).map_err(|e| e.to_error_kind())?;
+                f.write_u8              (color.r).map_err(|e| e.to_error_kind())?;
+                f.write_u8              (color.g).map_err(|e| e.to_error_kind())?;
+                f.write_u8              (color.b).map_err(|e| e.to_error_kind())?;
+            }
+        },
+
+        Precision::P64 => {
+            for i in 0..n_vertices {
+                let vertex = mesh.vertex(VId{val: i})?;
+                let color  = &colors[i];
+                f.write_f64::<BigEndian>(vertex.get_position(0)?).map_err(|e| e.to_error_kind())?;
+                f.write_f64::<BigEndian>(vertex.get_position(1)?).map_err(|e| e.to_error_kind())?;
+                f.write_f64::<BigEndian>(vertex.get_position(2)?).map_err(|e| e.to_error_kind())?;
+                f.write_u8              (color.r).map_err(|e| e.to_error_kind())?;
+                f.write_u8              (color.g).map_err(|e| e.to_error_kind())?;
+                f.write_u8              (color.b).map_err(|e| e.to_error_kind())?;
+            }
+        }
+    }
+
+    for i in 0..n_faces {
         let face = mesh.face_vertex_ids(FId{val: i})?;
         f.write_u8(3).map_err(|e| e.to_error_kind())?;
         f.write_u32::<BigEndian>(face.a.val as u32).map_err(|e| e.to_error_kind())?;
@@ -295,11 +422,11 @@ fn fill_mesh<EM, P>(vertices: Vec<P>, indices: Vec<usize>, mesh: &mut EM) -> Res
     if indices.len() % 3 != 0 {
         return Err(ErrorKind::PlyError(PlyError::LoadVerticesIncorrect));
     }
-    
+
     for vertex in vertices {
         mesh.add_vertex(vertex);
     }
-    
+
     for chunk in indices.chunks(3) {
         if chunk.len() == 3 {
                 mesh.try_add_connection(VId{val:chunk[0]}, VId{val:chunk[1]}, VId{val:chunk[2]})?;
