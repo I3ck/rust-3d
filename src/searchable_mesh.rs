@@ -161,3 +161,12 @@ impl<M, T> IsScalable for SearchableMesh<M, T> where
         self.mesh.scale(factor);
     }
 }
+
+impl<M, T> AsRef<M> for SearchableMesh<M, T> where
+    M: IsMesh<T, Face3> {
+
+    fn as_ref(&self) -> &M {
+        &self.mesh
+    }
+
+}
