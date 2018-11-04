@@ -17,7 +17,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
-use std::ops::{Mul};
+use std::ops::{Mul, Neg};
 
 use prelude::*;
 use distances_3d::*;
@@ -52,6 +52,14 @@ impl Mul<f64> for Norm3D {
 
     fn mul(self, other: f64) -> Point3D {
         Point3D{x: other * self.x, y: other * self.y, z: other * self.z}
+    }
+}
+
+impl Neg for Norm3D {
+    type Output = Norm3D;
+
+    fn neg(self) -> Norm3D {
+        Norm3D { x: -self.x, y: -self.y, z: -self.z }
     }
 }
 

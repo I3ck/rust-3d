@@ -18,7 +18,7 @@ along with rust-3d.  If not, see <http://www.gnu.org/licenses/>.
 use std::fmt;
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
-use std::ops::{Add, Mul, Sub};
+use std::ops::{Add, Mul, Sub, Neg};
 
 use prelude::*;
 use distances_3d::*;
@@ -77,6 +77,14 @@ impl Mul<f64> for Point3D {
 
     fn mul(self, other: f64) -> Point3D {
         Point3D {x: other * self.x, y: other * self.y, z: other * self.z}
+    }
+}
+
+impl Neg for Point3D {
+    type Output = Point3D;
+
+    fn neg(self) -> Point3D {
+        Point3D { x: -self.x, y: -self.y, z: -self.z }
     }
 }
 
