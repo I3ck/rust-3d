@@ -35,10 +35,15 @@ pub trait IsBuildable2D :
 
     /// Should build an object from x and y coordinates
     fn new(x: f64, y: f64) -> Self;
-
     /// Should use the coordinates of another as its own
     fn from<P>(&mut self, other: P) where
         P: Is2D;
+
+    /// Uses the coordinates of other to create a new
+    fn new_from<P>(other: P) -> Self where
+        P: Is2D {
+            Self::new(other.x(), other.y())
+    }
 
     /// Returns this with normalized values
     fn normalized(&self) -> Result<Self> {
@@ -48,7 +53,7 @@ pub trait IsBuildable2D :
         }
         Ok(Self::new(self.x() / l.get(), self.y() / l.get()))
     }
-    
+
     /// Applies a matrix to this
     fn multiply_m(&self, m: &Matrix3) -> Self {
         let x = self.x() * m.data[0][0] + self.y() * m.data[0][1] + m.data[0][2];

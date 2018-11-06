@@ -38,6 +38,12 @@ pub trait IsBuildable3D :
     fn from<P>(&mut self, other: P) where
         P: Is3D;
 
+    /// Uses the coordinates of other to create a new
+    fn new_from<P>(other: P) -> Self where
+        P: Is3D {
+            Self::new(other.x(), other.y(), other.z())
+    }
+
     /// Applies a matrix to this
     fn multiply_m(&self, m: &Matrix4) -> Self {
         let x = self.x() * m.data[0][0] + self.y() * m.data[0][1] + self.z() * m.data[0][2] + m.data[0][3];
