@@ -90,7 +90,7 @@ impl IsNormalized2D for Norm2D {
         P: Is2D {
 
         let l = p.abs();
-        if l.get() <= 0.0 {
+        if l.get() == 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
         }
 

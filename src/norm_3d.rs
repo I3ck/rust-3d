@@ -97,7 +97,7 @@ impl IsNormalized3D for Norm3D {
         P: Is3D {
 
         let l = p.abs();
-        if l.get() <= 0.0 {
+        if l.get() == 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
         }
 
