@@ -11,5 +11,5 @@ keywords = ["2d", "3d", "pointcloud", "mesh", "filters"]
 license-file = "LICENSE"
 
 [dependencies]
-num = "0.1.32"
-byteorder = "1.2.3"
+num = "0.2.0"
+byteorder = "1.2.7"
