@@ -20,6 +20,7 @@ use prelude::*;
 use std::marker::PhantomData;
 
 /// SearchableMesh, transforms IsMesh to IsSearchableMesh
+#[derive (Clone)]
 pub struct SearchableMesh<M, T> where
     M: IsMesh<T, Face3> {
 
@@ -46,6 +47,11 @@ impl<M, T> SearchableMesh<M, T> where
             return Err(ErrorKind::IncorrectFaceID);
         }
         Ok(())
+    }
+
+    /// Returns a reference to the held mesh
+    pub fn mesh(&self) -> &M {
+        &self.mesh
     }
 }
 
