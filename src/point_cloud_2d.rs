@@ -57,6 +57,10 @@ impl<P> PointCloud2D<P> where
             f(&mut *p);
         }
     }
+    /// Reserves number of vertices
+    pub fn reserve_vertices(&mut self, n: usize) {
+        self.data.reserve(n)
+    }
 }
 
 impl<P> PointCloud2D<P> where

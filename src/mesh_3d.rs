@@ -26,6 +26,19 @@ pub struct Mesh3D<P> where
     topology: Vec<VId>
 }
 
+impl<P> Mesh3D<P> where
+    P: Is3D {
+
+    /// Reserves number of vertices
+    pub fn reserve_vertices(&mut self, n: usize) {
+        self.pc.reserve_vertices(n)
+    }
+    /// Reserves number of faces
+    pub fn reserve_faces(&mut self, n: usize) {
+        self.topology.reserve(3*n)
+    }
+}
+
 impl<P> IsMesh<P, Face3> for Mesh3D<P> where
     P: Is3D + Clone {
 
