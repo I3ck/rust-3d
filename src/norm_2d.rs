@@ -21,6 +21,7 @@ use std::ops::{Mul, Neg};
 
 use prelude::*;
 use distances_2d::*;
+use utils::hash_f64;
 
 #[derive (Debug, PartialEq, PartialOrd, Clone)]
 /// Norm2D, a normalized vector within 2D space
@@ -40,8 +41,8 @@ impl Ord for Norm2D {
 
 impl Hash for Norm2D {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        (self.x as u64).hash(state);
-        (self.y as u64).hash(state);
+        hash_f64(self.x, state);
+        hash_f64(self.y, state);
     }
 }
 

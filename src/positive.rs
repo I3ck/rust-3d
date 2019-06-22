@@ -20,6 +20,7 @@ use std::ops::{Add, AddAssign, Mul, MulAssign};
 use std::hash::{Hash, Hasher};
 
 use prelude::*;
+use utils::hash_f64;
 
 #[derive (Debug, PartialEq, PartialOrd, Clone, Copy)]
 /// Positive, a wrapper for a f64 value, ensuring it is always > 0
@@ -53,7 +54,7 @@ impl Eq for Positive {}
 
 impl Hash for Positive {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        (self.val as u64).hash(state);
+        hash_f64(self.val, state);
     }
 }
 

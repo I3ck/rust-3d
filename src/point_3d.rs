@@ -19,6 +19,7 @@ use std::fmt;
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Mul, Sub, Neg};
+use utils::hash_f64;
 
 use prelude::*;
 use distances_3d::*;
@@ -48,9 +49,9 @@ impl Ord for Point3D {
 
 impl Hash for Point3D {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        (self.x as u64).hash(state);
-        (self.y as u64).hash(state);
-        (self.z as u64).hash(state);
+        hash_f64(self.x, state);
+        hash_f64(self.y, state);
+        hash_f64(self.z, state);
     }
 }
 
