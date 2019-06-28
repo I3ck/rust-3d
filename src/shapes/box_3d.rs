@@ -131,6 +131,12 @@ impl IsScalable for Box3D {
     }
 }
 
+impl IsMovable3D for Box3D {
+    fn move_by(&mut self, x: f64, y: f64, z: f64) {
+        self.center.move_by(x, y, z)
+    }
+}
+
 impl From<BoundingBox3D> for Box3D {
     fn from(x: BoundingBox3D) -> Self {
         Box3D{center: x.center_bb(), size_x: x.size_x(), size_y: x.size_y(), size_z: x.size_z()}

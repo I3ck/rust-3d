@@ -118,6 +118,12 @@ impl IsScalable for Box2D {
     }
 }
 
+impl IsMovable2D for Box2D {
+    fn move_by(&mut self, x: f64, y: f64) {
+        self.center.move_by(x, y)
+    }
+}
+
 impl From<BoundingBox2D> for Box2D {
     fn from(x: BoundingBox2D) -> Self {
         Box2D{center: x.center_bb(), size_x: x.size_x(), size_y: x.size_y()}
