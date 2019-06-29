@@ -36,6 +36,10 @@ impl Point3D {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Point3D {x, y, z}
     }
+    /// Creates a new Point3D with all coordinates set to 0
+    pub fn zero() -> Self {
+        Point3D {x: 0.0, y: 0.0, z: 0.0}
+    }
 }
 
 impl Eq for Point3D {}
