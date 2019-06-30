@@ -36,9 +36,21 @@ pub trait Is3D : IsND {
     /// Should return the z-coordinate
     fn z(&self) -> f64;
 
-    /// Returns the Position as x,y,z tuple
+    /// Returns the position as x,y,z tuple
     fn xyz(&self) -> (f64, f64, f64) {
         ( self.x(), self.y(), self.z() )
+    }
+    /// Returns the components of the position as tuple
+    fn xy(&self) -> (f64, f64) {
+        ( self.x(), self.y() )
+    }
+    /// Returns the components of the position as tuple
+    fn xz(&self) -> (f64, f64) {
+        ( self.x(), self.z() )
+    }
+    /// Returns the components of the position as tuple
+    fn yz(&self) -> (f64, f64) {
+        ( self.y(), self.z() )
     }
     /// Calculates the dot product with another Is3D
     fn dot(&self, other: &Is3D) -> f64 {
