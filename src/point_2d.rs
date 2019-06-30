@@ -42,10 +42,6 @@ impl Point2D {
     pub fn new(x: f64, y: f64) -> Self {
         Point2D {x, y}
     }
-    /// Creates a new Point2D with all coordinates set to 0
-    pub fn zero() -> Self {
-        Point2D {x: 0.0, y: 0.0}
-    }
 }
 
 impl Eq for Point2D {}

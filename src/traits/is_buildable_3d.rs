@@ -66,6 +66,10 @@ pub trait IsBuildable3D :
         }
         Ok(Self::new(self.x() / l.get(), self.y() / l.get(), self.z() / l.get()))
     }
+    /// Returns a new object with 0/0/0 as coordinates
+    fn zero() -> Self {
+        Self::new(0.0, 0.0, 0.0)
+    }
     /// Creates this from a "x y z" string. E.g. "32.2 14.7 1.90"
     fn parse(text: String) -> Result<Self> {
         let split = text.trim().split(" ");

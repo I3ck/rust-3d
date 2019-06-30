@@ -120,8 +120,6 @@ trait Colorized? or somehow offer the option to add colors to a type instead of 
 
 reserve methods for more types or even traits
 
-.zero() method could be moved to buildable3d
-
 more helper methods for bounding boxes
 
 access methods similar to glsl for Is2D Is3D

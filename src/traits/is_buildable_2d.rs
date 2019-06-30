@@ -51,7 +51,6 @@ pub trait IsBuildable2D :
         P: Is2D {
             Self::new(other.x(), other.y())
     }
-
     /// Returns this with normalized values
     fn normalized(&self) -> Result<Self> {
         let l = self.abs();
@@ -60,14 +59,16 @@ pub trait IsBuildable2D :
         }
         Ok(Self::new(self.x() / l.get(), self.y() / l.get()))
     }
-
+    /// Returns a new object with 0/0 as coordinates
+    fn zero() -> Self {
+        Self::new(0.0, 0.0)
+    }
     /// Applies a matrix to this
     fn multiply_m(&self, m: &Matrix3) -> Self {
         let x = self.x() * m.data[0][0] + self.y() * m.data[0][1] + m.data[0][2];
         let y = self.x() * m.data[1][0] + self.y() * m.data[1][1] + m.data[1][2];
         Self::new(x, y)
     }
-
     /// Creates this from a "x y" string. E.g. "4.3 17.29"
     fn parse(text: String) -> Result<Self> {
         let split = text.trim().split(" ");
