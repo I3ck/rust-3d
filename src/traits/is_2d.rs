@@ -33,7 +33,7 @@ pub trait Is2D : IsND {
     fn y(&self) -> f64;
 
     /// Returns the Position as x,y tuple
-    fn pos(&self) -> (f64, f64) {
+    fn xy(&self) -> (f64, f64) {
         ( self.x(), self.y() )
     }
     /// Calculates the dot product with another Is2D
