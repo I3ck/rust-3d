@@ -92,7 +92,7 @@ fn point_2d_test() {
     assert!(p1.x() == 4.0);
     assert!(p1.y() == 13.0);
 
-    p1.substract(&p2);
+    p1.subtract(&p2);
     assert!(p1.x() == 3.0);
     assert!(p1.y() == 11.0);
 

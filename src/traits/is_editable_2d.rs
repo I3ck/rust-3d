@@ -57,8 +57,8 @@ pub trait IsEditable2D : Is2D + IsEditableND {
         self.set_y(y);
     }
 
-    /// Substracts the coordinates of other from this. x = x - other.x ...
-    fn substract<P>(&mut self, other: &P) where
+    /// Subtracts the coordinates of other from this. x = x - other.x ...
+    fn subtract<P>(&mut self, other: &P) where
         P: Is2D {
 
         let x = self.x() - other.x();

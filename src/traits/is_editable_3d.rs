@@ -63,8 +63,8 @@ pub trait IsEditable3D : Is3D + IsEditableND {
         self.set_z(z);
     }
 
-    /// Substracts the coordinates of other from this. x = x - other.x ...
-    fn substract<P>(&mut self, other: &P) where
+    /// Subtracts the coordinates of other from this. x = x - other.x ...
+    fn subtract<P>(&mut self, other: &P) where
         P: Is3D {
 
         let x = self.x() - other.x();
