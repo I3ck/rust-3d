@@ -55,13 +55,13 @@ fn point_2d_test() {
     assert!(p2.cross(&p3) == 2.0);
     assert!(p2.dot(&p3) == 2.0);
 
-    assert!(p2.pos() == (p2.x(), p2.y()));
+    assert!(p2.xy() == (p2.x(), p2.y()));
     let mut p2_clone = p2.clone();
-    assert!(p2_clone.pos() == p2.pos());
+    assert!(p2_clone.xy() == p2.xy());
     assert!(p2.to_str() == "1 0");
 
     p2_clone.from(p1.clone());
-    assert!(p2_clone.pos() == p1.pos());
+    assert!(p2_clone.xy() == p1.xy());
 
     let p1_norm = p1.normalized();
     assert!(p1_norm.is_err());
@@ -96,7 +96,7 @@ fn point_2d_test() {
     assert!(p1.x() == 3.0);
     assert!(p1.y() == 11.0);
 
-    p1.scale(2.0);
+    p1.scale_pos(2.0);
     assert!(p1.x() == 6.0);
     assert!(p1.y() == 22.0);
 
