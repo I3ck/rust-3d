@@ -8,7 +8,7 @@ homepage = "https://github.com/I3ck/rust-3d"
 repository = "https://github.com/I3ck/rust-3d"
 readme = "README.md"
 keywords = ["2d", "3d", "pointcloud", "mesh", "filters"]
-license-file = "LICENSE"
+license = "MIT"
 
 [dependencies]
 num = "0.2.0"

@@ -80,4 +80,4 @@ Open an issue or email me beforehand.
 
 License
 ------
-LGPL (see LICENSE)
+MIT (see LICENSE)
