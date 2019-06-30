@@ -121,3 +121,5 @@ trait Colorized? or somehow offer the option to add colors to a type instead of 
 reserve methods for more types or even traits
 
 more helper methods for bounding boxes
+
+consider going 1.0.0 soon

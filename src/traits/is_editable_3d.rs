@@ -33,13 +33,27 @@ pub trait IsEditable3D : Is3D + IsEditableND {
     /// Should set the position in z
     fn set_z(&mut self, val: f64);
 
-    /// Sets the position from a x, y and z values
+    /// Sets the position from x, y and z values
     fn set_xyz(&mut self, x: f64, y: f64, z: f64) {
         self.set_x(x);
         self.set_y(y);
         self.set_z(z);
     }
-    
+    /// Updates the position with x and y values
+    fn set_xy(&mut self, x: f64, y: f64) {
+        self.set_x(x);
+        self.set_y(y);
+    }
+    /// Updates the position with x and z values
+    fn set_xz(&mut self, x: f64, z: f64) {
+        self.set_x(x);
+        self.set_z(z);
+    }
+    /// Updates the position with y and z values
+    fn set_yz(&mut self, y: f64, z: f64) {
+        self.set_y(y);
+        self.set_z(z);
+    }
     /// Increases distance towards other by factor
     fn increase_distance_to_by<P>(&mut self, other: &P, factor: Positive) where
         P: Is3D {
