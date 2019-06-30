@@ -90,12 +90,12 @@ fn point_3d_test() {
     assert!(p1.y() == 10.0);
     assert!(p1.z() == 11.0);
 
-    p1.set_pos(3.0, 11.0, 14.0);
+    p1.set_xyz(3.0, 11.0, 14.0);
     assert!(p1.x() == 3.0);
     assert!(p1.y() == 11.0);
     assert!(p1.z() == 14.0);
 
-    p2.set_pos(1.0, 2.0, 3.0);
+    p2.set_xyz(1.0, 2.0, 3.0);
     p1.add(&p2);
     assert!(p1.x() == 4.0);
     assert!(p1.y() == 13.0);
@@ -120,7 +120,7 @@ fn point_3d_test() {
         }
     }
 
-    p1.set_pos(1.0, 2.0, 3.0);
+    p1.set_xyz(1.0, 2.0, 3.0);
     p1.move_by(0.1, 0.2, 0.3);
     assert!(p1.x() == 1.1);
     assert!(p1.y() == 2.2);

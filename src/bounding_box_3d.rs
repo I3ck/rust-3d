@@ -212,8 +212,8 @@ impl IsScalable for BoundingBox3D {
         let min_z = c.z - (0.5 * factor.get() * self.size_z().get());
         let max_z = c.z + (0.5 * factor.get() * self.size_z().get());
 
-        self.min.set_pos(min_x, min_y, min_z);
-        self.max.set_pos(max_x, max_y, max_z);
+        self.min.set_xyz(min_x, min_y, min_z);
+        self.max.set_xyz(max_x, max_y, max_z);
     }
 }
 
@@ -230,8 +230,8 @@ impl IsMergeable for BoundingBox3D {
         if other.max.y() > max_y { max_y = other.max.y() }
         if other.max.z() > max_z { max_z = other.max.z() }
 
-        self.min.set_pos(min_x, min_y, min_z);
-        self.max.set_pos(max_x, max_y, max_z);
+        self.min.set_xyz(min_x, min_y, min_z);
+        self.max.set_xyz(max_x, max_y, max_z);
     }
 
     fn combine(&self, other: &Self) -> Self {

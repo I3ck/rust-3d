@@ -32,7 +32,7 @@ pub trait IsEditable2D : Is2D + IsEditableND {
     fn set_y(&mut self, val: f64);
 
     /// Sets the position from a x and y values
-    fn set_pos(&mut self, x: f64, y: f64) {
+    fn set_xy(&mut self, x: f64, y: f64) {
         self.set_x(x);
         self.set_y(y);
     }
@@ -44,7 +44,7 @@ pub trait IsEditable2D : Is2D + IsEditableND {
         let x = other.x() + factor.get() * (self.x() - other.x());
         let y = other.y() + factor.get() * (self.y() - other.y());
         
-        self.set_pos(x, y);
+        self.set_xy(x, y);
     }
 
     /// Adds the coordinates of other onto this. x = x + other.x ...

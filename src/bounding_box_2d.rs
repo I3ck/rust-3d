@@ -180,8 +180,8 @@ impl IsScalable for BoundingBox2D {
         let min_y = c.y - (0.5 * factor.get() * self.size_y().get());
         let max_y = c.y + (0.5 * factor.get() * self.size_y().get());
 
-        self.min.set_pos(min_x, min_y);
-        self.max.set_pos(max_x, max_y);
+        self.min.set_xy(min_x, min_y);
+        self.max.set_xy(max_x, max_y);
     }
 }
 
@@ -196,8 +196,8 @@ impl IsMergeable for BoundingBox2D {
         if other.max.x() > max_x { max_x = other.max.x() }
         if other.max.y() > max_y { max_y = other.max.y() }
 
-        self.min.set_pos(min_x, min_y);
-        self.max.set_pos(max_x, max_y);
+        self.min.set_xy(min_x, min_y);
+        self.max.set_xy(max_x, max_y);
     }
 
     fn combine(&self, other: &Self) -> Self {

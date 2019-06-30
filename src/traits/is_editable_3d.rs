@@ -34,7 +34,7 @@ pub trait IsEditable3D : Is3D + IsEditableND {
     fn set_z(&mut self, val: f64);
 
     /// Sets the position from a x, y and z values
-    fn set_pos(&mut self, x: f64, y: f64, z: f64) {
+    fn set_xyz(&mut self, x: f64, y: f64, z: f64) {
         self.set_x(x);
         self.set_y(y);
         self.set_z(z);
@@ -48,7 +48,7 @@ pub trait IsEditable3D : Is3D + IsEditableND {
         let y = other.y() + factor.get() * (self.y() - other.y());
         let z = other.z() + factor.get() * (self.z() - other.z());
 
-        self.set_pos(x, y, z);
+        self.set_xyz(x, y, z);
     }
 
     /// Adds the coordinates of other onto this. x = x + other.x ...

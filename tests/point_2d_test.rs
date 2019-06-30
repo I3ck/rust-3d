@@ -83,11 +83,11 @@ fn point_2d_test() {
     assert!(p1.x() == 3.0);
     assert!(p1.y() == 10.0);
 
-    p1.set_pos(3.0, 11.0);
+    p1.set_xy(3.0, 11.0);
     assert!(p1.x() == 3.0);
     assert!(p1.y() == 11.0);
 
-    p2.set_pos(1.0, 2.0);
+    p2.set_xy(1.0, 2.0);
     p1.add(&p2);
     assert!(p1.x() == 4.0);
     assert!(p1.y() == 13.0);
@@ -100,7 +100,7 @@ fn point_2d_test() {
     assert!(p1.x() == 6.0);
     assert!(p1.y() == 22.0);
 
-    p1.set_pos(1.0, 0.0);
+    p1.set_xy(1.0, 0.0);
     p1.rotate(Rad{val: 0.0}, &origin);
     assert!(p1.x() == 1.0);
     assert!(p1.y() == 0.0);
@@ -122,7 +122,7 @@ fn point_2d_test() {
         }
     }
 
-    p1.set_pos(1.0, 2.0);
+    p1.set_xy(1.0, 2.0);
     p1.move_by(0.1, 0.2);
     assert!(p1.x() == 1.1);
     assert!(p1.y() == 2.2);
