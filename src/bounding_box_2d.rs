@@ -94,6 +94,10 @@ impl BoundingBox2D {
     pub fn size_y(&self) -> Positive {
         Positive::new((self.max.y() - self.min.y()).abs()).unwrap() //safe since constrain enforced on construction
     }
+    /// Returns the sizes of the bounding box
+    pub fn sizes(&self) -> (Positive, Positive) {
+        (self.size_x(), self.size_y())
+    }
     /// Returns the center of the bounding box
     pub fn center_bb(&self) -> Point2D {
         Point2D{x: self.min.x() + (self.max.x() - self.min.x()) / 2.0,
