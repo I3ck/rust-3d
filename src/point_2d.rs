@@ -106,7 +106,7 @@ impl IsND for Point2D {
         2
     }
 
-    fn get_position(&self, dimension: usize) -> Result<f64> {
+    fn position_nd(&self, dimension: usize) -> Result<f64> {
         match dimension {
             0 => Ok(self.x),
             1 => Ok(self.y),
@@ -140,8 +140,8 @@ impl IsBuildableND for Point2D {
             return Err(ErrorKind::DimensionsDontMatch);
         }
 
-        self.x = other.get_position(0)?;
-        self.y = other.get_position(1)?;
+        self.x = other.position_nd(0)?;
+        self.y = other.position_nd(1)?;
         Ok(())
     }
 }

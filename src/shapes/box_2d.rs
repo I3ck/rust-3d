@@ -55,8 +55,8 @@ impl IsND for Box2D {
         Point2D::n_dimensions()
     }
 
-    fn get_position(&self, dimension: usize) -> Result<f64> {
-        self.center.get_position(dimension)
+    fn position_nd(&self, dimension: usize) -> Result<f64> {
+        self.center.position_nd(dimension)
     }
 }
 

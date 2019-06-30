@@ -43,8 +43,8 @@ impl IsND for FilterSphere {
         Sphere::n_dimensions()
     }
 
-    fn get_position(&self, dimension: usize) -> Result<f64> {
-        self.sphere.get_position(dimension)
+    fn position_nd(&self, dimension: usize) -> Result<f64> {
+        self.sphere.position_nd(dimension)
     }
 }
 

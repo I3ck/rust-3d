@@ -42,8 +42,8 @@ impl IsND for FilterBox2D {
         Box2D::n_dimensions()
     }
 
-    fn get_position(&self, dimension: usize) -> Result<f64> {
-        self.box_2d.get_position(dimension)
+    fn position_nd(&self, dimension: usize) -> Result<f64> {
+        self.box_2d.position_nd(dimension)
     }
 }
 

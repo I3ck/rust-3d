@@ -76,7 +76,7 @@ impl IsND for Norm3D {
         3
     }
 
-    fn get_position(&self, dimension: usize) -> Result<f64> {
+    fn position_nd(&self, dimension: usize) -> Result<f64> {
         match dimension {
             0 => Ok(self.x),
             1 => Ok(self.y),

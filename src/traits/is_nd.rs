@@ -29,5 +29,5 @@ pub trait IsND {
     /// Should return the number of dimensions. E.g. 2 for points in 2D space, 3 for points in 3D space etc.
     fn n_dimensions() -> usize where Self: Sized;
     /// Should return the value of a given dimensions. E.g. for 2D position with x = 4.3, y = 1.8 the result for dimension = 1 should be 1.8
-    fn get_position(&self, dimension: usize) -> Result<f64>;
+    fn position_nd(&self, dimension: usize) -> Result<f64>;
 }

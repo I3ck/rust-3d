@@ -147,18 +147,18 @@ pub fn save_ply_binary<M, P>(mesh: &M, filepath: &str, precision: &Precision) ->
         Precision::P32 => {
             for i in 0..mesh.num_vertices() {
                 let vertex = mesh.vertex(VId{val: i})?;
-                f.write_f32::<BigEndian>(vertex.get_position(0)? as f32).map_err(|e| e.to_error_kind())?;
-                f.write_f32::<BigEndian>(vertex.get_position(1)? as f32).map_err(|e| e.to_error_kind())?;
-                f.write_f32::<BigEndian>(vertex.get_position(2)? as f32).map_err(|e| e.to_error_kind())?;
+                f.write_f32::<BigEndian>(vertex.position_nd(0)? as f32).map_err(|e| e.to_error_kind())?;
+                f.write_f32::<BigEndian>(vertex.position_nd(1)? as f32).map_err(|e| e.to_error_kind())?;
+                f.write_f32::<BigEndian>(vertex.position_nd(2)? as f32).map_err(|e| e.to_error_kind())?;
             }
         },
 
         Precision::P64 => {
             for i in 0..mesh.num_vertices() {
                 let vertex = mesh.vertex(VId{val: i})?;
-                f.write_f64::<BigEndian>(vertex.get_position(0)?).map_err(|e| e.to_error_kind())?;
-                f.write_f64::<BigEndian>(vertex.get_position(1)?).map_err(|e| e.to_error_kind())?;
-                f.write_f64::<BigEndian>(vertex.get_position(2)?).map_err(|e| e.to_error_kind())?;
+                f.write_f64::<BigEndian>(vertex.position_nd(0)?).map_err(|e| e.to_error_kind())?;
+                f.write_f64::<BigEndian>(vertex.position_nd(1)?).map_err(|e| e.to_error_kind())?;
+                f.write_f64::<BigEndian>(vertex.position_nd(2)?).map_err(|e| e.to_error_kind())?;
             }
         }
     }
@@ -226,9 +226,9 @@ pub fn save_ply_binary_colored<M, P>(mesh: &M, filepath: &str, precision: &Preci
             for i in 0..n_vertices {
                 let vertex = mesh.vertex(VId{val: i})?;
                 let color  = &colors[i];
-                f.write_f32::<BigEndian>(vertex.get_position(0)? as f32).map_err(|e| e.to_error_kind())?;
-                f.write_f32::<BigEndian>(vertex.get_position(1)? as f32).map_err(|e| e.to_error_kind())?;
-                f.write_f32::<BigEndian>(vertex.get_position(2)? as f32).map_err(|e| e.to_error_kind())?;
+                f.write_f32::<BigEndian>(vertex.position_nd(0)? as f32).map_err(|e| e.to_error_kind())?;
+                f.write_f32::<BigEndian>(vertex.position_nd(1)? as f32).map_err(|e| e.to_error_kind())?;
+                f.write_f32::<BigEndian>(vertex.position_nd(2)? as f32).map_err(|e| e.to_error_kind())?;
                 f.write_u8              (color.r).map_err(|e| e.to_error_kind())?;
                 f.write_u8              (color.g).map_err(|e| e.to_error_kind())?;
                 f.write_u8              (color.b).map_err(|e| e.to_error_kind())?;
@@ -239,9 +239,9 @@ pub fn save_ply_binary_colored<M, P>(mesh: &M, filepath: &str, precision: &Preci
             for i in 0..n_vertices {
                 let vertex = mesh.vertex(VId{val: i})?;
                 let color  = &colors[i];
-                f.write_f64::<BigEndian>(vertex.get_position(0)?).map_err(|e| e.to_error_kind())?;
-                f.write_f64::<BigEndian>(vertex.get_position(1)?).map_err(|e| e.to_error_kind())?;
-                f.write_f64::<BigEndian>(vertex.get_position(2)?).map_err(|e| e.to_error_kind())?;
+                f.write_f64::<BigEndian>(vertex.position_nd(0)?).map_err(|e| e.to_error_kind())?;
+                f.write_f64::<BigEndian>(vertex.position_nd(1)?).map_err(|e| e.to_error_kind())?;
+                f.write_f64::<BigEndian>(vertex.position_nd(2)?).map_err(|e| e.to_error_kind())?;
                 f.write_u8              (color.r).map_err(|e| e.to_error_kind())?;
                 f.write_u8              (color.g).map_err(|e| e.to_error_kind())?;
                 f.write_u8              (color.b).map_err(|e| e.to_error_kind())?;

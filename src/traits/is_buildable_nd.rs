@@ -51,7 +51,7 @@ pub trait IsBuildableND :
         
         let mut v = Vec::with_capacity(n);
         for i in 0..n {
-            v.push(0.5 * (self.get_position(i)? + other.get_position(i)?));
+            v.push(0.5 * (self.position_nd(i)? + other.position_nd(i)?));
         }
         
         Self::new_nd(&v)

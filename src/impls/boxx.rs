@@ -31,8 +31,8 @@ impl<P> IsND for Box<P> where
         P::n_dimensions()
     }
 
-    fn get_position(&self, dimension: usize) -> Result<f64> {
-        self.as_ref().get_position(dimension)
+    fn position_nd(&self, dimension: usize) -> Result<f64> {
+        self.as_ref().position_nd(dimension)
     }
 }
 

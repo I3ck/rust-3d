@@ -42,8 +42,8 @@ impl IsND for FilterCircle {
         Circle::n_dimensions()
     }
 
-    fn get_position(&self, dimension: usize) -> Result<f64> {
-        self.circle.get_position(dimension)
+    fn position_nd(&self, dimension: usize) -> Result<f64> {
+        self.circle.position_nd(dimension)
     }
 }
 
