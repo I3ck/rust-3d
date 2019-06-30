@@ -46,7 +46,7 @@ impl IsTopologyUnit for Face3 {
         3
     }
 
-    fn get_vid(&self, index: usize) -> Result<VId> {
+    fn vid(&self, index: usize) -> Result<VId> {
         match index {
             0 => Ok(self.a),
             1 => Ok(self.b),

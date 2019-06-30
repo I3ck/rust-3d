@@ -29,5 +29,5 @@ pub trait IsTopologyUnit {
     /// Should return the number of indices a unit is defined with. (e.g. 3 for a tri mesh)
     fn n_vids() -> usize;
     /// Should return the vertex id of the nth element of this unit. Failure if index out of bounds
-    fn get_vid(&self, index: usize) -> Result<VId>;
+    fn vid(&self, index: usize) -> Result<VId>;
 }
