@@ -36,6 +36,21 @@ pub struct Box3D {
     pub size_z: Positive
 }
 
+impl Box3D {
+    /// Returns the minimum position of the box
+    pub fn min_p(&self) -> Point3D {
+        Point3D::new(self.center.x() - 0.5*self.size_x.get(), self.center.y() - 0.5*self.size_y.get(), self.center.z() - 0.5*self.size_z.get())
+    }
+    /// Returns the maximum position of the box
+    pub fn max_p(&self) -> Point3D {
+        Point3D::new(self.center.x() + 0.5*self.size_x.get(), self.center.y() + 0.5*self.size_y.get(), self.center.z() + 0.5*self.size_z.get())
+    }
+    /// Returns the sizes of the bounding box
+    pub fn sizes(&self) -> (Positive, Positive, Positive) {
+        (self.size_x, self.size_y, self.size_z)
+    }
+}
+
 impl Eq for Box3D {}
 
 impl Ord for Box3D {

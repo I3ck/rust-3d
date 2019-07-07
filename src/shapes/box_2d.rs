@@ -35,6 +35,21 @@ pub struct Box2D {
     pub size_y: Positive
 }
 
+impl Box2D {
+    /// Returns the minimum position of the box
+    pub fn min_p(&self) -> Point2D {
+        Point2D::new(self.center.x() - 0.5*self.size_x.get(), self.center.y() - 0.5*self.size_y.get())
+    }
+    /// Returns the maximum position of the box
+    pub fn max_p(&self) -> Point2D {
+        Point2D::new(self.center.x() + 0.5*self.size_x.get(), self.center.y() + 0.5*self.size_y.get())
+    }
+    /// Returns the sizes of the bounding box
+    pub fn sizes(&self) -> (Positive, Positive) {
+        (self.size_x, self.size_y)
+    }
+}
+
 impl Eq for Box2D {}
 
 impl Ord for Box2D {
