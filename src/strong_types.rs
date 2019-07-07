@@ -30,6 +30,25 @@ macro_rules! strong_usize {
         pub struct $NEW_NAME {
             pub val: usize
         }
+
+        impl Into<usize> for $NEW_NAME {
+            fn into(self) -> usize {
+                self.val
+            }
+        }
+
+        impl AsRef<usize> for $NEW_NAME {
+            fn as_ref(&self) -> &usize {
+                &self.val
+            }
+        }
+
+        impl AsMut<usize> for $NEW_NAME {
+            fn as_mut(&mut self) -> &mut usize {
+                &mut self.val
+            }
+        }
+
         impl fmt::Display for $NEW_NAME {
             fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
                 write!(f, "{}", self.val)
@@ -44,6 +63,25 @@ macro_rules! strong_f64 {
         pub struct $NEW_NAME {
             pub val: f64
         }
+
+        impl Into<f64> for $NEW_NAME {
+            fn into(self) -> f64 {
+                self.val
+            }
+        }
+
+        impl AsRef<f64> for $NEW_NAME {
+            fn as_ref(&self) -> &f64 {
+                &self.val
+            }
+        }
+
+        impl AsMut<f64> for $NEW_NAME {
+            fn as_mut(&mut self) -> &mut f64 {
+                &mut self.val
+            }
+        }
+
         impl fmt::Display for $NEW_NAME {
             fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
                 write!(f, "{}", self.val)

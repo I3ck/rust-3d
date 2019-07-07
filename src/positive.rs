@@ -107,6 +107,18 @@ impl MulAssign for Positive {
     }
 }
 
+impl Into<f64> for Positive {
+    fn into(self) -> f64 {
+        self.val
+    }
+}
+
+impl AsRef<f64> for Positive {
+    fn as_ref(&self) -> &f64 {
+        &self.val
+    }
+}
+
 impl Default for Positive {
     fn default() -> Self {
         Self::one()

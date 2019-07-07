@@ -159,6 +159,18 @@ impl DivAssign<Positive> for NonNegative {
     }
 }
 
+impl Into<f64> for NonNegative {
+    fn into(self) -> f64 {
+        self.val
+    }
+}
+
+impl AsRef<f64> for NonNegative {
+    fn as_ref(&self) -> &f64 {
+        &self.val
+    }
+}
+
 impl Default for NonNegative {
     fn default() -> Self {
         Self::zero()
