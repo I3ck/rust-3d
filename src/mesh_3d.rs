@@ -164,3 +164,11 @@ impl<P> IsMatrix4Transformable for Mesh3D<P> where
         self.pc.transform(m);
     }
 }
+
+impl<P> IsMovable3D for Mesh3D<P> where
+    P: Is3D + IsMovable3D {
+
+    fn move_by(&mut self, x: f64, y: f64, z: f64) {
+        self.pc.move_by(x, y, z)
+    }
+}
