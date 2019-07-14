@@ -20,14 +20,14 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//! Line2D, a line within 3D space
+//! Line3D, a line within 3D space
 
 use std::fmt;
 
 use prelude::*;
 
 #[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
-/// Line2D, a line within 3D space
+/// Line3D, a line within 3D space
 pub struct Line3D {
     pub anchor: Point3D,
     pub dir: Norm3D
