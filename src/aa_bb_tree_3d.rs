@@ -47,11 +47,11 @@ impl<HB> AABBTree3D<HB> where
         Ok(Self::new_rec(data, maxdepth, 0))
     }
 
-    pub fn line_intersecting<'a>(&'a self, line: &Line3D, result: &mut Vec<&'a HB>) {
+    pub fn for_each_intersection_candidate<'a>(&'a self, line: &Line3D, f: &mut FnMut(&HB)) {
         match self {
             AABBTree3D::Empty          => (),
-            AABBTree3D::Leaf(leaf)     => leaf.line_intersecting(line, result),
-            AABBTree3D::Branch(branch) => branch.line_intersecting(line, result)
+            AABBTree3D::Leaf(leaf)     => leaf  .for_each_intersection_candidate(line, f),
+            AABBTree3D::Branch(branch) => branch.for_each_intersection_candidate(line, f)
         }
     }
 
@@ -170,13 +170,13 @@ impl<HB> AABBTree3DLeaf<HB> where
         AABBTree3DLeaf{data, bb, _marker: PhantomData}
     }
 
-    pub fn line_intersecting<'a>(&'a self, line: &Line3D, result: &mut Vec<&'a HB>) {
+    pub fn for_each_intersection_candidate<'a>(&'a self, line: &Line3D, f: &mut FnMut(&HB)) {
         if !intersect(line, &self.bb) {
             return;
         }
         for x in self.data.iter() {
             if intersect(line, &x.bounding_box().unwrap()) { //unwrap fine due to early return in new
-                result.push(x)
+                f(x)
             }
         }
     }
@@ -251,13 +251,13 @@ impl<HB> AABBTree3DBranch<HB> where
         AABBTree3DBranch{left, right, bb, _marker: PhantomData}
     }
 
-    pub fn line_intersecting<'a>(&'a self, line: &Line3D, result: &mut Vec<&'a HB>) {
+    pub fn for_each_intersection_candidate<'a>(&'a self, line: &Line3D, f: &mut FnMut(&HB)) {
         if !intersect(line, &self.bb) {
             return;
         }
 
-        self.left.line_intersecting(line, result);
-        self.right.line_intersecting(line, result);
+        self.left .for_each_intersection_candidate(line, f);
+        self.right.for_each_intersection_candidate(line, f);
     }
 
     pub fn bb_colliding(&self, bb: &BoundingBox3D) -> Vec<&HB> {

@@ -129,3 +129,5 @@ bounding box < - > box code duplication
 update to 2018 edition?
 
 especially the (AABB)trees allocate too much memory
+
+use the for_each_intersecting solution at many more places, since this allows avoiding allocations easily
