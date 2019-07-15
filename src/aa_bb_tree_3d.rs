@@ -23,6 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! AABBTree3D, an axis aligned bounding box tree in 3D for fast collision detection
 
 use prelude::*;
+use functions::intersect;
 
 use std::marker::PhantomData;
 
@@ -44,6 +45,14 @@ impl<HB> AABBTree3D<HB> where
             x.bounding_box()?; //ensure bbs are known
         }
         Ok(Self::new_rec(data, maxdepth, 0))
+    }
+
+    pub fn line_intersecting(&self, line: &Line3D) -> Vec<&HB> {
+        match self {
+            AABBTree3D::Empty          => Vec::new(),
+            AABBTree3D::Leaf(leaf)     => leaf.line_intersecting(line),
+            AABBTree3D::Branch(branch) => branch.line_intersecting(line)
+        }
     }
 
     pub fn bb_colliding(&self, bb: &BoundingBox3D) -> Vec<&HB> {
@@ -161,6 +170,19 @@ impl<HB> AABBTree3DLeaf<HB> where
         AABBTree3DLeaf{data, bb, _marker: PhantomData}
     }
 
+    pub fn line_intersecting(&self, line: &Line3D) -> Vec<&HB> {
+        let mut result = Vec::new();
+        if !intersect(line, &self.bb) {
+            return result;
+        }
+        for x in self.data.iter() {
+            if intersect(line, &x.bounding_box().unwrap()) { //unwrap fine due to early return in new
+                result.push(x)
+            }
+        }
+        result
+    }
+
     pub fn bb_colliding(&self, bb: &BoundingBox3D) -> Vec<&HB> {
         let mut result = Vec::new();
         if !self.bb.collides_with(bb) {
@@ -229,6 +251,16 @@ impl<HB> AABBTree3DBranch<HB> where
 
     pub fn new(left: Box<AABBTree3D<HB>>, right: Box<AABBTree3D<HB>>, bb: BoundingBox3D) -> Self {
         AABBTree3DBranch{left, right, bb, _marker: PhantomData}
+    }
+
+    pub fn line_intersecting(&self, line: &Line3D) -> Vec<&HB> {
+        if !intersect(line, &self.bb) {
+            return Vec::new();
+        }
+
+        let mut result = self.left.line_intersecting(line);
+        result.append(&mut self.right.line_intersecting(line));
+        result
     }
 
     pub fn bb_colliding(&self, bb: &BoundingBox3D) -> Vec<&HB> {
