@@ -47,11 +47,11 @@ impl<HB> AABBTree3D<HB> where
         Ok(Self::new_rec(data, maxdepth, 0))
     }
 
-    pub fn line_intersecting(&self, line: &Line3D) -> Vec<&HB> {
+    pub fn line_intersecting<'a>(&'a self, line: &Line3D, result: &mut Vec<&'a HB>) {
         match self {
-            AABBTree3D::Empty          => Vec::new(),
-            AABBTree3D::Leaf(leaf)     => leaf.line_intersecting(line),
-            AABBTree3D::Branch(branch) => branch.line_intersecting(line)
+            AABBTree3D::Empty          => (),
+            AABBTree3D::Leaf(leaf)     => leaf.line_intersecting(line, result),
+            AABBTree3D::Branch(branch) => branch.line_intersecting(line, result)
         }
     }
 
@@ -170,17 +170,15 @@ impl<HB> AABBTree3DLeaf<HB> where
         AABBTree3DLeaf{data, bb, _marker: PhantomData}
     }
 
-    pub fn line_intersecting(&self, line: &Line3D) -> Vec<&HB> {
-        let mut result = Vec::new();
+    pub fn line_intersecting<'a>(&'a self, line: &Line3D, result: &mut Vec<&'a HB>) {
         if !intersect(line, &self.bb) {
-            return result;
+            return;
         }
         for x in self.data.iter() {
             if intersect(line, &x.bounding_box().unwrap()) { //unwrap fine due to early return in new
                 result.push(x)
             }
         }
-        result
     }
 
     pub fn bb_colliding(&self, bb: &BoundingBox3D) -> Vec<&HB> {
@@ -253,14 +251,13 @@ impl<HB> AABBTree3DBranch<HB> where
         AABBTree3DBranch{left, right, bb, _marker: PhantomData}
     }
 
-    pub fn line_intersecting(&self, line: &Line3D) -> Vec<&HB> {
+    pub fn line_intersecting<'a>(&'a self, line: &Line3D, result: &mut Vec<&'a HB>) {
         if !intersect(line, &self.bb) {
-            return Vec::new();
+            return;
         }
 
-        let mut result = self.left.line_intersecting(line);
-        result.append(&mut self.right.line_intersecting(line));
-        result
+        self.left.line_intersecting(line, result);
+        self.right.line_intersecting(line, result);
     }
 
     pub fn bb_colliding(&self, bb: &BoundingBox3D) -> Vec<&HB> {
