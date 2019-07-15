@@ -188,3 +188,38 @@ pub fn project_point_on_plane<PL,P2,P3,N>(plane: &PL, point: &P3) -> P2 where
     p2transf.from(tmp);
     p2transf
 }
+
+/// Minimum of two f64 values
+pub fn min64(a: f64, b: f64) -> f64 {
+    if a < b { a } else { b }
+}
+
+/// Maximum of two f64 values
+pub fn max64(a: f64, b: f64) -> f64 {
+    if a > b { a } else { b }
+}
+
+//@todo better location and as trait?
+/// Whether a line and BoundingBox intersect
+pub fn intersect(l: &Line3D, b: &BoundingBox3D) -> bool {
+    let inv_dir  = [1.0 / l.dir.x(), 1.0 / l.dir.y(), 1.0 / l.dir.z()];
+    let min      = b.min_p();
+    let max      = b.max_p();
+
+    let tx1      = (min.x() - l.anchor.x()) * inv_dir[0];
+    let tx2      = (max.x() - l.anchor.x()) * inv_dir[0];
+
+    let mut tmin = min64(tx1, tx2);
+    let mut tmax = max64(tx1, tx2);
+
+    let ty1      = (min.y() - l.anchor.y()) * inv_dir[1];
+    let ty2      = (max.y() - l.anchor.y()) * inv_dir[1];
+
+    tmin         = max64(tmin, min64(ty1, ty2));
+    tmax         = min64(tmax, max64(ty1, ty2));
+
+    let tz1      = (min.z() - l.anchor.z()) * inv_dir[2];
+    let tz2      = (max.z() - l.anchor.z()) * inv_dir[2];
+
+    min64(tmax, max64(tz1, tz2)) >= max64(tmin, min64(tz1, tz2))
+}
