@@ -128,8 +128,8 @@ impl BoundingBox2D {
     }
     /// Tests whether this bounding box and the other overlap in any way
     pub fn collides_with(&self, other: &BoundingBox2D) -> bool {
-           2.0 * self.center_bb().x - other.center_bb().x < ((self.size_x() + other.size_x()).get())
-        && 2.0 * self.center_bb().y - other.center_bb().y < ((self.size_y() + other.size_y()).get())
+           2.0 * (self.center_bb().x - other.center_bb().x).abs() < ((self.size_x() + other.size_x()).get())
+        && 2.0 * (self.center_bb().y - other.center_bb().y).abs() < ((self.size_y() + other.size_y()).get())
     }
     /// Tests whether this bounding box crosses a certain x value
     pub fn crossing_x_value(&self, x: f64) -> bool {
