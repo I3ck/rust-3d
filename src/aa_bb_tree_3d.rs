@@ -104,7 +104,7 @@ impl<HB> AABBTree3D<HB> where
                         1 => Compare::Y,
                         _ => Compare::Z
                     };
-                    let mut bb = Self::bb_of(&data).unwrap(); //unwrap fine due to early return in new and data not empty
+                    let bb     = Self::bb_of(&data).unwrap(); //unwrap fine due to early return in new and data not empty
                     let center = bb.center_bb();
 
                     let dleft  = data.iter().cloned().filter(|x| Self::is_left_of(&comp,  &x.bounding_box().unwrap(), &center)).collect::<Vec<_>>(); //unwrap fine due to early return in new

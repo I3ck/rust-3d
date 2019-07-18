@@ -83,7 +83,7 @@ impl<HB> AABBTree2D<HB> where
                     AABBTree2D::Leaf(AABBTree2DLeaf::new(data, bb))
                 } else {
                     let compx  = depth % 2 != 0;
-                    let mut bb = Self::bb_of(&data).unwrap(); //unwrap fine due to early return in new and data not empty
+                    let bb     = Self::bb_of(&data).unwrap(); //unwrap fine due to early return in new and data not empty
                     let center = bb.center_bb();
 
                     let dleft  = data.iter().cloned().filter(|x| Self::is_left_of(compx,  &x.bounding_box().unwrap(), &center)).collect::<Vec<_>>(); //unwrap fine due to early return in new
