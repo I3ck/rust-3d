@@ -200,8 +200,8 @@ pub fn max64(a: f64, b: f64) -> f64 {
 }
 
 //@todo better location and as trait?
-/// Whether a line and BoundingBox intersect
-pub fn intersect(l: &Line3D, b: &BoundingBox3D) -> bool {
+/// The intersection between a line and BoundingBox if there is any
+pub fn intersection(l: &Line3D, b: &BoundingBox3D) -> Option<Point3D> {
     let inv_dir  = [1.0 / l.dir.x(), 1.0 / l.dir.y(), 1.0 / l.dir.z()];
     let min      = b.min_p();
     let max      = b.max_p();
@@ -221,5 +221,12 @@ pub fn intersect(l: &Line3D, b: &BoundingBox3D) -> bool {
     let tz1      = (min.z() - l.anchor.z()) * inv_dir[2];
     let tz2      = (max.z() - l.anchor.z()) * inv_dir[2];
 
-    min64(tmax, max64(tz1, tz2)) >= max64(tmin, min64(tz1, tz2))
+    tmin         = max64(tmin, min64(tz1, tz2));
+    tmax         = min64(tmax, max64(tz1, tz2));
+
+    if tmax >= tmin {
+        Some(l.anchor.clone() + l.dir.clone()*tmin) //@todo avoid cloning
+    } else {
+        None
+    }
 }

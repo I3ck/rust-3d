@@ -23,7 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! AABBTree3D, an axis aligned bounding box tree in 3D for fast collision detection
 
 use prelude::*;
-use functions::intersect;
+use functions::intersection;
 
 use std::marker::PhantomData;
 
@@ -171,11 +171,11 @@ impl<HB> AABBTree3DLeaf<HB> where
     }
 
     pub fn for_each_intersection_candidate<'a>(&'a self, line: &Line3D, f: &mut FnMut(&HB)) {
-        if !intersect(line, &self.bb) {
+        if intersection(line, &self.bb).is_none() {
             return;
         }
         for x in self.data.iter() {
-            if intersect(line, &x.bounding_box().unwrap()) { //unwrap fine due to early return in new
+            if intersection(line, &x.bounding_box().unwrap()).is_some() { //unwrap fine due to early return in new
                 f(x)
             }
         }
@@ -252,7 +252,7 @@ impl<HB> AABBTree3DBranch<HB> where
     }
 
     pub fn for_each_intersection_candidate<'a>(&'a self, line: &Line3D, f: &mut FnMut(&HB)) {
-        if !intersect(line, &self.bb) {
+        if intersection(line, &self.bb).is_none() {
             return;
         }
 
