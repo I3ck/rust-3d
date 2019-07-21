@@ -78,6 +78,39 @@ impl BoundingBox2D {
             Err(ErrorKind::TooFewPoints)
         }
     }
+    /// Creates a new BoundBox2D which contains all the given positions
+    pub fn from_into_iterator<It2D,P>(source: It2D) -> Result<BoundingBox2D> where
+        It2D: IntoIterator<Item=P>,
+        P: Is2D + Sized {
+
+        let mut count = 0;
+
+        let mut minx : f64 = 0.0;
+        let mut miny : f64 = 0.0;
+        let mut maxx : f64 = 0.0;
+        let mut maxy : f64 = 0.0;
+
+        for p in source {
+            if count == 0 {
+                minx = p.x();
+                miny = p.y();
+                maxx = p.x();
+                maxy = p.y();
+                count += 1;
+                continue;
+            }
+            if p.x() < minx { minx = p.x(); }
+            if p.y() < miny { miny = p.y(); }
+            if p.x() > maxx { maxx = p.x(); }
+            if p.y() > maxy { maxy = p.y(); }
+            count += 1;
+        }
+        if count >= 2 {
+            Self::new(&Point2D{x: minx, y: miny}, &Point2D{x: maxx, y: maxy})
+        } else {
+            Err(ErrorKind::TooFewPoints)
+        }
+    }
     /// Returns the minimum position of the bounding box
     pub fn min_p(&self) -> Point2D {
         self.min.clone()

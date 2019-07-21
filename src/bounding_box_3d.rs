@@ -84,6 +84,45 @@ impl BoundingBox3D {
             Err(ErrorKind::TooFewPoints)
         }
     }
+    /// Creates a new BoundBox3D which contains all the given positions
+    pub fn from_into_iterator<It3D,P>(source: It3D) -> Result<BoundingBox3D> where
+        It3D: IntoIterator<Item=P>,
+        P: Is3D + Sized {
+
+        let mut count = 0;
+
+        let mut minx : f64 = 0.0;
+        let mut miny : f64 = 0.0;
+        let mut minz : f64 = 0.0;
+        let mut maxx : f64 = 0.0;
+        let mut maxy : f64 = 0.0;
+        let mut maxz : f64 = 0.0;
+
+        for p in source {
+            if count == 0 {
+                minx = p.x();
+                miny = p.y();
+                minz = p.z();
+                maxx = p.x();
+                maxy = p.y();
+                maxz = p.z();
+                count += 1;
+                continue;
+            }
+            if p.x() < minx { minx = p.x(); }
+            if p.y() < miny { miny = p.y(); }
+            if p.z() < minz { minz = p.z(); }
+            if p.x() > maxx { maxx = p.x(); }
+            if p.y() > maxy { maxy = p.y(); }
+            if p.z() > maxz { maxz = p.z(); }
+            count += 1;
+        }
+        if count >= 2 {
+            Self::new(&Point3D{x: minx, y: miny, z: minz}, &Point3D{x: maxx, y: maxy, z: maxz})
+        } else {
+            Err(ErrorKind::TooFewPoints)
+        }
+    }
     /// Returns the minimum position of the bounding box
     pub fn min_p(&self) -> Point3D {
         self.min.clone()
