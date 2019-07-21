@@ -139,6 +139,15 @@ impl BoundingBox2D {
     pub fn crossing_y_value(&self, y: f64) -> bool {
         self.min.y() < y && self.max.y() > y
     }
+    /// Returns the corner points of the bounding box
+    pub fn corners(&self) -> [Point2D; 4] {
+        [
+            Point2D::new(self.min.x(), self.min.y()),
+            Point2D::new(self.min.x(), self.max.y()),
+            Point2D::new(self.max.x(), self.min.y()),
+            Point2D::new(self.max.x(), self.max.y()),
+        ]
+    }
 }
 
 impl Default for BoundingBox2D {

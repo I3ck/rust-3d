@@ -161,6 +161,19 @@ impl BoundingBox3D {
     pub fn crossing_z_value(&self, z: f64) -> bool {
         self.min.z() < z && self.max.z() > z
     }
+    /// Returns the corner points of the bounding box
+    pub fn corners(&self) -> [Point3D; 8] {
+        [
+            Point3D::new(self.min.x(), self.min.y(), self.min.z()),
+            Point3D::new(self.min.x(), self.min.y(), self.max.z()),
+            Point3D::new(self.min.x(), self.max.y(), self.min.z()),
+            Point3D::new(self.min.x(), self.max.y(), self.max.z()),
+            Point3D::new(self.max.x(), self.min.y(), self.min.z()),
+            Point3D::new(self.max.x(), self.min.y(), self.max.z()),
+            Point3D::new(self.max.x(), self.max.y(), self.min.z()),
+            Point3D::new(self.max.x(), self.max.y(), self.max.z()),
+        ]
+    }
 }
 
 impl Default for BoundingBox3D {
