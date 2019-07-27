@@ -47,6 +47,14 @@ impl<HB> AABBTree3D<HB> where
         Ok(Self::new_rec(data, maxdepth, 0))
     }
 
+    pub fn any<'a>(&'a self, f: &Fn(&HB) -> bool) -> bool {
+        match self {
+            AABBTree3D::Empty          => false,
+            AABBTree3D::Leaf(leaf)     => leaf  .any(f),
+            AABBTree3D::Branch(branch) => branch.any(f)
+        }
+    }
+
     pub fn for_each_intersection_candidate<'a>(&'a self, line: &Line3D, f: &mut FnMut(&HB)) {
         match self {
             AABBTree3D::Empty          => (),
@@ -178,6 +186,15 @@ impl<HB> AABBTree3DLeaf<HB> where
         AABBTree3DLeaf{data, bb, _marker: PhantomData}
     }
 
+    pub fn any<'a>(&'a self, f: &Fn(&HB) -> bool) -> bool {
+        for x in self.data.iter() {
+            if f(x) { //unwrap fine due to early return in new
+                return true
+            }
+        }
+        false
+    }
+
     pub fn for_each_intersection_candidate<'a>(&'a self, line: &Line3D, f: &mut FnMut(&HB)) {
         if intersection(line, &self.bb).is_none() {
             return;
@@ -268,6 +285,10 @@ impl<HB> AABBTree3DBranch<HB> where
 
     pub fn new(left: Box<AABBTree3D<HB>>, right: Box<AABBTree3D<HB>>, bb: BoundingBox3D) -> Self {
         AABBTree3DBranch{left, right, bb, _marker: PhantomData}
+    }
+
+    pub fn any<'a>(&'a self, f: &Fn(&HB) -> bool) -> bool {
+        self.left.any(f) || self.right.any(f)
     }
 
     pub fn for_each_intersection_candidate<'a>(&'a self, line: &Line3D, f: &mut FnMut(&HB)) {

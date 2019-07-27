@@ -131,3 +131,6 @@ update to 2018 edition?
 especially the (AABB)trees allocate too much memory
 
 use the for_each_intersecting solution at many more places, since this allows avoiding allocations easily (Trees, unifiy AABBTrees)
+
+additionally to any() for trees, add all()
+ -> also consider implementing at least iter(), which can then replace any of such helper methods
