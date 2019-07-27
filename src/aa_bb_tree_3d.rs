@@ -55,6 +55,14 @@ impl<HB> AABBTree3D<HB> where
         }
     }
 
+    pub fn for_each_collision_candidate<'a>(&'a self, bb: &BoundingBox3D, f: &mut FnMut(&HB)) {
+        match self {
+            AABBTree3D::Empty          => (),
+            AABBTree3D::Leaf(leaf)     => leaf  .for_each_collision_candidate(bb, f),
+            AABBTree3D::Branch(branch) => branch.for_each_collision_candidate(bb, f)
+        }
+    }
+
     pub fn bb_colliding(&self, bb: &BoundingBox3D) -> Vec<&HB> {
         match self {
             AABBTree3D::Empty          => Vec::new(),
@@ -181,6 +189,17 @@ impl<HB> AABBTree3DLeaf<HB> where
         }
     }
 
+    pub fn for_each_collision_candidate<'a>(&'a self, bb: &BoundingBox3D, f: &mut FnMut(&HB)) {
+        if !self.bb.collides_with(bb) {
+            return;
+        }
+        for x in self.data.iter() {
+            if x.bounding_box().unwrap().collides_with(bb) { //unwrap fine due to early return in new
+                f(x)
+            }
+        }
+    }
+
     pub fn bb_colliding(&self, bb: &BoundingBox3D) -> Vec<&HB> {
         let mut result = Vec::new();
         if !self.bb.collides_with(bb) {
@@ -258,6 +277,15 @@ impl<HB> AABBTree3DBranch<HB> where
 
         self.left .for_each_intersection_candidate(line, f);
         self.right.for_each_intersection_candidate(line, f);
+    }
+
+    pub fn for_each_collision_candidate<'a>(&'a self, bb: &BoundingBox3D, f: &mut FnMut(&HB)) {
+        if !self.bb.collides_with(bb) {
+            return;
+        }
+
+        self.left .for_each_collision_candidate(bb, f);
+        self.right.for_each_collision_candidate(bb, f);
     }
 
     pub fn bb_colliding(&self, bb: &BoundingBox3D) -> Vec<&HB> {
