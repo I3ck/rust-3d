@@ -106,18 +106,4 @@ impl IsNormalized2D for Norm2D {
 
         Ok(Norm2D { x: f * p.x() , y: f * p.y() })
     }
-
-    fn norm_x() -> Self {
-        Norm2D {
-            x: 1.0,
-            y: 0.0
-        }
-    }
-
-    fn norm_y() -> Self {
-        Norm2D {
-            x: 0.0,
-            y: 1.0
-        }
-    }
 }

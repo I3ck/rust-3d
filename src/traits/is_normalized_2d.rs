@@ -29,11 +29,16 @@ pub trait IsNormalized2D :
     Sized + 
     Is2D {
     
-    /// Should return a new normalized object
+    /// Should construct a new object and only fail if it can't be normalized
     fn new<P>(p: P) -> Result<Self> where
         P: Is2D;
-    /// Should return a new normalized object which only points in the x-Direction
-    fn norm_x() -> Self;
-    /// Should return a new normalized object which only points in the y-Direction
-    fn norm_y() -> Self;
+
+    /// Returns a new normalized object which only points in the x-Direction
+    fn norm_x() -> Self {
+        Self::new(Point2D::new(1.0, 0.0)).unwrap()
+    }
+    /// Returns a new normalized object which only points in the y-Direction
+    fn norm_y() -> Self {
+        Self::new(Point2D::new(0.0, 1.0)).unwrap()
+    }
 }

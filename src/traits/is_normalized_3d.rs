@@ -28,13 +28,20 @@ use prelude::*;
 pub trait IsNormalized3D : 
     Sized + 
     Is3D {
-    
+    /// Should construct a new object and only fail if it can't be normalized
     fn new<P>(p: P) -> Result<Self> where
         P: Is3D;
-    /// Should return a new normalized object which only points in the x-Direction
-    fn norm_x() -> Self;
-    /// Should return a new normalized object which only points in the y-Direction
-    fn norm_y() -> Self;
-    /// Should return a new normalized object which only points in the z-Direction
-    fn norm_z() -> Self;
+
+    /// Returns a new normalized object which only points in the x-Direction
+    fn norm_x() -> Self {
+        Self::new(Point3D::new(1.0, 0.0, 0.0)).unwrap()
+    }
+    /// Returns a new normalized object which only points in the y-Direction
+    fn norm_y() -> Self {
+        Self::new(Point3D::new(0.0, 1.0, 0.0)).unwrap()
+    }
+    /// Returns a new normalized object which only points in the z-Direction
+    fn norm_z() -> Self {
+        Self::new(Point3D::new(0.0, 0.0, 1.0)).unwrap()
+    }
 }

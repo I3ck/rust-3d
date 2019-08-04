@@ -113,28 +113,4 @@ impl IsNormalized3D for Norm3D {
 
         Ok(Norm3D { x: f * p.x(), y: f * p.y(), z: f * p.z() })
     }
-
-    fn norm_x() -> Self {
-        Norm3D {
-            x: 1.0,
-            y: 0.0,
-            z: 0.0
-        }
-    }
-
-    fn norm_y() -> Self {
-        Norm3D {
-            x: 0.0,
-            y: 1.0,
-            z: 0.0
-        }
-    }
-
-    fn norm_z() -> Self {
-        Norm3D {
-            x: 0.0,
-            y: 0.0,
-            z: 1.0
-        }
-    }
 }
