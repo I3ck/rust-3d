@@ -120,6 +120,7 @@ pub mod distances_2d;
 pub mod distances_3d;
 pub mod distances_nd;
 pub mod test_helper;
+pub mod utils;
 
 mod           aa_bb_tree_2d;
 pub use self::aa_bb_tree_2d::AABBTree2D;
@@ -237,5 +238,3 @@ pub use self::shapes::*;
 
 mod enums;
 pub use self::enums::*;
-
-mod utils;
