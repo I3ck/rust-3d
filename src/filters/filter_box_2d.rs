@@ -74,7 +74,7 @@ impl IsBuildable2D for FilterBox2D {
         FilterBox2D::new(Box2D::new(x, y))
     }
 
-    fn from<P>(&mut self, other: P) where
+    fn from<P>(&mut self, other: &P) where
         P: Is2D {
 
         self.box_2d.from(other)

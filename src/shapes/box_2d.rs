@@ -102,7 +102,7 @@ impl IsBuildable2D for Box2D {
         Box2D{center: Point2D{x: x, y: y}, size_x: Positive::one(), size_y: Positive::one()}
     }
 
-    fn from<P>(&mut self, other: P) where
+    fn from<P>(&mut self, other: &P) where
         P: Is2D {
 
         self.center.from(other)

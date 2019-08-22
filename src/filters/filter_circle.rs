@@ -74,7 +74,7 @@ impl IsBuildable2D for FilterCircle {
         FilterCircle::new(Circle::new(x, y))
     }
 
-    fn from<P>(&mut self, other: P)
+    fn from<P>(&mut self, other: &P)
         where P: Is2D {
 
         self.circle.from(other)

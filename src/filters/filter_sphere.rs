@@ -79,7 +79,7 @@ impl IsBuildable3D for FilterSphere {
         FilterSphere::new(Sphere::new(x, y, z))
     }
 
-    fn from<P>(&mut self, other: P)
+    fn from<P>(&mut self, other: &P)
         where P: Is3D {
 
         self.sphere.from(other)

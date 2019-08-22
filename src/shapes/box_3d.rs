@@ -110,7 +110,7 @@ impl IsBuildable3D for Box3D {
         Box3D{center: Point3D{x: x, y: y, z: z}, size_x: Positive::one(), size_y: Positive::one(), size_z: Positive::one()}
     }
 
-    fn from<P>(&mut self, other: P)
+    fn from<P>(&mut self, other: &P)
         where P: Is3D {
 
         self.center.from(other)

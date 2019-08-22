@@ -87,7 +87,7 @@ impl IsBuildable3D for Sphere {
         Sphere{center: Point3D{x, y, z}, radius: Positive::one()}
     }
 
-    fn from<P>(&mut self, other: P)
+    fn from<P>(&mut self, other: &P)
         where P: Is3D {
 
         self.center.from(other)

@@ -151,7 +151,7 @@ impl IsBuildable2D for Point2D {
         Point2D{x: x, y: y}
     }
 
-    fn from<P>(&mut self, other: P)
+    fn from<P>(&mut self, other: &P)
         where P: Is2D {
 
         self.x = other.x();

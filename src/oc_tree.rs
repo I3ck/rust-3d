@@ -308,7 +308,7 @@ impl<P> OcNode<P> where
             n.collect(depth+1, maxdepth, &mut sub_pc);
             if let Ok(c) = sub_pc.center_of_gravity() {
                 let mut p = P::default();
-                p.from(c);
+                p.from(&c);
                 pc.push(p);
             }
         } else {

@@ -160,7 +160,7 @@ impl IsBuildable3D for Point3D {
         Point3D{x: x, y: y, z: z}
     }
 
-    fn from<P>(&mut self, other: P)
+    fn from<P>(&mut self, other: &P)
         where P: Is3D {
 
         self.x = other.x();

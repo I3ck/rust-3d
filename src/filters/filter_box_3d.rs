@@ -78,7 +78,7 @@ impl IsBuildable3D for FilterBox3D {
         FilterBox3D::new(Box3D::new(x, y, z))
     }
 
-    fn from<P>(&mut self, other: P)
+    fn from<P>(&mut self, other: &P)
         where P: Is3D {
 
         self.box_3d.from(other)

@@ -42,11 +42,11 @@ pub trait IsBuildable3D :
     /// Should build an object from x, y and z coordinates
     fn new(x: f64, y: f64, z: f64) -> Self;
     /// Should use the coordinates of another as its own
-    fn from<P>(&mut self, other: P) where
+    fn from<P>(&mut self, other: &P) where
         P: Is3D;
 
     /// Uses the coordinates of other to create a new
-    fn new_from<P>(other: P) -> Self where
+    fn new_from<P>(other: &P) -> Self where
         P: Is3D {
             Self::new(other.x(), other.y(), other.z())
     }

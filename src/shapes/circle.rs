@@ -83,7 +83,7 @@ impl IsBuildable2D for Circle {
         Circle{ center: Point2D{x: x, y: y}, radius: Positive::one()}
     }
 
-    fn from<P>(&mut self, other: P)
+    fn from<P>(&mut self, other: &P)
         where P: Is2D {
 
         self.center.from(other)

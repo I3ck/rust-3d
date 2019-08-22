@@ -185,7 +185,7 @@ pub fn project_point_on_plane<PL,P2,P3,N>(plane: &PL, point: &P3) -> P2 where
     tmp.set_x(plane.u().dot(&relative));
     tmp.set_y(plane.v().dot(&relative));
 
-    p2transf.from(tmp);
+    p2transf.from(&tmp);
     p2transf
 }
 
