@@ -23,8 +23,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! utility functions
 
 use std::cmp::Ordering;
+use std::ops::Sub;
 
 use prelude::*;
+use distances_3d::sqr_dist_3d;
 
 //@todo move these functions to better fitting files or make them methods of the correct types
 
@@ -169,6 +171,135 @@ pub fn conn<P>(p_from: &P, p_to: &P) -> P where
         p_to.y() - p_from.y(),
         p_to.z() - p_from.z()
     )
+}
+
+/// Positions the object in such a way that its center is at origin
+pub fn center<T>(x: &mut T) where
+    T: HasBoundingBox3D + IsMovable3D {
+
+    if let Ok(bb) = x.bounding_box() {
+        let center = bb.center_bb();
+        x.move_by(-center.x(), -center.y(), -center.z());
+    }
+}
+
+/// Scales the object to the required size
+pub fn set_size<T>(x: &mut T, size: [Positive; 3]) where
+    T: HasBoundingBox3D + IsMatrix4Transformable  {
+
+    if let Ok(bb) = x.bounding_box() {
+        let m = Matrix4::scale(size[0].get() / bb.size_x().get(), size[1].get() / bb.size_y().get(), size[2].get() / bb.size_z().get());
+        x.transform(&m);
+    }
+}
+
+/// Collects all intersections between a ray and mesh
+pub fn collect_intersections_ray_mesh<P, M>(ray: &Ray3D, mesh: &M, intersections: &mut Vec<P>) where
+    M: IsMesh<P, Face3>,
+    P: IsBuildable3D + Sub<Output = P> + Clone {
+
+    let nf = mesh.num_faces();
+    
+    for i in 0..nf {
+        let (v1, v2, v3) = mesh.face_vertices(FId{val: i}).unwrap(); // safe
+        //println!("face_vertices");
+        if let Some(intersection) = intersection_ray_triangle(ray, &v1, &v2, &v3) {
+            intersections.push(intersection);
+        }
+    }
+}
+
+//@todo more generic types?
+//@todo many clones required, check whether sub add etc. can be implemented more efficently
+/// Finds the intersection between a ray and triangle
+pub fn intersection_ray_triangle<P>(ray: &Ray3D, v1: &P, v2: &P, v3: &P) -> Option<P> where 
+    P: IsBuildable3D + Sub<Output = P> + Clone {
+
+    let orig = &ray.line.anchor;
+    let dir  = &ray.line.dir;
+    let n    = normal_of_face(v1, v2, v3);
+
+    let w1 = orig.clone() - v1.clone();
+    let a  = -n.dot(&w1);
+    let b  =  n.dot(dir);
+
+    if b == 0.0 { return None } //@todo eps
+
+    let r = a / b;
+
+    if r <= 0.0 { return None }
+
+    let p   = orig.clone() + dir.clone()*r;
+
+    let e1  = v2.clone() - v1.clone();
+    let vp1 = p.clone()  - v1.clone();
+    if n.dot(&cross(&e1, &vp1)) <= 0.0 { return None }
+
+    let e2  = v3.clone() - v2.clone();
+    let vp2 = p.clone()  - v2.clone();
+    if n.dot(&cross(&e2, &vp2)) <= 0.0 { return None }
+
+    let e3  = v1.clone() - v3.clone();
+    let vp3 = p.clone()  - v3.clone();
+    if n.dot(&cross(&e3, &vp3)) <= 0.0 { return None }
+
+    Some(P::new_from(&p))
+}
+
+/// Returns the closest intersection with the ray
+pub fn closest_intersecting<'c, I, HB>(ray: &Ray3D, hbs: I) -> Option<(Point3D, &'c mut HB)> where
+    I: Iterator<Item = &'c mut HB>,
+    HB: HasBoundingBox3D {
+
+    let mut result: Option<(Point3D, &'c mut HB)> = None;
+    
+    for hb in hbs {
+        if let Ok(bb) = hb.bounding_box() {
+            if let Some(i) = intersection(&ray.line, &bb) {
+                if let Some(r) = &result {
+                    if sqr_dist_3d(&ray.line.anchor, &i) < sqr_dist_3d(&ray.line.anchor, &r.0) {
+                        result = Some((i, hb)) 
+                    }
+                } else {
+                    result = Some((i, hb))
+                }
+            }
+        }
+    }
+
+    result
+}
+
+/// Returns the index of the closest intersection with the ray
+pub fn index_closest_intersecting<HB>(ray: &Ray3D, hbs: &[HB]) -> Option<(Point3D, usize)> where
+    HB: HasBoundingBox3D {
+
+    let mut result: Option<(Point3D, usize)> = None;
+    
+    for (i, hb) in hbs.iter().enumerate() {
+        if let Ok(bb) = hb.bounding_box() {
+            if let Some(inter) = intersection(&ray.line, &bb) {
+                if let Some(r) = &result {
+                    if sqr_dist_3d(&ray.line.anchor, &inter) < sqr_dist_3d(&ray.line.anchor, &r.0) {
+                        result = Some((inter, i)) 
+                    }
+                } else {
+                    result = Some((inter, i))
+                }
+            }
+        }
+    }
+
+    result
+}
+
+/// Calculates the normal of a face given by three vertices
+pub fn normal_of_face<P>(v1: &P, v2: &P, v3: &P) -> Norm3D where
+    P: IsBuildable3D {
+
+    let v12 = conn(v1, v2);
+    let v23 = conn(v2, v3);
+    Norm3D::new(cross(&v12, &v23)).unwrap_or(Norm3D::norm_z())
 }
 
 /// Projects a point onto a plane
