@@ -69,10 +69,10 @@ impl<P> IsMesh<P, Face3> for Mesh3D<P> where
         Ok(Face3::new(self.topology[id1], self.topology[id2], self.topology[id3]))
     }
 
-    fn face_vertices(&self, faceid: FId) -> Result<(P, P, P)> {
+    fn face_vertices(&self, faceid: FId) -> Result<[P; 3]> {
         let face = self.face_vertex_ids(faceid)?;
         if let (Ok(v1), Ok(v2), Ok(v3)) = (self.vertex(face.a), self.vertex(face.b), self.vertex(face.c)) {
-            return Ok((v1, v2, v3));
+            return Ok([v1, v2, v3]);
         }
         Err(ErrorKind::IncorrectVertexID)
     }

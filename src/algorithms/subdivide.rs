@@ -47,7 +47,7 @@ pub fn linear<V, MI, MO>(mi: &MI) -> Result<(MO)> where
     for i in 0..n_faces {
         let f               = mi.face_vertex_ids(FId{val:i})?;
         let (vi1, vi2, vi3) = (f.vid(0)?, f.vid(1)?, f.vid(2)?);
-        let (v1, v2, v3)    = mi.face_vertices(FId{ val:i })?;
+        let [v1, v2, v3]    = mi.face_vertices(FId{ val:i })?;
         
         let ia = *added_edges.entry((min(vi1, vi2), max(vi1, vi2))).or_insert_with(|| mo.add_vertex(v1.center(&v2).unwrap()));
         let ib = *added_edges.entry((min(vi2, vi3), max(vi2, vi3))).or_insert_with(|| mo.add_vertex(v2.center(&v3).unwrap()));

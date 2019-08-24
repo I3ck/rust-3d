@@ -30,7 +30,7 @@ pub trait IsMesh3D<P> : IsMesh<P, Face3> where
     P: IsBuildable3D {
     /// Returns the normal of a face
     fn face_normal(&self, faceid: FId) -> Result<Norm3D> {
-        let (v1, v2, v3) = self.face_vertices(faceid)?;
+        let [v1, v2, v3] = self.face_vertices(faceid)?;
 
         let v12 = conn(&v1, &v2);
         let v23 = conn(&v2, &v3);

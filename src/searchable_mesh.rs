@@ -77,7 +77,7 @@ impl<M, T> IsMesh<T, Face3> for SearchableMesh<M, T> where
         self.mesh.face_vertex_ids(faceid)
     }
 
-    fn face_vertices(&self, faceid: FId) -> Result<(T, T, T)> {
+    fn face_vertices(&self, faceid: FId) -> Result<[T; 3]> {
         self.mesh.face_vertices(faceid)
     }
 
