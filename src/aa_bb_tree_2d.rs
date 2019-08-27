@@ -26,6 +26,7 @@ use prelude::*;
 
 use std::marker::PhantomData;
 
+#[derive (Clone)]
 /// AABBTree2D, an axis aligned bounding box tree in 2D for fast collision detection
 pub enum AABBTree2D<HB> where
     HB: HasBoundingBox2D + Clone {
@@ -131,6 +132,7 @@ impl<HB> AABBTree2D<HB> where
     }
 }
 
+#[derive (Clone)]
 //todo describe
 pub struct AABBTree2DLeaf<HB> where
     HB: HasBoundingBox2D {
@@ -187,6 +189,7 @@ impl<HB> AABBTree2DLeaf<HB> where
     }
 }
 
+#[derive (Clone)]
 //todo describe
 pub struct AABBTree2DBranch<HB> where
     HB: HasBoundingBox2D + Clone {
