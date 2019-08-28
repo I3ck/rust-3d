@@ -41,11 +41,11 @@ pub enum AABBTree3D<HB> where
 impl<HB> AABBTree3D<HB> where
     HB: HasBoundingBox3D + Clone {
 
-    pub fn new(data: Vec<HB>, maxdepth: usize) -> Result<Self> {
+    pub fn new(data: Vec<HB>, maxdepth: usize, allowed_bucket_size: usize) -> Result<Self> {
         for x in data.iter() {
             x.bounding_box()?; //ensure bbs are known
         }
-        Ok(Self::new_rec(data, maxdepth, 0))
+        Ok(Self::new_rec(data, maxdepth, allowed_bucket_size, 0))
     }
 
     pub fn any<'a>(&'a self, f: &Fn(&HB) -> bool) -> bool {
@@ -104,7 +104,7 @@ impl<HB> AABBTree3D<HB> where
         }
     }
 
-    fn new_rec(data: Vec<HB>, maxdepth: usize, depth: usize) -> Self {
+    fn new_rec(data: Vec<HB>, maxdepth: usize, allowed_bucket_size: usize, depth: usize) -> Self {
         match data.len() {
             0 => AABBTree3D::Empty,
             1 => {
@@ -112,7 +112,7 @@ impl<HB> AABBTree3D<HB> where
                 AABBTree3D::Leaf(AABBTree3DLeaf::new(data, bb))
             },
             _ => {
-                if depth >= maxdepth {
+                if depth >= maxdepth || data.len() <= allowed_bucket_size {
                     let bb = Self::bb_of(&data).unwrap(); //unwrap fine, since data non empty and with valid bbs (see new)
                     AABBTree3D::Leaf(AABBTree3DLeaf::new(data, bb))
                 } else {
@@ -130,8 +130,8 @@ impl<HB> AABBTree3D<HB> where
                     if (dleft.len() == dright.len()) && dleft.len() == data.len() {
                         AABBTree3D::Leaf(AABBTree3DLeaf::new(data, bb))
                     } else {
-                        let left  = Box::new(Self::new_rec(dleft, maxdepth, depth+1));
-                        let right = Box::new(Self::new_rec(dright, maxdepth, depth+1));
+                        let left  = Box::new(Self::new_rec(dleft,  maxdepth, allowed_bucket_size, depth+1));
+                        let right = Box::new(Self::new_rec(dright, maxdepth, allowed_bucket_size, depth+1));
 
                         AABBTree3D::Branch(AABBTree3DBranch::new(left, right, bb))
                     }
