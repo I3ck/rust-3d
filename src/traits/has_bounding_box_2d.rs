@@ -26,6 +26,6 @@ use prelude::*;
 
 /// HasBoundingBox2D is a trait for types which might have a bounding box
 pub trait HasBoundingBox2D {
-    /// Should return the bounding box as a pair of two points. The first point should be the minimum for all coordinates, the second the maximum for all coordinates
+    /// Should return the bounding box
     fn bounding_box(&self) -> Result<BoundingBox2D>;
 }
