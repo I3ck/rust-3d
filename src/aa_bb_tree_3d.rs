@@ -41,11 +41,8 @@ pub enum AABBTree3D<HB> where
 impl<HB> AABBTree3D<HB> where
     HB: HasBoundingBox3D + Clone {
 
-    pub fn new(data: Vec<HB>, maxdepth: usize, allowed_bucket_size: usize) -> Result<Self> {
-        for x in data.iter() {
-            x.bounding_box()?; //ensure bbs are known
-        }
-        Ok(Self::new_rec(data, maxdepth, allowed_bucket_size, 0))
+    pub fn new(data: Vec<HB>, maxdepth: usize, allowed_bucket_size: usize) -> Self {
+        Self::new_rec(data, maxdepth, allowed_bucket_size, 0)
     }
 
     pub fn any<'a>(&'a self, f: &Fn(&HB) -> bool) -> bool {
@@ -124,8 +121,8 @@ impl<HB> AABBTree3D<HB> where
                     let bb     = Self::bb_of(&data).unwrap(); //unwrap fine due to early return in new and data not empty
                     let center = bb.center_bb();
 
-                    let dleft  = data.iter().cloned().filter(|x| Self::is_left_of(&comp,  &x.bounding_box().unwrap(), &center)).collect::<Vec<_>>(); //unwrap fine due to early return in new
-                    let dright = data.iter().cloned().filter(|x| Self::is_right_of(&comp, &x.bounding_box().unwrap(), &center)).collect::<Vec<_>>(); //unwrap fine due to early return in new
+                    let dleft  = data.iter().cloned().filter(|x| Self::is_left_of( &comp, &x.bounding_box(), &center)).collect::<Vec<_>>();
+                    let dright = data.iter().cloned().filter(|x| Self::is_right_of(&comp, &x.bounding_box(), &center)).collect::<Vec<_>>();
 
                     if (dleft.len() == dright.len()) && dleft.len() == data.len() {
                         AABBTree3D::Leaf(AABBTree3DLeaf::new(data, bb))
@@ -160,9 +157,9 @@ impl<HB> AABBTree3D<HB> where
         if data.len() == 0 {
             return Err(ErrorKind::IndexOutOfBounds) //@todo better type?
         }
-        let mut result = data[0].bounding_box().unwrap(); //unwrap fine due to early return in new
+        let mut result = data[0].bounding_box();
         for x in data.iter() {
-            result.consume(x.bounding_box().unwrap()); //unwrap fine due to early return in new
+            result.consume(x.bounding_box());
         }
 
         Ok(result)
@@ -202,7 +199,7 @@ impl<HB> AABBTree3DLeaf<HB> where
             return;
         }
         for x in self.data.iter() {
-            if intersection(line, &x.bounding_box().unwrap()).is_some() { //unwrap fine due to early return in new
+            if intersection(line, &x.bounding_box()).is_some() {
                 f(x)
             }
         }
@@ -213,7 +210,7 @@ impl<HB> AABBTree3DLeaf<HB> where
             return;
         }
         for x in self.data.iter() {
-            if x.bounding_box().unwrap().collides_with(bb) { //unwrap fine due to early return in new
+            if x.bounding_box().collides_with(bb) {
                 f(x)
             }
         }
@@ -225,7 +222,7 @@ impl<HB> AABBTree3DLeaf<HB> where
             return result;
         }
         for x in self.data.iter() {
-            if x.bounding_box().unwrap().collides_with(bb) { //unwrap fine due to early return in new
+            if x.bounding_box().collides_with(bb) {
                 result.push(x)
             }
         }
@@ -238,7 +235,7 @@ impl<HB> AABBTree3DLeaf<HB> where
             return result;
         }
         for d in self.data.iter() {
-            if d.bounding_box().unwrap().crossing_x_value(x) { //unwrap fine due to early return in new
+            if d.bounding_box().crossing_x_value(x) {
                 result.push(d)
             }
         }
@@ -251,7 +248,7 @@ impl<HB> AABBTree3DLeaf<HB> where
             return result;
         }
         for d in self.data.iter() {
-            if d.bounding_box().unwrap().crossing_y_value(y) { //unwrap fine due to early return in new
+            if d.bounding_box().crossing_y_value(y) {
                 result.push(d)
             }
         }
@@ -264,7 +261,7 @@ impl<HB> AABBTree3DLeaf<HB> where
             return result;
         }
         for d in self.data.iter() {
-            if d.bounding_box().unwrap().crossing_z_value(z) { //unwrap fine due to early return in new
+            if d.bounding_box().crossing_z_value(z) {
                 result.push(d)
             }
         }

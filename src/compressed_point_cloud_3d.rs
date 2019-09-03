@@ -49,7 +49,7 @@ impl<T> CompressedPointCloud3D<T> where
     pub fn compress<P>(pc: &PointCloud3D<P>) -> Result<CompressedPointCloud3D<T>> where
         P: Is3D {
 
-        let bb = pc.bounding_box()?;
+        let bb = pc.bounding_box_maybe()?;
 
         let rangex = (bb.max_p().x - bb.min_p().x).abs();
         let rangey = (bb.max_p().y - bb.min_p().y).abs();

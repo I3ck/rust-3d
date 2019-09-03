@@ -20,12 +20,18 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//! HasBoundingBox3D trait for types which might have a bounding box
+//! HasBoundingBox3D and HasBoundingBox3DMaybe traits for types which (might) have a bounding box
 
 use prelude::*;
 
-/// HasBoundingBox3D is a trait for types which might have a bounding box
-pub trait HasBoundingBox3D {
+/// HasBoundingBox3D is a trait for types which have a bounding box
+pub trait HasBoundingBox3D : HasBoundingBox3DMaybe {
     /// Should return the bounding box
-    fn bounding_box(&self) -> Result<BoundingBox3D>;
+    fn bounding_box(&self) -> BoundingBox3D;
+}
+
+/// HasBoundingBox3DMaybe is a trait for types which might have a bounding box
+pub trait HasBoundingBox3DMaybe {
+    /// Should return the bounding box if it can be calculated
+    fn bounding_box_maybe(&self) -> Result<BoundingBox3D>;
 }

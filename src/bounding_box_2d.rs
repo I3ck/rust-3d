@@ -190,8 +190,14 @@ impl Default for BoundingBox2D {
 }
 
 impl HasBoundingBox2D for BoundingBox2D {
-    fn bounding_box(&self) -> Result<BoundingBox2D> {
-        BoundingBox2D::new(&self.min, &self.max)
+    fn bounding_box(&self) -> BoundingBox2D {
+        BoundingBox2D::new(&self.min, &self.max).unwrap() // safe
+    }
+}
+
+impl HasBoundingBox2DMaybe for BoundingBox2D {
+    fn bounding_box_maybe(&self) -> Result<BoundingBox2D> {
+        Ok(self.bounding_box())
     }
 }
 

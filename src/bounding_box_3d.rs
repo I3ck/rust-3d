@@ -222,8 +222,14 @@ impl Default for BoundingBox3D {
 }
 
 impl HasBoundingBox3D for BoundingBox3D {
-    fn bounding_box(&self) -> Result<BoundingBox3D> {
-        BoundingBox3D::new(&self.min, &self.max)
+    fn bounding_box(&self) -> BoundingBox3D {
+        BoundingBox3D::new(&self.min, &self.max).unwrap() // safe
+    }
+}
+
+impl HasBoundingBox3DMaybe for BoundingBox3D {
+    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
+        Ok(self.bounding_box())
     }
 }
 

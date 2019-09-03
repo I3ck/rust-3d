@@ -149,10 +149,10 @@ impl<P> IsMovable2D for PointCloud2D<P> where
     }
 }
 
-impl<P> HasBoundingBox2D for PointCloud2D<P>
+impl<P> HasBoundingBox2DMaybe for PointCloud2D<P>
     where P: Is2D {
 
-    fn bounding_box(&self) -> Result<BoundingBox2D> {
+    fn bounding_box_maybe(&self) -> Result<BoundingBox2D> {
         BoundingBox2D::from_iterator(&self.data)
     }
 }
@@ -258,7 +258,7 @@ impl<P> IsScalable for PointCloud2D<P> where
     P : IsEditable2D {
 
     fn scale(&mut self, factor: Positive) {
-        if let Ok(bb) = self.bounding_box() {
+        if let Ok(bb) = self.bounding_box_maybe() {
             let c = bb.center_bb();
             for p in &mut self.data {
                 p.increase_distance_to_by(&c, factor);

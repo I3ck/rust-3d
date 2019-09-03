@@ -23,9 +23,11 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! Containing traits used by rust-3d
 mod           has_bounding_box_2d;
 pub use self::has_bounding_box_2d::HasBoundingBox2D;
+pub use self::has_bounding_box_2d::HasBoundingBox2DMaybe;
 
 mod           has_bounding_box_3d;
 pub use self::has_bounding_box_3d::HasBoundingBox3D;
+pub use self::has_bounding_box_3d::HasBoundingBox3DMaybe;
 
 mod           has_center_of_gravity_2d;
 pub use self::has_center_of_gravity_2d::HasCenterOfGravity2D;

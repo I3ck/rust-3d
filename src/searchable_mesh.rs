@@ -151,11 +151,11 @@ impl<M, T> IsSearchableMesh<T, Face3> for SearchableMesh<M, T> where
     }
 }
 
-impl<M, T> HasBoundingBox3D for SearchableMesh<M, T> where
-    M: IsMesh<T, Face3> + HasBoundingBox3D {
+impl<M, T> HasBoundingBox3DMaybe for SearchableMesh<M, T> where
+    M: IsMesh<T, Face3> + HasBoundingBox3DMaybe {
 
-    fn bounding_box(&self) -> Result<BoundingBox3D> {
-        self.mesh.bounding_box()
+    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
+        self.mesh.bounding_box_maybe()
     }
 }
 

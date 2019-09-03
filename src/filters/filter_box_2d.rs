@@ -98,8 +98,14 @@ impl IsEditable2D for FilterBox2D {
 }
 
 impl HasBoundingBox2D for FilterBox2D {
-    fn bounding_box(&self) -> Result<BoundingBox2D> {
+    fn bounding_box(&self) -> BoundingBox2D {
         self.box_2d.bounding_box()
+    }
+}
+
+impl HasBoundingBox2DMaybe for FilterBox2D {
+    fn bounding_box_maybe(&self) -> Result<BoundingBox2D> {
+        self.box_2d.bounding_box_maybe()
     }
 }
 

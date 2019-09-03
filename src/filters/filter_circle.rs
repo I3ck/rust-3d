@@ -98,8 +98,14 @@ impl IsEditable2D for FilterCircle {
 }
 
 impl HasBoundingBox2D for FilterCircle {
-    fn bounding_box(&self) -> Result<BoundingBox2D> {
+    fn bounding_box(&self) -> BoundingBox2D {
         self.circle.bounding_box()
+    }
+}
+
+impl HasBoundingBox2DMaybe for FilterCircle {
+    fn bounding_box_maybe(&self) -> Result<BoundingBox2D> {
+        self.circle.bounding_box_maybe()
     }
 }
 

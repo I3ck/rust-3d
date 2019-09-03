@@ -92,11 +92,11 @@ impl<P> IsMovable2D for Polygon2D<P> where
     }
 }
 
-impl<P> HasBoundingBox2D for Polygon2D<P>
+impl<P> HasBoundingBox2DMaybe for Polygon2D<P>
     where P: Is2D {
 
-    fn bounding_box(&self) -> Result<BoundingBox2D> {
-        self.pc.bounding_box()
+    fn bounding_box_maybe(&self) -> Result<BoundingBox2D> {
+        self.pc.bounding_box_maybe()
     }
 }
 

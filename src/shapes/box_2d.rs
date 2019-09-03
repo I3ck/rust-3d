@@ -126,10 +126,16 @@ impl IsEditable2D for Box2D {
 }
 
 impl HasBoundingBox2D for Box2D {
-    fn bounding_box(&self) -> Result<BoundingBox2D> {
+    fn bounding_box(&self) -> BoundingBox2D {
         let p_min = Point2D{x: self.center.x() - self.size_x.get() / 2.0, y: self.center.y() - self.size_y.get() / 2.0};
         let p_max = Point2D{x: self.center.x() + self.size_x.get() / 2.0, y: self.center.y() + self.size_y.get() / 2.0};
-        BoundingBox2D::new(&p_min, &p_max)
+        BoundingBox2D::new(&p_min, &p_max).unwrap() // safe
+    }
+}
+
+impl HasBoundingBox2DMaybe for Box2D {
+    fn bounding_box_maybe(&self) -> Result<BoundingBox2D> {
+        Ok(self.bounding_box())
     }
 }
 

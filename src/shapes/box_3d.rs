@@ -138,10 +138,16 @@ impl IsEditable3D for Box3D {
 }
 
 impl HasBoundingBox3D for Box3D {
-    fn bounding_box(&self) -> Result<BoundingBox3D> {
+    fn bounding_box(&self) -> BoundingBox3D {
         let p_min = Point3D{x: self.center.x() - self.size_x.get() / 2.0, y: self.center.y() - self.size_y.get() / 2.0, z: self.center.z() - self.size_z.get() / 2.0};
         let p_max = Point3D{x: self.center.x() + self.size_x.get() / 2.0, y: self.center.y() + self.size_y.get() / 2.0, z: self.center.z() + self.size_z.get() / 2.0};
-        BoundingBox3D::new(&p_min, &p_max)
+        BoundingBox3D::new(&p_min, &p_max).unwrap() // safe
+    }
+}
+
+impl HasBoundingBox3DMaybe for Box3D {
+    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
+        Ok(self.bounding_box())
     }
 }
 

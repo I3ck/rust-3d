@@ -127,11 +127,11 @@ impl<P> IsVertexEditableMesh<P, Face3> for Mesh3D<P> where
     }
 }
 
-impl<P> HasBoundingBox3D for Mesh3D<P> where
+impl<P> HasBoundingBox3DMaybe for Mesh3D<P> where
     P: Is3D {
 
-    fn bounding_box(&self) -> Result<BoundingBox3D> {
-        self.pc.bounding_box()
+    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
+        self.pc.bounding_box_maybe()
     }
 }
 

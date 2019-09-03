@@ -134,3 +134,5 @@ use the for_each_intersecting solution at many more places, since this allows av
 
 additionally to any() for trees, add all()
  -> also consider implementing at least iter(), which can then replace any of such helper methods
+
+ before next release ensure tests compile and run

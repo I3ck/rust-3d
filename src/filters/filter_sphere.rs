@@ -107,8 +107,14 @@ impl IsEditable3D for FilterSphere {
 }
 
 impl HasBoundingBox3D for FilterSphere {
-    fn bounding_box(&self) -> Result<BoundingBox3D> {
+    fn bounding_box(&self) -> BoundingBox3D {
         self.sphere.bounding_box()
+    }
+}
+
+impl HasBoundingBox3DMaybe for FilterSphere {
+    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
+        self.sphere.bounding_box_maybe()
     }
 }
 

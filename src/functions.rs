@@ -175,9 +175,9 @@ pub fn conn<P>(p_from: &P, p_to: &P) -> P where
 
 /// Positions the object in such a way that its center is at origin
 pub fn center<T>(x: &mut T) where
-    T: HasBoundingBox3D + IsMovable3D {
+    T: HasBoundingBox3DMaybe + IsMovable3D {
 
-    if let Ok(bb) = x.bounding_box() {
+    if let Ok(bb) = x.bounding_box_maybe() {
         let center = bb.center_bb();
         x.move_by(-center.x(), -center.y(), -center.z());
     }
@@ -185,9 +185,9 @@ pub fn center<T>(x: &mut T) where
 
 /// Scales the object to the required size
 pub fn set_size<T>(x: &mut T, size: [Positive; 3]) where
-    T: HasBoundingBox3D + IsMatrix4Transformable  {
+    T: HasBoundingBox3DMaybe + IsMatrix4Transformable  {
 
-    if let Ok(bb) = x.bounding_box() {
+    if let Ok(bb) = x.bounding_box_maybe() {
         let m = Matrix4::scale(size[0].get() / bb.size_x().get(), size[1].get() / bb.size_y().get(), size[2].get() / bb.size_z().get());
         x.transform(&m);
     }
@@ -249,12 +249,12 @@ pub fn intersection_ray_triangle<P>(ray: &Ray3D, v1: &P, v2: &P, v3: &P) -> Opti
 /// Returns the closest intersection with the ray
 pub fn closest_intersecting<'c, I, HB>(ray: &Ray3D, hbs: I) -> Option<(Point3D, &'c mut HB)> where
     I: Iterator<Item = &'c mut HB>,
-    HB: HasBoundingBox3D {
+    HB: HasBoundingBox3DMaybe {
 
     let mut result: Option<(Point3D, &'c mut HB)> = None;
     
     for hb in hbs {
-        if let Ok(bb) = hb.bounding_box() {
+        if let Ok(bb) = hb.bounding_box_maybe() {
             if let Some(i) = intersection(&ray.line, &bb) {
                 if let Some(r) = &result {
                     if sqr_dist_3d(&ray.line.anchor, &i) < sqr_dist_3d(&ray.line.anchor, &r.0) {
@@ -272,12 +272,12 @@ pub fn closest_intersecting<'c, I, HB>(ray: &Ray3D, hbs: I) -> Option<(Point3D, 
 
 /// Returns the index of the closest intersection with the ray
 pub fn index_closest_intersecting<HB>(ray: &Ray3D, hbs: &[HB]) -> Option<(Point3D, usize)> where
-    HB: HasBoundingBox3D {
+    HB: HasBoundingBox3DMaybe {
 
     let mut result: Option<(Point3D, usize)> = None;
     
     for (i, hb) in hbs.iter().enumerate() {
-        if let Ok(bb) = hb.bounding_box() {
+        if let Ok(bb) = hb.bounding_box_maybe() {
             if let Some(inter) = intersection(&ray.line, &bb) {
                 if let Some(r) = &result {
                     if sqr_dist_3d(&ray.line.anchor, &inter) < sqr_dist_3d(&ray.line.anchor, &r.0) {

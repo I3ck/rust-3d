@@ -55,8 +55,8 @@ impl HasLength for LineSegment3D {
     }
 }
 
-impl HasBoundingBox3D for LineSegment3D {
-    fn bounding_box(&self) -> Result<BoundingBox3D> {
+impl HasBoundingBox3DMaybe for LineSegment3D {
+    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
         BoundingBox3D::from_iterator(&[self.start.clone(), self.end.clone()])
     }
 }
@@ -69,10 +69,10 @@ impl HasCenterOfGravity3D for LineSegment3D {
 
 impl IsScalable for LineSegment3D {
     fn scale(&mut self, factor: Positive) {
-        let c = self.bounding_box().unwrap().center_bb(); //always known
-
-        self.start.increase_distance_to_by(&c, factor);
-        self.end.increase_distance_to_by(&c, factor);
+        if let Ok(c) = self.bounding_box_maybe().map(|x| x.center_bb()) {
+            self.start.increase_distance_to_by(&c, factor);
+            self.end.increase_distance_to_by(&c, factor);
+        }
     }
 }
 

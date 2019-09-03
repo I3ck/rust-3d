@@ -92,11 +92,11 @@ impl<P> IsMovable3D for Polygon3D<P> where
     }
 }
 
-impl<P> HasBoundingBox3D for Polygon3D<P>
+impl<P> HasBoundingBox3DMaybe for Polygon3D<P>
     where P: Is3D {
 
-    fn bounding_box(&self) -> Result<BoundingBox3D> {
-        self.pc.bounding_box()
+    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
+        self.pc.bounding_box_maybe()
     }
 }
 
