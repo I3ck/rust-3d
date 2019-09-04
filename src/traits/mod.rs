@@ -24,10 +24,12 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 mod           has_bounding_box_2d;
 pub use self::has_bounding_box_2d::HasBoundingBox2D;
 pub use self::has_bounding_box_2d::HasBoundingBox2DMaybe;
+pub use self::has_bounding_box_2d::HasBoundingBox2DConverted;
 
 mod           has_bounding_box_3d;
 pub use self::has_bounding_box_3d::HasBoundingBox3D;
 pub use self::has_bounding_box_3d::HasBoundingBox3DMaybe;
+pub use self::has_bounding_box_3d::HasBoundingBox3DConverted;
 
 mod           has_center_of_gravity_2d;
 pub use self::has_center_of_gravity_2d::HasCenterOfGravity2D;

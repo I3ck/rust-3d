@@ -35,3 +35,43 @@ pub trait HasBoundingBox2DMaybe {
     /// Should return the bounding box if it can be calculated
     fn bounding_box_maybe(&self) -> Result<BoundingBox2D>;
 }
+
+//------------------------------------------------------------------------------
+
+//@todo consider moving somewhere else
+
+/// Wrapper helper to convert the Maybe type to the non-Maybe type
+pub struct HasBoundingBox2DConverted<T> where
+    T: HasBoundingBox2DMaybe {
+    
+    data: T
+}
+
+impl<T> HasBoundingBox2DConverted<T> where
+    T: HasBoundingBox2DMaybe {
+        
+    pub fn new(data: T) -> Result<Self> {
+        data.bounding_box_maybe()?; // ensure present
+        Ok(Self { data })
+    }
+
+    pub fn get(&self) -> &T {
+        &self.data
+    }
+}
+
+impl<T> HasBoundingBox2DMaybe for HasBoundingBox2DConverted<T> where
+    T: HasBoundingBox2DMaybe {
+
+    fn bounding_box_maybe(&self) -> Result<BoundingBox2D> {
+        self.data.bounding_box_maybe()
+    } 
+}
+
+impl<T> HasBoundingBox2D for HasBoundingBox2DConverted<T> where
+    T: HasBoundingBox2DMaybe {
+
+    fn bounding_box(&self) -> BoundingBox2D {
+        self.data.bounding_box_maybe().unwrap() // safe since enforced on construction
+    } 
+}
