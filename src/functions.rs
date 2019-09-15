@@ -246,6 +246,20 @@ pub fn intersection_ray_triangle<P>(ray: &Ray3D, v1: &P, v2: &P, v3: &P) -> Opti
     Some(P::new_from(&p))
 }
 
+/// Applies the function to each intersection candidate
+pub fn for_each_intersecting<'c, I, HB>(ray: &Ray3D, hbs: I, f: &mut FnMut(&Point3D, &'c mut HB)) where
+    I: Iterator<Item = &'c mut HB>,
+    HB: HasBoundingBox3DMaybe {
+
+    for hb in hbs {
+        if let Ok(bb) = hb.bounding_box_maybe() {
+            if let Some(i) = intersection(&ray.line, &bb) {
+                f(&i, hb)
+            }
+        }
+    }
+}
+
 /// Returns the closest intersection with the ray
 pub fn closest_intersecting<'c, I, HB>(ray: &Ray3D, hbs: I) -> Option<(Point3D, &'c mut HB)> where
     I: Iterator<Item = &'c mut HB>,
