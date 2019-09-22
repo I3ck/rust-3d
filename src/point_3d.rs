@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use std::fmt;
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
-use std::ops::{Add, Mul, Sub, Neg};
+use std::ops::{Add, Mul, Sub, Neg, Div};
 use utils::hash_f64;
 
 use prelude::*;
@@ -85,6 +85,14 @@ impl Mul<f64> for Point3D {
 
     fn mul(self, other: f64) -> Point3D {
         Point3D {x: other * self.x, y: other * self.y, z: other * self.z}
+    }
+}
+
+impl Div<f64> for Point3D {
+    type Output = Point3D;
+
+    fn div(self, other: f64) -> Point3D {
+        Point3D {x: other / self.x, y: other / self.y, z: other / self.z}
     }
 }
 

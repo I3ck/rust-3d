@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use std::fmt;
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
-use std::ops::{Add, Mul, Sub, Neg};
+use std::ops::{Add, Mul, Sub, Neg, Div};
 
 use prelude::*;
 use distances_2d::*;
@@ -83,6 +83,14 @@ impl Mul<f64> for Point2D {
 
     fn mul(self, other: f64) -> Point2D {
         Point2D {x: other * self.x, y: other * self.y}
+    }
+}
+
+impl Div<f64> for Point2D {
+    type Output = Point2D;
+
+    fn div(self, other: f64) -> Point2D {
+        Point2D {x: self.x / other, y: self.y / other}
     }
 }
 
