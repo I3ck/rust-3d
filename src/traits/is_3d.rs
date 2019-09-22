@@ -23,7 +23,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! Is3D trait used for types which are positioned within the 3D space
 
 use prelude::*;
-use utils::max_f64_3;
 
 use std::f64::consts::PI;
 
@@ -85,6 +84,7 @@ impl<P> HasDistanceTo<P> for Is3D where
     }
 }
 
+/* causing conflicts now
 impl HasDistanceTo<BoundingBox3D> for Is3D {
     fn sqr_distance(&self, other: &BoundingBox3D) -> NonNegative {
         let dx = max_f64_3(other.min_p().x() - self.x(), 0.0, self.x() - other.max_p().x());
@@ -93,3 +93,4 @@ impl HasDistanceTo<BoundingBox3D> for Is3D {
         NonNegative::new(dx*dx + dy*dy + dz*dz).unwrap()
     }
 }
+*/

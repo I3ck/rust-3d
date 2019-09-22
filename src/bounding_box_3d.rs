@@ -221,6 +221,30 @@ impl Default for BoundingBox3D {
     }
 }
 
+impl IsND for BoundingBox3D {
+    fn n_dimensions() -> usize {
+        3
+    }
+
+    fn position_nd(&self, dimension: usize) -> Result<f64> {
+        self.center_bb().position_nd(dimension)
+    }
+}
+
+impl Is3D for BoundingBox3D {
+    fn x(&self) -> f64 {
+        self.center_bb().x()
+    }
+
+    fn y(&self) -> f64 {
+        self.center_bb().y()
+    }
+
+    fn z(&self) -> f64 {
+        self.center_bb().z()
+    }
+}
+
 impl HasBoundingBox3D for BoundingBox3D {
     fn bounding_box(&self) -> BoundingBox3D {
         BoundingBox3D::new(&self.min, &self.max).unwrap() // safe

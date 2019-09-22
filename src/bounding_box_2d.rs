@@ -189,6 +189,26 @@ impl Default for BoundingBox2D {
     }
 }
 
+impl IsND for BoundingBox2D {
+    fn n_dimensions() -> usize {
+        2
+    }
+
+    fn position_nd(&self, dimension: usize) -> Result<f64> {
+        self.center_bb().position_nd(dimension)
+    }
+}
+
+impl Is2D for BoundingBox2D {
+    fn x(&self) -> f64 {
+        self.center_bb().x()
+    }
+
+    fn y(&self) -> f64 {
+        self.center_bb().y()
+    }
+}
+
 impl HasBoundingBox2D for BoundingBox2D {
     fn bounding_box(&self) -> BoundingBox2D {
         BoundingBox2D::new(&self.min, &self.max).unwrap() // safe
