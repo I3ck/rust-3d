@@ -45,7 +45,7 @@ impl BoundingBox3D {
             Ok(BoundingBox3D{min: Point3D{x: min.x(), y: min.y(), z: min.z()}, max: Point3D{x: max.x(), y: max.y(), z: max.z()}})
         }
     }
-    /// Creates a new BoundBox3D which contains all the given positions
+    /// Creates a new BoundingBox3D which contains all the given positions
     pub fn from_iterator<'a, It3D,P>(source: It3D) -> Result<BoundingBox3D> where
         It3D: IntoIterator<Item=&'a P>,
         P: 'a + Is3D + Sized {
@@ -84,7 +84,7 @@ impl BoundingBox3D {
             Err(ErrorKind::TooFewPoints)
         }
     }
-    /// Creates a new BoundBox3D which contains all the given positions
+    /// Creates a new BoundingBox3D which contains all the given positions
     pub fn from_into_iterator<It3D,P>(source: It3D) -> Result<BoundingBox3D> where
         It3D: IntoIterator<Item=P>,
         P: Is3D + Sized {
@@ -242,6 +242,13 @@ impl Is3D for BoundingBox3D {
 
     fn z(&self) -> f64 {
         self.center_bb().z()
+    }
+}
+
+impl IsMovable3D for BoundingBox3D {
+    fn move_by(&mut self, x: f64, y: f64, z: f64) {
+        self.min.move_by(x, y, z);
+        self.max.move_by(x, y, z);
     }
 }
 

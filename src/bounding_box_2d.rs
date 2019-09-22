@@ -45,7 +45,7 @@ impl BoundingBox2D {
             Ok(BoundingBox2D{min: Point2D{x: min.x(), y: min.y()}, max: Point2D{x: max.x(), y: max.y()}})
         }
     }
-    /// Creates a new BoundBox2D which contains all the given positions
+    /// Creates a new BoundingBox2D which contains all the given positions
     pub fn from_iterator<'a, It2D,P>(source: It2D) -> Result<BoundingBox2D> where
         It2D: IntoIterator<Item=&'a P>,
         P: 'a + Is2D + Sized {
@@ -78,7 +78,7 @@ impl BoundingBox2D {
             Err(ErrorKind::TooFewPoints)
         }
     }
-    /// Creates a new BoundBox2D which contains all the given positions
+    /// Creates a new BoundingBox2D which contains all the given positions
     pub fn from_into_iterator<It2D,P>(source: It2D) -> Result<BoundingBox2D> where
         It2D: IntoIterator<Item=P>,
         P: Is2D + Sized {
@@ -206,6 +206,13 @@ impl Is2D for BoundingBox2D {
 
     fn y(&self) -> f64 {
         self.center_bb().y()
+    }
+}
+
+impl IsMovable2D for BoundingBox2D {
+    fn move_by(&mut self, x: f64, y: f64) {
+        self.min.move_by(x, y);
+        self.max.move_by(x, y);
     }
 }
 
