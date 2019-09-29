@@ -23,6 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! BoundingBox2D, an axis aligned bounding box within 2D space
 
 use prelude::*;
+use utils::max_f64_3;
 
 #[derive (Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// BoundingBox2D, an axis aligned bounding box within 2D space
@@ -180,6 +181,21 @@ impl BoundingBox2D {
             Point2D::new(self.max.x(), self.min.y()),
             Point2D::new(self.max.x(), self.max.y()),
         ]
+    }
+    /// Returns the distance to another Is2D
+    pub fn distance<P>(&self, other: &P) -> NonNegative where
+        P: Is2D {
+
+        let sqr_dist = self.sqr_distance(other).get();
+        NonNegative::new(sqr_dist.sqrt()).unwrap()
+    }
+    /// Returns the square distance to another Is2D
+    pub fn sqr_distance<P>(&self, other: &P) -> NonNegative where
+        P: Is2D {
+
+        let dx = max_f64_3(self.min_p().x() - other.x(), 0.0, other.x() - self.max_p().x());
+        let dy = max_f64_3(self.min_p().y() - other.y(), 0.0, other.y() - self.max_p().y());
+        NonNegative::new(dx*dx + dy*dy).unwrap()
     }
 }
 

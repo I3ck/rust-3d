@@ -23,6 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! BoundingBox3D, an axis aligned bounding box within 3D space
 
 use prelude::*;
+use utils::max_f64_3;
 
 #[derive (Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// BoundingBox3D, an axis aligned bounding box within 3D space
@@ -212,6 +213,22 @@ impl BoundingBox3D {
             Point3D::new(self.max.x(), self.max.y(), self.min.z()),
             Point3D::new(self.max.x(), self.max.y(), self.max.z()),
         ]
+    }
+    /// Returns the distance to another Is3D
+    pub fn distance<P>(&self, other: &P) -> NonNegative where
+        P: Is3D {
+
+        let sqr_dist = self.sqr_distance(other).get();
+        NonNegative::new(sqr_dist.sqrt()).unwrap()
+    }
+    /// Returns the square distance to another Is3D
+    pub fn sqr_distance<P>(&self, other: &P) -> NonNegative where
+        P: Is3D {
+
+        let dx = max_f64_3(self.min_p().x() - other.x(), 0.0, other.x() - self.max_p().x());
+        let dy = max_f64_3(self.min_p().y() - other.y(), 0.0, other.y() - self.max_p().y());
+        let dz = max_f64_3(self.min_p().z() - other.z(), 0.0, other.z() - self.max_p().z());
+        NonNegative::new(dx*dx + dy*dy + dz*dz).unwrap()
     }
 }
 
