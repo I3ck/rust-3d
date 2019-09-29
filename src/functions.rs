@@ -261,11 +261,35 @@ pub fn for_each_intersecting<'c, I, HB>(ray: &Ray3D, hbs: I, f: &mut FnMut(&Poin
 }
 
 /// Returns the closest intersection with the ray
-pub fn closest_intersecting<'c, I, HB>(ray: &Ray3D, hbs: I) -> Option<(Point3D, &'c mut HB)> where
+pub fn closest_intersecting_mut<'c, I, HB>(ray: &Ray3D, hbs: I) -> Option<(Point3D, &'c mut HB)> where
     I: Iterator<Item = &'c mut HB>,
     HB: HasBoundingBox3DMaybe {
 
     let mut result: Option<(Point3D, &'c mut HB)> = None;
+    
+    for hb in hbs {
+        if let Ok(bb) = hb.bounding_box_maybe() {
+            if let Some(i) = intersection(&ray.line, &bb) {
+                if let Some(r) = &result {
+                    if sqr_dist_3d(&ray.line.anchor, &i) < sqr_dist_3d(&ray.line.anchor, &r.0) {
+                        result = Some((i, hb)) 
+                    }
+                } else {
+                    result = Some((i, hb))
+                }
+            }
+        }
+    }
+
+    result
+}
+
+/// Returns the closest intersection with the ray
+pub fn closest_intersecting<'c, I, HB>(ray: &Ray3D, hbs: I) -> Option<(Point3D, &'c HB)> where
+    I: Iterator<Item = &'c HB>,
+    HB: HasBoundingBox3DMaybe {
+
+    let mut result: Option<(Point3D, &'c HB)> = None;
     
     for hb in hbs {
         if let Ok(bb) = hb.bounding_box_maybe() {
