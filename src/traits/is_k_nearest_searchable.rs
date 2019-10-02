@@ -23,7 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! IsKNearestSearchable trait used for search structures which can be queried for nearest neighbours.
 //! You should only implement this, if your solution is rather efficient
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsKNearestSearchable trait used for search structures which can be queried for nearest neighbours.
 /// You should only implement this, if your solution is rather efficient

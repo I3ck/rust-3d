@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsMesh trait used for meshes
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsMesh is trait used for meshes
 pub trait IsMesh<V, TU> where

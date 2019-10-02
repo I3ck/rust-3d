@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsSortable3D trait used for collections which can be sorted by x,y or z
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsSortable3D trait used for collections which can be sorted by x,y or z
 pub trait IsSortable3D : IsSortableND {

@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsBuildableND trait used for types which are positioned in n-dimensional space and can be constructed
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsBuildableND is a trait used for types which are positioned in n-dimensional space and can be constructed
 pub trait IsBuildableND : 

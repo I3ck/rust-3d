@@ -27,9 +27,9 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Mul, Sub, Neg, Div};
 
-use prelude::*;
-use distances_2d::*;
-use utils::hash_f64;
+use crate::prelude::*;
+use crate::distances_2d::*;
+use crate::utils::hash_f64;
 
 #[derive (Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Point2D, a point / position within 2D space

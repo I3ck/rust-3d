@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsPolygon is a trait used for closed polygons
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsPolygon is a trait used for closed polygons
 pub trait IsPolygon<V> {

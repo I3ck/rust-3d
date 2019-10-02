@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsViewBuildable trait used for types which can be constructed from a view / have a view applied to them
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsViewBuildable trait used for types which can be constructed from a view / have a view applied to them
 pub trait IsViewBuildable : Sized {

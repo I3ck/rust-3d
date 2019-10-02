@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsEditable2D trait used for types which are positioned in 2D space and their position can be changed
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsEditable2D is a trait used for types which are positioned in 2D space and their position can be changed
 pub trait IsEditable2D : Is2D + IsEditableND {

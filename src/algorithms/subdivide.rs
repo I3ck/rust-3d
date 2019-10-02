@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Subdivision algorithms to e.g. refine meshes
 
-use prelude::*;
+use crate::prelude::*;
 
 use std::cmp::{min, max};
 use std::collections::HashMap;

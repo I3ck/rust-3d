@@ -26,8 +26,8 @@ use std::fmt;
 use std::ops::{Add, AddAssign, Mul, MulAssign};
 use std::hash::{Hash, Hasher};
 
-use prelude::*;
-use utils::hash_f64;
+use crate::prelude::*;
+use crate::utils::hash_f64;
 
 #[derive (Debug, PartialEq, PartialOrd, Clone, Copy)]
 /// Positive, a wrapper for a f64 value, ensuring it is always > 0

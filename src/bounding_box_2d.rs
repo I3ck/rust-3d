@@ -22,8 +22,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! BoundingBox2D, an axis aligned bounding box within 2D space
 
-use prelude::*;
-use utils::max_f64_3;
+use crate::prelude::*;
+use crate::utils::max_f64_3;
 
 #[derive (Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// BoundingBox2D, an axis aligned bounding box within 2D space

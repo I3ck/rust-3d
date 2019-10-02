@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::f64::consts::PI;
 
-use prelude::*;
+use crate::prelude::*;
 
 /// Creates a 2D rectangle from given center width and height
 pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> PointCloud2D<P> where

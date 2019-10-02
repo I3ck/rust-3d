@@ -26,9 +26,9 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 use std::ops::{Mul, Neg};
 
-use prelude::*;
-use distances_3d::*;
-use utils::hash_f64;
+use crate::prelude::*;
+use crate::distances_3d::*;
+use crate::utils::hash_f64;
 
 #[derive (Debug, PartialEq, PartialOrd, Clone)]
 /// Norm3D, a normalized vector within 3D space

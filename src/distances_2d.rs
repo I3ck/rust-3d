@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Distances between objects in 2D space
 
-use prelude::*;
+use crate::prelude::*;
 
 /// Returns the distance between two Is2D
 pub fn dist_2d<P, Q>(p: &P, q: &Q) -> f64 where

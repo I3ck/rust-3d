@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsTransFormableTo2D trait used for any type which can be transformed 2D space
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsTransFormableTo2D is a trait used for any type which can be transformed 2D space
 pub trait IsTransFormableTo2D : Is3D {

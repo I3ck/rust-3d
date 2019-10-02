@@ -24,67 +24,67 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Exporting often used types / traits for convenience
 
-pub use result::*;
-pub use strong_types::*;
-pub use interpolation_2d::*;
-pub use traits::*;
-pub use algorithms::*;
+pub use crate::result::*;
+pub use crate::strong_types::*;
+pub use crate::interpolation_2d::*;
+pub use crate::traits::*;
+pub use crate::algorithms::*;
 
-pub use AABBTree2D;
+pub use crate::AABBTree2D;
 
-pub use Positive;
-pub use NonNegative;
+pub use crate::Positive;
+pub use crate::NonNegative;
 
-pub use BoundingBox2D;
-pub use BoundingBox3D;
+pub use crate::BoundingBox2D;
+pub use crate::BoundingBox3D;
 
-pub use Face3;
+pub use crate::Face3;
 
-pub use Line2D;
-pub use Line3D;
+pub use crate::Line2D;
+pub use crate::Line3D;
 
-pub use LineSegment2D;
-pub use LineSegment3D;
+pub use crate::LineSegment2D;
+pub use crate::LineSegment3D;
 
-pub use Ray2D;
-pub use Ray3D;
+pub use crate::Ray2D;
+pub use crate::Ray3D;
 
-pub use Norm2D;
-pub use Norm3D;
+pub use crate::Norm2D;
+pub use crate::Norm3D;
 
-pub use Point2D;
-pub use Point3D;
+pub use crate::Point2D;
+pub use crate::Point3D;
 
-pub use Matrix3;
-pub use Matrix4;
+pub use crate::Matrix3;
+pub use crate::Matrix4;
 
-pub use OcTree;
+pub use crate::OcTree;
 
-pub use Mesh3D;
+pub use crate::Mesh3D;
 
-pub use PointCloud2D;
-pub use PointCloud3D;
+pub use crate::PointCloud2D;
+pub use crate::PointCloud3D;
 
-pub use Polygon2D;
-pub use Polygon3D;
+pub use crate::Polygon2D;
+pub use crate::Polygon3D;
 
-pub use View;
+pub use crate::View;
 
-pub use HalfEdge;
+pub use crate::HalfEdge;
 
-pub use Circle;
-pub use Box2D;
+pub use crate::Circle;
+pub use crate::Box2D;
 
-pub use Sphere;
-pub use Box3D;
+pub use crate::Sphere;
+pub use crate::Box3D;
 
-pub use Precision;
+pub use crate::Precision;
 
-pub use filters::FilterBox2D;
-pub use filters::FilterBox3D;
-pub use filters::FilterCircle;
-pub use filters::FilterSphere;
-pub use filters::FilterOutlier3D;
+pub use crate::filters::FilterBox2D;
+pub use crate::filters::FilterBox3D;
+pub use crate::filters::FilterCircle;
+pub use crate::filters::FilterSphere;
+pub use crate::filters::FilterOutlier3D;
 
-pub use filters::combinators::*;
-pub use filters::transformers::*;
+pub use crate::filters::combinators::*;
+pub use crate::filters::transformers::*;

@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsSearchableMesh trait used for meshes which have extended search methods
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsSearchableMesh trait used for meshes which have extended search methods
 pub trait IsSearchableMesh<V, TU> : IsMesh<V, Face3> {

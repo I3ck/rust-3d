@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! HasCenterOfGravity3D trait for types which might have a center of gravity
 
-use prelude::*;
+use crate::prelude::*;
 
 /// HasCenterOfGravity3D is a trait for types which might have a center of gravity
 pub trait HasCenterOfGravity3D {

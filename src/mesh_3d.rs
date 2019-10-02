@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Mesh3D, a mesh with tri-faces within 3D space
 
-use prelude::*;
+use crate::prelude::*;
 
 #[derive (Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Mesh3D, a mesh with tri-faces within 3D space

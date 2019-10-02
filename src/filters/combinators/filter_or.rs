@@ -23,7 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! FilterOR, a filter which combines two filters and is true if one of its filters is true
 
 use std::marker::PhantomData;
-use traits::IsFilter;
+use crate::traits::IsFilter;
 
 /// FilterOR, a filter which combines two filters and is true if one of its filters is true
 pub struct FilterOR<F1, F2, T> where

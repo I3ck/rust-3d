@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::fmt;
 
-use prelude::*;
+use crate::prelude::*;
 
 #[derive (Debug, PartialEq, PartialOrd, Clone, Eq, Ord, Hash)]
 /// Face3, a face defined by 3 indices (e.g. used for Mesh)

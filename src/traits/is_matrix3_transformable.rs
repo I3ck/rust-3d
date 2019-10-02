@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsMatrix3Transformable trait used for types that can be transformed by a 3x3 Matrix
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsMatrix3Transformable trait used for types that can be transformed by a 3x3 Matrix
 pub trait IsMatrix3Transformable {

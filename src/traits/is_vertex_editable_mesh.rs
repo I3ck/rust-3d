@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsVertexEditableMesh trait used for meshes with editable vertex data
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsVertexEditableMesh trait used for meshes with editable vertex data
 pub trait IsVertexEditableMesh<V, TU> : IsMesh<V, TU> where

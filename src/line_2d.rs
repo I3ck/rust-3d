@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::fmt;
 
-use prelude::*;
+use crate::prelude::*;
 
 #[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Line2D, a line within 2D space

@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsNormalized2D trait used for types which are positioned within the 2D space and normalized
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsNormalized2D is a trait used for types which are positioned within the 2D space and normalized
 pub trait IsNormalized2D : 

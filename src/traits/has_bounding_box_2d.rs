@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! HasBoundingBox2D and HasBoundingBox2DMaybe traits for types which (might) have a bounding box
 
-use prelude::*;
+use crate::prelude::*;
 
 /// HasBoundingBox2D is a trait for types which have a bounding box
 pub trait HasBoundingBox2D : HasBoundingBox2DMaybe {

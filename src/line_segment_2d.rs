@@ -24,9 +24,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::fmt;
 
-use prelude::*;
-use distances_2d::dist_2d;
-use functions::center_2d;
+use crate::prelude::*;
+use crate::distances_2d::dist_2d;
+use crate::functions::center_2d;
 
 #[derive (Debug, PartialEq, PartialOrd, Eq, Clone, Hash)]
 /// LineSegment2D, a line segment within 2D space

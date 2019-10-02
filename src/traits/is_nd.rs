@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsND trait used for types which are positioned within the n-dimensional space
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsND is a trait used for types which are positioned within the n-dimensional space
 pub trait IsND {

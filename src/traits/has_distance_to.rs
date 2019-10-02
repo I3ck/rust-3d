@@ -23,7 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! HasDistanceTo trait used for types which have a defined distance towards another T.
 //! Implementing HasDistanceTo<T> for U also implements HasDistanceTo<U> for T
 
-use prelude::*;
+use crate::prelude::*;
 
 /// HasDistanceTo trait used for types which have a defined distance towards another T.
 /// Implementing HasDistanceTo<T> for U also implements HasDistanceTo<U> for T

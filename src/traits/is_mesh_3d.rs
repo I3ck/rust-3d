@@ -22,8 +22,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsMesh3D trait used for meshes in 3D space
 
-use prelude::*;
-use functions::{conn, cross};
+use crate::prelude::*;
+use crate::functions::{conn, cross};
 
 /// IsMesh3D is trait used for meshes in 3D space
 pub trait IsMesh3D<P> : IsMesh<P, Face3> where

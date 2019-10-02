@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Matrix4Pipe, which makes it easier to pipe different matrices in a defined order
 
-use prelude::*;
+use crate::prelude::*;
 
 #[derive (Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Matrix4Pipe, which makes it easier to pipe different matrices in a defined order

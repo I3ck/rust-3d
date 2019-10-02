@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsEditablePolygon trait used for polygons which can be edited
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsEditablePolygon trait used for polygons which can be edited
 pub trait IsEditablePolygon<V> : IsPolygon<V> {

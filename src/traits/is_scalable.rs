@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsScalable trait used for types that can have their size scaled by a factor
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsScalable trait used for types that can have their size scaled by a factor
 pub trait IsScalable {

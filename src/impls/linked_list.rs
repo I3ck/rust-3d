@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::collections::LinkedList;
 
-use prelude::*;
+use crate::prelude::*;
 
 impl<T> IsViewBuildable for LinkedList<T> where
     T: Clone {

@@ -24,8 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::fmt;
 
-use prelude::*;
-use distances_2d::*;
+use crate::prelude::*;
+use crate::distances_2d::*;
 
 #[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Polygon2D, a polygon within 2D space

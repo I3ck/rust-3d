@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsFaceEditableMesh trait used for meshes with editable face data
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsFaceEditableMesh trait used for meshes with editable face data
 pub trait IsFaceEditableMesh<V, TU> : IsMesh<V, TU> where

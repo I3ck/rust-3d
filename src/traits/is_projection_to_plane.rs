@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsProjectionToPlane trait used types which can be projected onto and from planes within 3D space
 
-use prelude::*;
+use crate::prelude::*;
 
 //@todo finish trait and add implementation
 //@todo better method names

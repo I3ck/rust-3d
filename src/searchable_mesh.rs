@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! SearchableMesh, transforms IsMesh to IsSearchableMesh
 
-use prelude::*;
+use crate::prelude::*;
 
 use std::marker::PhantomData;
 

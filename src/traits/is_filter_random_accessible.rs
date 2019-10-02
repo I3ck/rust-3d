@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsFilterRandomAccessible is a trait used for filters for random accessible collections
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsFilterRandomAccessible is a trait used for filters for random accessible collections
 pub trait IsFilterRandomAccessible<RA, T> where

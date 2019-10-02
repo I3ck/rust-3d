@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsOcTree trait used for OcTrees
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsOcTree is a trait used for OcTrees
 pub trait IsOcTree<P> : IsTree3D<P> where

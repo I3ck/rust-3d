@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsPlane3D trait used for planes within 3D space
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsPlane3D is a trait used for planes within 3D space
 pub trait IsPlane3D<P,N> : Sized where

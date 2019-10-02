@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsRandomInsertible trait used for collections of elements which are random insertible
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsRandomInsertible is a trait used for collections of elements which are random insertible
 pub trait IsRandomInsertible<T> : IsRandomAccessible<T> {

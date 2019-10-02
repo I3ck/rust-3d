@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterAllRandomAccessible, a filter to chain multiple IsFilterRandomAccessible with the and condition => must pass all filters to pass this filter
 
-use prelude::*;
+use crate::prelude::*;
 
 #[derive (Default)]
 /// FilterAllRandomAccessible, a filter to chain multiple IsFilterRandomAccessible with the and condition => must pass all filters to pass this filter

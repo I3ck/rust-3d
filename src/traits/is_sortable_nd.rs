@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsSortableND trait used for collections which can be sorted by certain dimensions. E.g. x,y,z
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsSortableND trait used for collections which can be sorted by certain dimensions. E.g. x,y,z
 pub trait IsSortableND {

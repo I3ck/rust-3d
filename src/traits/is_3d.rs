@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Is3D trait used for types which are positioned within the 3D space
 
-use prelude::*;
+use crate::prelude::*;
 
 use std::f64::consts::PI;
 

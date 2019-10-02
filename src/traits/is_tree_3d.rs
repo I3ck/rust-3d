@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsTree3D trait used for types which are any type of tree within 3D space
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsTree3D is a trait used for types which are any type of tree within 3D space
 pub trait IsTree3D<P> where

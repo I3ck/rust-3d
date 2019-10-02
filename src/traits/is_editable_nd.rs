@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsEditableND trait used for types which are positioned in n-dimensional space and their position can be changed
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsEditableND is a trait used for types which are positioned in n-dimensional space and their position can be changed
 pub trait IsEditableND : IsND {

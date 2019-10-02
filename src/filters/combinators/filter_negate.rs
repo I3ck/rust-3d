@@ -23,7 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! FilterNegate, a filter which negates another filter
 
 use std::marker::PhantomData;
-use traits::IsFilter;
+use crate::traits::IsFilter;
 
 /// FilterNegate, a filter which negates another filter
 pub struct FilterNegate<F, T> where

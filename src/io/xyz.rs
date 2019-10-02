@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extern crate core;
 
-use prelude::*;
+use crate::prelude::*;
 
 use self::core::str::FromStr;
 use std::io::prelude::*;

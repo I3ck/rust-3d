@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsMatrix4Transformable trait used for types that can be transformed by a 4x4 Matrix
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsMatrix4Transformable trait used for types that can be transformed by a 4x4 Matrix
 pub trait IsMatrix4Transformable {

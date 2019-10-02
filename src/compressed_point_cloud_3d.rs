@@ -27,8 +27,8 @@ extern crate num;
 use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
-use prelude::*;
-use compressed_point_3d::*;
+use crate::prelude::*;
+use crate::compressed_point_3d::*;
 
 #[derive (Debug, Clone, PartialEq, PartialOrd)]
 /// CompressedPointCloud3D

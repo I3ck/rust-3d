@@ -23,7 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! IsSphereSearchable trait used for search structures which can be queried for elements within a sphere
 //! You should only implement this, if your solution is rather efficient
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsSphereSearchable trait used for search structures which can be queried for elements within a sphere
 /// You should only implement this, if your solution is rather efficient

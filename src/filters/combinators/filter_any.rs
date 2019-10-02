@@ -23,7 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! FilterAny, a filter to chain multiple filters with the or condition => must pass any filter to pass this filter
 
 use std::marker::PhantomData;
-use traits::IsFilter;
+use crate::traits::IsFilter;
 
 /// FilterAny, a filter to chain multiple filters with the or condition => must pass any filter to pass this filter
 pub struct FilterAny<T> {

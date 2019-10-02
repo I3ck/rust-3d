@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsNormalized3D trait used for types which are positioned within the 3D space and normalized
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsNormalized3D is a trait used for types which are positioned within the 3D space and normalized
 pub trait IsNormalized3D : 

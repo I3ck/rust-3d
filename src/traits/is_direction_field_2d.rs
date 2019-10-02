@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsDirectionField2D is a trait used for fields of directions within 2D space
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsDirectionField2D is a trait used for fields of directions within 2D space
 pub trait IsDirectionField2D {

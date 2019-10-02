@@ -24,8 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::cmp::{Eq, Ordering};
 
-use prelude::*;
-use distances_3d::*;
+use crate::prelude::*;
+use crate::distances_3d::*;
 
 #[derive (Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
 /// Sphere, a sphere in 3D space

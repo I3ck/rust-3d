@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterAllow, a filter which always returns true
 
-use traits::IsFilter;
+use crate::traits::IsFilter;
 
 /// FilterAllow, a filter which always returns true
 pub struct FilterAllow {

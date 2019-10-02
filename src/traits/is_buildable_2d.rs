@@ -27,7 +27,7 @@ extern crate core;
 use std::hash::{Hash};
 use self::core::str::FromStr;
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsBuildable2D is a trait used for types which are positioned in 2D space and can be constructed
 pub trait IsBuildable2D :

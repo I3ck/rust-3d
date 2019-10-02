@@ -25,10 +25,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 extern crate core;
 extern crate byteorder;
 
-use prelude::*;
+use crate::prelude::*;
 
-use utils::to_words;
-use rgb::Rgb;
+use crate::utils::to_words;
+use crate::rgb::Rgb;
 
 use self::core::str::FromStr;
 use std::io::prelude::*;

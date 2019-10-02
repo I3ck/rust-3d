@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::f64::consts::PI;
 
-use prelude::*;
+use crate::prelude::*;
 
 fn factorial(number: usize) -> usize {
     let mut result = 1;

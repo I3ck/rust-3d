@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use std::marker::PhantomData;
 use std::collections::HashSet;
 
-use prelude::*;
+use crate::prelude::*;
 
 /// FilterRandomAccessible, a filter which can transform any IsFilter into an IsFilterRandomAccessible
 pub struct FilterRandomAccessible<F, T> where

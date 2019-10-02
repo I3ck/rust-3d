@@ -27,7 +27,7 @@ extern crate core;
 use self::core::str::FromStr;
 use std::hash::{Hash};
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsBuildable3D is a trait used for types which are positioned in 3D space and can be constructed
 pub trait IsBuildable3D :

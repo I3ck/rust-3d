@@ -23,7 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! FilterAll, a filter to chain multiple filters with the and condition => must pass all filters to pass this filter
 
 use std::marker::PhantomData;
-use traits::IsFilter;
+use crate::traits::IsFilter;
 
 /// FilterAll, a filter to chain multiple filters with the and condition => must pass all filters to pass this filter
 pub struct FilterAll<T> {

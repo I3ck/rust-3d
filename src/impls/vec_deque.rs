@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::collections::VecDeque;
 
-use prelude::*;
+use crate::prelude::*;
 
 impl<T> IsRandomAccessible<T> for VecDeque<T> {
     fn len(&self) -> usize {

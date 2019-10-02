@@ -26,9 +26,9 @@ use std::fmt;
 use std::ops::Index;
 use std::ops::IndexMut;
 
-use prelude::*;
-use distances_3d::*;
-use functions::{sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z};
+use crate::prelude::*;
+use crate::distances_3d::*;
+use crate::functions::{sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z};
 
 #[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// PointCloud3D, a collection of positions within 3D space

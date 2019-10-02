@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsVoxelImage trait used for any type of voxel image
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsVoxelImage is a trait used for any type of voxel image
 pub trait IsVoxelImage<T> {

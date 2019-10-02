@@ -22,8 +22,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterSphere, a sphere filter within 3D space
 
-use prelude::*;
-use distances_3d::*;
+use crate::prelude::*;
+use crate::distances_3d::*;
 
 #[derive (Debug, PartialEq, PartialOrd, Default, Clone, Hash, Eq, Ord)]
 /// FilterSphere, a sphere filter within 3D space

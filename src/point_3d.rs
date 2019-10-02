@@ -26,10 +26,10 @@ use std::fmt;
 use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 use std::ops::{Add, Mul, Sub, Neg, Div};
-use utils::hash_f64;
+use crate::utils::hash_f64;
 
-use prelude::*;
-use distances_3d::*;
+use crate::prelude::*;
+use crate::distances_3d::*;
 
 #[derive (Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Point3D, a point / position within 3D space

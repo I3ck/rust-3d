@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Is2D trait used for types which are positioned within the 2D space
 
-use prelude::*;
+use crate::prelude::*;
 
 /// Is2D is a trait used for types which are positioned within the 2D space
 pub trait Is2D : IsND {

@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsEditable3D trait used for types which are positioned in 3D space and their position can be changed
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsEditable3D is a trait used for types which are positioned in 3D space and their position can be changed
 pub trait IsEditable3D : Is3D + IsEditableND {

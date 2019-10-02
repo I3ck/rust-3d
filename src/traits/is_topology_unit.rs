@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsTopologyUnit trait used for single units of a topology. E.g. size 1 for paths, size 3 for tri meshes, size 4 for quad meshes
 
-use prelude::*;
+use crate::prelude::*;
 
 /// IsTopologyUnit trait used for single units of a topology. E.g. size 1 for paths, size 3 for tri meshes, size 4 for quad meshes
 pub trait IsTopologyUnit {
