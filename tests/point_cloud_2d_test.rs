@@ -39,15 +39,15 @@ fn point_cloud_2d_test() {
     assert!(pc.data[0].x() == 0.1);
     assert!(pc.data[0].y() == 0.2);
 
-    assert!(pc.bounding_box().is_err());
+    assert!(pc.bounding_box_maybe().is_err());
 
     let p = Point2D::new(0.2, 0.3);
     pc.push(p);
     assert!(pc.len() == 2);
 
-    assert!(pc.bounding_box().is_ok());
+    assert!(pc.bounding_box_maybe().is_ok());
 
-    match pc.bounding_box() {
+    match pc.bounding_box_maybe() {
         Err(_) => assert!(false),
         Ok(bb) => {
             assert!(bb.min_p().x() == 0.1);

@@ -45,10 +45,10 @@ fn test_bounding_box_3d() {
     pc4.push(Point3D::new(-10.0, -10.0, -10.0));
     pc4.push(Point3D::new(-11.0, -11.0, -11.0));
 
-    let bb1 = pc1.bounding_box().unwrap();
-    let bb2 = pc2.bounding_box().unwrap();
-    let bb3 = pc3.bounding_box().unwrap();
-    let bb4 = pc4.bounding_box().unwrap();
+    let bb1 = pc1.bounding_box_maybe().unwrap();
+    let bb2 = pc2.bounding_box_maybe().unwrap();
+    let bb3 = pc3.bounding_box_maybe().unwrap();
+    let bb4 = pc4.bounding_box_maybe().unwrap();
 
     assert!(bb1.min_p().x() == 0.0);
     assert!(bb1.min_p().y() == 0.0);

@@ -63,7 +63,7 @@ fn point_3d_test() {
     assert!(p2_clone.xyz() == p2.xyz());
     assert!(p2.to_str() == "1 0 0");
 
-    p2_clone.from(p1.clone());
+    p2_clone.from(&p1.clone());
     assert!(p2_clone.xyz() == p1.xyz());
 
     let p1_norm = p1.normalized();

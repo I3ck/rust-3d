@@ -58,7 +58,7 @@ fn point_2d_test() {
     assert!(p2_clone.xy() == p2.xy());
     assert!(p2.to_str() == "1 0");
 
-    p2_clone.from(p1.clone());
+    p2_clone.from(&p1);
     assert!(p2_clone.xy() == p1.xy());
 
     let p1_norm = p1.normalized();

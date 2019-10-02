@@ -84,11 +84,11 @@ fn mesh_test() {
 
     match mesh.face_vertices(FId { val: 0 }) {
         Err(_) => assert!(false),
-        Ok((p1, p2, p3)) => assert!(p1.x() == 0.0 && p2.x() == 0.1 && p3.x() == 0.2),
+        Ok([p1, p2, p3]) => assert!(p1.x() == 0.0 && p2.x() == 0.1 && p3.x() == 0.2),
     };
 
     match mesh.face_vertices(FId { val: 1 }) {
         Err(_) => assert!(false),
-        Ok((p1, p2, p3)) => assert!(p1.x() == 1.0 && p2.x() == 2.0 && p3.x() == 3.0),
+        Ok([p1, p2, p3]) => assert!(p1.x() == 1.0 && p2.x() == 2.0 && p3.x() == 3.0),
     };
 }
