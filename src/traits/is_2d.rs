@@ -36,11 +36,11 @@ pub trait Is2D : IsND {
         ( self.x(), self.y() )
     }
     /// Calculates the dot product with another Is2D
-    fn dot(&self, other: &Is2D) -> f64 {
+    fn dot(&self, other: &dyn Is2D) -> f64 {
         self.x() * other.x() + self.y() * other.y()
     }
     /// Calculates the cross product with another Is2D
-    fn cross(&self, other: &Is2D) -> f64 {
+    fn cross(&self, other: &dyn Is2D) -> f64 {
         self.x() * other.y() - self.y() * other.x()
     }
     /// The absolute / length of this position
@@ -48,7 +48,7 @@ pub trait Is2D : IsND {
         NonNegative::new(((self.x()).powi(2) + (self.y()).powi(2)).sqrt()).unwrap()
     }
     /// Calculates the angle to the other Is2D in radians
-    fn rad_to(&self, other: &Is2D) -> Rad {
+    fn rad_to(&self, other: &dyn Is2D) -> Rad {
         Rad{val: (other.y() - self.y()).atan2(other.x() - self.x())}
     }
     /// Transforms the position in a "x y" string. E.g. "3.72 5.99"
@@ -60,7 +60,7 @@ pub trait Is2D : IsND {
     }
 }
 
-impl<P> HasDistanceTo<P> for Is2D where
+impl<P> HasDistanceTo<P> for dyn Is2D where
     P: Is2D {
 
     fn sqr_distance(&self, other: &P) -> NonNegative {

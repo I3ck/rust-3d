@@ -247,7 +247,7 @@ pub fn intersection_ray_triangle<P>(ray: &Ray3D, v1: &P, v2: &P, v3: &P) -> Opti
 }
 
 /// Applies the function to each intersection candidate
-pub fn for_each_intersecting<'c, I, HB>(ray: &Ray3D, hbs: I, f: &mut FnMut(&Point3D, &'c mut HB)) where
+pub fn for_each_intersecting<'c, I, HB>(ray: &Ray3D, hbs: I, f: &mut dyn FnMut(&Point3D, &'c mut HB)) where
     I: Iterator<Item = &'c mut HB>,
     HB: HasBoundingBox3DMaybe {
 

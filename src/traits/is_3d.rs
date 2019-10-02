@@ -52,7 +52,7 @@ pub trait Is3D : IsND {
         ( self.y(), self.z() )
     }
     /// Calculates the dot product with another Is3D
-    fn dot(&self, other: &Is3D) -> f64 {
+    fn dot(&self, other: &dyn Is3D) -> f64 {
         self.x() * other.x() + self.y() * other.y() + self.z() * other.z()
     }
     /// The absolute / length of this position
@@ -60,7 +60,7 @@ pub trait Is3D : IsND {
         NonNegative::new(((self.x()).powi(2) + (self.y()).powi(2) + (self.z()).powi(2)).sqrt()).unwrap()
     }
     /// Calculates the angle to the other Is3D in radians
-    fn rad_to(&self, other: &Is3D) -> Rad {
+    fn rad_to(&self, other: &dyn Is3D) -> Rad {
         if self.abs().get() == 0.0 || other.abs().get() == 0.0 {
             return Rad { val: PI } //@todo consider returning something else on error
         }
@@ -76,7 +76,7 @@ pub trait Is3D : IsND {
     }
 }
 
-impl<P> HasDistanceTo<P> for Is3D where
+impl<P> HasDistanceTo<P> for dyn Is3D where
     P: Is3D {
 
     fn sqr_distance(&self, other: &P) -> NonNegative {

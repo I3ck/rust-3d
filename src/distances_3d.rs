@@ -25,13 +25,19 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use prelude::*;
 
 /// Returns the distance between two Is3D
-pub fn dist_3d(p1: &Is3D, p2: &Is3D) -> f64 {
-    sqr_dist_3d(p1,p2).sqrt()
+pub fn dist_3d<P, Q>(p: &P, q: &Q) -> f64 where
+    P: Is3D,
+    Q: Is3D {
+
+    sqr_dist_3d(p, q).sqrt()
 }
 
 /// Returns the squared distance between two Is3D
-pub fn sqr_dist_3d(p1: &Is3D, p2: &Is3D) -> f64 {
-    (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2) + (p1.z() - p2.z()).powi(2)
+pub fn sqr_dist_3d<P, Q>(p: &P, q: &Q) -> f64 where
+    P: Is3D,
+    Q: Is3D {
+
+    (p.x() - q.x()).powi(2) + (p.y() - q.y()).powi(2) + (p.z() - q.z()).powi(2)
 }
 
 

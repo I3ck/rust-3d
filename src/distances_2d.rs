@@ -25,12 +25,18 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use prelude::*;
 
 /// Returns the distance between two Is2D
-pub fn dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
-    sqr_dist_2d(p1,p2).sqrt()
+pub fn dist_2d<P, Q>(p: &P, q: &Q) -> f64 where
+    P: Is2D,
+    Q: Is2D {
+
+    sqr_dist_2d(p, q).sqrt()
 }
 
 /// Returns the squared distance between two Is2D
-pub fn sqr_dist_2d(p1: &Is2D, p2: &Is2D) -> f64 {
-    (p1.x() - p2.x()).powi(2) + (p1.y() - p2.y()).powi(2)
+pub fn sqr_dist_2d<P, Q>(p: &P, q: &Q) -> f64 where
+    P: Is2D,
+    Q: Is2D {
+
+    (p.x() - q.x()).powi(2) + (p.y() - q.y()).powi(2)
 }
 

@@ -29,7 +29,7 @@ use prelude::*;
 pub struct FilterAllRandomAccessible<RA, T> where
     RA: IsRandomAccessible<T> {
 
-    pub filters: Vec<Box<IsFilterRandomAccessible<RA, T>>>
+    pub filters: Vec<Box<dyn IsFilterRandomAccessible<RA, T>>>
 }
 
 impl<RA, T> IsFilterRandomAccessible<RA, T> for FilterAllRandomAccessible<RA, T> where

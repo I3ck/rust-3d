@@ -27,7 +27,7 @@ use traits::IsFilter;
 
 /// FilterAny, a filter to chain multiple filters with the or condition => must pass any filter to pass this filter
 pub struct FilterAny<T> {
-    pub filters: Vec<Box<IsFilter<T>>>,
+    pub filters: Vec<Box<dyn IsFilter<T>>>,
     _marker: PhantomData<T>
 }
 

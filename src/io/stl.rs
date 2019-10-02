@@ -29,7 +29,8 @@ use std::io::{BufWriter};
 use std::fs::File;
 
 /// Saves an IsMesh3D in the ASCII .stl file format
-pub fn save_stl_ascii<P>(mesh: &IsMesh3D<P>, filepath: &str) -> Result<()> where
+pub fn save_stl_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()> where
+    M: IsMesh3D<P>,
     P: IsBuildable3D {
 
     let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
