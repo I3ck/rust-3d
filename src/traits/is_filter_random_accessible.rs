@@ -25,8 +25,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsFilterRandomAccessible is a trait used for filters for random accessible collections
-pub trait IsFilterRandomAccessible<RA, T> where
-    RA: IsRandomAccessible<T> {
+pub trait IsFilterRandomAccessible<RA, T>
+where
+    RA: IsRandomAccessible<T>,
+{
     /// Should filter the passed elements by setting the flags within the view
     fn filter(&self, ra: &RA, view: &mut View);
 }

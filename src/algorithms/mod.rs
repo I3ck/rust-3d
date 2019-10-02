@@ -22,10 +22,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Containing algorithms
 
-mod           convex_hull_2d;
+mod convex_hull_2d;
 pub use self::convex_hull_2d::convex_hull_2d;
 
-mod           douglas_peucker_2d;
+mod douglas_peucker_2d;
 pub use self::douglas_peucker_2d::douglas_peucker_2d;
 
 pub mod subdivide;

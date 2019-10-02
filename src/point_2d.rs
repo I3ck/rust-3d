@@ -22,25 +22,25 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Point2D, a point / position within 2D space
 
-use std::fmt;
 use std::cmp::{Eq, Ordering};
+use std::fmt;
 use std::hash::{Hash, Hasher};
-use std::ops::{Add, Mul, Sub, Neg, Div};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
-use crate::prelude::*;
 use crate::distances_2d::*;
+use crate::prelude::*;
 use crate::utils::hash_f64;
 
-#[derive (Default, Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Point2D, a point / position within 2D space
 pub struct Point2D {
     pub x: f64,
-    pub y: f64
+    pub y: f64,
 }
 
 impl Point2D {
     pub fn new(x: f64, y: f64) -> Self {
-        Point2D {x, y}
+        Point2D { x, y }
     }
 }
 
@@ -49,7 +49,9 @@ impl Eq for Point2D {}
 impl Ord for Point2D {
     fn cmp(&self, other: &Self) -> Ordering {
         let origin = Point2D::default();
-        sqr_dist_2d(&origin, self).partial_cmp(&sqr_dist_2d(&origin, other)).unwrap_or(Ordering::Equal)
+        sqr_dist_2d(&origin, self)
+            .partial_cmp(&sqr_dist_2d(&origin, other))
+            .unwrap_or(Ordering::Equal)
     }
 }
 
@@ -60,21 +62,31 @@ impl Hash for Point2D {
     }
 }
 
-impl<P> Add<P> for Point2D where
-    P: Is2D {
+impl<P> Add<P> for Point2D
+where
+    P: Is2D,
+{
     type Output = Point2D;
 
     fn add(self, other: P) -> Point2D {
-        Point2D {x: self.x + other.x(), y: self.y + other.y()}
+        Point2D {
+            x: self.x + other.x(),
+            y: self.y + other.y(),
+        }
     }
 }
 
-impl<P> Sub<P> for Point2D where
-    P: Is2D {
+impl<P> Sub<P> for Point2D
+where
+    P: Is2D,
+{
     type Output = Point2D;
 
     fn sub(self, other: P) -> Point2D {
-        Point2D {x: self.x - other.x(), y: self.y - other.y()}
+        Point2D {
+            x: self.x - other.x(),
+            y: self.y - other.y(),
+        }
     }
 }
 
@@ -82,7 +94,10 @@ impl Mul<f64> for Point2D {
     type Output = Point2D; //@todo could later be another type
 
     fn mul(self, other: f64) -> Point2D {
-        Point2D {x: other * self.x, y: other * self.y}
+        Point2D {
+            x: other * self.x,
+            y: other * self.y,
+        }
     }
 }
 
@@ -90,7 +105,10 @@ impl Div<f64> for Point2D {
     type Output = Point2D;
 
     fn div(self, other: f64) -> Point2D {
-        Point2D {x: self.x / other, y: self.y / other}
+        Point2D {
+            x: self.x / other,
+            y: self.y / other,
+        }
     }
 }
 
@@ -98,7 +116,10 @@ impl Neg for Point2D {
     type Output = Point2D;
 
     fn neg(self) -> Point2D {
-        Point2D { x: -self.x, y: -self.y }
+        Point2D {
+            x: -self.x,
+            y: -self.y,
+        }
     }
 }
 
@@ -118,7 +139,7 @@ impl IsND for Point2D {
         match dimension {
             0 => Ok(self.x),
             1 => Ok(self.y),
-            _ => Err(ErrorKind::IncorrectDimension)
+            _ => Err(ErrorKind::IncorrectDimension),
         }
     }
 }
@@ -138,12 +159,16 @@ impl IsBuildableND for Point2D {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Point2D{x: coords[0], y: coords[1]})
+        Ok(Point2D {
+            x: coords[0],
+            y: coords[1],
+        })
     }
 
-    fn from_nd<P>(&mut self, other: P) -> Result<()> where
-        P: IsBuildableND {
-
+    fn from_nd<P>(&mut self, other: P) -> Result<()>
+    where
+        P: IsBuildableND,
+    {
         if P::n_dimensions() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
@@ -156,12 +181,13 @@ impl IsBuildableND for Point2D {
 
 impl IsBuildable2D for Point2D {
     fn new(x: f64, y: f64) -> Self {
-        Point2D{x: x, y: y}
+        Point2D { x: x, y: y }
     }
 
     fn from<P>(&mut self, other: &P)
-        where P: Is2D {
-
+    where
+        P: Is2D,
+    {
         self.x = other.x();
         self.y = other.y();
     }
@@ -189,9 +215,10 @@ impl IsEditable2D for Point2D {
 }
 
 impl IsTransFormableTo3D for Point2D {
-    fn transform_to_3d<P>(&self, z: f64) -> P where
-        P: IsBuildable3D {
-
+    fn transform_to_3d<P>(&self, z: f64) -> P
+    where
+        P: IsBuildable3D,
+    {
         P::new(self.x, self.y, z)
     }
 }

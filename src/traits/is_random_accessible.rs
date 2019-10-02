@@ -26,7 +26,7 @@ use std::ops::Index;
 use std::ops::IndexMut;
 
 /// IsRandomAccessible is a trait used for collections of elements which are random accessible
-pub trait IsRandomAccessible<T> : Index<usize, Output=T> + IndexMut<usize> {
+pub trait IsRandomAccessible<T>: Index<usize, Output = T> + IndexMut<usize> {
     /// Should return the number of elements within the collection
     fn len(&self) -> usize;
 }

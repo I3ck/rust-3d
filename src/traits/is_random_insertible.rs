@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsRandomInsertible is a trait used for collections of elements which are random insertible
-pub trait IsRandomInsertible<T> : IsRandomAccessible<T> {
+pub trait IsRandomInsertible<T>: IsRandomAccessible<T> {
     /// Should push an element to the end of collection
     fn push(&mut self, x: T);
     /// Should insert an element at the given index

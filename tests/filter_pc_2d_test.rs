@@ -28,15 +28,19 @@ use rust_3d::prelude::*;
 
 #[test]
 fn filter_pc_2d_test() {
-    let center = Point2D{x: 10.0, y: -5.0};
+    let center = Point2D { x: 10.0, y: -5.0 };
     let size_x = Positive::new(3.0).unwrap();
     let size_y = Positive::new(5.0).unwrap();
-    let filter = FilterBox2D::new(Box2D{center: center, size_x: size_x,size_y: size_y});
+    let filter = FilterBox2D::new(Box2D {
+        center: center,
+        size_x: size_x,
+        size_y: size_y,
+    });
     let mut pc = PointCloud2D::<Point2D>::new();
     let mut view = View::Full;
     pc.push(Point2D::new(10.0, -5.0)); // 0  YES
-    pc.push(Point2D::new(9.0, -5.0));  // 1  YES
-    pc.push(Point2D::new(8.0, -5.0));  // 2  NO
+    pc.push(Point2D::new(9.0, -5.0)); // 1  YES
+    pc.push(Point2D::new(8.0, -5.0)); // 2  NO
     pc.push(Point2D::new(11.0, -5.0)); // 3  YES
     pc.push(Point2D::new(12.0, -5.0)); // 4  NO
     pc.push(Point2D::new(10.0, -4.0)); // 5  YES
@@ -45,7 +49,7 @@ fn filter_pc_2d_test() {
     pc.push(Point2D::new(10.0, -6.0)); // 8  YES
     pc.push(Point2D::new(10.0, -7.0)); // 9  YES
     pc.push(Point2D::new(10.0, -8.0)); // 10 NO
-    // => 0 1 3 5 6 8 9 in => len = 7
+                                       // => 0 1 3 5 6 8 9 in => len = 7
 
     let filter_pc = FilterRandomAccessible::new(filter);
     filter_pc.filter(&pc, &mut view);
@@ -55,16 +59,16 @@ fn filter_pc_2d_test() {
         View::Restricted(indices) => {
             assert!(indices.len() == 7);
 
-            assert!( indices.contains(&(0 as usize)));
-            assert!( indices.contains(&(1 as usize)));
+            assert!(indices.contains(&(0 as usize)));
+            assert!(indices.contains(&(1 as usize)));
             assert!(!indices.contains(&(2 as usize)));
-            assert!( indices.contains(&(3 as usize)));
+            assert!(indices.contains(&(3 as usize)));
             assert!(!indices.contains(&(4 as usize)));
-            assert!( indices.contains(&(5 as usize)));
-            assert!( indices.contains(&(6 as usize)));
+            assert!(indices.contains(&(5 as usize)));
+            assert!(indices.contains(&(6 as usize)));
             assert!(!indices.contains(&(7 as usize)));
-            assert!( indices.contains(&(8 as usize)));
-            assert!( indices.contains(&(9 as usize)));
+            assert!(indices.contains(&(8 as usize)));
+            assert!(indices.contains(&(9 as usize)));
             assert!(!indices.contains(&(10 as usize)));
         }
     }

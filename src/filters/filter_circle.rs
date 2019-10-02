@@ -22,18 +22,18 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterCircle, a circle filter within 2D space
 
-use crate::prelude::*;
 use crate::distances_2d::*;
+use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Default, Clone, Eq, Ord, Hash)]
+#[derive(Debug, PartialEq, PartialOrd, Default, Clone, Eq, Ord, Hash)]
 /// FilterCircle, a circle filter within 2D space
 pub struct FilterCircle {
-    circle: Circle
+    circle: Circle,
 }
 impl FilterCircle {
     /// Creates a new FilterCircle with the given parameters
     pub fn new(circle: Circle) -> Self {
-        FilterCircle {circle}
+        FilterCircle { circle }
     }
 }
 
@@ -62,9 +62,10 @@ impl IsBuildableND for FilterCircle {
         Ok(FilterCircle::new(Circle::new_nd(coords)?))
     }
 
-    fn from_nd<P>(&mut self, other: P) -> Result<()> where
-        P: IsBuildableND {
-
+    fn from_nd<P>(&mut self, other: P) -> Result<()>
+    where
+        P: IsBuildableND,
+    {
         self.circle.from_nd(other)
     }
 }
@@ -75,8 +76,9 @@ impl IsBuildable2D for FilterCircle {
     }
 
     fn from<P>(&mut self, other: &P)
-        where P: Is2D {
-
+    where
+        P: Is2D,
+    {
         self.circle.from(other)
     }
 }
@@ -109,9 +111,10 @@ impl HasBoundingBox2DMaybe for FilterCircle {
     }
 }
 
-impl<T> IsFilter<T> for FilterCircle where
-    T: Is2D {
-
+impl<T> IsFilter<T> for FilterCircle
+where
+    T: Is2D,
+{
     fn is_allowed(&self, p: &T) -> bool {
         dist_2d(p, &self.circle.center) <= self.circle.radius.get()
     }

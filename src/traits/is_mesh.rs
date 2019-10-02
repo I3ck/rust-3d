@@ -25,8 +25,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsMesh is trait used for meshes
-pub trait IsMesh<V, TU> where
-    TU: IsTopologyUnit {
+pub trait IsMesh<V, TU>
+where
+    TU: IsTopologyUnit,
+{
     /// Should return the number of faces within the mesh
     fn num_faces(&self) -> usize;
     /// Should return the number of vertices within the mesh

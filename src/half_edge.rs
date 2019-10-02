@@ -25,65 +25,94 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 use crate::utils::safe_append_at;
 
-#[derive (Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Edge type used within the HalfEdge
 struct Edge {
     tail: VId,
-    twin: Option<EId>
+    twin: Option<EId>,
 }
 
-#[derive (Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// HalfEdge, the half edge data structure
 pub struct HalfEdge {
     edges: Vec<Edge>,
-    vertices_start_edges: Vec<Vec<EId>> //@todo better name
+    vertices_start_edges: Vec<Vec<EId>>, //@todo better name
 }
 
 impl HalfEdge {
     /// Creates a new HalfEdge3D for the given IsMesh3D
     /// This only stays valid if IMesh3D is not changed after creation
     /// The mesh must be manifold (@todo ensure via types?)
-    pub fn new<T, M>(mesh: &M) -> Self where
-        M: IsMesh<T, Face3> {
-
+    pub fn new<T, M>(mesh: &M) -> Self
+    where
+        M: IsMesh<T, Face3>,
+    {
         let n_faces = mesh.num_faces();
 
         let mut edges = Vec::with_capacity(3 * n_faces);
         let mut vertices_start_edges = Vec::new();
 
         for i in 0..n_faces {
-            match mesh.face_vertex_ids(FId{val: i}) {
-                Err(_) => {},
+            match mesh.face_vertex_ids(FId { val: i }) {
+                Err(_) => {}
                 Ok(face) => {
-                    edges.push(Edge{tail: face.a, twin: None});
-                    edges.push(Edge{tail: face.b, twin: None});
-                    edges.push(Edge{tail: face.c, twin: None});
+                    edges.push(Edge {
+                        tail: face.a,
+                        twin: None,
+                    });
+                    edges.push(Edge {
+                        tail: face.b,
+                        twin: None,
+                    });
+                    edges.push(Edge {
+                        tail: face.c,
+                        twin: None,
+                    });
 
-                    safe_append_at(&mut vertices_start_edges, face.a.val, EId{val: i*3 + 0});
-                    safe_append_at(&mut vertices_start_edges, face.b.val, EId{val: i*3 + 1});
-                    safe_append_at(&mut vertices_start_edges, face.c.val, EId{val: i*3 + 2});
+                    safe_append_at(
+                        &mut vertices_start_edges,
+                        face.a.val,
+                        EId { val: i * 3 + 0 },
+                    );
+                    safe_append_at(
+                        &mut vertices_start_edges,
+                        face.b.val,
+                        EId { val: i * 3 + 1 },
+                    );
+                    safe_append_at(
+                        &mut vertices_start_edges,
+                        face.c.val,
+                        EId { val: i * 3 + 2 },
+                    );
                 }
             }
         }
 
-        let mut result = HalfEdge{edges: edges , vertices_start_edges: vertices_start_edges };
+        let mut result = HalfEdge {
+            edges: edges,
+            vertices_start_edges: vertices_start_edges,
+        };
 
         // For each edge, get tail of next
         // Of this get all edges originating
         // Of these the one where next has the same tail must be the twin
         // @todo could let this fail if there is more than one valid candidate (not manifold)
         for i in 0..result.edges.len() {
-            let _ = result.next(EId{val: i})
+            let _ = result
+                .next(EId { val: i })
                 .and_then(|next_id| {
                     let mut cache = Vec::new(); //@todo try doing this in outer scope
                     result.edges_originating(result.edges[next_id.val].tail, &mut cache)?;
                     Ok(cache)
                 })
-                .map(|originating_ids| for originating_id in originating_ids {
-                    let _ = result.next(originating_id)
-                        .map(|candidate_id| if result.edges[candidate_id.val].tail == result.edges[i].tail {
-                            result.edges[i].twin = Some(candidate_id)
+                .map(|originating_ids| {
+                    for originating_id in originating_ids {
+                        let _ = result.next(originating_id).map(|candidate_id| {
+                            if result.edges[candidate_id.val].tail == result.edges[i].tail {
+                                result.edges[i].twin = Some(candidate_id)
+                            }
                         });
+                    }
                 });
         }
         result
@@ -96,7 +125,7 @@ impl HalfEdge {
     /// Returns the ID of the face the edge belongs to (error if id out of bounds)
     pub fn face(&self, id: EId) -> Result<FId> {
         self.ensure_edge_id(id)?;
-        Ok(FId{val: id.val / 3})
+        Ok(FId { val: id.val / 3 })
     }
     /// Returns the ID of the twin edge (None if there isn't any) (error if id out of bounds)
     pub fn twin(&self, id: EId) -> Result<Option<EId>> {
@@ -107,17 +136,17 @@ impl HalfEdge {
     pub fn next(&self, id: EId) -> Result<EId> {
         self.ensure_edge_id(id)?;
         if Self::last_in_face(id) {
-            return Ok(EId{val: id.val - 2});
+            return Ok(EId { val: id.val - 2 });
         }
-        Ok(EId{val: id.val + 1})
+        Ok(EId { val: id.val + 1 })
     }
     /// Returns the ID of the edge before this edge (error if id out of bounds)
     pub fn prev(&self, id: EId) -> Result<EId> {
         self.ensure_edge_id(id)?;
         if Self::first_in_face(id) {
-            return Ok(EId{val: id.val + 2});
+            return Ok(EId { val: id.val + 2 });
         }
-        Ok(EId{val: id.val - 1})
+        Ok(EId { val: id.val - 1 })
     }
     /// Appends all edges originating (pointing away) from the given vertex (error if id out of bounds)
     pub fn edges_originating(&self, id: VId, result: &mut Vec<EId>) -> Result<()> {
@@ -132,8 +161,8 @@ impl HalfEdge {
         self.edges_originating(id, cache)?;
         for edge in cache {
             match self.prev(*edge) {
-                Err(_) => {},
-                Ok(id) => result.push(id)
+                Err(_) => {}
+                Ok(id) => result.push(id),
             }
         }
         Ok(())
@@ -146,8 +175,8 @@ impl HalfEdge {
         for edge in cache {
             result.push(*edge);
             match self.prev(*edge) {
-                Err(_) => {},
-                Ok(id) => result.push(id)
+                Err(_) => {}
+                Ok(id) => result.push(id),
             }
         }
         Ok(())
@@ -160,7 +189,7 @@ impl HalfEdge {
         for edge in cache {
             match self.face(*edge) {
                 Err(_) => {}
-                Ok(id) => result.push(id)
+                Ok(id) => result.push(id),
             }
         }
         Ok(())

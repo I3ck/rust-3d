@@ -27,6 +27,7 @@ use crate::prelude::*;
 /// IsDirectionField3D is a trait used for fields of directions within 3D space
 pub trait IsDirectionField3D {
     /// Should return the direction at the given position
-    fn direction_at<P>(&self, p: &P) -> Norm3D where
+    fn direction_at<P>(&self, p: &P) -> Norm3D
+    where
         P: Is3D;
 }

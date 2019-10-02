@@ -25,19 +25,19 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// Returns the distance between two Is3D
-pub fn dist_3d<P, Q>(p: &P, q: &Q) -> f64 where
+pub fn dist_3d<P, Q>(p: &P, q: &Q) -> f64
+where
     P: Is3D,
-    Q: Is3D {
-
+    Q: Is3D,
+{
     sqr_dist_3d(p, q).sqrt()
 }
 
 /// Returns the squared distance between two Is3D
-pub fn sqr_dist_3d<P, Q>(p: &P, q: &Q) -> f64 where
+pub fn sqr_dist_3d<P, Q>(p: &P, q: &Q) -> f64
+where
     P: Is3D,
-    Q: Is3D {
-
+    Q: Is3D,
+{
     (p.x() - q.x()).powi(2) + (p.y() - q.y()).powi(2) + (p.z() - q.z()).powi(2)
 }
-
-

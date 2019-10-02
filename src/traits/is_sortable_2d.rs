@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsSortable2D trait used for collections which can be sorted by x or y
-pub trait IsSortable2D : IsSortableND {
+pub trait IsSortable2D: IsSortableND {
     /// Should sort all elements by x
     fn sort_x(&mut self);
     /// Should sort all elements by y

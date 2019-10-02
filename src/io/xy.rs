@@ -27,32 +27,33 @@ extern crate core;
 use crate::prelude::*;
 
 use self::core::str::FromStr;
+use std::fs::File;
 use std::io::prelude::*;
 use std::io::{BufReader, BufWriter};
-use std::fs::File;
 
 /// Saves an IsRandomAccessible<Is2D> as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xy file format or .csv files
-pub fn save_xy<RA, P>(ra: &RA, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()> where
+pub fn save_xy<RA, P>(ra: &RA, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()>
+where
     RA: IsRandomAccessible<P>,
-    P: Is2D {
-
+    P: Is2D,
+{
     let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
     let n = ra.len();
     for i in 0..n {
         let ref p = ra[i];
-        let buffer = p.x().to_string()  + delim_coord
-                   + &p.y().to_string()
-                   + delim_pos;
-        f.write_all(buffer.as_bytes()).map_err(|e| e.to_error_kind())?;
+        let buffer = p.x().to_string() + delim_coord + &p.y().to_string() + delim_pos;
+        f.write_all(buffer.as_bytes())
+            .map_err(|e| e.to_error_kind())?;
     }
     Ok(())
 }
 
 /// Loads a IsRandomInsertible<Is2D> as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to load the .xy file format or .csv files
-pub fn load_xy<RI, P>(ri: &mut RI, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()> where
+pub fn load_xy<RI, P>(ri: &mut RI, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()>
+where
     RI: IsRandomInsertible<P>,
-    P: Is2D + IsBuildable2D {
-
+    P: Is2D + IsBuildable2D,
+{
     let mut f = BufReader::new(File::open(filepath)?);
 
     let mut content = String::new();
@@ -70,9 +71,9 @@ pub fn load_xy<RI, P>(ri: &mut RI, filepath: &str, delim_coord: &str, delim_pos:
             2 => {
                 let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
                 let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
-                ri.push(P::new(x,y))
-            },
-            _ => return Err(ErrorKind::ParseError)
+                ri.push(P::new(x, y))
+            }
+            _ => return Err(ErrorKind::ParseError),
         }
     }
     Ok(())

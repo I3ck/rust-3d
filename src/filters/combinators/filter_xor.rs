@@ -22,33 +22,40 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterXOR, a filter which combines two filters and is true iff one of its filters is true
 
-use std::marker::PhantomData;
 use crate::traits::IsFilter;
+use std::marker::PhantomData;
 
 /// FilterXOR, a filter which combines two filters and is true iff one of its filters is true
-pub struct FilterXOR<F1, F2, T> where
+pub struct FilterXOR<F1, F2, T>
+where
     F1: IsFilter<T>,
-    F2: IsFilter<T> {
-
+    F2: IsFilter<T>,
+{
     filter1: F1,
     filter2: F2,
-    _marker: PhantomData<T>
+    _marker: PhantomData<T>,
 }
 
-impl<F1, F2, T> FilterXOR<F1, F2, T> where
+impl<F1, F2, T> FilterXOR<F1, F2, T>
+where
     F1: IsFilter<T>,
-    F2: IsFilter<T> {
-
+    F2: IsFilter<T>,
+{
     /// Creates a new FilterXOR from two other IsFilter
     pub fn new(filter1: F1, filter2: F2) -> Self {
-        FilterXOR {filter1, filter2, _marker: PhantomData}
+        FilterXOR {
+            filter1,
+            filter2,
+            _marker: PhantomData,
+        }
     }
 }
 
-impl<F1, F2, T> IsFilter<T> for FilterXOR<F1, F2, T> where
+impl<F1, F2, T> IsFilter<T> for FilterXOR<F1, F2, T>
+where
     F1: IsFilter<T>,
-    F2: IsFilter<T> {
-
+    F2: IsFilter<T>,
+{
     fn is_allowed(&self, x: &T) -> bool {
         self.filter1.is_allowed(x) ^ self.filter2.is_allowed(x)
     }

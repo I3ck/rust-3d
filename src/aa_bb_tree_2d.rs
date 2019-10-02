@@ -26,45 +26,47 @@ use crate::prelude::*;
 
 use std::marker::PhantomData;
 
-#[derive (Clone)]
+#[derive(Clone)]
 /// AABBTree2D, an axis aligned bounding box tree in 2D for fast collision detection
-pub enum AABBTree2D<HB> where
-    HB: HasBoundingBox2D + Clone {
-
+pub enum AABBTree2D<HB>
+where
+    HB: HasBoundingBox2D + Clone,
+{
     Empty,
     Leaf(AABBTree2DLeaf<HB>),
-    Branch(AABBTree2DBranch<HB>)
+    Branch(AABBTree2DBranch<HB>),
 }
 
 // currently often calculates the bounding box, try cache it
-impl<HB> AABBTree2D<HB> where
-    HB: HasBoundingBox2D + Clone {
-
+impl<HB> AABBTree2D<HB>
+where
+    HB: HasBoundingBox2D + Clone,
+{
     pub fn new(data: Vec<HB>, maxdepth: usize, allowed_bucket_size: usize) -> Self {
         Self::new_rec(data, maxdepth, allowed_bucket_size, 0)
     }
 
     pub fn bb_colliding(&self, bb: &BoundingBox2D) -> Vec<&HB> {
         match self {
-            AABBTree2D::Empty          => Vec::new(),
-            AABBTree2D::Leaf(leaf)     => leaf.bb_colliding(bb),
-            AABBTree2D::Branch(branch) => branch.bb_colliding(bb)
+            AABBTree2D::Empty => Vec::new(),
+            AABBTree2D::Leaf(leaf) => leaf.bb_colliding(bb),
+            AABBTree2D::Branch(branch) => branch.bb_colliding(bb),
         }
     }
 
     pub fn bb_crossing_x_value(&self, x: f64) -> Vec<&HB> {
         match self {
-            AABBTree2D::Empty          => Vec::new(),
-            AABBTree2D::Leaf(leaf)     => leaf.bb_crossing_x_value(x),
-            AABBTree2D::Branch(branch) => branch.bb_crossing_x_value(x)
+            AABBTree2D::Empty => Vec::new(),
+            AABBTree2D::Leaf(leaf) => leaf.bb_crossing_x_value(x),
+            AABBTree2D::Branch(branch) => branch.bb_crossing_x_value(x),
         }
     }
 
     pub fn bb_crossing_y_value(&self, y: f64) -> Vec<&HB> {
         match self {
-            AABBTree2D::Empty          => Vec::new(),
-            AABBTree2D::Leaf(leaf)     => leaf.bb_crossing_y_value(y),
-            AABBTree2D::Branch(branch) => branch.bb_crossing_y_value(y)
+            AABBTree2D::Empty => Vec::new(),
+            AABBTree2D::Leaf(leaf) => leaf.bb_crossing_y_value(y),
+            AABBTree2D::Branch(branch) => branch.bb_crossing_y_value(y),
         }
     }
 
@@ -74,24 +76,42 @@ impl<HB> AABBTree2D<HB> where
             1 => {
                 let bb = Self::bb_of(&data).unwrap(); //unwrap fine, since data non empty and with valid bbs (see new)
                 AABBTree2D::Leaf(AABBTree2DLeaf::new(data, bb))
-            },
+            }
             _ => {
                 if depth >= maxdepth || data.len() <= allowed_bucket_size {
                     let bb = Self::bb_of(&data).unwrap(); //unwrap fine, since data non empty and with valid bbs (see new)
                     AABBTree2D::Leaf(AABBTree2DLeaf::new(data, bb))
                 } else {
-                    let compx  = depth % 2 != 0;
-                    let bb     = Self::bb_of(&data).unwrap(); //unwrap fine due to early return in new and data not empty
+                    let compx = depth % 2 != 0;
+                    let bb = Self::bb_of(&data).unwrap(); //unwrap fine due to early return in new and data not empty
                     let center = bb.center_bb();
 
-                    let dleft  = data.iter().cloned().filter(|x| Self::is_left_of( compx, &x.bounding_box(), &center)).collect::<Vec<_>>();
-                    let dright = data.iter().cloned().filter(|x| Self::is_right_of(compx, &x.bounding_box(), &center)).collect::<Vec<_>>();
+                    let dleft = data
+                        .iter()
+                        .cloned()
+                        .filter(|x| Self::is_left_of(compx, &x.bounding_box(), &center))
+                        .collect::<Vec<_>>();
+                    let dright = data
+                        .iter()
+                        .cloned()
+                        .filter(|x| Self::is_right_of(compx, &x.bounding_box(), &center))
+                        .collect::<Vec<_>>();
 
                     if (dleft.len() == dright.len()) && dleft.len() == data.len() {
                         AABBTree2D::Leaf(AABBTree2DLeaf::new(data, bb))
                     } else {
-                        let left  = Box::new(Self::new_rec(dleft,  maxdepth, allowed_bucket_size, depth+1));
-                        let right = Box::new(Self::new_rec(dright, maxdepth, allowed_bucket_size, depth+1));
+                        let left = Box::new(Self::new_rec(
+                            dleft,
+                            maxdepth,
+                            allowed_bucket_size,
+                            depth + 1,
+                        ));
+                        let right = Box::new(Self::new_rec(
+                            dright,
+                            maxdepth,
+                            allowed_bucket_size,
+                            depth + 1,
+                        ));
 
                         AABBTree2D::Branch(AABBTree2DBranch::new(left, right, bb))
                     }
@@ -118,7 +138,7 @@ impl<HB> AABBTree2D<HB> where
 
     fn bb_of(data: &Vec<HB>) -> Result<BoundingBox2D> {
         if data.len() == 0 {
-            return Err(ErrorKind::IndexOutOfBounds) //@todo better type?
+            return Err(ErrorKind::IndexOutOfBounds); //@todo better type?
         }
         let mut result = data[0].bounding_box();
         for x in data.iter() {
@@ -129,21 +149,27 @@ impl<HB> AABBTree2D<HB> where
     }
 }
 
-#[derive (Clone)]
+#[derive(Clone)]
 //todo describe
-pub struct AABBTree2DLeaf<HB> where
-    HB: HasBoundingBox2D {
-
+pub struct AABBTree2DLeaf<HB>
+where
+    HB: HasBoundingBox2D,
+{
     data: Vec<HB>,
     bb: BoundingBox2D,
-    _marker: PhantomData<HB>
+    _marker: PhantomData<HB>,
 }
 
-impl<HB> AABBTree2DLeaf<HB> where
-    HB: HasBoundingBox2D + Clone {
-
+impl<HB> AABBTree2DLeaf<HB>
+where
+    HB: HasBoundingBox2D + Clone,
+{
     pub fn new(data: Vec<HB>, bb: BoundingBox2D) -> Self {
-        AABBTree2DLeaf{data, bb, _marker: PhantomData}
+        AABBTree2DLeaf {
+            data,
+            bb,
+            _marker: PhantomData,
+        }
     }
 
     pub fn bb_colliding(&self, bb: &BoundingBox2D) -> Vec<&HB> {
@@ -186,22 +212,29 @@ impl<HB> AABBTree2DLeaf<HB> where
     }
 }
 
-#[derive (Clone)]
+#[derive(Clone)]
 //todo describe
-pub struct AABBTree2DBranch<HB> where
-    HB: HasBoundingBox2D + Clone {
-
+pub struct AABBTree2DBranch<HB>
+where
+    HB: HasBoundingBox2D + Clone,
+{
     left: Box<AABBTree2D<HB>>,
     right: Box<AABBTree2D<HB>>,
     bb: BoundingBox2D,
-    _marker: PhantomData<HB>
+    _marker: PhantomData<HB>,
 }
 
-impl<HB> AABBTree2DBranch<HB> where
-    HB: HasBoundingBox2D + Clone {
-
+impl<HB> AABBTree2DBranch<HB>
+where
+    HB: HasBoundingBox2D + Clone,
+{
     pub fn new(left: Box<AABBTree2D<HB>>, right: Box<AABBTree2D<HB>>, bb: BoundingBox2D) -> Self {
-        AABBTree2DBranch{left, right, bb, _marker: PhantomData}
+        AABBTree2DBranch {
+            left,
+            right,
+            bb,
+            _marker: PhantomData,
+        }
     }
 
     pub fn bb_colliding(&self, bb: &BoundingBox2D) -> Vec<&HB> {

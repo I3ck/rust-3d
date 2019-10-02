@@ -27,5 +27,5 @@ use crate::prelude::*;
 /// IsScalable trait used for types that can have their size scaled by a factor
 pub trait IsScalable {
     /// Should scale by the given factor. 0.5 -> half size, 2.0 double the size without moving the position/center
-    fn scale(&mut self, factor: Positive); 
+    fn scale(&mut self, factor: Positive);
 }

@@ -24,21 +24,21 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::fmt;
 
-use crate::prelude::*;
 use crate::distances_3d::dist_3d;
 use crate::functions::center_3d;
+use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Eq, Clone, Hash)]
+#[derive(Debug, PartialEq, PartialOrd, Eq, Clone, Hash)]
 /// LineSegment3D, a line segment within 3D space
 pub struct LineSegment3D {
     pub start: Point3D,
-    pub end: Point3D
+    pub end: Point3D,
 }
 
 impl LineSegment3D {
     /// Creates a new LineSegment3D from a start and end point
     pub fn new(start: Point3D, end: Point3D) -> Self {
-        LineSegment3D{start, end}
+        LineSegment3D { start, end }
     }
 }
 
@@ -91,6 +91,15 @@ impl IsMatrix4Transformable for LineSegment3D {
 
 impl fmt::Display for LineSegment3D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({}, {}, {} -> {}, {}, {})", self.start.x(), self.start.y(), self.start.z(), self.end.x(), self.end.y(), self.end.z())
+        write!(
+            f,
+            "({}, {}, {} -> {}, {}, {})",
+            self.start.x(),
+            self.start.y(),
+            self.start.z(),
+            self.end.x(),
+            self.end.y(),
+            self.end.z()
+        )
     }
 }

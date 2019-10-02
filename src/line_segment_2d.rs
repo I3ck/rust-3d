@@ -24,21 +24,21 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::fmt;
 
-use crate::prelude::*;
 use crate::distances_2d::dist_2d;
 use crate::functions::center_2d;
+use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Eq, Clone, Hash)]
+#[derive(Debug, PartialEq, PartialOrd, Eq, Clone, Hash)]
 /// LineSegment2D, a line segment within 2D space
 pub struct LineSegment2D {
     pub start: Point2D,
-    pub end: Point2D
+    pub end: Point2D,
 }
 
 impl LineSegment2D {
     /// Creates a new LineSegment2D from a start and end Point
     pub fn new(start: Point2D, end: Point2D) -> Self {
-        LineSegment2D{start, end}
+        LineSegment2D { start, end }
     }
 }
 
@@ -51,7 +51,7 @@ impl IsMovable2D for LineSegment2D {
 
 impl HasLength for LineSegment2D {
     fn length(&self) -> f64 {
-       dist_2d(&self.start, &self.end)
+        dist_2d(&self.start, &self.end)
     }
 }
 
@@ -91,6 +91,13 @@ impl IsMatrix3Transformable for LineSegment2D {
 
 impl fmt::Display for LineSegment2D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({}, {} -> {}, {})", self.start.x(), self.start.y(), self.end.x(), self.end.y())
+        write!(
+            f,
+            "({}, {} -> {}, {})",
+            self.start.x(),
+            self.start.y(),
+            self.end.x(),
+            self.end.y()
+        )
     }
 }

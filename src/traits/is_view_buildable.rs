@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsViewBuildable trait used for types which can be constructed from a view / have a view applied to them
-pub trait IsViewBuildable : Sized {
+pub trait IsViewBuildable: Sized {
     /// Should apply the view and only keep items indexed within the view. Should return an error if any index is out of bounds
     fn apply_view(&mut self, view: &View) -> Result<()>;
     /// Should create a new object consisting only of items indexed within the view. Should return an error if any index is out of bounds

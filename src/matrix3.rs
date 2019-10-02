@@ -26,63 +26,47 @@ use std::ops::Mul;
 
 use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, PartialEq, PartialOrd, Clone)]
 /// Matrix3, a matrix with 3 rows and columns
 pub struct Matrix3 {
-    pub data: [[f64; 3]; 3]
+    pub data: [[f64; 3]; 3],
 }
 
 impl Matrix3 {
     /// Creates a new matrix which contains only zeroes
     pub fn zeroes() -> Matrix3 {
-        Matrix3{
-            data: [
-                [0.0, 0.0, 0.0],
-                [0.0, 0.0, 0.0],
-                [0.0, 0.0, 0.0]
-            ]
+        Matrix3 {
+            data: [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
         }
     }
     /// Creates a new matrix which applies translation
     pub fn translation(x: f64, y: f64) -> Matrix3 {
-        Matrix3{
-            data: [
-                [1.0, 0.0, x],
-                [0.0, 1.0, y],
-                [0.0, 0.0, 1.0]
-            ]
+        Matrix3 {
+            data: [[1.0, 0.0, x], [0.0, 1.0, y], [0.0, 0.0, 1.0]],
         }
     }
     /// Creates a new matrix which applies scaling
     pub fn scale(x: f64, y: f64) -> Matrix3 {
-        Matrix3{
-            data: [
-                [x,   0.0, 0.0],
-                [0.0, y,   0.0],
-                [0.0, 0.0, 1.0]
-            ]
+        Matrix3 {
+            data: [[x, 0.0, 0.0], [0.0, y, 0.0], [0.0, 0.0, 1.0]],
         }
     }
     /// Creates a new matrix which applies rotation
     pub fn rotation(rad: Rad) -> Matrix3 {
-        Matrix3{
+        Matrix3 {
             data: [
                 [rad.val.cos(), -rad.val.sin(), 0.0],
-                [rad.val.sin(),  rad.val.cos(), 0.0],
-                [0.0,            0.0,           1.0]
-            ]
+                [rad.val.sin(), rad.val.cos(), 0.0],
+                [0.0, 0.0, 1.0],
+            ],
         }
     }
 }
 
 impl Default for Matrix3 {
     fn default() -> Self {
-        Matrix3{
-            data: [
-                [1.0, 0.0, 0.0],
-                [0.0, 1.0, 0.0],
-                [0.0, 0.0, 1.0],
-            ]
+        Matrix3 {
+            data: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
         }
     }
 }
@@ -94,10 +78,9 @@ impl Mul for Matrix3 {
         let mut result = Matrix3::default();
         for i in 0..3 {
             for j in 0..3 {
-                result.data[i][j] =
-                    self.data[i][0] * other.data[0][j] + 
-                    self.data[i][1] * other.data[1][j] +
-                    self.data[i][2] * other.data[2][j];
+                result.data[i][j] = self.data[i][0] * other.data[0][j]
+                    + self.data[i][1] * other.data[1][j]
+                    + self.data[i][2] * other.data[2][j];
             }
         }
         result

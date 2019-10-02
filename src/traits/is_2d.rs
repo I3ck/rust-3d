@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// Is2D is a trait used for types which are positioned within the 2D space
-pub trait Is2D : IsND {
+pub trait Is2D: IsND {
     /// Should return the x-coordinate
     fn x(&self) -> f64;
     /// Should return the y-coordinate
@@ -33,7 +33,7 @@ pub trait Is2D : IsND {
 
     /// Returns the Position as x,y tuple
     fn xy(&self) -> (f64, f64) {
-        ( self.x(), self.y() )
+        (self.x(), self.y())
     }
     /// Calculates the dot product with another Is2D
     fn dot(&self, other: &dyn Is2D) -> f64 {
@@ -49,7 +49,9 @@ pub trait Is2D : IsND {
     }
     /// Calculates the angle to the other Is2D in radians
     fn rad_to(&self, other: &dyn Is2D) -> Rad {
-        Rad{val: (other.y() - self.y()).atan2(other.x() - self.x())}
+        Rad {
+            val: (other.y() - self.y()).atan2(other.x() - self.x()),
+        }
     }
     /// Transforms the position in a "x y" string. E.g. "3.72 5.99"
     fn to_str(&self) -> String {
@@ -60,9 +62,10 @@ pub trait Is2D : IsND {
     }
 }
 
-impl<P> HasDistanceTo<P> for dyn Is2D where
-    P: Is2D {
-
+impl<P> HasDistanceTo<P> for dyn Is2D
+where
+    P: Is2D,
+{
     fn sqr_distance(&self, other: &P) -> NonNegative {
         NonNegative::new((self.x() - other.x()).powi(2) + (self.y() - other.y()).powi(2)).unwrap()
     }

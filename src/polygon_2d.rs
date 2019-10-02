@@ -24,20 +24,22 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::fmt;
 
-use crate::prelude::*;
 use crate::distances_2d::*;
+use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
+#[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Polygon2D, a polygon within 2D space
-pub struct Polygon2D<P> where
-    P: Is2D {
-
-    pc: PointCloud2D<P>
+pub struct Polygon2D<P>
+where
+    P: Is2D,
+{
+    pc: PointCloud2D<P>,
 }
 
-impl<P> IsPolygon<P> for Polygon2D<P> where
-    P: Is2D + Clone {
-
+impl<P> IsPolygon<P> for Polygon2D<P>
+where
+    P: Is2D + Clone,
+{
     fn num_segments(&self) -> usize {
         self.pc.len()
     }
@@ -45,10 +47,15 @@ impl<P> IsPolygon<P> for Polygon2D<P> where
     fn segment_vertex_ids(&self, segmentid: SId) -> Result<(VId, VId)> {
         if segmentid.val >= self.pc.len() {
             Err(ErrorKind::IncorrectSegmentID)
-        } else if segmentid.val == self.pc.len() -1 {
-            Ok((VId{val: segmentid.val}, VId{val: 0}))
+        } else if segmentid.val == self.pc.len() - 1 {
+            Ok((VId { val: segmentid.val }, VId { val: 0 }))
         } else {
-            Ok((VId{val: segmentid.val}, VId{val: segmentid.val + 1}))
+            Ok((
+                VId { val: segmentid.val },
+                VId {
+                    val: segmentid.val + 1,
+                },
+            ))
         }
     }
 
@@ -66,12 +73,15 @@ impl<P> IsPolygon<P> for Polygon2D<P> where
     }
 }
 
-impl<P> IsEditablePolygon<P> for Polygon2D<P> where
-    P: Is2D + Clone {
-
+impl<P> IsEditablePolygon<P> for Polygon2D<P>
+where
+    P: Is2D + Clone,
+{
     fn add_vertex(&mut self, vertex: P) -> VId {
         self.pc.data.push(vertex);
-        VId{val: self.pc.len() - 1}
+        VId {
+            val: self.pc.len() - 1,
+        }
     }
 
     fn change_vertex(&mut self, vertexid: VId, vertex: P) -> Result<()> {
@@ -84,55 +94,61 @@ impl<P> IsEditablePolygon<P> for Polygon2D<P> where
     }
 }
 
-impl<P> IsMovable2D for Polygon2D<P> where
-    P: Is2D + IsMovable2D {
-
+impl<P> IsMovable2D for Polygon2D<P>
+where
+    P: Is2D + IsMovable2D,
+{
     fn move_by(&mut self, x: f64, y: f64) {
         self.pc.move_by(x, y)
     }
 }
 
 impl<P> HasBoundingBox2DMaybe for Polygon2D<P>
-    where P: Is2D {
-
+where
+    P: Is2D,
+{
     fn bounding_box_maybe(&self) -> Result<BoundingBox2D> {
         self.pc.bounding_box_maybe()
     }
 }
 
 impl<P> HasCenterOfGravity2D for Polygon2D<P>
-    where P: Is2D {
-
+where
+    P: Is2D,
+{
     fn center_of_gravity(&self) -> Result<Point2D> {
         self.pc.center_of_gravity()
     }
 }
 
-impl<P> HasLength for Polygon2D<P> where
-    P: Is2D {
-
+impl<P> HasLength for Polygon2D<P>
+where
+    P: Is2D,
+{
     fn length(&self) -> f64 {
         let mut length = self.pc.length();
 
         if self.pc.data.len() > 0 {
-            length += dist_2d(&self.pc.data[self.pc.data.len()-1], &self.pc.data[0]);
+            length += dist_2d(&self.pc.data[self.pc.data.len() - 1], &self.pc.data[0]);
         }
 
         length
     }
 }
 
-impl<P> IsScalable for Polygon2D<P> where
-    P : IsEditable2D {
-
+impl<P> IsScalable for Polygon2D<P>
+where
+    P: IsEditable2D,
+{
     fn scale(&mut self, factor: Positive) {
         self.pc.scale(factor)
     }
 }
 
-impl<P> IsMatrix3Transformable for Polygon2D<P> where
-    P: Is2D + IsMatrix3Transformable + Clone {
-
+impl<P> IsMatrix3Transformable for Polygon2D<P>
+where
+    P: Is2D + IsMatrix3Transformable + Clone,
+{
     fn transformed(&self, m: &Matrix3) -> Self {
         let mut new = self.clone();
         new.transform(m);
@@ -144,27 +160,31 @@ impl<P> IsMatrix3Transformable for Polygon2D<P> where
     }
 }
 
-impl<P> fmt::Display for Polygon2D<P> where
-    P: Is2D + fmt::Display {
-
+impl<P> fmt::Display for Polygon2D<P>
+where
+    P: Is2D + fmt::Display,
+{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.pc.fmt(f) //@todo consider output similar to Line2D
     }
 }
 
-impl<P> Default for Polygon2D<P> where //https://github.com/rust-lang/rust/issues/26925
-    P: Is2D {
-
+impl<P> Default for Polygon2D<P>
+where
+    //https://github.com/rust-lang/rust/issues/26925
+    P: Is2D,
+{
     fn default() -> Self {
         let pc = PointCloud2D::default();
-        Polygon2D{pc}
+        Polygon2D { pc }
     }
 }
 
-impl<P> From<PointCloud2D<P>> for Polygon2D<P> where
-    P: Is2D {
-
+impl<P> From<PointCloud2D<P>> for Polygon2D<P>
+where
+    P: Is2D,
+{
     fn from(pc: PointCloud2D<P>) -> Self {
-        Polygon2D{pc}
+        Polygon2D { pc }
     }
 }

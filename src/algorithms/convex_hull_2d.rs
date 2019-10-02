@@ -27,46 +27,57 @@ use crate::prelude::*;
 
 /// Convex hull algorithm returning a Vec of the hull where the points are ordered according to the hull
 /// Using Andrew's monotone chain convex hull algorithm https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
-pub fn convex_hull_2d<RA, P>(ra: &RA) -> Vec<P> where
+pub fn convex_hull_2d<RA, P>(ra: &RA) -> Vec<P>
+where
     RA: IsRandomAccessible<P>,
-    P: Is2D + IsBuildable2D + Clone {
-        let n = ra.len();
+    P: Is2D + IsBuildable2D + Clone,
+{
+    let n = ra.len();
 
-        let mut sorted = PointCloud2D::new();
-        sorted.append_ra(ra);
-        sorted.sort_x();
-        let sorted = sorted;
+    let mut sorted = PointCloud2D::new();
+    sorted.append_ra(ra);
+    sorted.sort_x();
+    let sorted = sorted;
 
-        let mut lower = Vec::<P>::new();
-        for i in 0..n {
-            while lower.len() >= 2 && ccw(&lower[lower.len()-2], &lower[lower.len()-1], &sorted[i]) <= 0.0 {
-                println!("pop");
-                lower.pop().unwrap(); //safe, since only called if len > 0
-            }
-            lower.push(sorted[i].clone());
+    let mut lower = Vec::<P>::new();
+    for i in 0..n {
+        while lower.len() >= 2
+            && ccw(&lower[lower.len() - 2], &lower[lower.len() - 1], &sorted[i]) <= 0.0
+        {
+            println!("pop");
+            lower.pop().unwrap(); //safe, since only called if len > 0
         }
+        lower.push(sorted[i].clone());
+    }
 
-        let mut upper = Vec::<P>::new();
-        for i in (0..n).rev() {
-            while upper.len() >= 2 && ccw(&upper[upper.len()-2], &upper[upper.len()-1], &sorted[i]) <= 0.0 {
-                upper.pop().unwrap(); //safe, since only called if len > 0
-            }
-            upper.push(sorted[i].clone());
+    let mut upper = Vec::<P>::new();
+    for i in (0..n).rev() {
+        while upper.len() >= 2
+            && ccw(&upper[upper.len() - 2], &upper[upper.len() - 1], &sorted[i]) <= 0.0
+        {
+            upper.pop().unwrap(); //safe, since only called if len > 0
         }
+        upper.push(sorted[i].clone());
+    }
 
-        if lower.len() > 0 { lower.pop().unwrap(); } //safe, since len > 0
-        if upper.len() > 0 { upper.pop().unwrap(); } //safe, since len > 0
+    if lower.len() > 0 {
+        lower.pop().unwrap();
+    } //safe, since len > 0
+    if upper.len() > 0 {
+        upper.pop().unwrap();
+    } //safe, since len > 0
 
-        let mut result = Vec::<P>::new();
-        result.extend(lower);
-        result.extend(upper);
-        result
+    let mut result = Vec::<P>::new();
+    result.extend(lower);
+    result.extend(upper);
+    result
 }
 
-fn ccw<P1, P2, P3>(p1: &P1, p2: &P2, p3: &P3) -> f64 where
+fn ccw<P1, P2, P3>(p1: &P1, p2: &P2, p3: &P3) -> f64
+where
     P1: Is2D,
     P2: Is2D,
-    P3: Is2D {
-
-    (p2.x() - p1.x())*(p3.y() - p1.y()) - (p2.y() - p1.y())*(p3.x() - p1.x())
+    P3: Is2D,
+{
+    (p2.x() - p1.x()) * (p3.y() - p1.y()) - (p2.y() - p1.y()) * (p3.x() - p1.x())
 }

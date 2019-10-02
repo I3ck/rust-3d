@@ -24,40 +24,47 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::prelude::*;
 
-use std::cmp::{min, max};
+use std::cmp::{max, min};
 use std::collections::HashMap;
 
 /// Subdivides a mesh linearly by creating four faces for each input face
 /// This will not smoothen the input mesh, since new vertices are placed only on existing edges
-pub fn linear<V, MI, MO>(mi: &MI) -> Result<(MO)> where
+pub fn linear<V, MI, MO>(mi: &MI) -> Result<(MO)>
+where
     MI: IsMesh<V, Face3>,
     MO: IsFaceEditableMesh<V, Face3> + IsVertexEditableMesh<V, Face3> + Default,
-    V:  IsBuildableND {
-    
+    V: IsBuildableND,
+{
     let mut mo = MO::default();
-    
-    let n_vertices      = mi.num_vertices();
-    let n_faces         = mi.num_faces();
+
+    let n_vertices = mi.num_vertices();
+    let n_faces = mi.num_faces();
     let mut added_edges = HashMap::new();
-    
+
     for i in 0..n_vertices {
-        mo.add_vertex(mi.vertex(VId{val: i})?);
+        mo.add_vertex(mi.vertex(VId { val: i })?);
     }
-    
+
     for i in 0..n_faces {
-        let f               = mi.face_vertex_ids(FId{val:i})?;
+        let f = mi.face_vertex_ids(FId { val: i })?;
         let (vi1, vi2, vi3) = (f.vid(0)?, f.vid(1)?, f.vid(2)?);
-        let [v1, v2, v3]    = mi.face_vertices(FId{ val:i })?;
-        
-        let ia = *added_edges.entry((min(vi1, vi2), max(vi1, vi2))).or_insert_with(|| mo.add_vertex(v1.center(&v2).unwrap()));
-        let ib = *added_edges.entry((min(vi2, vi3), max(vi2, vi3))).or_insert_with(|| mo.add_vertex(v2.center(&v3).unwrap()));
-        let ic = *added_edges.entry((min(vi3, vi1), max(vi3, vi1))).or_insert_with(|| mo.add_vertex(v3.center(&v1).unwrap()));
-        
+        let [v1, v2, v3] = mi.face_vertices(FId { val: i })?;
+
+        let ia = *added_edges
+            .entry((min(vi1, vi2), max(vi1, vi2)))
+            .or_insert_with(|| mo.add_vertex(v1.center(&v2).unwrap()));
+        let ib = *added_edges
+            .entry((min(vi2, vi3), max(vi2, vi3)))
+            .or_insert_with(|| mo.add_vertex(v2.center(&v3).unwrap()));
+        let ic = *added_edges
+            .entry((min(vi3, vi1), max(vi3, vi1)))
+            .or_insert_with(|| mo.add_vertex(v3.center(&v1).unwrap()));
+
         mo.try_add_connection(vi1, ia, ic)?;
         mo.try_add_connection(ia, vi2, ib)?;
         mo.try_add_connection(ia, ib, ic)?;
-        mo.try_add_connection(ic, ib, vi3)?;      
+        mo.try_add_connection(ic, ib, vi3)?;
     }
-    
+
     Ok(mo)
 }

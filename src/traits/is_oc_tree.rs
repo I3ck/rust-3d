@@ -25,8 +25,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsOcTree is a trait used for OcTrees
-pub trait IsOcTree<P> : IsTree3D<P> where
-    P: Is3D {
+pub trait IsOcTree<P>: IsTree3D<P>
+where
+    P: Is3D,
+{
     /// Should return all positions up the given depth
     fn collect(&self, maxdepth: i8) -> PointCloud3D<P>;
 }

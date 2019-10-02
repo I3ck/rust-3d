@@ -27,9 +27,10 @@ use std::f64::consts::PI;
 use crate::prelude::*;
 
 /// Creates a 2D rectangle from given center width and height
-pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> PointCloud2D<P> where
-    P: IsBuildable2D {
-
+pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> PointCloud2D<P>
+where
+    P: IsBuildable2D,
+{
     let mut pc = PointCloud2D::with_capacity(4);
     let w = width.get();
     let h = height.get();
@@ -41,41 +42,60 @@ pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> PointCloud
 }
 
 /// Creates a involut circle with the given center, diameter, resolution and start and end angles in radians
-pub fn involut_circle<P>(center: &P, n_points: usize, diameter: Positive, start: Rad, end: Rad) -> PointCloud2D<P> where
-    P: IsBuildable2D {
-
+pub fn involut_circle<P>(
+    center: &P,
+    n_points: usize,
+    diameter: Positive,
+    start: Rad,
+    end: Rad,
+) -> PointCloud2D<P>
+where
+    P: IsBuildable2D,
+{
     let mut pc = PointCloud2D::with_capacity(n_points);
     let d = diameter.get();
     let p_dist = (end.val - start.val).abs() / (n_points - 1) as f64;
 
     for i in 0..n_points {
         let current = (i as f64) * p_dist;
-        pc.push(P::new(center.x() + d/2.0 * (current.cos() + current * current.sin()),
-                       center.y() + d/2.0 * (current.sin() - current * current.cos())));
+        pc.push(P::new(
+            center.x() + d / 2.0 * (current.cos() + current * current.sin()),
+            center.y() + d / 2.0 * (current.sin() - current * current.cos()),
+        ));
     }
     pc
 }
 
 /// Creates an arc with the given center, diameter, resolution and start and end angles in radians
-pub fn arc<P>(center: &P, n_points: usize, diameter: Positive, start: Rad, end: Rad) -> PointCloud2D<P> where
-    P: IsBuildable2D {
-
+pub fn arc<P>(
+    center: &P,
+    n_points: usize,
+    diameter: Positive,
+    start: Rad,
+    end: Rad,
+) -> PointCloud2D<P>
+where
+    P: IsBuildable2D,
+{
     let mut pc = PointCloud2D::with_capacity(n_points);
     let d = diameter.get();
     let p_dist = (end.val - start.val).abs() / (n_points - 1) as f64;
 
     for i in 0..n_points {
         let radians = start.val + (i as f64) * p_dist;
-        pc.push(P::new(center.x() + d/2.0 * radians.cos(),
-                       center.y() + d/2.0 * radians.sin()));
+        pc.push(P::new(
+            center.x() + d / 2.0 * radians.cos(),
+            center.y() + d / 2.0 * radians.sin(),
+        ));
     }
     pc
 }
 
 /// Creates an ellipse with the given center, a, b and resolution
-pub fn ellipse<P>(center: &P, n_points: usize, ap: Positive, bp: Positive) -> PointCloud2D<P> where
-    P: IsBuildable2D {
-
+pub fn ellipse<P>(center: &P, n_points: usize, ap: Positive, bp: Positive) -> PointCloud2D<P>
+where
+    P: IsBuildable2D,
+{
     let mut pc = PointCloud2D::with_capacity(n_points);
     let p_dist = PI / (n_points - 1) as f64;
     let a = ap.get();
@@ -84,8 +104,10 @@ pub fn ellipse<P>(center: &P, n_points: usize, ap: Positive, bp: Positive) -> Po
 
     for i in 0..n_points {
         let radians = (i as f64) * p_dist;
-        pc.push(P::new(center.x() + a * radians.cos() * angle.cos() - b * radians.sin() * angle.sin(),
-                       center.y() + a * radians.cos() * angle.sin() + b * radians.sin() * angle.cos()));
+        pc.push(P::new(
+            center.x() + a * radians.cos() * angle.cos() - b * radians.sin() * angle.sin(),
+            center.y() + a * radians.cos() * angle.sin() + b * radians.sin() * angle.cos(),
+        ));
     }
     pc
 }

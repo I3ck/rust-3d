@@ -44,12 +44,13 @@ impl<T> IsRandomInsertible<T> for Vec<T> {
     }
 }
 
-impl<T> IsViewBuildable for Vec<T> where
-    T: Clone {
-
+impl<T> IsViewBuildable for Vec<T>
+where
+    T: Clone,
+{
     fn apply_view(&mut self, view: &View) -> Result<()> {
         match view {
-            View::Full => { Ok(()) }
+            View::Full => Ok(()),
             View::Restricted(indices) => {
                 let n = self.len();
                 if indices.iter().any(|x| x >= &n) {
@@ -74,9 +75,10 @@ impl<T> IsViewBuildable for Vec<T> where
     }
 }
 
-impl<T> IsMovable2D for Vec<T> where
-    T: IsMovable2D {
-    
+impl<T> IsMovable2D for Vec<T>
+where
+    T: IsMovable2D,
+{
     fn move_by(&mut self, x: f64, y: f64) {
         for ref mut p in self.iter_mut() {
             p.move_by(x, y);
@@ -84,9 +86,10 @@ impl<T> IsMovable2D for Vec<T> where
     }
 }
 
-impl<T> IsMovable3D for Vec<T> where
-    T: IsMovable3D {
-
+impl<T> IsMovable3D for Vec<T>
+where
+    T: IsMovable3D,
+{
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         for ref mut p in self.iter_mut() {
             p.move_by(x, y, z);

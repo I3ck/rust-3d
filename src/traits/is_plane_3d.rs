@@ -25,9 +25,11 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsPlane3D is a trait used for planes within 3D space
-pub trait IsPlane3D<P,N> : Sized where
+pub trait IsPlane3D<P, N>: Sized
+where
     P: Is3D,
-    N: IsNormalized3D {
+    N: IsNormalized3D,
+{
     /// Should return a new plane with the given origin, u and v vectors
     fn new(origin: P, u: N, v: N) -> Self;
     /// Should return the origin of the plane

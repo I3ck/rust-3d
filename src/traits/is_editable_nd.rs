@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsEditableND is a trait used for types which are positioned in n-dimensional space and their position can be changed
-pub trait IsEditableND : IsND {
+pub trait IsEditableND: IsND {
     /// Should set the coordinate / position at dimension to val
     fn set_position(&mut self, dimension: usize, val: f64) -> Result<()>; //@todo rename
 }

@@ -24,26 +24,34 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::cmp::{Eq, Ordering};
 
-use crate::prelude::*;
 use crate::distances_3d::*;
+use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
 /// Box3D, a box in 3D space
 pub struct Box3D {
     pub center: Point3D,
     pub size_x: Positive,
     pub size_y: Positive,
-    pub size_z: Positive
+    pub size_z: Positive,
 }
 
 impl Box3D {
     /// Returns the minimum position of the box
     pub fn min_p(&self) -> Point3D {
-        Point3D::new(self.center.x() - 0.5*self.size_x.get(), self.center.y() - 0.5*self.size_y.get(), self.center.z() - 0.5*self.size_z.get())
+        Point3D::new(
+            self.center.x() - 0.5 * self.size_x.get(),
+            self.center.y() - 0.5 * self.size_y.get(),
+            self.center.z() - 0.5 * self.size_z.get(),
+        )
     }
     /// Returns the maximum position of the box
     pub fn max_p(&self) -> Point3D {
-        Point3D::new(self.center.x() + 0.5*self.size_x.get(), self.center.y() + 0.5*self.size_y.get(), self.center.z() + 0.5*self.size_z.get())
+        Point3D::new(
+            self.center.x() + 0.5 * self.size_x.get(),
+            self.center.y() + 0.5 * self.size_y.get(),
+            self.center.z() + 0.5 * self.size_z.get(),
+        )
     }
     /// Returns the sizes of the bounding box
     pub fn sizes(&self) -> (Positive, Positive, Positive) {
@@ -62,9 +70,12 @@ impl Ord for Box3D {
                 Some(x) => x,
                 None => match self.size_y.partial_cmp(&other.size_y) {
                     Some(x) => x,
-                    None => self.size_z.partial_cmp(&other.size_z).unwrap_or(Ordering::Equal)
-                }
-            }
+                    None => self
+                        .size_z
+                        .partial_cmp(&other.size_z)
+                        .unwrap_or(Ordering::Equal),
+                },
+            },
         }
     }
 }
@@ -95,24 +106,36 @@ impl Is3D for Box3D {
 
 impl IsBuildableND for Box3D {
     fn new_nd(coords: &[f64]) -> Result<Self> {
-        Ok(Box3D{center: Point3D::new_nd(coords)?, size_x: Positive::one(), size_y: Positive::one(), size_z: Positive::one()})
+        Ok(Box3D {
+            center: Point3D::new_nd(coords)?,
+            size_x: Positive::one(),
+            size_y: Positive::one(),
+            size_z: Positive::one(),
+        })
     }
 
-    fn from_nd<P>(&mut self, other: P) -> Result<()> where
-        P: IsBuildableND {
-
+    fn from_nd<P>(&mut self, other: P) -> Result<()>
+    where
+        P: IsBuildableND,
+    {
         self.center.from_nd(other)
     }
 }
 
 impl IsBuildable3D for Box3D {
     fn new(x: f64, y: f64, z: f64) -> Self {
-        Box3D{center: Point3D{x: x, y: y, z: z}, size_x: Positive::one(), size_y: Positive::one(), size_z: Positive::one()}
+        Box3D {
+            center: Point3D { x: x, y: y, z: z },
+            size_x: Positive::one(),
+            size_y: Positive::one(),
+            size_z: Positive::one(),
+        }
     }
 
     fn from<P>(&mut self, other: &P)
-        where P: Is3D {
-
+    where
+        P: Is3D,
+    {
         self.center.from(other)
     }
 }
@@ -139,8 +162,16 @@ impl IsEditable3D for Box3D {
 
 impl HasBoundingBox3D for Box3D {
     fn bounding_box(&self) -> BoundingBox3D {
-        let p_min = Point3D{x: self.center.x() - self.size_x.get() / 2.0, y: self.center.y() - self.size_y.get() / 2.0, z: self.center.z() - self.size_z.get() / 2.0};
-        let p_max = Point3D{x: self.center.x() + self.size_x.get() / 2.0, y: self.center.y() + self.size_y.get() / 2.0, z: self.center.z() + self.size_z.get() / 2.0};
+        let p_min = Point3D {
+            x: self.center.x() - self.size_x.get() / 2.0,
+            y: self.center.y() - self.size_y.get() / 2.0,
+            z: self.center.z() - self.size_z.get() / 2.0,
+        };
+        let p_max = Point3D {
+            x: self.center.x() + self.size_x.get() / 2.0,
+            y: self.center.y() + self.size_y.get() / 2.0,
+            z: self.center.z() + self.size_z.get() / 2.0,
+        };
         BoundingBox3D::new(&p_min, &p_max).unwrap() // safe
     }
 }
@@ -167,6 +198,11 @@ impl IsMovable3D for Box3D {
 
 impl From<BoundingBox3D> for Box3D {
     fn from(x: BoundingBox3D) -> Self {
-        Box3D{center: x.center_bb(), size_x: x.size_x(), size_y: x.size_y(), size_z: x.size_z()}
+        Box3D {
+            center: x.center_bb(),
+            size_x: x.size_x(),
+            size_y: x.size_y(),
+            size_z: x.size_z(),
+        }
     }
 }

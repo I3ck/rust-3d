@@ -22,28 +22,35 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterNegate, a filter which negates another filter
 
-use std::marker::PhantomData;
 use crate::traits::IsFilter;
+use std::marker::PhantomData;
 
 /// FilterNegate, a filter which negates another filter
-pub struct FilterNegate<F, T> where
-    F: IsFilter<T> {
-
+pub struct FilterNegate<F, T>
+where
+    F: IsFilter<T>,
+{
     filter: F,
-    _marker: PhantomData<T>
+    _marker: PhantomData<T>,
 }
 
-impl<F, T> FilterNegate<F, T> where
-    F: IsFilter<T> {
+impl<F, T> FilterNegate<F, T>
+where
+    F: IsFilter<T>,
+{
     /// Creates a new FilterNegate from another IsFilter which will be negated
     pub fn new(filter: F) -> Self {
-        FilterNegate {filter, _marker: PhantomData}
+        FilterNegate {
+            filter,
+            _marker: PhantomData,
+        }
     }
 }
 
-impl<F, T> IsFilter<T> for FilterNegate<F, T> where
-    F: IsFilter<T> {
-
+impl<F, T> IsFilter<T> for FilterNegate<F, T>
+where
+    F: IsFilter<T>,
+{
     fn is_allowed(&self, x: &T) -> bool {
         !self.filter.is_allowed(x)
     }

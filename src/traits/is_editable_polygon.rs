@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsEditablePolygon trait used for polygons which can be edited
-pub trait IsEditablePolygon<V> : IsPolygon<V> {
+pub trait IsEditablePolygon<V>: IsPolygon<V> {
     /// Should add a vertex to the end and return its id
     fn add_vertex(&mut self, vertex: V) -> VId;
     /// Should change vertex at vId to the given vertex returning an error on failure

@@ -22,16 +22,16 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Rgb, a struct holding color information
 
-#[derive (Default, Debug, PartialEq, PartialOrd, Eq, Ord, Hash, Clone)]
+#[derive(Default, Debug, PartialEq, PartialOrd, Eq, Ord, Hash, Clone)]
 /// Rgb, a struct holding color information
 pub struct Rgb {
     pub r: u8,
     pub g: u8,
-    pub b: u8
+    pub b: u8,
 }
 
 impl Rgb {
     pub fn new(r: u8, g: u8, b: u8) -> Self {
-        Rgb {r, g, b}
+        Rgb { r, g, b }
     }
 }

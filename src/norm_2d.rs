@@ -26,15 +26,15 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 use std::ops::{Mul, Neg};
 
-use crate::prelude::*;
 use crate::distances_2d::*;
+use crate::prelude::*;
 use crate::utils::hash_f64;
 
-#[derive (Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, PartialEq, PartialOrd, Clone)]
 /// Norm2D, a normalized vector within 2D space
 pub struct Norm2D {
     x: f64,
-    y: f64
+    y: f64,
 }
 
 impl Eq for Norm2D {}
@@ -42,7 +42,9 @@ impl Eq for Norm2D {}
 impl Ord for Norm2D {
     fn cmp(&self, other: &Self) -> Ordering {
         let origin = Point2D::default();
-        sqr_dist_2d(&origin, self).partial_cmp(&sqr_dist_2d(&origin, other)).unwrap_or(Ordering::Equal)
+        sqr_dist_2d(&origin, self)
+            .partial_cmp(&sqr_dist_2d(&origin, other))
+            .unwrap_or(Ordering::Equal)
     }
 }
 
@@ -57,7 +59,10 @@ impl Mul<f64> for Norm2D {
     type Output = Point2D;
 
     fn mul(self, other: f64) -> Point2D {
-        Point2D{x: other * self.x, y: other * self.y}
+        Point2D {
+            x: other * self.x,
+            y: other * self.y,
+        }
     }
 }
 
@@ -65,7 +70,10 @@ impl Neg for Norm2D {
     type Output = Norm2D;
 
     fn neg(self) -> Norm2D {
-        Norm2D { x: -self.x, y: -self.y }
+        Norm2D {
+            x: -self.x,
+            y: -self.y,
+        }
     }
 }
 
@@ -78,7 +86,7 @@ impl IsND for Norm2D {
         match dimension {
             0 => Ok(self.x),
             1 => Ok(self.y),
-            _ => Err(ErrorKind::IncorrectDimension)
+            _ => Err(ErrorKind::IncorrectDimension),
         }
     }
 }
@@ -94,9 +102,10 @@ impl Is2D for Norm2D {
 }
 
 impl IsNormalized2D for Norm2D {
-    fn new<P>(p: P) -> Result<Self> where
-        P: Is2D {
-
+    fn new<P>(p: P) -> Result<Self>
+    where
+        P: Is2D,
+    {
         let l = p.abs().get();
         if l == 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
@@ -104,6 +113,9 @@ impl IsNormalized2D for Norm2D {
 
         let f = 1.0 / l;
 
-        Ok(Norm2D { x: f * p.x() , y: f * p.y() })
+        Ok(Norm2D {
+            x: f * p.x(),
+            y: f * p.y(),
+        })
     }
 }

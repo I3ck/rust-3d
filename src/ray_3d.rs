@@ -26,16 +26,16 @@ use std::fmt;
 
 use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
+#[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Ray3D, a ray within 3D space
 pub struct Ray3D {
-    pub line: Line3D
+    pub line: Line3D,
 }
 
 impl Ray3D {
     /// Creates a new Ray3D from a Line3D
     pub fn new(line: Line3D) -> Self {
-        Ray3D {line}
+        Ray3D { line }
     }
 }
 

@@ -22,31 +22,37 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterRandomAccessible, a filter which can transform any IsFilter into an IsFilterRandomAccessible
 
-use std::marker::PhantomData;
 use std::collections::HashSet;
+use std::marker::PhantomData;
 
 use crate::prelude::*;
 
 /// FilterRandomAccessible, a filter which can transform any IsFilter into an IsFilterRandomAccessible
-pub struct FilterRandomAccessible<F, T> where
-    F: IsFilter<T> {
-
+pub struct FilterRandomAccessible<F, T>
+where
+    F: IsFilter<T>,
+{
     filter: F,
-    _marker: PhantomData<T>
+    _marker: PhantomData<T>,
 }
 
-impl<F, T> FilterRandomAccessible<F, T> where
-    F: IsFilter<T> {
-
+impl<F, T> FilterRandomAccessible<F, T>
+where
+    F: IsFilter<T>,
+{
     pub fn new(filter: F) -> Self {
-        FilterRandomAccessible {filter, _marker: PhantomData}
+        FilterRandomAccessible {
+            filter,
+            _marker: PhantomData,
+        }
     }
 }
 
-impl<F, T, RA> IsFilterRandomAccessible<RA, T> for FilterRandomAccessible<F, T> where
+impl<F, T, RA> IsFilterRandomAccessible<RA, T> for FilterRandomAccessible<F, T>
+where
     F: IsFilter<T>,
-    RA: IsRandomAccessible<T>{
-
+    RA: IsRandomAccessible<T>,
+{
     fn filter(&self, ra: &RA, view: &mut View) {
         if ra.len() == 0 {
             *view = View::Full;

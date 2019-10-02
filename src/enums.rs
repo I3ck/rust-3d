@@ -23,4 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! General enum definitions
 
 /// Used to flag precision e.g. for IO operations (32 or 64 bit)
-pub enum Precision { P32, P64 }
+pub enum Precision {
+    P32,
+    P64,
+}

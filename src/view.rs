@@ -24,26 +24,24 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::collections::HashSet;
 
-#[derive (Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 /// View, which defines a restricted / full view onto any T. E.g. used when filtering collections of points.
 pub enum View {
     Full,
-    Restricted(HashSet<usize>)
+    Restricted(HashSet<usize>),
 }
 
 impl View {
     /// Merges two Views
     pub fn union(&mut self, other: View) {
         match other {
-            View::Full => { *self = other }
-            View::Restricted(indices_other) => {
-                match self {
-                    View::Full => {}
-                    View::Restricted(indices_source) => {
-                        indices_source.extend(&indices_other);
-                    }
+            View::Full => *self = other,
+            View::Restricted(indices_other) => match self {
+                View::Full => {}
+                View::Restricted(indices_source) => {
+                    indices_source.extend(&indices_other);
                 }
-            }
+            },
         }
     }
 }

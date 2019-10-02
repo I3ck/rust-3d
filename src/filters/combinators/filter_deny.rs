@@ -25,8 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::traits::IsFilter;
 
 /// FilterDeny, a filter which always returns false
-pub struct FilterDeny {
-}
+pub struct FilterDeny {}
 
 impl FilterDeny {
     /// Creates a new FilterDeny

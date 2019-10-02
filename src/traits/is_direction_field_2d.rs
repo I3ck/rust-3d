@@ -27,6 +27,7 @@ use crate::prelude::*;
 /// IsDirectionField2D is a trait used for fields of directions within 2D space
 pub trait IsDirectionField2D {
     /// Should return the direction at the given position
-    fn direction_at<P>(&self, p: &P) -> Norm2D where
+    fn direction_at<P>(&self, p: &P) -> Norm2D
+    where
         P: Is2D;
 }

@@ -22,82 +22,84 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! AABBTree3D, an axis aligned bounding box tree in 3D for fast collision detection
 
-use crate::prelude::*;
 use crate::functions::intersection;
+use crate::prelude::*;
 
 use std::marker::PhantomData;
 
-#[derive (Clone)]
+#[derive(Clone)]
 /// AABBTree3D, an axis aligned bounding box tree in 3D for fast collision detection
-pub enum AABBTree3D<HB> where
-    HB: HasBoundingBox3D + Clone {
-
+pub enum AABBTree3D<HB>
+where
+    HB: HasBoundingBox3D + Clone,
+{
     Empty,
     Leaf(AABBTree3DLeaf<HB>),
-    Branch(AABBTree3DBranch<HB>)
+    Branch(AABBTree3DBranch<HB>),
 }
 
 // currently often calculates the bounding box, try cache it
-impl<HB> AABBTree3D<HB> where
-    HB: HasBoundingBox3D + Clone {
-
+impl<HB> AABBTree3D<HB>
+where
+    HB: HasBoundingBox3D + Clone,
+{
     pub fn new(data: Vec<HB>, maxdepth: usize, allowed_bucket_size: usize) -> Self {
         Self::new_rec(data, maxdepth, allowed_bucket_size, 0)
     }
 
     pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
         match self {
-            AABBTree3D::Empty          => false,
-            AABBTree3D::Leaf(leaf)     => leaf  .any(f),
-            AABBTree3D::Branch(branch) => branch.any(f)
+            AABBTree3D::Empty => false,
+            AABBTree3D::Leaf(leaf) => leaf.any(f),
+            AABBTree3D::Branch(branch) => branch.any(f),
         }
     }
 
     pub fn for_each_intersection_candidate<'a>(&'a self, line: &Line3D, f: &mut dyn FnMut(&HB)) {
         match self {
-            AABBTree3D::Empty          => (),
-            AABBTree3D::Leaf(leaf)     => leaf  .for_each_intersection_candidate(line, f),
-            AABBTree3D::Branch(branch) => branch.for_each_intersection_candidate(line, f)
+            AABBTree3D::Empty => (),
+            AABBTree3D::Leaf(leaf) => leaf.for_each_intersection_candidate(line, f),
+            AABBTree3D::Branch(branch) => branch.for_each_intersection_candidate(line, f),
         }
     }
 
     pub fn for_each_collision_candidate<'a>(&'a self, bb: &BoundingBox3D, f: &mut dyn FnMut(&HB)) {
         match self {
-            AABBTree3D::Empty          => (),
-            AABBTree3D::Leaf(leaf)     => leaf  .for_each_collision_candidate(bb, f),
-            AABBTree3D::Branch(branch) => branch.for_each_collision_candidate(bb, f)
+            AABBTree3D::Empty => (),
+            AABBTree3D::Leaf(leaf) => leaf.for_each_collision_candidate(bb, f),
+            AABBTree3D::Branch(branch) => branch.for_each_collision_candidate(bb, f),
         }
     }
 
     pub fn bb_colliding(&self, bb: &BoundingBox3D) -> Vec<&HB> {
         match self {
-            AABBTree3D::Empty          => Vec::new(),
-            AABBTree3D::Leaf(leaf)     => leaf.bb_colliding(bb),
-            AABBTree3D::Branch(branch) => branch.bb_colliding(bb)
+            AABBTree3D::Empty => Vec::new(),
+            AABBTree3D::Leaf(leaf) => leaf.bb_colliding(bb),
+            AABBTree3D::Branch(branch) => branch.bb_colliding(bb),
         }
     }
 
     pub fn bb_crossing_x_value(&self, x: f64) -> Vec<&HB> {
         match self {
-            AABBTree3D::Empty          => Vec::new(),
-            AABBTree3D::Leaf(leaf)     => leaf.bb_crossing_x_value(x),
-            AABBTree3D::Branch(branch) => branch.bb_crossing_x_value(x)
+            AABBTree3D::Empty => Vec::new(),
+            AABBTree3D::Leaf(leaf) => leaf.bb_crossing_x_value(x),
+            AABBTree3D::Branch(branch) => branch.bb_crossing_x_value(x),
         }
     }
 
     pub fn bb_crossing_y_value(&self, y: f64) -> Vec<&HB> {
         match self {
-            AABBTree3D::Empty          => Vec::new(),
-            AABBTree3D::Leaf(leaf)     => leaf.bb_crossing_y_value(y),
-            AABBTree3D::Branch(branch) => branch.bb_crossing_y_value(y)
+            AABBTree3D::Empty => Vec::new(),
+            AABBTree3D::Leaf(leaf) => leaf.bb_crossing_y_value(y),
+            AABBTree3D::Branch(branch) => branch.bb_crossing_y_value(y),
         }
     }
 
     pub fn bb_crossing_z_value(&self, z: f64) -> Vec<&HB> {
         match self {
-            AABBTree3D::Empty          => Vec::new(),
-            AABBTree3D::Leaf(leaf)     => leaf.bb_crossing_z_value(z),
-            AABBTree3D::Branch(branch) => branch.bb_crossing_z_value(z)
+            AABBTree3D::Empty => Vec::new(),
+            AABBTree3D::Leaf(leaf) => leaf.bb_crossing_z_value(z),
+            AABBTree3D::Branch(branch) => branch.bb_crossing_z_value(z),
         }
     }
 
@@ -107,28 +109,46 @@ impl<HB> AABBTree3D<HB> where
             1 => {
                 let bb = Self::bb_of(&data).unwrap(); //unwrap fine, since data non empty and with valid bbs (see new)
                 AABBTree3D::Leaf(AABBTree3DLeaf::new(data, bb))
-            },
+            }
             _ => {
                 if depth >= maxdepth || data.len() <= allowed_bucket_size {
                     let bb = Self::bb_of(&data).unwrap(); //unwrap fine, since data non empty and with valid bbs (see new)
                     AABBTree3D::Leaf(AABBTree3DLeaf::new(data, bb))
                 } else {
-                    let comp  = match depth % 3 {
+                    let comp = match depth % 3 {
                         0 => Compare::X,
                         1 => Compare::Y,
-                        _ => Compare::Z
+                        _ => Compare::Z,
                     };
-                    let bb     = Self::bb_of(&data).unwrap(); //unwrap fine due to early return in new and data not empty
+                    let bb = Self::bb_of(&data).unwrap(); //unwrap fine due to early return in new and data not empty
                     let center = bb.center_bb();
 
-                    let dleft  = data.iter().cloned().filter(|x| Self::is_left_of( &comp, &x.bounding_box(), &center)).collect::<Vec<_>>();
-                    let dright = data.iter().cloned().filter(|x| Self::is_right_of(&comp, &x.bounding_box(), &center)).collect::<Vec<_>>();
+                    let dleft = data
+                        .iter()
+                        .cloned()
+                        .filter(|x| Self::is_left_of(&comp, &x.bounding_box(), &center))
+                        .collect::<Vec<_>>();
+                    let dright = data
+                        .iter()
+                        .cloned()
+                        .filter(|x| Self::is_right_of(&comp, &x.bounding_box(), &center))
+                        .collect::<Vec<_>>();
 
                     if (dleft.len() == dright.len()) && dleft.len() == data.len() {
                         AABBTree3D::Leaf(AABBTree3DLeaf::new(data, bb))
                     } else {
-                        let left  = Box::new(Self::new_rec(dleft,  maxdepth, allowed_bucket_size, depth+1));
-                        let right = Box::new(Self::new_rec(dright, maxdepth, allowed_bucket_size, depth+1));
+                        let left = Box::new(Self::new_rec(
+                            dleft,
+                            maxdepth,
+                            allowed_bucket_size,
+                            depth + 1,
+                        ));
+                        let right = Box::new(Self::new_rec(
+                            dright,
+                            maxdepth,
+                            allowed_bucket_size,
+                            depth + 1,
+                        ));
 
                         AABBTree3D::Branch(AABBTree3DBranch::new(left, right, bb))
                     }
@@ -141,7 +161,7 @@ impl<HB> AABBTree3D<HB> where
         match comp {
             Compare::X => bb.min_p().x() < center.x(),
             Compare::Y => bb.min_p().y() < center.y(),
-            Compare::Z => bb.min_p().z() < center.z()
+            Compare::Z => bb.min_p().z() < center.z(),
         }
     }
 
@@ -149,13 +169,13 @@ impl<HB> AABBTree3D<HB> where
         match comp {
             Compare::X => bb.max_p().x() >= center.x(),
             Compare::Y => bb.max_p().y() >= center.y(),
-            Compare::Z => bb.max_p().z() >= center.z()
+            Compare::Z => bb.max_p().z() >= center.z(),
         }
     }
 
     fn bb_of(data: &Vec<HB>) -> Result<BoundingBox3D> {
         if data.len() == 0 {
-            return Err(ErrorKind::IndexOutOfBounds) //@todo better type?
+            return Err(ErrorKind::IndexOutOfBounds); //@todo better type?
         }
         let mut result = data[0].bounding_box();
         for x in data.iter() {
@@ -166,29 +186,40 @@ impl<HB> AABBTree3D<HB> where
     }
 }
 
-enum Compare { X, Y, Z}
-
-#[derive (Clone)]
-//todo describe
-pub struct AABBTree3DLeaf<HB> where
-    HB: HasBoundingBox3D {
-
-    data: Vec<HB>,
-    bb: BoundingBox3D,
-    _marker: PhantomData<HB>
+enum Compare {
+    X,
+    Y,
+    Z,
 }
 
-impl<HB> AABBTree3DLeaf<HB> where
-    HB: HasBoundingBox3D + Clone {
+#[derive(Clone)]
+//todo describe
+pub struct AABBTree3DLeaf<HB>
+where
+    HB: HasBoundingBox3D,
+{
+    data: Vec<HB>,
+    bb: BoundingBox3D,
+    _marker: PhantomData<HB>,
+}
 
+impl<HB> AABBTree3DLeaf<HB>
+where
+    HB: HasBoundingBox3D + Clone,
+{
     pub fn new(data: Vec<HB>, bb: BoundingBox3D) -> Self {
-        AABBTree3DLeaf{data, bb, _marker: PhantomData}
+        AABBTree3DLeaf {
+            data,
+            bb,
+            _marker: PhantomData,
+        }
     }
 
     pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
         for x in self.data.iter() {
-            if f(x) { //unwrap fine due to early return in new
-                return true
+            if f(x) {
+                //unwrap fine due to early return in new
+                return true;
             }
         }
         false
@@ -269,22 +300,29 @@ impl<HB> AABBTree3DLeaf<HB> where
     }
 }
 
-#[derive (Clone)]
+#[derive(Clone)]
 //todo describe
-pub struct AABBTree3DBranch<HB> where
-    HB: HasBoundingBox3D + Clone {
-
+pub struct AABBTree3DBranch<HB>
+where
+    HB: HasBoundingBox3D + Clone,
+{
     left: Box<AABBTree3D<HB>>,
     right: Box<AABBTree3D<HB>>,
     bb: BoundingBox3D,
-    _marker: PhantomData<HB>
+    _marker: PhantomData<HB>,
 }
 
-impl<HB> AABBTree3DBranch<HB> where
-    HB: HasBoundingBox3D + Clone {
-
+impl<HB> AABBTree3DBranch<HB>
+where
+    HB: HasBoundingBox3D + Clone,
+{
     pub fn new(left: Box<AABBTree3D<HB>>, right: Box<AABBTree3D<HB>>, bb: BoundingBox3D) -> Self {
-        AABBTree3DBranch{left, right, bb, _marker: PhantomData}
+        AABBTree3DBranch {
+            left,
+            right,
+            bb,
+            _marker: PhantomData,
+        }
     }
 
     pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
@@ -296,7 +334,7 @@ impl<HB> AABBTree3DBranch<HB> where
             return;
         }
 
-        self.left .for_each_intersection_candidate(line, f);
+        self.left.for_each_intersection_candidate(line, f);
         self.right.for_each_intersection_candidate(line, f);
     }
 
@@ -305,7 +343,7 @@ impl<HB> AABBTree3DBranch<HB> where
             return;
         }
 
-        self.left .for_each_collision_candidate(bb, f);
+        self.left.for_each_collision_candidate(bb, f);
         self.right.for_each_collision_candidate(bb, f);
     }
 

@@ -26,17 +26,17 @@ use std::fmt;
 
 use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
+#[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Line3D, a line within 3D space
 pub struct Line3D {
     pub anchor: Point3D,
-    pub dir: Norm3D
+    pub dir: Norm3D,
 }
 
 impl Line3D {
     /// Creates a new Line3D from an anchor point and a direction
     pub fn new(anchor: Point3D, dir: Norm3D) -> Self {
-        Line3D{anchor, dir}
+        Line3D { anchor, dir }
     }
 }
 
@@ -48,6 +48,15 @@ impl IsMovable3D for Line3D {
 
 impl fmt::Display for Line3D {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({}, {}, {} -> {}, {}, {})", self.anchor.x(), self.anchor.y(), self.anchor.z(), self.dir.x(), self.dir.y(), self.dir.z())
+        write!(
+            f,
+            "({}, {}, {} -> {}, {}, {})",
+            self.anchor.x(),
+            self.anchor.y(),
+            self.anchor.z(),
+            self.dir.x(),
+            self.dir.y(),
+            self.dir.z()
+        )
     }
 }

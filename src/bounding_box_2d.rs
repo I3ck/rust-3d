@@ -25,38 +25,49 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 use crate::utils::max_f64_3;
 
-#[derive (Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// BoundingBox2D, an axis aligned bounding box within 2D space
 pub struct BoundingBox2D {
     min: Point2D,
-    max: Point2D
+    max: Point2D,
 }
 
 impl BoundingBox2D {
     /// Creates a new BoundingBox2D with the given min and max positions
-    pub fn new<P1, P2>(min: &P1, max: &P2) -> Result<BoundingBox2D> where
+    pub fn new<P1, P2>(min: &P1, max: &P2) -> Result<BoundingBox2D>
+    where
         P1: Is2D,
-        P2: Is2D {
-
+        P2: Is2D,
+    {
         if min.x() == max.x() || min.y() == max.y() {
             Err(ErrorKind::MinMaxEqual)
         } else if min.x() > max.x() || min.y() > max.y() {
             Err(ErrorKind::MinMaxSwapped)
         } else {
-            Ok(BoundingBox2D{min: Point2D{x: min.x(), y: min.y()}, max: Point2D{x: max.x(), y: max.y()}})
+            Ok(BoundingBox2D {
+                min: Point2D {
+                    x: min.x(),
+                    y: min.y(),
+                },
+                max: Point2D {
+                    x: max.x(),
+                    y: max.y(),
+                },
+            })
         }
     }
     /// Creates a new BoundingBox2D which contains all the given positions
-    pub fn from_iterator<'a, It2D,P>(source: It2D) -> Result<BoundingBox2D> where
-        It2D: IntoIterator<Item=&'a P>,
-        P: 'a + Is2D + Sized {
-
+    pub fn from_iterator<'a, It2D, P>(source: It2D) -> Result<BoundingBox2D>
+    where
+        It2D: IntoIterator<Item = &'a P>,
+        P: 'a + Is2D + Sized,
+    {
         let mut count = 0;
 
-        let mut minx : f64 = 0.0;
-        let mut miny : f64 = 0.0;
-        let mut maxx : f64 = 0.0;
-        let mut maxy : f64 = 0.0;
+        let mut minx: f64 = 0.0;
+        let mut miny: f64 = 0.0;
+        let mut maxx: f64 = 0.0;
+        let mut maxy: f64 = 0.0;
 
         for p in source {
             if count == 0 {
@@ -67,29 +78,38 @@ impl BoundingBox2D {
                 count += 1;
                 continue;
             }
-            if p.x() < minx { minx = p.x(); }
-            if p.y() < miny { miny = p.y(); }
-            if p.x() > maxx { maxx = p.x(); }
-            if p.y() > maxy { maxy = p.y(); }
+            if p.x() < minx {
+                minx = p.x();
+            }
+            if p.y() < miny {
+                miny = p.y();
+            }
+            if p.x() > maxx {
+                maxx = p.x();
+            }
+            if p.y() > maxy {
+                maxy = p.y();
+            }
             count += 1;
         }
         if count >= 2 {
-            Self::new(&Point2D{x: minx, y: miny}, &Point2D{x: maxx, y: maxy})
+            Self::new(&Point2D { x: minx, y: miny }, &Point2D { x: maxx, y: maxy })
         } else {
             Err(ErrorKind::TooFewPoints)
         }
     }
     /// Creates a new BoundingBox2D which contains all the given positions
-    pub fn from_into_iterator<It2D,P>(source: It2D) -> Result<BoundingBox2D> where
-        It2D: IntoIterator<Item=P>,
-        P: Is2D + Sized {
-
+    pub fn from_into_iterator<It2D, P>(source: It2D) -> Result<BoundingBox2D>
+    where
+        It2D: IntoIterator<Item = P>,
+        P: Is2D + Sized,
+    {
         let mut count = 0;
 
-        let mut minx : f64 = 0.0;
-        let mut miny : f64 = 0.0;
-        let mut maxx : f64 = 0.0;
-        let mut maxy : f64 = 0.0;
+        let mut minx: f64 = 0.0;
+        let mut miny: f64 = 0.0;
+        let mut maxx: f64 = 0.0;
+        let mut maxy: f64 = 0.0;
 
         for p in source {
             if count == 0 {
@@ -100,14 +120,22 @@ impl BoundingBox2D {
                 count += 1;
                 continue;
             }
-            if p.x() < minx { minx = p.x(); }
-            if p.y() < miny { miny = p.y(); }
-            if p.x() > maxx { maxx = p.x(); }
-            if p.y() > maxy { maxy = p.y(); }
+            if p.x() < minx {
+                minx = p.x();
+            }
+            if p.y() < miny {
+                miny = p.y();
+            }
+            if p.x() > maxx {
+                maxx = p.x();
+            }
+            if p.y() > maxy {
+                maxy = p.y();
+            }
             count += 1;
         }
         if count >= 2 {
-            Self::new(&Point2D{x: minx, y: miny}, &Point2D{x: maxx, y: maxy})
+            Self::new(&Point2D { x: minx, y: miny }, &Point2D { x: maxx, y: maxy })
         } else {
             Err(ErrorKind::TooFewPoints)
         }
@@ -134,36 +162,42 @@ impl BoundingBox2D {
     }
     /// Returns the center of the bounding box
     pub fn center_bb(&self) -> Point2D {
-        Point2D{x: self.min.x() + (self.max.x() - self.min.x()) / 2.0,
-                y: self.min.y() + (self.max.y() - self.min.y()) / 2.0}
+        Point2D {
+            x: self.min.x() + (self.max.x() - self.min.x()) / 2.0,
+            y: self.min.y() + (self.max.y() - self.min.y()) / 2.0,
+        }
     }
     /// Tests whether this bounding box is within the other
     pub fn is_inside(&self, other: &BoundingBox2D) -> bool {
-           self.min.x() > other.min.x()
-        && self.min.y() > other.min.y()
-        && self.max.x() < other.max.x()
-        && self.max.y() < other.max.y()
+        self.min.x() > other.min.x()
+            && self.min.y() > other.min.y()
+            && self.max.x() < other.max.x()
+            && self.max.y() < other.max.y()
     }
     /// Tests whether this bounding box contains a position
-    pub fn contains<P>(&self, other: &P) -> bool where
-        Self: Sized, P: Is2D {
-
-           other.x() > self.min.x()
-        && other.x() < self.max.x()
-        && other.y() > self.min.y()
-        && other.y() < self.max.y()
+    pub fn contains<P>(&self, other: &P) -> bool
+    where
+        Self: Sized,
+        P: Is2D,
+    {
+        other.x() > self.min.x()
+            && other.x() < self.max.x()
+            && other.y() > self.min.y()
+            && other.y() < self.max.y()
     }
     /// Tests whether this bounding box contains the other
     pub fn has_inside(&self, other: &BoundingBox2D) -> bool {
-           self.min.x() < other.min.x()
-        && self.min.y() < other.min.y()
-        && self.max.x() > other.max.x()
-        && self.max.y() > other.max.y()
+        self.min.x() < other.min.x()
+            && self.min.y() < other.min.y()
+            && self.max.x() > other.max.x()
+            && self.max.y() > other.max.y()
     }
     /// Tests whether this bounding box and the other overlap in any way
     pub fn collides_with(&self, other: &BoundingBox2D) -> bool {
-           2.0 * (self.center_bb().x - other.center_bb().x).abs() < ((self.size_x() + other.size_x()).get())
-        && 2.0 * (self.center_bb().y - other.center_bb().y).abs() < ((self.size_y() + other.size_y()).get())
+        2.0 * (self.center_bb().x - other.center_bb().x).abs()
+            < ((self.size_x() + other.size_x()).get())
+            && 2.0 * (self.center_bb().y - other.center_bb().y).abs()
+                < ((self.size_y() + other.size_y()).get())
     }
     /// Tests whether this bounding box crosses a certain x value
     pub fn crossing_x_value(&self, x: f64) -> bool {
@@ -183,25 +217,38 @@ impl BoundingBox2D {
         ]
     }
     /// Returns the distance to another Is2D
-    pub fn distance<P>(&self, other: &P) -> NonNegative where
-        P: Is2D {
-
+    pub fn distance<P>(&self, other: &P) -> NonNegative
+    where
+        P: Is2D,
+    {
         let sqr_dist = self.sqr_distance(other).get();
         NonNegative::new(sqr_dist.sqrt()).unwrap()
     }
     /// Returns the square distance to another Is2D
-    pub fn sqr_distance<P>(&self, other: &P) -> NonNegative where
-        P: Is2D {
-
-        let dx = max_f64_3(self.min_p().x() - other.x(), 0.0, other.x() - self.max_p().x());
-        let dy = max_f64_3(self.min_p().y() - other.y(), 0.0, other.y() - self.max_p().y());
-        NonNegative::new(dx*dx + dy*dy).unwrap()
+    pub fn sqr_distance<P>(&self, other: &P) -> NonNegative
+    where
+        P: Is2D,
+    {
+        let dx = max_f64_3(
+            self.min_p().x() - other.x(),
+            0.0,
+            other.x() - self.max_p().x(),
+        );
+        let dy = max_f64_3(
+            self.min_p().y() - other.y(),
+            0.0,
+            other.y() - self.max_p().y(),
+        );
+        NonNegative::new(dx * dx + dy * dy).unwrap()
     }
 }
 
 impl Default for BoundingBox2D {
     fn default() -> Self {
-        BoundingBox2D {min: Point2D {x: -0.5, y: -0.5}, max: Point2D {x: 0.5, y: 0.5}}
+        BoundingBox2D {
+            min: Point2D { x: -0.5, y: -0.5 },
+            max: Point2D { x: 0.5, y: 0.5 },
+        }
     }
 }
 
@@ -251,19 +298,17 @@ impl HasDistanceTo<BoundingBox2D> for BoundingBox2D {
 
         if other.max_p().x() < self.min_p().x() {
             dx = other.max_p().x() - self.min_p().x();
-        }
-        else if other.min_p().x() > self.max_p().x() {
+        } else if other.min_p().x() > self.max_p().x() {
             dx = other.min_p().x() - self.max_p().x();
         }
 
         if other.max_p().y() < self.min_p().y() {
             dy = other.max_p().y() - self.min_p().y();
-        }
-        else if other.min_p().y() > self.max_p().y() {
+        } else if other.min_p().y() > self.max_p().y() {
             dy = other.min_p().y() - self.max_p().y();
         }
 
-        NonNegative::new(dx*dx + dy*dy).unwrap()
+        NonNegative::new(dx * dx + dy * dy).unwrap()
     }
 }
 
@@ -285,11 +330,19 @@ impl IsMergeable for BoundingBox2D {
         let (mut min_x, mut min_y) = (self.min.x(), self.min.y());
         let (mut max_x, mut max_y) = (self.max.x(), self.max.y());
 
-        if other.min.x() < min_x { min_x = other.min.x() }
-        if other.min.y() < min_y { min_y = other.min.y() }
+        if other.min.x() < min_x {
+            min_x = other.min.x()
+        }
+        if other.min.y() < min_y {
+            min_y = other.min.y()
+        }
 
-        if other.max.x() > max_x { max_x = other.max.x() }
-        if other.max.y() > max_y { max_y = other.max.y() }
+        if other.max.x() > max_x {
+            max_x = other.max.x()
+        }
+        if other.max.y() > max_y {
+            max_y = other.max.y()
+        }
 
         self.min.set_xy(min_x, min_y);
         self.max.set_xy(max_x, max_y);
@@ -299,15 +352,23 @@ impl IsMergeable for BoundingBox2D {
         let (mut min_x, mut min_y) = (self.min.x(), self.min.y());
         let (mut max_x, mut max_y) = (self.max.x(), self.max.y());
 
-        if other.min.x() < min_x { min_x = other.min.x() }
-        if other.min.y() < min_y { min_y = other.min.y() }
+        if other.min.x() < min_x {
+            min_x = other.min.x()
+        }
+        if other.min.y() < min_y {
+            min_y = other.min.y()
+        }
 
-        if other.max.x() > max_x { max_x = other.max.x() }
-        if other.max.y() > max_y { max_y = other.max.y() }
+        if other.max.x() > max_x {
+            max_x = other.max.x()
+        }
+        if other.max.y() > max_y {
+            max_y = other.max.y()
+        }
 
         let min = Point2D::new(min_x, min_y);
         let max = Point2D::new(max_x, max_y);
 
-        BoundingBox2D{min, max}
+        BoundingBox2D { min, max }
     }
 }

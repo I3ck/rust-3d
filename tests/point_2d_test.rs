@@ -30,10 +30,8 @@ use rust_3d::prelude::*;
 
 #[test]
 fn point_2d_test() {
-
     let eps = 0.0000001;
     let origin = Point2D::default();
-
 
     let mut p1 = Point2D::default();
 
@@ -70,9 +68,9 @@ fn point_2d_test() {
     assert!(p3_norm.is_ok());
 
     match p3_norm {
-        Err(_) => {},
+        Err(_) => {}
         Ok(n) => {
-            assert!((1.0 - n.abs().get()).abs() < eps) ;
+            assert!((1.0 - n.abs().get()).abs() < eps);
             assert!(n.x() == p3.x() / p3.abs().get());
             assert!(n.y() == p3.y() / p3.abs().get());
         }
@@ -101,16 +99,20 @@ fn point_2d_test() {
     assert!(p1.y() == 22.0);
 
     p1.set_xy(1.0, 0.0);
-    p1.rotate(Rad{val: 0.0}, &origin);
+    p1.rotate(Rad { val: 0.0 }, &origin);
     assert!(p1.x() == 1.0);
     assert!(p1.y() == 0.0);
 
-    p1.rotate(Rad{val: 2.0 * consts::PI}, &origin);
+    p1.rotate(
+        Rad {
+            val: 2.0 * consts::PI,
+        },
+        &origin,
+    );
     assert!((1.0 - p1.x()).abs() < eps);
     assert!((0.0 - p1.y()).abs() < eps);
 
-
-    p1.rotate(Rad{val: consts::PI}, &origin);
+    p1.rotate(Rad { val: consts::PI }, &origin);
     assert!((-1.0 - p1.x()).abs() < eps);
     assert!((0.0 - p1.y()).abs() < eps);
 

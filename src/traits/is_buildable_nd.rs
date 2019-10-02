@@ -25,14 +25,12 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsBuildableND is a trait used for types which are positioned in n-dimensional space and can be constructed
-pub trait IsBuildableND : 
-    Sized +
-    IsND {
-    
+pub trait IsBuildableND: Sized + IsND {
     /// Should build an object from the correct number of coordinates
     fn new_nd(coords: &[f64]) -> Result<Self>;
     /// Should use the coordinates of another as its own
-    fn from_nd<P>(&mut self, other: P) -> Result<()> where
+    fn from_nd<P>(&mut self, other: P) -> Result<()>
+    where
         P: IsBuildableND;
 
     /// Returns a new object with 0 for all coordinates
@@ -40,20 +38,21 @@ pub trait IsBuildableND :
         Self::new_nd(&vec![0.0; Self::n_dimensions()])
     }
     /// Returns the center between this and other
-    fn center<P>(&self, other:& P) -> Result<Self> where
-        P: IsND {
-        
+    fn center<P>(&self, other: &P) -> Result<Self>
+    where
+        P: IsND,
+    {
         let n = Self::n_dimensions();
-        
+
         if n != P::n_dimensions() {
             return Err(ErrorKind::IncorrectDimension);
         }
-        
+
         let mut v = Vec::with_capacity(n);
         for i in 0..n {
             v.push(0.5 * (self.position_nd(i)? + other.position_nd(i)?));
         }
-        
+
         Self::new_nd(&v)
     }
 }

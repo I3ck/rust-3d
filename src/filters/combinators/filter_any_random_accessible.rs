@@ -24,17 +24,19 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::prelude::*;
 
-#[derive (Default)]
+#[derive(Default)]
 /// FilterAnyRandomAccessible, a filter to chain multiple IsFilterRandomAccessible with the or condition => must pass any filter to pass this filter
-pub struct FilterAnyRandomAccessible<RA, T> where
-    RA: IsRandomAccessible<T> {
-
-    pub filters: Vec<Box<dyn IsFilterRandomAccessible<RA, T>>>
+pub struct FilterAnyRandomAccessible<RA, T>
+where
+    RA: IsRandomAccessible<T>,
+{
+    pub filters: Vec<Box<dyn IsFilterRandomAccessible<RA, T>>>,
 }
 
-impl<RA, T> IsFilterRandomAccessible<RA, T> for FilterAnyRandomAccessible<RA, T> where
-    RA: IsRandomAccessible<T> {
-
+impl<RA, T> IsFilterRandomAccessible<RA, T> for FilterAnyRandomAccessible<RA, T>
+where
+    RA: IsRandomAccessible<T>,
+{
     fn filter(&self, ra: &RA, view: &mut View) {
         let view_initial = view.clone();
         for f in &self.filters {

@@ -24,32 +24,28 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extern crate core;
 
-use std::hash::{Hash};
 use self::core::str::FromStr;
+use std::hash::Hash;
 
 use crate::prelude::*;
 
 /// IsBuildable2D is a trait used for types which are positioned in 2D space and can be constructed
-pub trait IsBuildable2D :
-    Sized +
-    Is2D +
-    IsBuildableND +
-    Eq +
-    PartialEq +
-    Ord +
-    PartialOrd +
-    Hash {
-
+pub trait IsBuildable2D:
+    Sized + Is2D + IsBuildableND + Eq + PartialEq + Ord + PartialOrd + Hash
+{
     /// Should build an object from x and y coordinates
     fn new(x: f64, y: f64) -> Self;
     /// Should use the coordinates of another as its own
-    fn from<P>(&mut self, other: &P) where
+    fn from<P>(&mut self, other: &P)
+    where
         P: Is2D;
 
     /// Uses the coordinates of other to create a new
-    fn new_from<P>(other: &P) -> Self where
-        P: Is2D {
-            Self::new(other.x(), other.y())
+    fn new_from<P>(other: &P) -> Self
+    where
+        P: Is2D,
+    {
+        Self::new(other.x(), other.y())
     }
     /// Returns this with normalized values
     fn normalized(&self) -> Result<Self> {
@@ -77,9 +73,9 @@ pub trait IsBuildable2D :
             2 => {
                 let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
                 let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
-                Ok(Self::new(x,y))
-            },
-            _ => Err(ErrorKind::ParseError)
+                Ok(Self::new(x, y))
+            }
+            _ => Err(ErrorKind::ParseError),
         }
     }
 }

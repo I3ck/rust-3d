@@ -23,29 +23,29 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! Positive, a wrapper for a f64 value, ensuring it is always > 0
 
 use std::fmt;
-use std::ops::{Add, AddAssign, Mul, MulAssign};
 use std::hash::{Hash, Hasher};
+use std::ops::{Add, AddAssign, Mul, MulAssign};
 
 use crate::prelude::*;
 use crate::utils::hash_f64;
 
-#[derive (Debug, PartialEq, PartialOrd, Clone, Copy)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 /// Positive, a wrapper for a f64 value, ensuring it is always > 0
 pub struct Positive {
-    val: f64
+    val: f64,
 }
 
 impl Positive {
     /// Creates a new Positive if input > 0, fails otherwise
     pub fn new(val: f64) -> Result<Positive> {
         if val > 0.0 {
-            return Ok(Positive {val});
+            return Ok(Positive { val });
         }
         Err(ErrorKind::NumberInWrongRange)
     }
     /// Creates a new Positive with value 1
     pub fn one() -> Positive {
-        Positive {val : 1.0}
+        Positive { val: 1.0 }
     }
     /// Returns the wrapped value
     pub fn get(&self) -> f64 {
@@ -53,7 +53,9 @@ impl Positive {
     }
     /// Returns the square root
     pub fn sqrt(&self) -> Positive {
-        Positive{val: self.val.sqrt()}
+        Positive {
+            val: self.val.sqrt(),
+        }
     }
 }
 
@@ -69,7 +71,9 @@ impl Add for Positive {
     type Output = Positive;
 
     fn add(self, other: Positive) -> Positive {
-        Positive {val: self.val + other.val}
+        Positive {
+            val: self.val + other.val,
+        }
     }
 }
 
@@ -77,7 +81,9 @@ impl Add<NonNegative> for Positive {
     type Output = Positive;
 
     fn add(self, other: NonNegative) -> Positive {
-        Positive { val: self.val + other.get() }
+        Positive {
+            val: self.val + other.get(),
+        }
     }
 }
 
@@ -85,7 +91,7 @@ impl AddAssign for Positive {
     fn add_assign(&mut self, other: Positive) {
         self.val += other.val;
     }
-} 
+}
 
 impl AddAssign<NonNegative> for Positive {
     fn add_assign(&mut self, other: NonNegative) {
@@ -95,9 +101,11 @@ impl AddAssign<NonNegative> for Positive {
 
 impl Mul for Positive {
     type Output = Positive;
-    
+
     fn mul(self, other: Positive) -> Positive {
-        Positive {val: self.val * other.val }
+        Positive {
+            val: self.val * other.val,
+        }
     }
 }
 

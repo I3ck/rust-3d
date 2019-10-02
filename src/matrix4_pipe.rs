@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::prelude::*;
 
-#[derive (Default, Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Matrix4Pipe, which makes it easier to pipe different matrices in a defined order
 pub struct Matrix4Pipe {
     pub mtranslation: Matrix4,
@@ -32,14 +32,14 @@ pub struct Matrix4Pipe {
     pub mscale: Matrix4,
     pub mperspective: Matrix4,
     pub mcamtrans: Matrix4,
-    pub mcamlook: Matrix4
+    pub mcamlook: Matrix4,
 }
 
 impl Matrix4Pipe {
     //@todo might be inversed order
     /// Creates a new matrix as a result of all defined operations set within the pipe
     pub fn result(&self) -> Matrix4 {
-              self.mperspective.clone()
+        self.mperspective.clone()
             * self.mcamlook.clone()
             * self.mcamtrans.clone()
             * self.mtranslation.clone()
@@ -60,9 +60,10 @@ impl Matrix4Pipe {
         self.mrotation = Matrix4::rotation(x, y, z);
     }
     /// Adds a rotation around an axis to the pipe
-    pub fn add_rotation_axis<N>(&mut self, axis: &N, rad: Rad) where
-        N: IsNormalized3D {
-
+    pub fn add_rotation_axis<N>(&mut self, axis: &N, rad: Rad)
+    where
+        N: IsNormalized3D,
+    {
         self.mrotation = Matrix4::rotation_axis(axis, rad)
     }
     /// Removes any rotation from the pipe
@@ -98,10 +99,11 @@ impl Matrix4Pipe {
     }
 
     /// Adds a look at target to the pipe
-    pub fn add_look_at<P, N>(&mut self, target: &P, up: &N) -> Result<()> where
+    pub fn add_look_at<P, N>(&mut self, target: &P, up: &N) -> Result<()>
+    where
         P: IsBuildable3D,
-        N: IsNormalized3D {
-
+        N: IsNormalized3D,
+    {
         self.mcamlook = Matrix4::look_at(target, up)?;
         Ok(())
     }

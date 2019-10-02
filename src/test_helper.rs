@@ -22,11 +22,11 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! helper functions for testing (these functions unwrap and panic, only use for tests)
 
-use std::io::prelude::*;
 use std::fs::File;
+use std::io::prelude::*;
 
-use crate::prelude::*;
 use crate::io::*;
+use crate::prelude::*;
 
 /// Ensures the content of two files is equal
 pub fn assert_files_equal(filepath1: &str, filepath2: &str) {
@@ -43,10 +43,11 @@ pub fn assert_files_equal(filepath1: &str, filepath2: &str) {
 }
 
 /// Tests a 2D filter by comparing the result of its usage on the test quare vs. its expected result
-pub fn test_filter_2d<F, P>(f: F, path_expected: &str, unique_identifier: &str) where
+pub fn test_filter_2d<F, P>(f: F, path_expected: &str, unique_identifier: &str)
+where
     F: IsFilter<P>,
-    P: IsBuildable2D + Clone {
-
+    P: IsBuildable2D + Clone,
+{
     let path_tmp = ["tests/tmp/tmp", unique_identifier, ".xyz"].join("");
     let filter = FilterRandomAccessible::new(f);
 
@@ -62,10 +63,11 @@ pub fn test_filter_2d<F, P>(f: F, path_expected: &str, unique_identifier: &str) 
 }
 
 /// Tests a 3D filter by comparing the result of its usage on the test cube vs. its expected result
-pub fn test_filter_3d<F, P>(f: F, path_expected: &str, unique_identifier: &str) where
+pub fn test_filter_3d<F, P>(f: F, path_expected: &str, unique_identifier: &str)
+where
     F: IsFilter<P>,
-    P: IsBuildable3D + Clone {
-
+    P: IsBuildable3D + Clone,
+{
     let path_tmp = ["tests/tmp/tmp", unique_identifier, ".xyz"].join("");
     let filter = FilterRandomAccessible::new(f);
 
@@ -81,10 +83,11 @@ pub fn test_filter_3d<F, P>(f: F, path_expected: &str, unique_identifier: &str) 
 }
 
 /// Can be used to write the expected result of a 2D filter to later compare against in a test
-pub fn write_expected_filter_2d<F, P>(f: F, path_expected: &str) where
+pub fn write_expected_filter_2d<F, P>(f: F, path_expected: &str)
+where
     F: IsFilter<P>,
-    P: IsBuildable2D + Clone {
-
+    P: IsBuildable2D + Clone,
+{
     let filter = FilterRandomAccessible::new(f);
 
     let mut view = View::Full;
@@ -98,10 +101,11 @@ pub fn write_expected_filter_2d<F, P>(f: F, path_expected: &str) where
 }
 
 /// Can be used to write the expected result of a 3D filter to later compare against in a test
-pub fn write_expected_filter_3d<F, P>(f: F, path_expected: &str) where
+pub fn write_expected_filter_3d<F, P>(f: F, path_expected: &str)
+where
     F: IsFilter<P>,
-    P: IsBuildable3D + Clone {
-
+    P: IsBuildable3D + Clone,
+{
     let filter = FilterRandomAccessible::new(f);
 
     let mut view = View::Full;

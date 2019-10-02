@@ -24,25 +24,31 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::cmp::{Eq, Ordering};
 
-use crate::prelude::*;
 use crate::distances_2d::*;
+use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
 /// Box2D, a box in 2D space
 pub struct Box2D {
     pub center: Point2D,
     pub size_x: Positive,
-    pub size_y: Positive
+    pub size_y: Positive,
 }
 
 impl Box2D {
     /// Returns the minimum position of the box
     pub fn min_p(&self) -> Point2D {
-        Point2D::new(self.center.x() - 0.5*self.size_x.get(), self.center.y() - 0.5*self.size_y.get())
+        Point2D::new(
+            self.center.x() - 0.5 * self.size_x.get(),
+            self.center.y() - 0.5 * self.size_y.get(),
+        )
     }
     /// Returns the maximum position of the box
     pub fn max_p(&self) -> Point2D {
-        Point2D::new(self.center.x() + 0.5*self.size_x.get(), self.center.y() + 0.5*self.size_y.get())
+        Point2D::new(
+            self.center.x() + 0.5 * self.size_x.get(),
+            self.center.y() + 0.5 * self.size_y.get(),
+        )
     }
     /// Returns the sizes of the bounding box
     pub fn sizes(&self) -> (Positive, Positive) {
@@ -59,8 +65,11 @@ impl Ord for Box2D {
             Some(x) => x,
             None => match self.size_x.partial_cmp(&other.size_x) {
                 Some(x) => x,
-                None => self.size_y.partial_cmp(&other.size_y).unwrap_or(Ordering::Equal)
-            }
+                None => self
+                    .size_y
+                    .partial_cmp(&other.size_y)
+                    .unwrap_or(Ordering::Equal),
+            },
         }
     }
 }
@@ -87,24 +96,34 @@ impl Is2D for Box2D {
 
 impl IsBuildableND for Box2D {
     fn new_nd(coords: &[f64]) -> Result<Self> {
-        Ok(Box2D{center: Point2D::new_nd(coords)?,  size_x: Positive::one(), size_y: Positive::one()})
+        Ok(Box2D {
+            center: Point2D::new_nd(coords)?,
+            size_x: Positive::one(),
+            size_y: Positive::one(),
+        })
     }
 
-    fn from_nd<P>(&mut self, other: P) -> Result<()> where
-        P: IsBuildableND {
-
+    fn from_nd<P>(&mut self, other: P) -> Result<()>
+    where
+        P: IsBuildableND,
+    {
         self.center.from_nd(other)
     }
 }
 
 impl IsBuildable2D for Box2D {
     fn new(x: f64, y: f64) -> Self {
-        Box2D{center: Point2D{x: x, y: y}, size_x: Positive::one(), size_y: Positive::one()}
+        Box2D {
+            center: Point2D { x: x, y: y },
+            size_x: Positive::one(),
+            size_y: Positive::one(),
+        }
     }
 
-    fn from<P>(&mut self, other: &P) where
-        P: Is2D {
-
+    fn from<P>(&mut self, other: &P)
+    where
+        P: Is2D,
+    {
         self.center.from(other)
     }
 }
@@ -127,8 +146,14 @@ impl IsEditable2D for Box2D {
 
 impl HasBoundingBox2D for Box2D {
     fn bounding_box(&self) -> BoundingBox2D {
-        let p_min = Point2D{x: self.center.x() - self.size_x.get() / 2.0, y: self.center.y() - self.size_y.get() / 2.0};
-        let p_max = Point2D{x: self.center.x() + self.size_x.get() / 2.0, y: self.center.y() + self.size_y.get() / 2.0};
+        let p_min = Point2D {
+            x: self.center.x() - self.size_x.get() / 2.0,
+            y: self.center.y() - self.size_y.get() / 2.0,
+        };
+        let p_max = Point2D {
+            x: self.center.x() + self.size_x.get() / 2.0,
+            y: self.center.y() + self.size_y.get() / 2.0,
+        };
         BoundingBox2D::new(&p_min, &p_max).unwrap() // safe
     }
 }
@@ -154,6 +179,10 @@ impl IsMovable2D for Box2D {
 
 impl From<BoundingBox2D> for Box2D {
     fn from(x: BoundingBox2D) -> Self {
-        Box2D{center: x.center_bb(), size_x: x.size_x(), size_y: x.size_y()}
+        Box2D {
+            center: x.center_bb(),
+            size_x: x.size_x(),
+            size_y: x.size_y(),
+        }
     }
 }

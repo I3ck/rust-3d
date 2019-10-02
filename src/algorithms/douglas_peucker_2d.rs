@@ -25,14 +25,18 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// Douglas Peucker algorithm for 2D https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
-pub fn douglas_peucker_2d<P>(mut pc: PointCloud2D<P>, epsilon: f64) -> PointCloud2D<P> where //@todo error if pc too small
-    P: Is2D + Clone {
-
-    if pc.len() < 1 { return pc; }
+pub fn douglas_peucker_2d<P>(mut pc: PointCloud2D<P>, epsilon: f64) -> PointCloud2D<P>
+where
+    //@todo error if pc too small
+    P: Is2D + Clone,
+{
+    if pc.len() < 1 {
+        return pc;
+    }
 
     let mut dmax = 0.0;
     let mut index = 0;
-    let end = pc.len()-1;
+    let end = pc.len() - 1;
 
     for i in 1..end {
         let d = distance_point_line(&pc.data[i], &pc.data[0], &pc.data[end]);
@@ -55,8 +59,7 @@ pub fn douglas_peucker_2d<P>(mut pc: PointCloud2D<P>, epsilon: f64) -> PointClou
         let n_take = pc1.data.len() - 1;
         pc1.data = pc1.data.into_iter().take(n_take).collect();
         pc = pc1.combine(&pc2);
-    }
-    else {
+    } else {
         let p1 = pc.data[0].clone();
         let p2 = pc.data[end].clone();
         pc.data.clear();
@@ -67,11 +70,12 @@ pub fn douglas_peucker_2d<P>(mut pc: PointCloud2D<P>, epsilon: f64) -> PointClou
 }
 
 //@todo consider implementing in utils or via HasDistanceTo
-fn distance_point_line<P,Q,R>(p: &P, l1: &Q, l2: &R) -> f64 where
+fn distance_point_line<P, Q, R>(p: &P, l1: &Q, l2: &R) -> f64
+where
     P: Is2D,
     Q: Is2D,
-    R: Is2D {
-
+    R: Is2D,
+{
     let a1 = l1.x();
     let a2 = l1.y();
 
@@ -81,10 +85,16 @@ fn distance_point_line<P,Q,R>(p: &P, l1: &Q, l2: &R) -> f64 where
     let c1 = p.x();
     let c2 = p.y();
 
-    let x  =  (a1*a1*c1 - a1*a2*b2 + a1*a2*c2 - 2.0*a1*b1*c1 + a1*b2*b2 - a1*b2*c2 + a2*a2*b1 - a2*b1*b2 - a2*b1*c2 + b1*b1*c1 + b1*b2*c2)
-            / (a1*a1 - 2.0*a1*b1 + a2*a2 - 2.0*a2*b2 + b1*b1 + b2*b2);
+    let x = (a1 * a1 * c1 - a1 * a2 * b2 + a1 * a2 * c2 - 2.0 * a1 * b1 * c1 + a1 * b2 * b2
+        - a1 * b2 * c2
+        + a2 * a2 * b1
+        - a2 * b1 * b2
+        - a2 * b1 * c2
+        + b1 * b1 * c1
+        + b1 * b2 * c2)
+        / (a1 * a1 - 2.0 * a1 * b1 + a2 * a2 - 2.0 * a2 * b2 + b1 * b1 + b2 * b2);
 
-    let y  = ((a2 - b2) * x + a1*b2 - a2*b1) / (a1 - b1);
+    let y = ((a2 - b2) * x + a1 * b2 - a2 * b1) / (a1 - b1);
 
-    return (  (x-p.x()).powi(2) + (y-p.y()).powi(2)  ).sqrt();
+    return ((x - p.x()).powi(2) + (y - p.y()).powi(2)).sqrt();
 }

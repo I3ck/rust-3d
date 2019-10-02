@@ -24,8 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extern crate rust_3d;
 
-use rust_3d::prelude::*;
 use rust_3d::io::*;
+use rust_3d::prelude::*;
 use rust_3d::test_helper::*;
 
 static GENERATE_EXCEPTED_RESULT_FILES: bool = false;
@@ -57,5 +57,4 @@ fn point_cloud_2d_io_test() {
         load_xy(&mut pc, "tests/data/test_square.xy", " ", "\n").unwrap();
         assert!(pc.len() == 20 * 20);
     }
-
 }

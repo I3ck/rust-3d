@@ -22,8 +22,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #![deny(warnings)]
 
-use rust_3d::prelude::*;
 use rust_3d::io::*;
+use rust_3d::prelude::*;
 use rust_3d::test_helper::*;
 
 extern crate rust_3d;

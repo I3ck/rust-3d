@@ -24,21 +24,19 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::prelude::*;
 
-#[derive (Default, Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Matrix3Pipe, which makes it easier to pipe different matrices in a defined order
 pub struct Matrix3Pipe {
     pub mtranslation: Matrix3,
     pub mrotation: Matrix3,
-    pub mscale: Matrix3
+    pub mscale: Matrix3,
 }
 
 impl Matrix3Pipe {
     //@todo might be inversed order
     /// Creates a new matrix as a result of all defined operations set within the pipe
     pub fn result(&self) -> Matrix3 {
-              self.mtranslation.clone()
-            * self.mrotation.clone()
-            * self.mscale.clone()
+        self.mtranslation.clone() * self.mrotation.clone() * self.mscale.clone()
     }
     /// Adds a translation to the pipe
     pub fn add_translation(&mut self, x: f64, y: f64) {
@@ -48,7 +46,7 @@ impl Matrix3Pipe {
     pub fn remove_translation(&mut self) {
         self.mtranslation = Matrix3::default();
     }
-    
+
     /// Adds a rotation to the pipe
     pub fn add_rotation(&mut self, rad: Rad) {
         self.mrotation = Matrix3::rotation(rad);

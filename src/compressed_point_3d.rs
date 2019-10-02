@@ -27,12 +27,13 @@ extern crate num;
 use self::num::traits::PrimInt;
 use self::num::traits::Unsigned;
 
-#[derive (Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 /// CompressedPoint3D
-pub struct CompressedPoint3D<T> where
-    T: Unsigned + PrimInt  {
-
+pub struct CompressedPoint3D<T>
+where
+    T: Unsigned + PrimInt,
+{
     pub unitsx: T,
     pub unitsy: T,
-    pub unitsz: T
+    pub unitsz: T,
 }

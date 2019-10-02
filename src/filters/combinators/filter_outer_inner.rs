@@ -25,29 +25,32 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// FilterOuterInner, a filter which combines an inner and an outer filter. Where the inner is negated while the outer is allowed. This is useful to create hollow filter shapes
-pub struct FilterOuterInner<FOuter, FInner, T> where
+pub struct FilterOuterInner<FOuter, FInner, T>
+where
     FOuter: IsFilter<T>,
-    FInner: IsFilter<T> {
-
-    filter: FilterAND<FOuter, FilterNegate<FInner, T>, T>
+    FInner: IsFilter<T>,
+{
+    filter: FilterAND<FOuter, FilterNegate<FInner, T>, T>,
 }
 
-impl<FOuter, FInner, T> FilterOuterInner<FOuter, FInner, T> where
+impl<FOuter, FInner, T> FilterOuterInner<FOuter, FInner, T>
+where
     FOuter: IsFilter<T>,
-    FInner: IsFilter<T> {
-
+    FInner: IsFilter<T>,
+{
     /// Creates a new FilterOuterInner from two other IsFilter
     pub fn new(filter_outer: FOuter, filter_inner: FInner) -> Self {
         FilterOuterInner {
-            filter: FilterAND::new(filter_outer, FilterNegate::new(filter_inner))
+            filter: FilterAND::new(filter_outer, FilterNegate::new(filter_inner)),
         }
     }
 }
 
-impl<FOuter, FInner, T> IsFilter<T> for FilterOuterInner<FOuter, FInner, T> where
+impl<FOuter, FInner, T> IsFilter<T> for FilterOuterInner<FOuter, FInner, T>
+where
     FOuter: IsFilter<T>,
-    FInner: IsFilter<T> {
-
+    FInner: IsFilter<T>,
+{
     fn is_allowed(&self, x: &T) -> bool {
         self.filter.is_allowed(x)
     }

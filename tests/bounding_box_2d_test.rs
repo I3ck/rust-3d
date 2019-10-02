@@ -28,7 +28,6 @@ use rust_3d::prelude::*;
 
 #[test]
 fn bounding_box_2d_test() {
-
     let mut pc1 = PointCloud2D::<Point2D>::new();
     let mut pc2 = PointCloud2D::<Point2D>::new();
     let mut pc3 = PointCloud2D::<Point2D>::new();

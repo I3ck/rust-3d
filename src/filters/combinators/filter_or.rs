@@ -22,33 +22,40 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterOR, a filter which combines two filters and is true if one of its filters is true
 
-use std::marker::PhantomData;
 use crate::traits::IsFilter;
+use std::marker::PhantomData;
 
 /// FilterOR, a filter which combines two filters and is true if one of its filters is true
-pub struct FilterOR<F1, F2, T> where
+pub struct FilterOR<F1, F2, T>
+where
     F1: IsFilter<T>,
-    F2: IsFilter<T> {
-
+    F2: IsFilter<T>,
+{
     filter1: F1,
     filter2: F2,
-    _marker: PhantomData<T>
+    _marker: PhantomData<T>,
 }
 
-impl<F1, F2, T> FilterOR<F1, F2, T> where
+impl<F1, F2, T> FilterOR<F1, F2, T>
+where
     F1: IsFilter<T>,
-    F2: IsFilter<T> {
-
+    F2: IsFilter<T>,
+{
     /// Creates a new FilterOR from two other IsFilter
     pub fn new(filter1: F1, filter2: F2) -> Self {
-        FilterOR {filter1, filter2, _marker: PhantomData}
+        FilterOR {
+            filter1,
+            filter2,
+            _marker: PhantomData,
+        }
     }
 }
 
-impl<F1, F2, T> IsFilter<T> for FilterOR<F1, F2, T> where
+impl<F1, F2, T> IsFilter<T> for FilterOR<F1, F2, T>
+where
     F1: IsFilter<T>,
-    F2: IsFilter<T> {
-
+    F2: IsFilter<T>,
+{
     fn is_allowed(&self, x: &T) -> bool {
         self.filter1.is_allowed(x) || self.filter2.is_allowed(x)
     }

@@ -26,16 +26,16 @@ use std::fmt;
 
 use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
+#[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Ray2D, a ray within 2D space
 pub struct Ray2D {
-    pub line: Line2D
+    pub line: Line2D,
 }
 
 impl Ray2D {
     /// Creates a new Ray2D from a Line2D
     pub fn new(line: Line2D) -> Self {
-        Ray2D {line}
+        Ray2D { line }
     }
 }
 

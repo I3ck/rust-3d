@@ -28,7 +28,6 @@ use rust_3d::prelude::*;
 
 #[test]
 fn point_cloud_2d_test() {
-
     let mut pc = PointCloud2D::<Point2D>::new();
 
     assert!(pc.len() == 0);

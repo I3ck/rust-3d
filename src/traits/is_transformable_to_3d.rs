@@ -25,8 +25,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsTransFormableTo3D is a trait used for any type which can be transformed 3D space
-pub trait IsTransFormableTo3D : Is2D {
+pub trait IsTransFormableTo3D: Is2D {
     /// Should create representation of self within the 3D space with a given z-coordinate
-    fn transform_to_3d<P>(&self, z: f64) -> P where
+    fn transform_to_3d<P>(&self, z: f64) -> P
+    where
         P: IsBuildable3D;
 }

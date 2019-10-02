@@ -27,33 +27,43 @@ extern crate core;
 use crate::prelude::*;
 
 use self::core::str::FromStr;
+use std::fs::File;
 use std::io::prelude::*;
 use std::io::{BufReader, BufWriter};
-use std::fs::File;
 
 /// Saves an IsRandomAccessible<Is3D> as x y z coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xyz file format or .csv files
-pub fn save_xyz<RA, P>(ra: &RA, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()> where
+pub fn save_xyz<RA, P>(ra: &RA, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()>
+where
     RA: IsRandomAccessible<P>,
-    P: Is3D {
-
+    P: Is3D,
+{
     let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
     let n = ra.len();
     for i in 0..n {
         let ref p = ra[i];
-        let buffer = p.x().to_string()  + delim_coord
-                   + &p.y().to_string() + delim_coord
-                   + &p.z().to_string()
-                   + delim_pos;
-        f.write_all(buffer.as_bytes()).map_err(|e| e.to_error_kind())?;
+        let buffer = p.x().to_string()
+            + delim_coord
+            + &p.y().to_string()
+            + delim_coord
+            + &p.z().to_string()
+            + delim_pos;
+        f.write_all(buffer.as_bytes())
+            .map_err(|e| e.to_error_kind())?;
     }
     Ok(())
 }
 
 /// Loads a IsRandomInsertible<Is3D> as x y z coordinates with a specified delimiter between coordinates and positions. E.g. used to load the .xyz file format or .csv file
-pub fn load_xyz<RI, P>(ri: &mut RI, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()> where
+pub fn load_xyz<RI, P>(
+    ri: &mut RI,
+    filepath: &str,
+    delim_coord: &str,
+    delim_pos: &str,
+) -> Result<()>
+where
     RI: IsRandomInsertible<P>,
-    P: Is3D + IsBuildable3D {
-
+    P: Is3D + IsBuildable3D,
+{
     let mut f = BufReader::new(File::open(filepath)?);
 
     let mut content = String::new();
@@ -72,9 +82,9 @@ pub fn load_xyz<RI, P>(ri: &mut RI, filepath: &str, delim_coord: &str, delim_pos
                 let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
                 let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
                 let z = f64::from_str(words[2]).map_err(|e| e.to_error_kind())?;
-                ri.push(P::new(x,y,z))
-            },
-            _ => return Err(ErrorKind::ParseError)
+                ri.push(P::new(x, y, z))
+            }
+            _ => return Err(ErrorKind::ParseError),
         }
     }
     Ok(())

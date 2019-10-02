@@ -25,17 +25,17 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 pub mod combinators;
 pub mod transformers;
 
-mod           filter_box_2d;
+mod filter_box_2d;
 pub use self::filter_box_2d::FilterBox2D;
 
-mod           filter_box_3d;
+mod filter_box_3d;
 pub use self::filter_box_3d::FilterBox3D;
 
-mod           filter_circle;
+mod filter_circle;
 pub use self::filter_circle::FilterCircle;
 
-mod           filter_sphere;
+mod filter_sphere;
 pub use self::filter_sphere::FilterSphere;
 
-mod           filter_outlier_3d;
+mod filter_outlier_3d;
 pub use self::filter_outlier_3d::FilterOutlier3D;

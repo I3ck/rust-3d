@@ -24,16 +24,16 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Exporting often used types / traits for convenience
 
+pub use crate::algorithms::*;
+pub use crate::interpolation_2d::*;
 pub use crate::result::*;
 pub use crate::strong_types::*;
-pub use crate::interpolation_2d::*;
 pub use crate::traits::*;
-pub use crate::algorithms::*;
 
 pub use crate::AABBTree2D;
 
-pub use crate::Positive;
 pub use crate::NonNegative;
+pub use crate::Positive;
 
 pub use crate::BoundingBox2D;
 pub use crate::BoundingBox3D;
@@ -72,19 +72,19 @@ pub use crate::View;
 
 pub use crate::HalfEdge;
 
-pub use crate::Circle;
 pub use crate::Box2D;
+pub use crate::Circle;
 
-pub use crate::Sphere;
 pub use crate::Box3D;
+pub use crate::Sphere;
 
 pub use crate::Precision;
 
 pub use crate::filters::FilterBox2D;
 pub use crate::filters::FilterBox3D;
 pub use crate::filters::FilterCircle;
-pub use crate::filters::FilterSphere;
 pub use crate::filters::FilterOutlier3D;
+pub use crate::filters::FilterSphere;
 
 pub use crate::filters::combinators::*;
 pub use crate::filters::transformers::*;

@@ -22,24 +22,26 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterAny, a filter to chain multiple filters with the or condition => must pass any filter to pass this filter
 
-use std::marker::PhantomData;
 use crate::traits::IsFilter;
+use std::marker::PhantomData;
 
 /// FilterAny, a filter to chain multiple filters with the or condition => must pass any filter to pass this filter
 pub struct FilterAny<T> {
     pub filters: Vec<Box<dyn IsFilter<T>>>,
-    _marker: PhantomData<T>
+    _marker: PhantomData<T>,
 }
 
-impl<T> FilterAny<T> {    
+impl<T> FilterAny<T> {
     /// Creates a new FilterAny
     pub fn new() -> Self {
-        FilterAny {filters: Vec::new(), _marker: PhantomData}
+        FilterAny {
+            filters: Vec::new(),
+            _marker: PhantomData,
+        }
     }
 }
 
 impl<T> IsFilter<T> for FilterAny<T> {
-    
     fn is_allowed(&self, x: &T) -> bool {
         for f in &self.filters {
             if f.is_allowed(x) {

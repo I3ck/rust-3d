@@ -22,24 +22,26 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterAll, a filter to chain multiple filters with the and condition => must pass all filters to pass this filter
 
-use std::marker::PhantomData;
 use crate::traits::IsFilter;
+use std::marker::PhantomData;
 
 /// FilterAll, a filter to chain multiple filters with the and condition => must pass all filters to pass this filter
 pub struct FilterAll<T> {
     pub filters: Vec<Box<dyn IsFilter<T>>>,
-    _marker: PhantomData<T>
+    _marker: PhantomData<T>,
 }
 
-impl<T> FilterAll<T> {    
+impl<T> FilterAll<T> {
     /// Creates a new FilterAll
     pub fn new() -> Self {
-        FilterAll {filters: Vec::new(), _marker: PhantomData}
+        FilterAll {
+            filters: Vec::new(),
+            _marker: PhantomData,
+        }
     }
 }
 
 impl<T> IsFilter<T> for FilterAll<T> {
-    
     fn is_allowed(&self, x: &T) -> bool {
         for f in &self.filters {
             if !f.is_allowed(x) {

@@ -24,8 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extern crate rust_3d;
 
-use rust_3d::prelude::*;
 use rust_3d::functions::cross;
+use rust_3d::prelude::*;
 
 #[test]
 fn point_3d_test() {
@@ -58,7 +58,6 @@ fn point_3d_test() {
     assert!(cross23.y() == 0.0 * 2.0 - 1.0 * 2.0);
     assert!(cross23.z() == 1.0 * 2.0 - 0.0 * 2.0);
 
-
     assert!(p2.xyz() == (p2.x(), p2.y(), p2.z()));
     let mut p2_clone = p2.clone();
     assert!(p2_clone.xyz() == p2.xyz());
@@ -74,9 +73,9 @@ fn point_3d_test() {
     assert!(p3_norm.is_ok());
 
     match p3_norm {
-        Err(_) => {},
+        Err(_) => {}
         Ok(n) => {
-            assert!((1.0 - n.abs().get()).abs() < eps) ;
+            assert!((1.0 - n.abs().get()).abs() < eps);
             assert!(n.x() == p3.x() / p3.abs().get());
             assert!(n.y() == p3.y() / p3.abs().get());
             assert!(n.z() == p3.z() / p3.abs().get());

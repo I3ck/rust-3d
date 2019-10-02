@@ -24,8 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extern crate rust_3d;
 
-use rust_3d::prelude::*;
 use rust_3d::io::*;
+use rust_3d::prelude::*;
 use rust_3d::test_helper::*;
 
 #[test]
@@ -36,5 +36,8 @@ fn convex_hull_2d_test() {
 
     let hull = convex_hull_2d(&pc);
     save_xy(&hull, "tests/tmp/tmp_convex_hull_2d.xy", " ", "\n").unwrap();
-    assert_files_equal("tests/data/expected_convex_hull_2d.xy", "tests/tmp/tmp_convex_hull_2d.xy");
+    assert_files_equal(
+        "tests/data/expected_convex_hull_2d.xy",
+        "tests/tmp/tmp_convex_hull_2d.xy",
+    );
 }

@@ -22,19 +22,19 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterSphere, a sphere filter within 3D space
 
-use crate::prelude::*;
 use crate::distances_3d::*;
+use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Default, Clone, Hash, Eq, Ord)]
+#[derive(Debug, PartialEq, PartialOrd, Default, Clone, Hash, Eq, Ord)]
 /// FilterSphere, a sphere filter within 3D space
 pub struct FilterSphere {
-    sphere: Sphere
+    sphere: Sphere,
 }
 
 impl FilterSphere {
     /// Creates a new FilterSphere with the given parameters
     pub fn new(sphere: Sphere) -> Self {
-        FilterSphere {sphere}
+        FilterSphere { sphere }
     }
 }
 
@@ -67,9 +67,10 @@ impl IsBuildableND for FilterSphere {
         Ok(FilterSphere::new(Sphere::new_nd(coords)?))
     }
 
-    fn from_nd<P>(&mut self, other: P) -> Result<()> where
-        P: IsBuildableND {
-
+    fn from_nd<P>(&mut self, other: P) -> Result<()>
+    where
+        P: IsBuildableND,
+    {
         self.sphere.from_nd(other)
     }
 }
@@ -80,8 +81,9 @@ impl IsBuildable3D for FilterSphere {
     }
 
     fn from<P>(&mut self, other: &P)
-        where P: Is3D {
-
+    where
+        P: Is3D,
+    {
         self.sphere.from(other)
     }
 }
@@ -119,8 +121,9 @@ impl HasBoundingBox3DMaybe for FilterSphere {
 }
 
 impl<T> IsFilter<T> for FilterSphere
-    where T: Is3D {
-
+where
+    T: Is3D,
+{
     fn is_allowed(&self, p: &T) -> bool {
         dist_3d(p, &self.sphere.center) <= self.sphere.radius.get()
     }

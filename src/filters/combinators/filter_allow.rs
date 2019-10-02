@@ -25,8 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::traits::IsFilter;
 
 /// FilterAllow, a filter which always returns true
-pub struct FilterAllow {
-}
+pub struct FilterAllow {}
 
 impl FilterAllow {
     /// Creates a new FilterAllow

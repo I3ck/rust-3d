@@ -23,6 +23,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! rust-3d trait implementations for standard containers / structs
 
 pub mod boxx;
+pub mod linked_list;
 pub mod vec;
 pub mod vec_deque;
-pub mod linked_list;

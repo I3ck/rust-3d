@@ -25,8 +25,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsVertexEditableMesh trait used for meshes with editable vertex data
-pub trait IsVertexEditableMesh<V, TU> : IsMesh<V, TU> where
-    TU: IsTopologyUnit {
+pub trait IsVertexEditableMesh<V, TU>: IsMesh<V, TU>
+where
+    TU: IsTopologyUnit,
+{
     /// Should add a vertex to the end and return its id
     fn add_vertex(&mut self, vertex: V) -> VId;
     /// Should change vertex at vId to the given vertex returning an error on failure

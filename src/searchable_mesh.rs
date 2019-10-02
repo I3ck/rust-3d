@@ -27,25 +27,31 @@ use crate::prelude::*;
 use std::marker::PhantomData;
 
 /// SearchableMesh, transforms IsMesh to IsSearchableMesh
-#[derive (Clone)]
-pub struct SearchableMesh<M, T> where
-    M: IsMesh<T, Face3> {
-
+#[derive(Clone)]
+pub struct SearchableMesh<M, T>
+where
+    M: IsMesh<T, Face3>,
+{
     mesh: M,
     he: HalfEdge,
-    phantomt: PhantomData<T>
+    phantomt: PhantomData<T>,
 }
 
-impl<M, T> SearchableMesh<M, T> where
-    M: IsMesh<T, Face3> {
+impl<M, T> SearchableMesh<M, T>
+where
+    M: IsMesh<T, Face3>,
+{
     /// Creates a new SearchableMesh3D from an IsMesh3D
     /// This only stays valid if IMesh3D is not changed after creation
     /// The mesh must be manifold (@todo ensure via types?)
     pub fn new(mesh: M) -> Self {
-
         let he = HalfEdge::new(&mesh);
 
-        SearchableMesh {mesh, he, phantomt: PhantomData}
+        SearchableMesh {
+            mesh,
+            he,
+            phantomt: PhantomData,
+        }
     }
 
     /// Fails if the vertex ID is out of bounds
@@ -62,9 +68,10 @@ impl<M, T> SearchableMesh<M, T> where
     }
 }
 
-impl<M, T> IsMesh<T, Face3> for SearchableMesh<M, T> where
-    M: IsMesh<T, Face3> {
-
+impl<M, T> IsMesh<T, Face3> for SearchableMesh<M, T>
+where
+    M: IsMesh<T, Face3>,
+{
     fn num_faces(&self) -> usize {
         self.mesh.num_faces()
     }
@@ -86,10 +93,11 @@ impl<M, T> IsMesh<T, Face3> for SearchableMesh<M, T> where
     }
 }
 
-impl<M, T> IsVertexEditableMesh<T, Face3> for SearchableMesh<M, T> where
+impl<M, T> IsVertexEditableMesh<T, Face3> for SearchableMesh<M, T>
+where
     M: IsMesh<T, Face3> + IsVertexEditableMesh<T, Face3>,
-    T: IsEditable3D + IsBuildable3D + Clone {
-
+    T: IsEditable3D + IsBuildable3D + Clone,
+{
     fn add_vertex(&mut self, vertex: T) -> VId {
         self.mesh.add_vertex(vertex)
     }
@@ -99,29 +107,48 @@ impl<M, T> IsVertexEditableMesh<T, Face3> for SearchableMesh<M, T> where
     }
 }
 
-impl<M, T> IsSearchableMesh<T, Face3> for SearchableMesh<M, T> where
-    M: IsMesh<T, Face3> {
-
+impl<M, T> IsSearchableMesh<T, Face3> for SearchableMesh<M, T>
+where
+    M: IsMesh<T, Face3>,
+{
     fn num_edges(&self) -> usize {
         self.mesh.num_faces() * 3
     }
 
     fn edges_of_face(&self, faceid: FId) -> Result<(EId, EId, EId)> {
         self.ensure_face_id(faceid)?;
-        Ok((EId{val: faceid.val * 3 + 0},
-            EId{val: faceid.val * 3 + 1},
-            EId{val: faceid.val * 3 + 2}))
+        Ok((
+            EId {
+                val: faceid.val * 3 + 0,
+            },
+            EId {
+                val: faceid.val * 3 + 1,
+            },
+            EId {
+                val: faceid.val * 3 + 2,
+            },
+        ))
     }
 
     fn edges_originating_from_vertex(&self, vertexid: VId, result: &mut Vec<EId>) -> Result<()> {
         self.he.edges_originating(vertexid, result)
     }
 
-    fn edges_ending_at_vertex(&self, vertexid: VId, cache: &mut Vec<EId>, result: &mut Vec<EId>) -> Result<()> {
+    fn edges_ending_at_vertex(
+        &self,
+        vertexid: VId,
+        cache: &mut Vec<EId>,
+        result: &mut Vec<EId>,
+    ) -> Result<()> {
         self.he.edges_ending(vertexid, cache, result)
     }
 
-    fn edges_of_vertex(&self, vertexid: VId, cache: &mut Vec<EId>, result: &mut Vec<EId>) -> Result<()> {
+    fn edges_of_vertex(
+        &self,
+        vertexid: VId,
+        cache: &mut Vec<EId>,
+        result: &mut Vec<EId>,
+    ) -> Result<()> {
         self.he.edges_all(vertexid, cache, result)
     }
 
@@ -130,8 +157,7 @@ impl<M, T> IsSearchableMesh<T, Face3> for SearchableMesh<M, T> where
     }
 
     fn edge_head(&self, edgeid: EId) -> Result<VId> {
-        self.he.next(edgeid)
-            .and_then(|next| self.he.tail(next))
+        self.he.next(edgeid).and_then(|next| self.he.tail(next))
     }
 
     fn edge_next(&self, edgeid: EId) -> Result<EId> {
@@ -151,35 +177,38 @@ impl<M, T> IsSearchableMesh<T, Face3> for SearchableMesh<M, T> where
     }
 }
 
-impl<M, T> HasBoundingBox3DMaybe for SearchableMesh<M, T> where
-    M: IsMesh<T, Face3> + HasBoundingBox3DMaybe {
-
+impl<M, T> HasBoundingBox3DMaybe for SearchableMesh<M, T>
+where
+    M: IsMesh<T, Face3> + HasBoundingBox3DMaybe,
+{
     fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
         self.mesh.bounding_box_maybe()
     }
 }
 
-impl<M, T> HasCenterOfGravity3D for SearchableMesh<M, T> where
-    M: IsMesh<T, Face3> + HasCenterOfGravity3D {
-
+impl<M, T> HasCenterOfGravity3D for SearchableMesh<M, T>
+where
+    M: IsMesh<T, Face3> + HasCenterOfGravity3D,
+{
     fn center_of_gravity(&self) -> Result<Point3D> {
         self.mesh.center_of_gravity()
     }
 }
 
-impl<M, T> IsScalable for SearchableMesh<M, T> where
-    M: IsMesh<T, Face3> + IsScalable {
-
+impl<M, T> IsScalable for SearchableMesh<M, T>
+where
+    M: IsMesh<T, Face3> + IsScalable,
+{
     fn scale(&mut self, factor: Positive) {
         self.mesh.scale(factor);
     }
 }
 
-impl<M, T> AsRef<M> for SearchableMesh<M, T> where
-    M: IsMesh<T, Face3> {
-
+impl<M, T> AsRef<M> for SearchableMesh<M, T>
+where
+    M: IsMesh<T, Face3>,
+{
     fn as_ref(&self) -> &M {
         &self.mesh
     }
-
 }

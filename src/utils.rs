@@ -31,11 +31,12 @@ pub fn to_words(line: &str) -> Vec<&str> {
 }
 
 /// Allows random adds anywhere on the Vec<Vec> by automatically resizing it with empty vectors
-pub fn safe_append_at<T>(vec: &mut Vec<Vec<T>>, i: usize, val: T) where
-    T: Clone {
-
+pub fn safe_append_at<T>(vec: &mut Vec<Vec<T>>, i: usize, val: T)
+where
+    T: Clone,
+{
     if i >= vec.len() {
-        vec.resize(i+1, Vec::new());
+        vec.resize(i + 1, Vec::new());
     }
 
     vec[i].push(val);
@@ -43,7 +44,9 @@ pub fn safe_append_at<T>(vec: &mut Vec<Vec<T>>, i: usize, val: T) where
 
 /// Max of two f64 values
 pub fn max_f64(a: f64, b: f64) -> f64 {
-    if a > b { return a; }
+    if a > b {
+        return a;
+    }
     b
 }
 
@@ -53,9 +56,10 @@ pub fn max_f64_3(a: f64, b: f64, c: f64) -> f64 {
 }
 
 /// Generates the hash of an f64
-pub fn hash_f64<H>(x: f64, state: &mut H) where
-    H: Hasher {
-
+pub fn hash_f64<H>(x: f64, state: &mut H)
+where
+    H: Hasher,
+{
     let (m, e, s) = integer_decode(x);
     m.hash(state);
     e.hash(state);

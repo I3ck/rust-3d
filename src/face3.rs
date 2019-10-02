@@ -26,18 +26,18 @@ use std::fmt;
 
 use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Clone, Eq, Ord, Hash)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Eq, Ord, Hash)]
 /// Face3, a face defined by 3 indices (e.g. used for Mesh)
 pub struct Face3 {
     pub a: VId,
     pub b: VId,
-    pub c: VId
+    pub c: VId,
 }
 
 impl Face3 {
     /// Creates a new Face3 from 3 indices
     pub fn new(a: VId, b: VId, c: VId) -> Self {
-        Face3 {a, b, c}
+        Face3 { a, b, c }
     }
 }
 
@@ -51,7 +51,7 @@ impl IsTopologyUnit for Face3 {
             0 => Ok(self.a),
             1 => Ok(self.b),
             2 => Ok(self.c),
-            _ => Err(ErrorKind::IncorrectUnitID)
+            _ => Err(ErrorKind::IncorrectUnitID),
         }
     }
 }

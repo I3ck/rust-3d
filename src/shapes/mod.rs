@@ -22,14 +22,14 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Containing basic shapes used in other structures or algorithms
 
-mod           circle;
+mod circle;
 pub use self::circle::Circle;
 
-mod           box_2d;
+mod box_2d;
 pub use self::box_2d::Box2D;
 
-mod           sphere;
+mod sphere;
 pub use self::sphere::Sphere;
 
-mod           box_3d;
+mod box_3d;
 pub use self::box_3d::Box3D;

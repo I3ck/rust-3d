@@ -25,12 +25,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsNormalized2D is a trait used for types which are positioned within the 2D space and normalized
-pub trait IsNormalized2D : 
-    Sized + 
-    Is2D {
-    
+pub trait IsNormalized2D: Sized + Is2D {
     /// Should construct a new object and only fail if it can't be normalized
-    fn new<P>(p: P) -> Result<Self> where
+    fn new<P>(p: P) -> Result<Self>
+    where
         P: Is2D;
 
     /// Returns a new normalized object which only points in the x-Direction

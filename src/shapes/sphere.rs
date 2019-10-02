@@ -24,14 +24,14 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::cmp::{Eq, Ordering};
 
-use crate::prelude::*;
 use crate::distances_3d::*;
+use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
 /// Sphere, a sphere in 3D space
 pub struct Sphere {
     pub center: Point3D,
-    pub radius: Positive
+    pub radius: Positive,
 }
 
 impl Eq for Sphere {}
@@ -41,7 +41,10 @@ impl Ord for Sphere {
         let origin = Point3D::default();
         match sqr_dist_3d(&origin, &self.center).partial_cmp(&sqr_dist_3d(&origin, &other.center)) {
             Some(x) => x,
-            None => self.radius.partial_cmp(&other.radius).unwrap_or(Ordering::Equal)
+            None => self
+                .radius
+                .partial_cmp(&other.radius)
+                .unwrap_or(Ordering::Equal),
         }
     }
 }
@@ -72,24 +75,32 @@ impl Is3D for Sphere {
 
 impl IsBuildableND for Sphere {
     fn new_nd(coords: &[f64]) -> Result<Self> {
-        Ok(Sphere{center: Point3D::new_nd(coords)?, radius: Positive::one()})
+        Ok(Sphere {
+            center: Point3D::new_nd(coords)?,
+            radius: Positive::one(),
+        })
     }
 
-    fn from_nd<P>(&mut self, other: P) -> Result<()> where
-        P: IsBuildableND {
-
+    fn from_nd<P>(&mut self, other: P) -> Result<()>
+    where
+        P: IsBuildableND,
+    {
         self.center.from_nd(other)
     }
 }
 
 impl IsBuildable3D for Sphere {
     fn new(x: f64, y: f64, z: f64) -> Self {
-        Sphere{center: Point3D{x, y, z}, radius: Positive::one()}
+        Sphere {
+            center: Point3D { x, y, z },
+            radius: Positive::one(),
+        }
     }
 
     fn from<P>(&mut self, other: &P)
-        where P: Is3D {
-
+    where
+        P: Is3D,
+    {
         self.center.from(other)
     }
 }
@@ -116,8 +127,16 @@ impl IsEditable3D for Sphere {
 
 impl HasBoundingBox3D for Sphere {
     fn bounding_box(&self) -> BoundingBox3D {
-        let p_min = Point3D{x: self.center.x() - self.radius.get(), y: self.center.y() - self.radius.get(), z: self.center.z() - self.radius.get()};
-        let p_max = Point3D{x: self.center.x() + self.radius.get(), y: self.center.y() + self.radius.get(), z: self.center.z() + self.radius.get()};
+        let p_min = Point3D {
+            x: self.center.x() - self.radius.get(),
+            y: self.center.y() - self.radius.get(),
+            z: self.center.z() - self.radius.get(),
+        };
+        let p_max = Point3D {
+            x: self.center.x() + self.radius.get(),
+            y: self.center.y() + self.radius.get(),
+            z: self.center.z() + self.radius.get(),
+        };
         BoundingBox3D::new(&p_min, &p_max).unwrap() // safe
     }
 }

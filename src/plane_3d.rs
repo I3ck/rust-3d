@@ -25,33 +25,36 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// Plane3D, a plane within 3D space
-#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
-pub struct Plane3D<P, N> where
+#[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
+pub struct Plane3D<P, N>
+where
     P: Is3D,
-    N: IsNormalized3D {
-
+    N: IsNormalized3D,
+{
     pub origin: P,
     pub u: N,
-    pub v: N
+    pub v: N,
 }
 
-impl<P, N> Default for Plane3D<P, N> where
+impl<P, N> Default for Plane3D<P, N>
+where
     P: Is3D + Default,
-    N: IsNormalized3D {
-
+    N: IsNormalized3D,
+{
     fn default() -> Self {
         Plane3D {
             origin: P::default(),
             u: N::norm_x(),
-            v: N::norm_y()
+            v: N::norm_y(),
         }
     }
 }
 
-impl<P, N> IsPlane3D<P,N> for Plane3D<P,N> where
+impl<P, N> IsPlane3D<P, N> for Plane3D<P, N>
+where
     P: IsBuildable3D + Clone,
-    N: IsNormalized3D + Clone {
-
+    N: IsNormalized3D + Clone,
+{
     fn new(origin: P, u: N, v: N) -> Self {
         Plane3D { origin, u, v }
     }

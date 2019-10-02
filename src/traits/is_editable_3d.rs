@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsEditable3D is a trait used for types which are positioned in 3D space and their position can be changed
-pub trait IsEditable3D : Is3D + IsEditableND {
+pub trait IsEditable3D: Is3D + IsEditableND {
     /// Should set the position in x
     fn set_x(&mut self, val: f64);
     /// Should set the position in y
@@ -55,9 +55,10 @@ pub trait IsEditable3D : Is3D + IsEditableND {
         self.set_z(z);
     }
     /// Increases distance towards other by factor
-    fn increase_distance_to_by<P>(&mut self, other: &P, factor: Positive) where
-        P: Is3D {
-
+    fn increase_distance_to_by<P>(&mut self, other: &P, factor: Positive)
+    where
+        P: Is3D,
+    {
         let x = other.x() + factor.get() * (self.x() - other.x());
         let y = other.y() + factor.get() * (self.y() - other.y());
         let z = other.z() + factor.get() * (self.z() - other.z());
@@ -66,9 +67,10 @@ pub trait IsEditable3D : Is3D + IsEditableND {
     }
 
     /// Adds the coordinates of other onto this. x = x + other.x ...
-    fn add<P>(&mut self, other: &P) where
-        P: Is3D {
-
+    fn add<P>(&mut self, other: &P)
+    where
+        P: Is3D,
+    {
         let x = self.x() + other.x();
         let y = self.y() + other.y();
         let z = self.z() + other.z();
@@ -78,9 +80,10 @@ pub trait IsEditable3D : Is3D + IsEditableND {
     }
 
     /// Subtracts the coordinates of other from this. x = x - other.x ...
-    fn subtract<P>(&mut self, other: &P) where
-        P: Is3D {
-
+    fn subtract<P>(&mut self, other: &P)
+    where
+        P: Is3D,
+    {
         let x = self.x() - other.x();
         let y = self.y() - other.y();
         let z = self.z() - other.z();

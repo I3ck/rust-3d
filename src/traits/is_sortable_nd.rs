@@ -27,7 +27,9 @@ use crate::prelude::*;
 /// IsSortableND trait used for collections which can be sorted by certain dimensions. E.g. x,y,z
 pub trait IsSortableND {
     /// Should return the number of dimensions. E.g. 2 for 2D space, 3 for 3D space etc.
-    fn n_dimensions() -> usize where Self: Sized;
+    fn n_dimensions() -> usize
+    where
+        Self: Sized;
     /// Should sort all elements by the given dimension
     fn sort_dim(&mut self, dimension: usize) -> Result<()>;
 }

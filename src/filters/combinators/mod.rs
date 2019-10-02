@@ -22,35 +22,35 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Containing filter combinators
 
-mod           filter_all_random_accessible;
+mod filter_all_random_accessible;
 pub use self::filter_all_random_accessible::FilterAllRandomAccessible;
 
-mod           filter_any_random_accessible;
+mod filter_any_random_accessible;
 pub use self::filter_any_random_accessible::FilterAnyRandomAccessible;
 
-mod           filter_all;
+mod filter_all;
 pub use self::filter_all::FilterAll;
 
-mod           filter_any;
+mod filter_any;
 pub use self::filter_any::FilterAny;
 
-mod           filter_negate;
+mod filter_negate;
 pub use self::filter_negate::FilterNegate;
 
-mod           filter_and;
+mod filter_and;
 pub use self::filter_and::FilterAND;
 
-mod           filter_or;
+mod filter_or;
 pub use self::filter_or::FilterOR;
 
-mod           filter_xor;
+mod filter_xor;
 pub use self::filter_xor::FilterXOR;
 
-mod           filter_outer_inner;
+mod filter_outer_inner;
 pub use self::filter_outer_inner::FilterOuterInner;
 
-mod           filter_allow;
+mod filter_allow;
 pub use self::filter_allow::FilterAllow;
 
-mod           filter_deny;
+mod filter_deny;
 pub use self::filter_deny::FilterDeny;

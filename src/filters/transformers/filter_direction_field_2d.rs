@@ -25,26 +25,29 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// FilterDirectionField2D, a filter which can transform any IsDirectionField2D into a filter for (Is2D, IsNormalized2D)
-pub struct FilterDirectionField2D<DF> where
-    DF: IsDirectionField2D {
-
+pub struct FilterDirectionField2D<DF>
+where
+    DF: IsDirectionField2D,
+{
     field: DF,
-    eps: Rad
+    eps: Rad,
 }
 
-impl<DF> FilterDirectionField2D<DF> where
-    DF: IsDirectionField2D {
-
-    pub fn new(field: DF, eps: Rad ) -> Self {
-        FilterDirectionField2D {field, eps}
+impl<DF> FilterDirectionField2D<DF>
+where
+    DF: IsDirectionField2D,
+{
+    pub fn new(field: DF, eps: Rad) -> Self {
+        FilterDirectionField2D { field, eps }
     }
 }
 
-impl<DF, P, N> IsFilter<(P, N)> for FilterDirectionField2D<DF> where
+impl<DF, P, N> IsFilter<(P, N)> for FilterDirectionField2D<DF>
+where
     DF: IsDirectionField2D,
-    P:  Is2D,
-    N:  IsNormalized2D {
-
+    P: Is2D,
+    N: IsNormalized2D,
+{
     fn is_allowed(&self, pn: &(P, N)) -> bool {
         let expected = self.field.direction_at(&pn.0);
         return expected.rad_to(&pn.1) <= self.eps;

@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsEditable2D is a trait used for types which are positioned in 2D space and their position can be changed
-pub trait IsEditable2D : Is2D + IsEditableND {
+pub trait IsEditable2D: Is2D + IsEditableND {
     /// Should set the position in x
     fn set_x(&mut self, val: f64);
     /// Should set the position in y
@@ -36,21 +36,23 @@ pub trait IsEditable2D : Is2D + IsEditableND {
         self.set_x(x);
         self.set_y(y);
     }
-    
+
     /// Increases distance towards other by factor
-    fn increase_distance_to_by<P>(&mut self, other: &P, factor: Positive) where
-        P: Is2D {
-        
+    fn increase_distance_to_by<P>(&mut self, other: &P, factor: Positive)
+    where
+        P: Is2D,
+    {
         let x = other.x() + factor.get() * (self.x() - other.x());
         let y = other.y() + factor.get() * (self.y() - other.y());
-        
+
         self.set_xy(x, y);
     }
 
     /// Adds the coordinates of other onto this. x = x + other.x ...
-    fn add<P>(&mut self, other: &P) where
-        P: Is2D {
-
+    fn add<P>(&mut self, other: &P)
+    where
+        P: Is2D,
+    {
         let x = self.x() + other.x();
         let y = self.y() + other.y();
         self.set_x(x);
@@ -58,9 +60,10 @@ pub trait IsEditable2D : Is2D + IsEditableND {
     }
 
     /// Subtracts the coordinates of other from this. x = x - other.x ...
-    fn subtract<P>(&mut self, other: &P) where
-        P: Is2D {
-
+    fn subtract<P>(&mut self, other: &P)
+    where
+        P: Is2D,
+    {
         let x = self.x() - other.x();
         let y = self.y() - other.y();
         self.set_x(x);
@@ -76,12 +79,15 @@ pub trait IsEditable2D : Is2D + IsEditableND {
     }
 
     /// Rotates the position around a center ccw for rad radians
-    fn rotate<P>(&mut self, r: Rad, center: &P) where
-        P: Is2D {
-
+    fn rotate<P>(&mut self, r: Rad, center: &P)
+    where
+        P: Is2D,
+    {
         let rad = r.val;
-        let newx = center.x() + rad.cos() * (self.x() - center.x()) - rad.sin() * (self.y() - center.y());
-        let newy = center.y() + rad.sin() * (self.x() - center.x()) + rad.cos() * (self.y() - center.y());
+        let newx =
+            center.x() + rad.cos() * (self.x() - center.x()) - rad.sin() * (self.y() - center.y());
+        let newy =
+            center.y() + rad.sin() * (self.x() - center.x()) + rad.cos() * (self.y() - center.y());
 
         self.set_x(newx);
         self.set_y(newy);

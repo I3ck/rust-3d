@@ -23,33 +23,33 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! NonNegative, a wrapper for a f64 value, ensuring it is always >= 0
 
 use std::fmt;
-use std::ops::{Add, AddAssign, Mul, MulAssign, Div, DivAssign};
 use std::hash::{Hash, Hasher};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign};
 
 use crate::prelude::*;
 use crate::utils::hash_f64;
 
-#[derive (Debug, PartialEq, PartialOrd, Clone, Copy)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 /// NonNegative, a wrapper for a f64 value, ensuring it is always >= 0
 pub struct NonNegative {
-    val: f64
+    val: f64,
 }
 
 impl NonNegative {
     /// Creates a new NonNegative if input >= 0, fails otherwise
     pub fn new(val: f64) -> Result<NonNegative> {
         if val >= 0.0 {
-            return Ok(NonNegative {val});
+            return Ok(NonNegative { val });
         }
         Err(ErrorKind::NumberInWrongRange)
     }
     /// Creates a new NonNegative with value 0
     pub fn zero() -> NonNegative {
-        NonNegative {val: 0.0}
+        NonNegative { val: 0.0 }
     }
     /// Creates a new NonNegative with value 1
     pub fn one() -> NonNegative {
-        NonNegative {val : 1.0}
+        NonNegative { val: 1.0 }
     }
     /// Returns the wrapped value
     pub fn get(&self) -> f64 {
@@ -57,13 +57,15 @@ impl NonNegative {
     }
     /// Returns the square root
     pub fn sqrt(&self) -> NonNegative {
-        NonNegative{val: self.val.sqrt()}
+        NonNegative {
+            val: self.val.sqrt(),
+        }
     }
 }
 
 impl From<Positive> for NonNegative {
     fn from(x: Positive) -> Self {
-        NonNegative {val: x.get() }
+        NonNegative { val: x.get() }
     }
 }
 
@@ -79,7 +81,9 @@ impl Add for NonNegative {
     type Output = NonNegative;
 
     fn add(self, other: NonNegative) -> NonNegative {
-        NonNegative {val: self.val + other.val}
+        NonNegative {
+            val: self.val + other.val,
+        }
     }
 }
 
@@ -87,7 +91,9 @@ impl Add<Positive> for NonNegative {
     type Output = NonNegative;
 
     fn add(self, other: Positive) -> NonNegative {
-        NonNegative {val: self.val + other.get()}
+        NonNegative {
+            val: self.val + other.get(),
+        }
     }
 }
 
@@ -107,7 +113,9 @@ impl Mul for NonNegative {
     type Output = NonNegative;
 
     fn mul(self, other: NonNegative) -> NonNegative {
-        NonNegative {val: self.val * other.val}
+        NonNegative {
+            val: self.val * other.val,
+        }
     }
 }
 
@@ -115,7 +123,9 @@ impl Mul<Positive> for NonNegative {
     type Output = NonNegative;
 
     fn mul(self, other: Positive) -> NonNegative {
-        NonNegative {val: self.val * other.get()}
+        NonNegative {
+            val: self.val * other.get(),
+        }
     }
 }
 
@@ -135,7 +145,9 @@ impl Div for NonNegative {
     type Output = NonNegative;
 
     fn div(self, other: NonNegative) -> NonNegative {
-        NonNegative {val: self.val / other.val}
+        NonNegative {
+            val: self.val / other.val,
+        }
     }
 }
 
@@ -143,7 +155,9 @@ impl Div<Positive> for NonNegative {
     type Output = NonNegative;
 
     fn div(self, other: Positive) -> NonNegative {
-        NonNegative {val: self.val / other.get()}
+        NonNegative {
+            val: self.val / other.get(),
+        }
     }
 }
 

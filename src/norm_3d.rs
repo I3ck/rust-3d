@@ -26,24 +26,26 @@ use std::cmp::{Eq, Ordering};
 use std::hash::{Hash, Hasher};
 use std::ops::{Mul, Neg};
 
-use crate::prelude::*;
 use crate::distances_3d::*;
+use crate::prelude::*;
 use crate::utils::hash_f64;
 
-#[derive (Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, PartialEq, PartialOrd, Clone)]
 /// Norm3D, a normalized vector within 3D space
 pub struct Norm3D {
     x: f64,
     y: f64,
-    z: f64
+    z: f64,
 }
 
-impl Eq for Norm3D{}
+impl Eq for Norm3D {}
 
 impl Ord for Norm3D {
     fn cmp(&self, other: &Self) -> Ordering {
         let origin = Point3D::default();
-        sqr_dist_3d(&origin, self).partial_cmp(&sqr_dist_3d(&origin, other)).unwrap_or(Ordering::Equal)
+        sqr_dist_3d(&origin, self)
+            .partial_cmp(&sqr_dist_3d(&origin, other))
+            .unwrap_or(Ordering::Equal)
     }
 }
 
@@ -59,7 +61,11 @@ impl Mul<f64> for Norm3D {
     type Output = Point3D;
 
     fn mul(self, other: f64) -> Point3D {
-        Point3D{x: other * self.x, y: other * self.y, z: other * self.z}
+        Point3D {
+            x: other * self.x,
+            y: other * self.y,
+            z: other * self.z,
+        }
     }
 }
 
@@ -67,7 +73,11 @@ impl Neg for Norm3D {
     type Output = Norm3D;
 
     fn neg(self) -> Norm3D {
-        Norm3D { x: -self.x, y: -self.y, z: -self.z }
+        Norm3D {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
     }
 }
 
@@ -81,7 +91,7 @@ impl IsND for Norm3D {
             0 => Ok(self.x),
             1 => Ok(self.y),
             2 => Ok(self.z),
-            _ => Err(ErrorKind::IncorrectDimension)
+            _ => Err(ErrorKind::IncorrectDimension),
         }
     }
 }
@@ -101,9 +111,10 @@ impl Is3D for Norm3D {
 }
 
 impl IsNormalized3D for Norm3D {
-    fn new<P>(p: P) -> Result<Self> where
-        P: Is3D {
-
+    fn new<P>(p: P) -> Result<Self>
+    where
+        P: Is3D,
+    {
         let l = p.abs().get();
         if l == 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
@@ -111,6 +122,10 @@ impl IsNormalized3D for Norm3D {
 
         let f = 1.0 / l;
 
-        Ok(Norm3D { x: f * p.x(), y: f * p.y(), z: f * p.z() })
+        Ok(Norm3D {
+            x: f * p.x(),
+            y: f * p.y(),
+            z: f * p.z(),
+        })
     }
 }

@@ -24,16 +24,16 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Default, Clone, Eq, Hash, Ord)]
+#[derive(Debug, PartialEq, PartialOrd, Default, Clone, Eq, Hash, Ord)]
 /// FilterBox3D, a box filter within 3D space
 pub struct FilterBox3D {
-    box_3d: Box3D
+    box_3d: Box3D,
 }
 
 impl FilterBox3D {
     /// Creates a new FilterBox3D with the given parameters
     pub fn new(box_3d: Box3D) -> Self {
-        FilterBox3D {box_3d}
+        FilterBox3D { box_3d }
     }
 }
 
@@ -66,9 +66,10 @@ impl IsBuildableND for FilterBox3D {
         Ok(FilterBox3D::new(Box3D::new_nd(coords)?))
     }
 
-    fn from_nd<P>(&mut self, other: P) -> Result<()> where
-        P: IsBuildableND {
-
+    fn from_nd<P>(&mut self, other: P) -> Result<()>
+    where
+        P: IsBuildableND,
+    {
         self.box_3d.from_nd(other)
     }
 }
@@ -79,8 +80,9 @@ impl IsBuildable3D for FilterBox3D {
     }
 
     fn from<P>(&mut self, other: &P)
-        where P: Is3D {
-
+    where
+        P: Is3D,
+    {
         self.box_3d.from(other)
     }
 }
@@ -117,16 +119,17 @@ impl HasBoundingBox3DMaybe for FilterBox3D {
     }
 }
 
-impl<T> IsFilter<T> for FilterBox3D where
-    T: Is3D {
-
+impl<T> IsFilter<T> for FilterBox3D
+where
+    T: Is3D,
+{
     fn is_allowed(&self, p: &T) -> bool {
-           p.x() >= self.box_3d.x() - self.box_3d.size_x.get() / 2.0
-        && p.x() <= self.box_3d.x() + self.box_3d.size_x.get() / 2.0
-        && p.y() >= self.box_3d.y() - self.box_3d.size_y.get() / 2.0
-        && p.y() <= self.box_3d.y() + self.box_3d.size_y.get() / 2.0
-        && p.z() >= self.box_3d.z() - self.box_3d.size_z.get() / 2.0
-        && p.z() <= self.box_3d.z() + self.box_3d.size_z.get() / 2.0
+        p.x() >= self.box_3d.x() - self.box_3d.size_x.get() / 2.0
+            && p.x() <= self.box_3d.x() + self.box_3d.size_x.get() / 2.0
+            && p.y() >= self.box_3d.y() - self.box_3d.size_y.get() / 2.0
+            && p.y() <= self.box_3d.y() + self.box_3d.size_y.get() / 2.0
+            && p.z() >= self.box_3d.z() - self.box_3d.size_z.get() / 2.0
+            && p.z() <= self.box_3d.z() + self.box_3d.size_z.get() / 2.0
     }
 }
 
@@ -138,6 +141,11 @@ impl IsScalable for FilterBox3D {
 
 impl From<BoundingBox3D> for FilterBox3D {
     fn from(x: BoundingBox3D) -> Self {
-        Self::new(Box3D{center: x.center_bb(), size_x: x.size_x(), size_y: x.size_y(), size_z: x.size_z()})
+        Self::new(Box3D {
+            center: x.center_bb(),
+            size_x: x.size_x(),
+            size_y: x.size_y(),
+            size_z: x.size_z(),
+        })
     }
 }

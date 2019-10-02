@@ -22,11 +22,11 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Result, the result type used within rust-3d. Also defining the error enum and several transformation methods between error types.
 
-use std::result;
 use std::fmt;
+use std::io::Error as ioError;
 use std::num::ParseFloatError;
 use std::num::ParseIntError;
-use std::io::Error as ioError;
+use std::result;
 
 /// The Error Enum used by rust-3d
 pub enum ErrorKind {
@@ -50,7 +50,7 @@ pub enum ErrorKind {
     NumberInWrongRange,
     ComparisionFailed,
     ColorArrayIncorrectLength,
-    PlyError(PlyError)
+    PlyError(PlyError),
 }
 
 pub enum PlyError {
@@ -70,27 +70,29 @@ impl ErrorKind {
     /// Returns readable text for the ErrorKind
     pub fn as_str(&self) -> &'static str {
         match self {
-            ErrorKind::MinMaxSwapped             => "Passed min/max values are swapped (min > max)",
-            ErrorKind::MinMaxEqual               => "Passed min/max values are equal",
-            ErrorKind::TooFewPoints              => "Container had too few points for the operation",
-            ErrorKind::BoundingBoxMissing        => "Bounding box is missing for the operation",
+            ErrorKind::MinMaxSwapped => "Passed min/max values are swapped (min > max)",
+            ErrorKind::MinMaxEqual => "Passed min/max values are equal",
+            ErrorKind::TooFewPoints => "Container had too few points for the operation",
+            ErrorKind::BoundingBoxMissing => "Bounding box is missing for the operation",
             ErrorKind::NormalizeVecWithoutLength => "Can't normalize a vector of length 0",
-            ErrorKind::IOError                   => "Can't read or write a file",
-            ErrorKind::ParseError                => "Can't parse data",
-            ErrorKind::IndexOutOfBounds          => "Tried to access an out of bounds index",
-            ErrorKind::IncorrectFaceID           => "Used an incorrect face id",
-            ErrorKind::IncorrectVertexID         => "Used an incorrect vertex id",
-            ErrorKind::IncorrectEdgeID           => "Used an incorrect edge id",
-            ErrorKind::IncorrectVoxelID          => "Used an incorrect voxel id",
-            ErrorKind::IncorrectUnitID           => "Used an incorrect unit id",
-            ErrorKind::IncorrectSegmentID        => "Used an incorrect segment id",
-            ErrorKind::IncorrectDimension        => "Trying to access an incorrect dimension",
-            ErrorKind::DimensionsDontMatch       => "Trying to mix types with different dimensions",
-            ErrorKind::NumberConversionError     => "Failed converting one number type to another",
-            ErrorKind::NumberInWrongRange        => "Passed number is within the wrong range",
-            ErrorKind::ComparisionFailed         => "Comparision between two values failed",
-            ErrorKind::ColorArrayIncorrectLength => "The provided color array has an incorrect length",
-            ErrorKind::PlyError(x)               => x.as_str()
+            ErrorKind::IOError => "Can't read or write a file",
+            ErrorKind::ParseError => "Can't parse data",
+            ErrorKind::IndexOutOfBounds => "Tried to access an out of bounds index",
+            ErrorKind::IncorrectFaceID => "Used an incorrect face id",
+            ErrorKind::IncorrectVertexID => "Used an incorrect vertex id",
+            ErrorKind::IncorrectEdgeID => "Used an incorrect edge id",
+            ErrorKind::IncorrectVoxelID => "Used an incorrect voxel id",
+            ErrorKind::IncorrectUnitID => "Used an incorrect unit id",
+            ErrorKind::IncorrectSegmentID => "Used an incorrect segment id",
+            ErrorKind::IncorrectDimension => "Trying to access an incorrect dimension",
+            ErrorKind::DimensionsDontMatch => "Trying to mix types with different dimensions",
+            ErrorKind::NumberConversionError => "Failed converting one number type to another",
+            ErrorKind::NumberInWrongRange => "Passed number is within the wrong range",
+            ErrorKind::ComparisionFailed => "Comparision between two values failed",
+            ErrorKind::ColorArrayIncorrectLength => {
+                "The provided color array has an incorrect length"
+            }
+            ErrorKind::PlyError(x) => x.as_str(),
         }
     }
 }
@@ -99,16 +101,16 @@ impl PlyError {
     /// Returns readable text for the PlyError
     pub fn as_str(&self) -> &'static str {
         match self {
-            PlyError::LoadError                 => "Error while loading .ply",
-            PlyError::LoadStartNotFound         => "Start of .ply header not found",
-            PlyError::LoadFormatNotFound        => "Format of .ply missing or not supported",
-            PlyError::LoadWrongPropertyCount    => "Property count of .ply missing or not supported",
+            PlyError::LoadError => "Error while loading .ply",
+            PlyError::LoadStartNotFound => "Start of .ply header not found",
+            PlyError::LoadFormatNotFound => "Format of .ply missing or not supported",
+            PlyError::LoadWrongPropertyCount => "Property count of .ply missing or not supported",
             PlyError::LoadVertexIndexDefinitionNotFound => "Index definition in .ply not found",
-            PlyError::LoadHeaderEndNotFound     => "End of header definition of .ply not found",
-            PlyError::LoadVertexCountNotFound   => "Vertex count of .ply not found",
-            PlyError::LoadFaceCountNotFound     => "Face count of .ply not found",
-            PlyError::LoadVertexCountIncorrect  => "Vertex count of .ply not found",
-            PlyError::LoadVerticesIncorrect     => "Vertices in .ply incorrect"
+            PlyError::LoadHeaderEndNotFound => "End of header definition of .ply not found",
+            PlyError::LoadVertexCountNotFound => "Vertex count of .ply not found",
+            PlyError::LoadFaceCountNotFound => "Face count of .ply not found",
+            PlyError::LoadVertexCountIncorrect => "Vertex count of .ply not found",
+            PlyError::LoadVerticesIncorrect => "Vertices in .ply incorrect",
         }
     }
 }

@@ -22,14 +22,14 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Containing IO functions / traits / types
 
-mod           stl;
+mod stl;
 pub use self::stl::*;
 
-mod           ply;
+mod ply;
 pub use self::ply::*;
 
-mod           xy;
+mod xy;
 pub use self::xy::*;
 
-mod           xyz;
+mod xyz;
 pub use self::xyz::*;

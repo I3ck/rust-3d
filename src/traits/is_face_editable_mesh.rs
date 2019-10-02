@@ -25,8 +25,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsFaceEditableMesh trait used for meshes with editable face data
-pub trait IsFaceEditableMesh<V, TU> : IsMesh<V, TU> where
-    TU: IsTopologyUnit {
+pub trait IsFaceEditableMesh<V, TU>: IsMesh<V, TU>
+where
+    TU: IsTopologyUnit,
+{
     /// Should add a face with the 3 positions. Also should return the id of the new face
     fn add_face(&mut self, v1: V, v2: V, v3: V) -> FId;
     /// Should add a face to the mesh by connecting the vertices via their ids. Should return the id of the newly added face

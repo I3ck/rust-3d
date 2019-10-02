@@ -22,26 +22,26 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Point3D, a point / position within 3D space
 
-use std::fmt;
-use std::cmp::{Eq, Ordering};
-use std::hash::{Hash, Hasher};
-use std::ops::{Add, Mul, Sub, Neg, Div};
 use crate::utils::hash_f64;
+use std::cmp::{Eq, Ordering};
+use std::fmt;
+use std::hash::{Hash, Hasher};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
-use crate::prelude::*;
 use crate::distances_3d::*;
+use crate::prelude::*;
 
-#[derive (Default, Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Point3D, a point / position within 3D space
 pub struct Point3D {
     pub x: f64,
     pub y: f64,
-    pub z: f64
+    pub z: f64,
 }
 
 impl Point3D {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
-        Point3D {x, y, z}
+        Point3D { x, y, z }
     }
 }
 
@@ -50,7 +50,9 @@ impl Eq for Point3D {}
 impl Ord for Point3D {
     fn cmp(&self, other: &Self) -> Ordering {
         let origin = Point3D::default();
-        sqr_dist_3d(&origin, self).partial_cmp(&sqr_dist_3d(&origin, other)).unwrap_or(Ordering::Equal)
+        sqr_dist_3d(&origin, self)
+            .partial_cmp(&sqr_dist_3d(&origin, other))
+            .unwrap_or(Ordering::Equal)
     }
 }
 
@@ -62,21 +64,33 @@ impl Hash for Point3D {
     }
 }
 
-impl<P> Add<P> for Point3D where
-    P: Is3D {
+impl<P> Add<P> for Point3D
+where
+    P: Is3D,
+{
     type Output = Point3D;
 
     fn add(self, other: P) -> Point3D {
-        Point3D {x: self.x + other.x(), y: self.y + other.y(), z: self.z + other.z()}
+        Point3D {
+            x: self.x + other.x(),
+            y: self.y + other.y(),
+            z: self.z + other.z(),
+        }
     }
 }
 
-impl<P> Sub<P> for Point3D where
-    P: Is3D {
+impl<P> Sub<P> for Point3D
+where
+    P: Is3D,
+{
     type Output = Point3D;
 
     fn sub(self, other: P) -> Point3D {
-        Point3D {x: self.x - other.x(), y: self.y - other.y(), z: self.z - other.z()}
+        Point3D {
+            x: self.x - other.x(),
+            y: self.y - other.y(),
+            z: self.z - other.z(),
+        }
     }
 }
 
@@ -84,7 +98,11 @@ impl Mul<f64> for Point3D {
     type Output = Point3D;
 
     fn mul(self, other: f64) -> Point3D {
-        Point3D {x: other * self.x, y: other * self.y, z: other * self.z}
+        Point3D {
+            x: other * self.x,
+            y: other * self.y,
+            z: other * self.z,
+        }
     }
 }
 
@@ -92,7 +110,11 @@ impl Div<f64> for Point3D {
     type Output = Point3D;
 
     fn div(self, other: f64) -> Point3D {
-        Point3D {x: self.x / other, y: self.y / other, z: self.z / other}
+        Point3D {
+            x: self.x / other,
+            y: self.y / other,
+            z: self.z / other,
+        }
     }
 }
 
@@ -100,7 +122,11 @@ impl Neg for Point3D {
     type Output = Point3D;
 
     fn neg(self) -> Point3D {
-        Point3D { x: -self.x, y: -self.y, z: -self.z }
+        Point3D {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
     }
 }
 
@@ -122,7 +148,7 @@ impl IsND for Point3D {
             0 => Ok(self.x),
             1 => Ok(self.y),
             2 => Ok(self.z),
-            _ => Err(ErrorKind::IncorrectDimension)
+            _ => Err(ErrorKind::IncorrectDimension),
         }
     }
 }
@@ -146,12 +172,17 @@ impl IsBuildableND for Point3D {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
-        Ok(Point3D{x: coords[0], y: coords[1], z: coords[2]})
+        Ok(Point3D {
+            x: coords[0],
+            y: coords[1],
+            z: coords[2],
+        })
     }
 
-    fn from_nd<P>(&mut self, other: P) -> Result<()> where
-        P: IsBuildableND {
-
+    fn from_nd<P>(&mut self, other: P) -> Result<()>
+    where
+        P: IsBuildableND,
+    {
         if P::n_dimensions() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);
         }
@@ -165,12 +196,13 @@ impl IsBuildableND for Point3D {
 
 impl IsBuildable3D for Point3D {
     fn new(x: f64, y: f64, z: f64) -> Self {
-        Point3D{x: x, y: y, z: z}
+        Point3D { x: x, y: y, z: z }
     }
 
     fn from<P>(&mut self, other: &P)
-        where P: Is3D {
-
+    where
+        P: Is3D,
+    {
         self.x = other.x();
         self.y = other.y();
         self.z = other.z();
@@ -204,9 +236,10 @@ impl IsEditable3D for Point3D {
 }
 
 impl IsTransFormableTo2D for Point3D {
-    fn transform_to_2d<P>(&self) -> P where
-        P: IsBuildable2D {
-
+    fn transform_to_2d<P>(&self) -> P
+    where
+        P: IsBuildable2D,
+    {
         P::new(self.x, self.y)
     }
 }

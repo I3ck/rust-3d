@@ -25,10 +25,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use std::fmt;
 
 macro_rules! strong_usize {
-    ($NEW_NAME:ident) => (
-        #[derive (Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    ($NEW_NAME:ident) => {
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
         pub struct $NEW_NAME {
-            pub val: usize
+            pub val: usize,
         }
 
         impl Into<usize> for $NEW_NAME {
@@ -54,14 +54,14 @@ macro_rules! strong_usize {
                 write!(f, "{}", self.val)
             }
         }
-    )
+    };
 }
 
 macro_rules! strong_f64 {
-    ($NEW_NAME:ident) => (
-        #[derive (Debug, Clone, Copy, PartialEq, PartialOrd)]
+    ($NEW_NAME:ident) => {
+        #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
         pub struct $NEW_NAME {
-            pub val: f64
+            pub val: f64,
         }
 
         impl Into<f64> for $NEW_NAME {
@@ -87,7 +87,7 @@ macro_rules! strong_f64 {
                 write!(f, "{}", self.val)
             }
         }
-    )
+    };
 }
 
 strong_usize!(VId);

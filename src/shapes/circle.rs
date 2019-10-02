@@ -24,14 +24,14 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::cmp::{Eq, Ordering};
 
-use crate::prelude::*;
 use crate::distances_2d::*;
+use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
 /// Circle, a circle in 2D space
 pub struct Circle {
     pub center: Point2D,
-    pub radius: Positive
+    pub radius: Positive,
 }
 
 impl Eq for Circle {}
@@ -41,7 +41,10 @@ impl Ord for Circle {
         let origin = Point2D::default();
         match sqr_dist_2d(&origin, &self.center).partial_cmp(&sqr_dist_2d(&origin, &other.center)) {
             Some(x) => x,
-            None => self.radius.partial_cmp(&other.radius).unwrap_or(Ordering::Equal)
+            None => self
+                .radius
+                .partial_cmp(&other.radius)
+                .unwrap_or(Ordering::Equal),
         }
     }
 }
@@ -68,24 +71,32 @@ impl Is2D for Circle {
 
 impl IsBuildableND for Circle {
     fn new_nd(coords: &[f64]) -> Result<Self> {
-        Ok(Circle{ center: Point2D::new_nd(coords)?, radius: Positive::one()})
+        Ok(Circle {
+            center: Point2D::new_nd(coords)?,
+            radius: Positive::one(),
+        })
     }
 
-    fn from_nd<P>(&mut self, other: P) -> Result<()> where
-        P: IsBuildableND {
-
+    fn from_nd<P>(&mut self, other: P) -> Result<()>
+    where
+        P: IsBuildableND,
+    {
         self.center.from_nd(other)
     }
 }
 
 impl IsBuildable2D for Circle {
     fn new(x: f64, y: f64) -> Self {
-        Circle{ center: Point2D{x: x, y: y}, radius: Positive::one()}
+        Circle {
+            center: Point2D { x: x, y: y },
+            radius: Positive::one(),
+        }
     }
 
     fn from<P>(&mut self, other: &P)
-        where P: Is2D {
-
+    where
+        P: Is2D,
+    {
         self.center.from(other)
     }
 }
@@ -108,8 +119,14 @@ impl IsEditable2D for Circle {
 
 impl HasBoundingBox2D for Circle {
     fn bounding_box(&self) -> BoundingBox2D {
-        let p_min = Point2D{x: self.center.x() - self.radius.get(), y: self.center.y() - self.radius.get()};
-        let p_max = Point2D{x: self.center.x() + self.radius.get(), y: self.center.y() + self.radius.get()};
+        let p_min = Point2D {
+            x: self.center.x() - self.radius.get(),
+            y: self.center.y() - self.radius.get(),
+        };
+        let p_max = Point2D {
+            x: self.center.x() + self.radius.get(),
+            y: self.center.y() + self.radius.get(),
+        };
         BoundingBox2D::new(&p_min, &p_max).unwrap() // safe
     }
 }

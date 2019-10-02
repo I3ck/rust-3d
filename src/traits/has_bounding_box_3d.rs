@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// HasBoundingBox3D is a trait for types which have a bounding box
-pub trait HasBoundingBox3D : HasBoundingBox3DMaybe {
+pub trait HasBoundingBox3D: HasBoundingBox3DMaybe {
     /// Should return the bounding box
     fn bounding_box(&self) -> BoundingBox3D;
 }
@@ -41,15 +41,17 @@ pub trait HasBoundingBox3DMaybe {
 //@todo consider moving somewhere else
 
 /// Wrapper helper to convert the Maybe type to the non-Maybe type
-pub struct HasBoundingBox3DConverted<T> where
-    T: HasBoundingBox3DMaybe {
-    
-    data: T
+pub struct HasBoundingBox3DConverted<T>
+where
+    T: HasBoundingBox3DMaybe,
+{
+    data: T,
 }
 
-impl<T> HasBoundingBox3DConverted<T> where
-    T: HasBoundingBox3DMaybe {
-        
+impl<T> HasBoundingBox3DConverted<T>
+where
+    T: HasBoundingBox3DMaybe,
+{
     pub fn new(data: T) -> Result<Self> {
         data.bounding_box_maybe()?; // ensure present
         Ok(Self { data })
@@ -60,18 +62,20 @@ impl<T> HasBoundingBox3DConverted<T> where
     }
 }
 
-impl<T> HasBoundingBox3DMaybe for HasBoundingBox3DConverted<T> where
-    T: HasBoundingBox3DMaybe {
-
+impl<T> HasBoundingBox3DMaybe for HasBoundingBox3DConverted<T>
+where
+    T: HasBoundingBox3DMaybe,
+{
     fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
         self.data.bounding_box_maybe()
-    } 
+    }
 }
 
-impl<T> HasBoundingBox3D for HasBoundingBox3DConverted<T> where
-    T: HasBoundingBox3DMaybe {
-
+impl<T> HasBoundingBox3D for HasBoundingBox3DConverted<T>
+where
+    T: HasBoundingBox3DMaybe,
+{
     fn bounding_box(&self) -> BoundingBox3D {
         self.data.bounding_box_maybe().unwrap() // safe since enforced on construction
-    } 
+    }
 }

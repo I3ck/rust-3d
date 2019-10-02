@@ -106,134 +106,134 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! ------
 //! MIT (see LICENSE)
 
-pub mod prelude;
-pub mod strong_types;
-pub mod traits;
-pub mod impls;
-pub mod io;
-pub mod filters;
 pub mod algorithms;
-pub mod functions;
-pub mod factory_2d;
-pub mod interpolation_2d;
 pub mod distances_2d;
 pub mod distances_3d;
 pub mod distances_nd;
+pub mod factory_2d;
+pub mod filters;
+pub mod functions;
+pub mod impls;
+pub mod interpolation_2d;
+pub mod io;
+pub mod prelude;
+pub mod strong_types;
 pub mod test_helper;
+pub mod traits;
 pub mod utils;
 
-mod           aa_bb_tree_2d;
+mod aa_bb_tree_2d;
 pub use self::aa_bb_tree_2d::AABBTree2D;
 
-mod           aa_bb_tree_3d;
+mod aa_bb_tree_3d;
 pub use self::aa_bb_tree_3d::AABBTree3D;
 
-mod           point_2d;
+mod point_2d;
 pub use self::point_2d::Point2D;
 
-mod           point_3d;
+mod point_3d;
 pub use self::point_3d::Point3D;
 
-mod           line_2d;
+mod line_2d;
 pub use self::line_2d::Line2D;
 
-mod           line_3d;
+mod line_3d;
 pub use self::line_3d::Line3D;
 
-mod           line_segment_2d;
+mod line_segment_2d;
 pub use self::line_segment_2d::LineSegment2D;
 
-mod           line_segment_3d;
+mod line_segment_3d;
 pub use self::line_segment_3d::LineSegment3D;
 
-mod           ray_2d;
+mod ray_2d;
 pub use self::ray_2d::Ray2D;
 
-mod           ray_3d;
+mod ray_3d;
 pub use self::ray_3d::Ray3D;
 
-mod           plane_3d;
+mod plane_3d;
 pub use self::plane_3d::Plane3D;
 
-mod           point_cloud_2d;
+mod point_cloud_2d;
 pub use self::point_cloud_2d::PointCloud2D;
 
-mod           point_cloud_3d;
+mod point_cloud_3d;
 pub use self::point_cloud_3d::PointCloud3D;
 
-mod           polygon_2d;
+mod polygon_2d;
 pub use self::polygon_2d::Polygon2D;
 
-mod           polygon_3d;
+mod polygon_3d;
 pub use self::polygon_3d::Polygon3D;
 
-mod           norm_2d;
+mod norm_2d;
 pub use self::norm_2d::Norm2D;
 
-mod           norm_3d;
+mod norm_3d;
 pub use self::norm_3d::Norm3D;
 
-mod           bounding_box_2d;
+mod bounding_box_2d;
 pub use self::bounding_box_2d::BoundingBox2D;
 
-mod           bounding_box_3d;
+mod bounding_box_3d;
 pub use self::bounding_box_3d::BoundingBox3D;
 
-mod           matrix3;
+mod matrix3;
 pub use self::matrix3::Matrix3;
 
-mod           matrix4;
+mod matrix4;
 pub use self::matrix4::Matrix4;
 
-mod           matrix3_pipe;
+mod matrix3_pipe;
 pub use self::matrix3_pipe::Matrix3Pipe;
 
-mod           matrix4_pipe;
+mod matrix4_pipe;
 pub use self::matrix4_pipe::Matrix4Pipe;
 
-mod           compressed_point_3d;
+mod compressed_point_3d;
 pub use self::compressed_point_3d::CompressedPoint3D;
 
-mod           compressed_point_cloud_3d;
+mod compressed_point_cloud_3d;
 pub use self::compressed_point_cloud_3d::CompressedPointCloud3D;
 
-mod           projection_to_plane;
+mod projection_to_plane;
 //pub use self::projection_to_plane::ProjectionToPlane;
 
-mod           kd_tree;
+mod kd_tree;
 pub use self::kd_tree::KdTree;
 
-mod           mesh_3d;
+mod mesh_3d;
 pub use self::mesh_3d::Mesh3D;
 
-mod           searchable_mesh;
+mod searchable_mesh;
 pub use self::searchable_mesh::SearchableMesh;
 
-mod           oc_tree;
+mod oc_tree;
 pub use self::oc_tree::OcTree;
 
-mod           view;
+mod view;
 pub use self::view::View;
 
-mod           positive;
+mod positive;
 pub use self::positive::Positive;
 
-mod           non_negative;
+mod non_negative;
 pub use self::non_negative::NonNegative;
 
-mod           result;
+mod result;
 pub use self::result::Result;
 
-mod           rgb;
+mod rgb;
 pub use self::rgb::Rgb;
 
-mod           face3;
+mod face3;
 pub use self::face3::Face3;
 
-mod           half_edge;
+mod half_edge;
 pub use self::half_edge::HalfEdge;
 
-mod           shapes;
+mod shapes;
 pub use self::shapes::*;
 
 mod enums;

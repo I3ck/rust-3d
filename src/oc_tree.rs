@@ -25,25 +25,27 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use std::collections::HashSet;
 use std::iter::IntoIterator;
 
+use crate::functions::center_3d;
 use crate::prelude::*;
-use crate::functions::{center_3d};
 
-#[derive (Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
+#[derive(Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// OcTree https://en.wikipedia.org/wiki/Octree
-pub struct OcTree<P> where
-    P: Is3D {
-
+pub struct OcTree<P>
+where
+    P: Is3D,
+{
     root: Option<OcNode<P>>,
-    bb: BoundingBox3D
+    bb: BoundingBox3D,
 }
 
-impl<P> IsTree3D<P> for OcTree<P> where
-    P: IsBuildable3D + Clone + Default {
-
+impl<P> IsTree3D<P> for OcTree<P>
+where
+    P: IsBuildable3D + Clone + Default,
+{
     fn size(&self) -> usize {
         match self.root {
             None => 0,
-            Some(ref node) => node.size()
+            Some(ref node) => node.size(),
         }
     }
 
@@ -66,11 +68,12 @@ impl<P> IsTree3D<P> for OcTree<P> where
     }
 }
 
-impl<P> IsOcTree<P> for OcTree<P> where
-    P: IsBuildable3D + Clone + Default {
-
+impl<P> IsOcTree<P> for OcTree<P>
+where
+    P: IsBuildable3D + Clone + Default,
+{
     //@todo rewrite or make new method which returns cog instead of stopping recursion
-    fn collect(&self,  maxdepth: i8) -> PointCloud3D<P> {
+    fn collect(&self, maxdepth: i8) -> PointCloud3D<P> {
         let mut result = PointCloud3D::new();
         if let Some(ref node) = self.root {
             node.collect(0, maxdepth, &mut result);
@@ -79,19 +82,22 @@ impl<P> IsOcTree<P> for OcTree<P> where
     }
 }
 
-#[derive (Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
+#[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// OcNode, which is a single node used within OcTree
-enum OcNode<P> where
-    P: Is3D {
-
+enum OcNode<P>
+where
+    P: Is3D,
+{
     Leaf(P),
-    Node(Internal<P>)
+    Node(Internal<P>),
 }
 
-#[derive (Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
-struct Internal<P> where
-    P: Is3D { // naming : p == positive, n == negative ||| xyz   => pnp => x positive, y negative, z positive direction from center
-
+#[derive(Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
+struct Internal<P>
+where
+    P: Is3D,
+{
+    // naming : p == positive, n == negative ||| xyz   => pnp => x positive, y negative, z positive direction from center
     ppp: Option<Box<OcNode<P>>>,
     ppn: Option<Box<OcNode<P>>>,
     pnp: Option<Box<OcNode<P>>>,
@@ -99,7 +105,7 @@ struct Internal<P> where
     npp: Option<Box<OcNode<P>>>,
     npn: Option<Box<OcNode<P>>>,
     nnp: Option<Box<OcNode<P>>>,
-    nnn: Option<Box<OcNode<P>>>
+    nnn: Option<Box<OcNode<P>>>,
 }
 
 enum Direction {
@@ -110,7 +116,7 @@ enum Direction {
     NPP,
     NPN,
     NNP,
-    NNN
+    NNN,
 }
 
 /*
@@ -138,33 +144,55 @@ pub fn calc_direction<P>(reference: &Point3D, p: &Point3D) -> Direction where
 }
 */
 
-impl<P> OcNode<P> where
-    P: Is3D {
+impl<P> OcNode<P>
+where
+    P: Is3D,
+{
     /// Returns the size of the oc node
     pub fn size(&self) -> usize {
         match self {
             OcNode::Leaf(_) => 1,
             OcNode::Node(internal) => {
                 let mut result: usize = 0;
-                if let Some(ref n) = internal.ppp { result += n.size(); }
-                if let Some(ref n) = internal.ppn { result += n.size(); }
-                if let Some(ref n) = internal.pnp { result += n.size(); }
-                if let Some(ref n) = internal.pnn { result += n.size(); }
-                if let Some(ref n) = internal.npp { result += n.size(); }
-                if let Some(ref n) = internal.npn { result += n.size(); }
-                if let Some(ref n) = internal.nnp { result += n.size(); }
-                if let Some(ref n) = internal.nnn { result += n.size(); }
+                if let Some(ref n) = internal.ppp {
+                    result += n.size();
+                }
+                if let Some(ref n) = internal.ppn {
+                    result += n.size();
+                }
+                if let Some(ref n) = internal.pnp {
+                    result += n.size();
+                }
+                if let Some(ref n) = internal.pnn {
+                    result += n.size();
+                }
+                if let Some(ref n) = internal.npp {
+                    result += n.size();
+                }
+                if let Some(ref n) = internal.npn {
+                    result += n.size();
+                }
+                if let Some(ref n) = internal.nnp {
+                    result += n.size();
+                }
+                if let Some(ref n) = internal.nnn {
+                    result += n.size();
+                }
                 result
             }
         }
     }
 }
 
-impl<P> OcNode<P> where
-    P: IsBuildable3D + Clone {
+impl<P> OcNode<P>
+where
+    P: IsBuildable3D + Clone,
+{
     /// Creates a new OcNode from a min and max position and the data it should hold
     pub fn new(bb: &BoundingBox3D, pc: Vec<P>) -> Result<OcNode<P>> {
-        if pc.len() == 1 { return Ok(OcNode::Leaf(pc[0].clone())); };
+        if pc.len() == 1 {
+            return Ok(OcNode::Leaf(pc[0].clone()));
+        };
         let mut pcppp = Vec::new();
         let mut pcppn = Vec::new();
         let mut pcpnp = Vec::new();
@@ -184,7 +212,7 @@ impl<P> OcNode<P> where
         let bbnnn = Self::calc_sub_min_max(Direction::NNN, bb)?;
 
         for p in pc {
-            if        bbppp.contains(&p) {
+            if bbppp.contains(&p) {
                 pcppp.push(p);
             } else if bbppn.contains(&p) {
                 pcppn.push(p);
@@ -220,14 +248,13 @@ impl<P> OcNode<P> where
             npp: npp,
             npn: npn,
             nnp: nnp,
-            nnn: nnn
+            nnn: nnn,
         };
 
         Ok(OcNode::Node(result))
     }
     /// Calculates the min and max values of sub nodes of an OcTree
     fn calc_sub_min_max(dir: Direction, bb: &BoundingBox3D) -> Result<BoundingBox3D> {
-
         let (min, max) = (bb.min_p(), bb.max_p());
         let middle = center_3d(&min, &max);
 
@@ -243,30 +270,44 @@ impl<P> OcNode<P> where
 
         //@todo get rid of unwrapping
         match dir {
-            Direction::PPP => BoundingBox3D::new(&middle,                   &max),
-            Direction::PPN => BoundingBox3D::new(&Point3D::new(mx, my, nz), &Point3D::new(px, py, mz)),
-            Direction::PNP => BoundingBox3D::new(&Point3D::new(mx, ny, mz), &Point3D::new(px, my, pz)),
-            Direction::PNN => BoundingBox3D::new(&Point3D::new(mx, ny, nz), &Point3D::new(px, my, mz)),
-            Direction::NPP => BoundingBox3D::new(&Point3D::new(nx, my, mz), &Point3D::new(mx, py, pz)),
-            Direction::NPN => BoundingBox3D::new(&Point3D::new(nx, my, nz), &Point3D::new(mx, py, mz)),
-            Direction::NNP => BoundingBox3D::new(&Point3D::new(nx, ny, mz), &Point3D::new(mx, my, pz)),
-            Direction::NNN => BoundingBox3D::new(&min.clone(),              &middle)
+            Direction::PPP => BoundingBox3D::new(&middle, &max),
+            Direction::PPN => {
+                BoundingBox3D::new(&Point3D::new(mx, my, nz), &Point3D::new(px, py, mz))
+            }
+            Direction::PNP => {
+                BoundingBox3D::new(&Point3D::new(mx, ny, mz), &Point3D::new(px, my, pz))
+            }
+            Direction::PNN => {
+                BoundingBox3D::new(&Point3D::new(mx, ny, nz), &Point3D::new(px, my, mz))
+            }
+            Direction::NPP => {
+                BoundingBox3D::new(&Point3D::new(nx, my, mz), &Point3D::new(mx, py, pz))
+            }
+            Direction::NPN => {
+                BoundingBox3D::new(&Point3D::new(nx, my, nz), &Point3D::new(mx, py, mz))
+            }
+            Direction::NNP => {
+                BoundingBox3D::new(&Point3D::new(nx, ny, mz), &Point3D::new(mx, my, pz))
+            }
+            Direction::NNN => BoundingBox3D::new(&min.clone(), &middle),
         }
     }
     /// Creates a child node
-    fn build_subnode(pc: Vec<P>,bb: &BoundingBox3D) -> Option<Box<OcNode<P>>> {
+    fn build_subnode(pc: Vec<P>, bb: &BoundingBox3D) -> Option<Box<OcNode<P>>> {
         match pc.len() {
             0 => None,
             _ => match OcNode::new(bb, pc) {
                 Err(_) => None,
-                Ok(x)  => Some(Box::new(x))
-            }
+                Ok(x) => Some(Box::new(x)),
+            },
         }
     }
 }
 
-impl<P> OcNode<P> where
-    P: IsBuildable3D + Clone + Default {
+impl<P> OcNode<P>
+where
+    P: IsBuildable3D + Clone + Default,
+{
     /// Collects all points within the node until a certain depth
     pub fn collect(&self, depth: i8, maxdepth: i8, pc: &mut PointCloud3D<P>) {
         let only_collect_centers = maxdepth >= 0 && depth > maxdepth;
@@ -302,17 +343,23 @@ impl<P> OcNode<P> where
         }
     }
     /// Depending on a flag either returns the child points or the center of gravity
-    fn collect_center_or_all(n: &OcNode<P>, only_collect_centers: bool, depth: i8, maxdepth: i8, pc: &mut PointCloud3D<P>) {
+    fn collect_center_or_all(
+        n: &OcNode<P>,
+        only_collect_centers: bool,
+        depth: i8,
+        maxdepth: i8,
+        pc: &mut PointCloud3D<P>,
+    ) {
         if only_collect_centers {
             let mut sub_pc = PointCloud3D::new();
-            n.collect(depth+1, maxdepth, &mut sub_pc);
+            n.collect(depth + 1, maxdepth, &mut sub_pc);
             if let Ok(c) = sub_pc.center_of_gravity() {
                 let mut p = P::default();
                 p.from(&c);
                 pc.push(p);
             }
         } else {
-            n.collect(depth+1, maxdepth, pc);
+            n.collect(depth + 1, maxdepth, pc);
         }
     }
 }

@@ -24,9 +24,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::prelude::*;
 
-impl<P> IsND for Box<P> where
-    P: IsND {
-
+impl<P> IsND for Box<P>
+where
+    P: IsND,
+{
     fn n_dimensions() -> usize {
         P::n_dimensions()
     }
@@ -36,9 +37,10 @@ impl<P> IsND for Box<P> where
     }
 }
 
-impl<P> Is2D for Box<P> where
-    P: IsND + Is2D {
-
+impl<P> Is2D for Box<P>
+where
+    P: IsND + Is2D,
+{
     fn x(&self) -> f64 {
         self.as_ref().x()
     }
@@ -48,9 +50,10 @@ impl<P> Is2D for Box<P> where
     }
 }
 
-impl<P> Is3D for Box<P> where
-    P: IsND + Is3D {
-
+impl<P> Is3D for Box<P>
+where
+    P: IsND + Is3D,
+{
     fn x(&self) -> f64 {
         self.as_ref().x()
     }

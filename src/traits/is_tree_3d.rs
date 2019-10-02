@@ -25,12 +25,14 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::prelude::*;
 
 /// IsTree3D is a trait used for types which are any type of tree within 3D space
-pub trait IsTree3D<P> where
-    P: Is3D {
+pub trait IsTree3D<P>
+where
+    P: Is3D,
+{
     /// Should return the number of elements within the tree
     fn size(&self) -> usize;
     /// Should return all positions within the tree as point cloud
     fn to_pointcloud(&self) -> PointCloud3D<P>; //@todo as trait
     /// Should create a new tree from a given point cloud
-    fn build(&mut self, pc : PointCloud3D<P>) -> Result<()>;
+    fn build(&mut self, pc: PointCloud3D<P>) -> Result<()>;
 }

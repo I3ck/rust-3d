@@ -24,16 +24,16 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::prelude::*;
 
-#[derive (Debug, PartialEq, PartialOrd, Default, Clone, Hash, Eq, Ord)]
+#[derive(Debug, PartialEq, PartialOrd, Default, Clone, Hash, Eq, Ord)]
 /// FilterBox2D, a box filter within 2D space
 pub struct FilterBox2D {
-    box_2d: Box2D
+    box_2d: Box2D,
 }
 
 impl FilterBox2D {
     /// Creates a new FilterBox2D with the given parameters
     pub fn new(box_2d: Box2D) -> Self {
-        FilterBox2D {box_2d}
+        FilterBox2D { box_2d }
     }
 }
 
@@ -62,9 +62,10 @@ impl IsBuildableND for FilterBox2D {
         Ok(FilterBox2D::new(Box2D::new_nd(coords)?))
     }
 
-    fn from_nd<P>(&mut self, other: P) -> Result<()> where
-        P: IsBuildableND {
-
+    fn from_nd<P>(&mut self, other: P) -> Result<()>
+    where
+        P: IsBuildableND,
+    {
         self.box_2d.from_nd(other)
     }
 }
@@ -74,9 +75,10 @@ impl IsBuildable2D for FilterBox2D {
         FilterBox2D::new(Box2D::new(x, y))
     }
 
-    fn from<P>(&mut self, other: &P) where
-        P: Is2D {
-
+    fn from<P>(&mut self, other: &P)
+    where
+        P: Is2D,
+    {
         self.box_2d.from(other)
     }
 }
@@ -109,14 +111,15 @@ impl HasBoundingBox2DMaybe for FilterBox2D {
     }
 }
 
-impl<T> IsFilter<T> for FilterBox2D where
-    T: Is2D {
-
+impl<T> IsFilter<T> for FilterBox2D
+where
+    T: Is2D,
+{
     fn is_allowed(&self, p: &T) -> bool {
-           p.x() >= self.box_2d.x() - self.box_2d.size_x.get() / 2.0
-        && p.x() <= self.box_2d.x() + self.box_2d.size_x.get() / 2.0
-        && p.y() >= self.box_2d.y() - self.box_2d.size_y.get() / 2.0
-        && p.y() <= self.box_2d.y() + self.box_2d.size_y.get() / 2.0
+        p.x() >= self.box_2d.x() - self.box_2d.size_x.get() / 2.0
+            && p.x() <= self.box_2d.x() + self.box_2d.size_x.get() / 2.0
+            && p.y() >= self.box_2d.y() - self.box_2d.size_y.get() / 2.0
+            && p.y() <= self.box_2d.y() + self.box_2d.size_y.get() / 2.0
     }
 }
 
@@ -128,6 +131,10 @@ impl IsScalable for FilterBox2D {
 
 impl From<BoundingBox2D> for FilterBox2D {
     fn from(x: BoundingBox2D) -> Self {
-        Self::new(Box2D{center: x.center_bb(), size_x: x.size_x(), size_y: x.size_y()})
+        Self::new(Box2D {
+            center: x.center_bb(),
+            size_x: x.size_x(),
+            size_y: x.size_y(),
+        })
     }
 }

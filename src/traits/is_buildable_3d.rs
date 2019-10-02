@@ -25,37 +25,41 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 extern crate core;
 
 use self::core::str::FromStr;
-use std::hash::{Hash};
+use std::hash::Hash;
 
 use crate::prelude::*;
 
 /// IsBuildable3D is a trait used for types which are positioned in 3D space and can be constructed
-pub trait IsBuildable3D :
-    Sized +
-    Is3D +
-    Eq +
-    PartialEq +
-    Ord +
-    PartialOrd +
-    Hash {
-
+pub trait IsBuildable3D: Sized + Is3D + Eq + PartialEq + Ord + PartialOrd + Hash {
     /// Should build an object from x, y and z coordinates
     fn new(x: f64, y: f64, z: f64) -> Self;
     /// Should use the coordinates of another as its own
-    fn from<P>(&mut self, other: &P) where
+    fn from<P>(&mut self, other: &P)
+    where
         P: Is3D;
 
     /// Uses the coordinates of other to create a new
-    fn new_from<P>(other: &P) -> Self where
-        P: Is3D {
-            Self::new(other.x(), other.y(), other.z())
+    fn new_from<P>(other: &P) -> Self
+    where
+        P: Is3D,
+    {
+        Self::new(other.x(), other.y(), other.z())
     }
 
     /// Applies a matrix to this
     fn multiply_m(&self, m: &Matrix4) -> Self {
-        let x = self.x() * m.data[0][0] + self.y() * m.data[0][1] + self.z() * m.data[0][2] + m.data[0][3];
-        let y = self.x() * m.data[1][0] + self.y() * m.data[1][1] + self.z() * m.data[1][2] + m.data[1][3];
-        let z = self.x() * m.data[2][0] + self.y() * m.data[2][1] + self.z() * m.data[2][2] + m.data[2][3];
+        let x = self.x() * m.data[0][0]
+            + self.y() * m.data[0][1]
+            + self.z() * m.data[0][2]
+            + m.data[0][3];
+        let y = self.x() * m.data[1][0]
+            + self.y() * m.data[1][1]
+            + self.z() * m.data[1][2]
+            + m.data[1][3];
+        let z = self.x() * m.data[2][0]
+            + self.y() * m.data[2][1]
+            + self.z() * m.data[2][2]
+            + m.data[2][3];
         Self::new(x, y, z)
     }
     /// Returns this with normalized values
@@ -64,7 +68,11 @@ pub trait IsBuildable3D :
         if l.get() == 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
         }
-        Ok(Self::new(self.x() / l.get(), self.y() / l.get(), self.z() / l.get()))
+        Ok(Self::new(
+            self.x() / l.get(),
+            self.y() / l.get(),
+            self.z() / l.get(),
+        ))
     }
     /// Returns a new object with 0/0/0 as coordinates
     fn zero() -> Self {
@@ -79,9 +87,9 @@ pub trait IsBuildable3D :
                 let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
                 let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
                 let z = f64::from_str(words[2]).map_err(|e| e.to_error_kind())?;
-                Ok(Self::new(x,y,z))
-            },
-            _ => Err(ErrorKind::ParseError)
+                Ok(Self::new(x, y, z))
+            }
+            _ => Err(ErrorKind::ParseError),
         }
     }
 }
