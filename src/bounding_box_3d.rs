@@ -22,8 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! BoundingBox3D, an axis aligned bounding box within 3D space
 
-use crate::prelude::*;
-use crate::utils::max_f64_3;
+use crate::{prelude::*, utils::max_f64_3};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// BoundingBox3D, an axis aligned bounding box within 3D space

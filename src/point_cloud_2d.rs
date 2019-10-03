@@ -22,13 +22,16 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! PointCloud2D, a collection of positions within 2D space
 
-use std::fmt;
-use std::ops::Index;
-use std::ops::IndexMut;
+use std::{
+    fmt,
+    ops::{Index, IndexMut},
+};
 
-use crate::distances_2d::*;
-use crate::functions::{sort_vec_2d_x, sort_vec_2d_y};
-use crate::prelude::*;
+use crate::{
+    distances_2d::*,
+    functions::{sort_vec_2d_x, sort_vec_2d_y},
+    prelude::*,
+};
 
 #[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// PointCloud2D, a collection of positions within 2D space

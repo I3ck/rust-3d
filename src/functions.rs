@@ -22,11 +22,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! utility functions
 
-use std::cmp::Ordering;
-use std::ops::Sub;
+use std::{cmp::Ordering, ops::Sub};
 
-use crate::distances_3d::sqr_dist_3d;
-use crate::prelude::*;
+use crate::{distances_3d::sqr_dist_3d, prelude::*};
 
 //@todo move these functions to better fitting files or make them methods of the correct types
 

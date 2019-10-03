@@ -22,12 +22,13 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Positive, a wrapper for a f64 value, ensuring it is always > 0
 
-use std::fmt;
-use std::hash::{Hash, Hasher};
-use std::ops::{Add, AddAssign, Mul, MulAssign};
+use std::{
+    fmt,
+    hash::{Hash, Hasher},
+    ops::{Add, AddAssign, Mul, MulAssign},
+};
 
-use crate::prelude::*;
-use crate::utils::hash_f64;
+use crate::{prelude::*, utils::hash_f64};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 /// Positive, a wrapper for a f64 value, ensuring it is always > 0

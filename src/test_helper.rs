@@ -22,11 +22,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! helper functions for testing (these functions unwrap and panic, only use for tests)
 
-use std::fs::File;
-use std::io::prelude::*;
+use std::{fs::File, io::prelude::*};
 
-use crate::io::*;
-use crate::prelude::*;
+use crate::{io::*, prelude::*};
 
 /// Ensures the content of two files is equal
 pub fn assert_files_equal(filepath1: &str, filepath2: &str) {

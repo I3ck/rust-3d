@@ -24,8 +24,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::prelude::*;
 
-use std::cmp::{max, min};
-use std::collections::HashMap;
+use std::{
+    cmp::{max, min},
+    collections::HashMap,
+};
 
 /// Subdivides a mesh linearly by creating four faces for each input face
 /// This will not smoothen the input mesh, since new vertices are placed only on existing edges

@@ -22,14 +22,14 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Point2D, a point / position within 2D space
 
-use std::cmp::{Eq, Ordering};
-use std::fmt;
-use std::hash::{Hash, Hasher};
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::{
+    cmp::{Eq, Ordering},
+    fmt,
+    hash::{Hash, Hasher},
+    ops::{Add, Div, Mul, Neg, Sub},
+};
 
-use crate::distances_2d::*;
-use crate::prelude::*;
-use crate::utils::hash_f64;
+use crate::{distances_2d::*, prelude::*, utils::hash_f64};
 
 #[derive(Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Point2D, a point / position within 2D space

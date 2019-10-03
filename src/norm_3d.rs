@@ -22,13 +22,13 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Norm3D, a normalized vector within 3D space
 
-use std::cmp::{Eq, Ordering};
-use std::hash::{Hash, Hasher};
-use std::ops::{Mul, Neg};
+use std::{
+    cmp::{Eq, Ordering},
+    hash::{Hash, Hasher},
+    ops::{Mul, Neg},
+};
 
-use crate::distances_3d::*;
-use crate::prelude::*;
-use crate::utils::hash_f64;
+use crate::{distances_3d::*, prelude::*, utils::hash_f64};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 /// Norm3D, a normalized vector within 3D space

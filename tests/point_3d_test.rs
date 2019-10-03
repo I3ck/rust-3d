@@ -24,8 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extern crate rust_3d;
 
-use rust_3d::functions::cross;
-use rust_3d::prelude::*;
+use rust_3d::{functions::cross, prelude::*};
 
 #[test]
 fn point_3d_test() {

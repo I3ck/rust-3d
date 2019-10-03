@@ -24,11 +24,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extern crate num;
 
-use self::num::traits::PrimInt;
-use self::num::traits::Unsigned;
+use self::num::traits::{PrimInt, Unsigned};
 
-use crate::compressed_point_3d::*;
-use crate::prelude::*;
+use crate::{compressed_point_3d::*, prelude::*};
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 /// CompressedPointCloud3D

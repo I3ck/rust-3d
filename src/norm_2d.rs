@@ -22,13 +22,13 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Norm2D, a normalized vector within 2D space
 
-use std::cmp::{Eq, Ordering};
-use std::hash::{Hash, Hasher};
-use std::ops::{Mul, Neg};
+use std::{
+    cmp::{Eq, Ordering},
+    hash::{Hash, Hasher},
+    ops::{Mul, Neg},
+};
 
-use crate::distances_2d::*;
-use crate::prelude::*;
-use crate::utils::hash_f64;
+use crate::{distances_2d::*, prelude::*, utils::hash_f64};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 /// Norm2D, a normalized vector within 2D space

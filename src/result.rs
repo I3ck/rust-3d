@@ -22,11 +22,12 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Result, the result type used within rust-3d. Also defining the error enum and several transformation methods between error types.
 
-use std::fmt;
-use std::io::Error as ioError;
-use std::num::ParseFloatError;
-use std::num::ParseIntError;
-use std::result;
+use std::{
+    fmt,
+    io::Error as ioError,
+    num::{ParseFloatError, ParseIntError},
+    result,
+};
 
 /// The Error Enum used by rust-3d
 pub enum ErrorKind {

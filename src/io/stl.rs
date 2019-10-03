@@ -24,9 +24,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::prelude::*;
 
-use std::fs::File;
-use std::io::prelude::*;
-use std::io::BufWriter;
+use std::{
+    fs::File,
+    io::{prelude::*, BufWriter},
+};
 
 /// Saves an IsMesh3D in the ASCII .stl file format
 pub fn save_stl_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()>

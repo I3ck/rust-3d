@@ -24,9 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extern crate rust_3d;
 
-use rust_3d::io::*;
-use rust_3d::prelude::*;
-use rust_3d::test_helper::*;
+use rust_3d::{io::*, prelude::*, test_helper::*};
 
 static GENERATE_EXCEPTED_RESULT_FILES: bool = false;
 

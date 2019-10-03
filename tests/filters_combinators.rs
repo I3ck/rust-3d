@@ -24,8 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extern crate rust_3d;
 
-use rust_3d::prelude::*;
-use rust_3d::test_helper::*;
+use rust_3d::{prelude::*, test_helper::*};
 
 #[test]
 fn filter_or_test() {

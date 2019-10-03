@@ -27,9 +27,10 @@ extern crate core;
 use crate::prelude::*;
 
 use self::core::str::FromStr;
-use std::fs::File;
-use std::io::prelude::*;
-use std::io::{BufReader, BufWriter};
+use std::{
+    fs::File,
+    io::{prelude::*, BufReader, BufWriter},
+};
 
 /// Saves an IsRandomAccessible<Is3D> as x y z coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xyz file format or .csv files
 pub fn save_xyz<RA, P>(ra: &RA, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()>

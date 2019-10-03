@@ -22,13 +22,16 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! PointCloud3D, a collection of positions within 3D space
 
-use std::fmt;
-use std::ops::Index;
-use std::ops::IndexMut;
+use std::{
+    fmt,
+    ops::{Index, IndexMut},
+};
 
-use crate::distances_3d::*;
-use crate::functions::{sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z};
-use crate::prelude::*;
+use crate::{
+    distances_3d::*,
+    functions::{sort_vec_3d_x, sort_vec_3d_y, sort_vec_3d_z},
+    prelude::*,
+};
 
 #[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// PointCloud3D, a collection of positions within 3D space

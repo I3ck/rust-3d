@@ -23,13 +23,14 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! Point3D, a point / position within 3D space
 
 use crate::utils::hash_f64;
-use std::cmp::{Eq, Ordering};
-use std::fmt;
-use std::hash::{Hash, Hasher};
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::{
+    cmp::{Eq, Ordering},
+    fmt,
+    hash::{Hash, Hasher},
+    ops::{Add, Div, Mul, Neg, Sub},
+};
 
-use crate::distances_3d::*;
-use crate::prelude::*;
+use crate::{distances_3d::*, prelude::*};
 
 #[derive(Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Point3D, a point / position within 3D space

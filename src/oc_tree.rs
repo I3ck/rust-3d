@@ -22,11 +22,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! OcTree https://en.wikipedia.org/wiki/Octree
 
-use std::collections::HashSet;
-use std::iter::IntoIterator;
+use std::{collections::HashSet, iter::IntoIterator};
 
-use crate::functions::center_3d;
-use crate::prelude::*;
+use crate::{functions::center_3d, prelude::*};
 
 #[derive(Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// OcTree https://en.wikipedia.org/wiki/Octree

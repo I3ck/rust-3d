@@ -24,67 +24,46 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Exporting often used types / traits for convenience
 
-pub use crate::algorithms::*;
-pub use crate::interpolation_2d::*;
-pub use crate::result::*;
-pub use crate::strong_types::*;
-pub use crate::traits::*;
+pub use crate::{algorithms::*, interpolation_2d::*, result::*, strong_types::*, traits::*};
 
 pub use crate::AABBTree2D;
 
-pub use crate::NonNegative;
-pub use crate::Positive;
+pub use crate::{NonNegative, Positive};
 
-pub use crate::BoundingBox2D;
-pub use crate::BoundingBox3D;
+pub use crate::{BoundingBox2D, BoundingBox3D};
 
 pub use crate::Face3;
 
-pub use crate::Line2D;
-pub use crate::Line3D;
+pub use crate::{Line2D, Line3D};
 
-pub use crate::LineSegment2D;
-pub use crate::LineSegment3D;
+pub use crate::{LineSegment2D, LineSegment3D};
 
-pub use crate::Ray2D;
-pub use crate::Ray3D;
+pub use crate::{Ray2D, Ray3D};
 
-pub use crate::Norm2D;
-pub use crate::Norm3D;
+pub use crate::{Norm2D, Norm3D};
 
-pub use crate::Point2D;
-pub use crate::Point3D;
+pub use crate::{Point2D, Point3D};
 
-pub use crate::Matrix3;
-pub use crate::Matrix4;
+pub use crate::{Matrix3, Matrix4};
 
 pub use crate::OcTree;
 
 pub use crate::Mesh3D;
 
-pub use crate::PointCloud2D;
-pub use crate::PointCloud3D;
+pub use crate::{PointCloud2D, PointCloud3D};
 
-pub use crate::Polygon2D;
-pub use crate::Polygon3D;
+pub use crate::{Polygon2D, Polygon3D};
 
 pub use crate::View;
 
 pub use crate::HalfEdge;
 
-pub use crate::Box2D;
-pub use crate::Circle;
+pub use crate::{Box2D, Circle};
 
-pub use crate::Box3D;
-pub use crate::Sphere;
+pub use crate::{Box3D, Sphere};
 
 pub use crate::Precision;
 
-pub use crate::filters::FilterBox2D;
-pub use crate::filters::FilterBox3D;
-pub use crate::filters::FilterCircle;
-pub use crate::filters::FilterOutlier3D;
-pub use crate::filters::FilterSphere;
+pub use crate::filters::{FilterBox2D, FilterBox3D, FilterCircle, FilterOutlier3D, FilterSphere};
 
-pub use crate::filters::combinators::*;
-pub use crate::filters::transformers::*;
+pub use crate::filters::{combinators::*, transformers::*};

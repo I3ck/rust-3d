@@ -24,8 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::ops::Mul;
 
-use crate::functions::cross;
-use crate::prelude::*;
+use crate::{functions::cross, prelude::*};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 /// Matrix4, a matrix with 4 rows and columns

@@ -27,14 +27,16 @@ extern crate core;
 
 use crate::prelude::*;
 
-use crate::rgb::Rgb;
-use crate::utils::to_words;
+use crate::{rgb::Rgb, utils::to_words};
 
-use self::byteorder::{BigEndian, WriteBytesExt};
-use self::core::str::FromStr;
-use std::fs::File;
-use std::io::prelude::*;
-use std::io::{BufReader, BufWriter};
+use self::{
+    byteorder::{BigEndian, WriteBytesExt},
+    core::str::FromStr,
+};
+use std::{
+    fs::File,
+    io::{prelude::*, BufReader, BufWriter},
+};
 
 /// Saves an IsMesh3D in the ASCII .ply file format
 pub fn save_ply_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()>
