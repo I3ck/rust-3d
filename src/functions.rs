@@ -457,7 +457,7 @@ pub fn intersection(l: &Line3D, b: &BoundingBox3D) -> Option<Point3D> {
     tmin = max64(tmin, min64(tz1, tz2));
     tmax = min64(tmax, max64(tz1, tz2));
 
-    if tmax >= tmin {
+    if tmax >= tmin && tmax >= 0.0 {
         Some(l.anchor.clone() + l.dir.clone() * tmin) //@todo avoid cloning
     } else {
         None
