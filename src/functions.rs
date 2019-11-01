@@ -362,13 +362,14 @@ where
 }
 
 /// Returns the index of the closest intersection with the ray
-pub fn index_closest_intersecting<HB>(ray: &Ray3D, hbs: &[HB]) -> Option<(Point3D, usize)>
+pub fn index_closest_intersecting<'c, I, HB>(ray: &Ray3D, hbs: I) -> Option<(Point3D, usize)>
 where
-    HB: HasBoundingBox3DMaybe,
+    I: Iterator<Item = &'c HB>,
+    HB: 'c + HasBoundingBox3DMaybe,
 {
     let mut result: Option<(Point3D, usize)> = None;
 
-    for (i, hb) in hbs.iter().enumerate() {
+    for (i, hb) in hbs.enumerate() {
         if let Ok(bb) = hb.bounding_box_maybe() {
             if let Some(inter) = intersection(&ray.line, &bb) {
                 if let Some(r) = &result {
