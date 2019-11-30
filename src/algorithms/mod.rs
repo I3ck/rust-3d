@@ -29,3 +29,6 @@ mod douglas_peucker_2d;
 pub use self::douglas_peucker_2d::douglas_peucker_2d;
 
 pub mod subdivide;
+
+mod unify_faces;
+pub use self::unify_faces::unify_faces;
