@@ -22,8 +22,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #![deny(warnings)]
 
-
-
 use rust_3d::prelude::*;
 
 #[test]

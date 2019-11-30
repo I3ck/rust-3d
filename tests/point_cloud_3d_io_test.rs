@@ -24,8 +24,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use rust_3d::{io::*, prelude::*, test_helper::*};
 
-
-
 static GENERATE_EXCEPTED_RESULT_FILES: bool = false;
 
 #[test]
