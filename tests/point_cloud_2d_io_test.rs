@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #![deny(warnings)]
 
-extern crate rust_3d;
+
 
 use rust_3d::{io::*, prelude::*, test_helper::*};
 

@@ -22,11 +22,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for IO of the xy file format
 
-extern crate core;
-
 use crate::prelude::*;
 
-use self::core::str::FromStr;
+use core::str::FromStr;
 use std::{
     fs::File,
     io::{prelude::*, BufReader, BufWriter},

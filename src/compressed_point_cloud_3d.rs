@@ -22,9 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! CompressedPointCloud3D
 
-extern crate num;
-
-use self::num::traits::{PrimInt, Unsigned};
+use num::traits::{PrimInt, Unsigned};
 
 use crate::{compressed_point_3d::*, prelude::*};
 

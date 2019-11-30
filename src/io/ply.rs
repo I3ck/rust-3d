@@ -22,17 +22,14 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for IO operations of the ply file format
 
-extern crate byteorder;
-extern crate core;
-
 use crate::prelude::*;
 
 use crate::{rgb::Rgb, utils::to_words};
 
-use self::{
-    byteorder::{BigEndian, WriteBytesExt},
-    core::str::FromStr,
-};
+use byteorder::{BigEndian, WriteBytesExt};
+
+use core::str::FromStr;
+
 use std::{
     fs::File,
     io::{prelude::*, BufReader, BufWriter},

@@ -22,9 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsBuildable2D trait used for types which are positioned in 2D space and can be constructed
 
-extern crate core;
-
-use self::core::str::FromStr;
+use core::str::FromStr;
 use std::hash::Hash;
 
 use crate::prelude::*;

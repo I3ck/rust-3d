@@ -22,9 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! CompressedPoint3D
 
-extern crate num;
-
-use self::num::traits::{PrimInt, Unsigned};
+use num::traits::{PrimInt, Unsigned};
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 /// CompressedPoint3D
