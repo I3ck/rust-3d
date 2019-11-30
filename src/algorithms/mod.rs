@@ -32,3 +32,6 @@ pub mod subdivide;
 
 mod unify_faces;
 pub use self::unify_faces::unify_faces;
+
+mod heal_mesh;
+pub use self::heal_mesh::heal_mesh;
