@@ -35,3 +35,6 @@ pub use self::unify_faces::unify_faces;
 
 mod heal_mesh;
 pub use self::heal_mesh::heal_mesh;
+
+mod cluster_vertices;
+pub use self::cluster_vertices::cluster_vertices;

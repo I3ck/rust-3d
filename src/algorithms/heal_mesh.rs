@@ -20,7 +20,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//! Algorithm remove duplicate and degenerate faces from a mesh
+//! Algorithm to remove duplicate and degenerate faces from a mesh
 
 use crate::prelude::*;
 
@@ -28,7 +28,7 @@ use std::{collections::HashMap, hash::Hash};
 
 //------------------------------------------------------------------------------
 
-/// Algorithm remove duplicate and degenerate faces from a mesh
+/// Algorithm to remove duplicate and degenerate faces from a mesh
 pub fn heal_mesh<P, M>(mesh: &M) -> Result<M>
 where
     M: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3> + Default,

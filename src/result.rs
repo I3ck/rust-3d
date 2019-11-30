@@ -51,6 +51,7 @@ pub enum ErrorKind {
     NumberInWrongRange,
     ComparisionFailed,
     ColorArrayIncorrectLength,
+    ClusterTooBig,
     PlyError(PlyError),
 }
 
@@ -93,6 +94,7 @@ impl ErrorKind {
             ErrorKind::ColorArrayIncorrectLength => {
                 "The provided color array has an incorrect length"
             }
+            ErrorKind::ClusterTooBig => "Clustering size is too big for given mesh",
             ErrorKind::PlyError(x) => x.as_str(),
         }
     }
