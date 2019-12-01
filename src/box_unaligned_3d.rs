@@ -53,21 +53,19 @@ impl BoxUnaligned3D {
             size,
         }
     }
-    /*
-    //@todo don't only implement this constructor, but consider adding it and multiple others
-    pub fn new(center: Pos, size: [f64; 3], rotation: f64) -> Self {
-        let mut y_dir = Pos([0.0, 1.0, 0.0]); //@todo Pos wrapper here is a hack
+    //@todo consider adding alternative constructors
+    pub fn new_from_z_rotation(center: Point3D, size: [f64; 3], rotation: f64) -> Self {
+        let mut y_dir = Point3D::new(0.0, 1.0, 0.0);
         let z_dir = [0.0, 0.0, 1.0];
 
         y_dir = rot2d(&y_dir, rotation);
         Self {
             center,
             size,
-            y_dir: y_dir.0,
+            y_dir: [y_dir.x(), y_dir.y(), y_dir.z()],
             z_dir,
         }
     }
-    */
     fn d_x(&self) -> [f64; 3] {
         //@todo would be easier implemented with proper members
         let dir = self.x_dir();
@@ -220,4 +218,17 @@ impl HasBoundingBox3DMaybe for BoxUnaligned3D {
     fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
         Ok(self.bounding_box())
     }
+}
+
+//------------------------------------------------------------------------------
+
+//@todo consider moving somewhere else
+fn rot2d<P>(p: &P, phi: f64) -> P
+where
+    P: IsBuildable3D,
+{
+    let s = (-phi).sin();
+    let c = (-phi).cos();
+
+    P::new(p.x() * c - p.y() * s, p.x() * s + p.y() * c, p.z())
 }
