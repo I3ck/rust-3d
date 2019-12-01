@@ -31,7 +31,7 @@ use std::{
 
 /// Subdivides a mesh linearly by creating four faces for each input face
 /// This will not smoothen the input mesh, since new vertices are placed only on existing edges
-pub fn linear<V, MI, MO>(mi: &MI) -> Result<(MO)>
+pub fn linear<V, MI, MO>(mi: &MI) -> Result<MO>
 where
     MI: IsMesh<V, Face3>,
     MO: IsFaceEditableMesh<V, Face3> + IsVertexEditableMesh<V, Face3> + Default,
