@@ -474,3 +474,33 @@ impl IsMergeable for BoundingBox3D {
         BoundingBox3D { min, max }
     }
 }
+
+impl IsSATObject for BoundingBox3D {
+    fn for_each_point<F>(&self, f: &mut F)
+    where
+        F: FnMut(&Point3D),
+    {
+        //@todo Is3D
+
+        let (minx, miny, minz) = (self.min_p().x(), self.min_p().y(), self.min_p().z());
+        let (maxx, maxy, maxz) = (self.max_p().x(), self.max_p().y(), self.max_p().z());
+
+        f(&Point3D::new(minx, miny, minz));
+        f(&Point3D::new(minx, miny, maxz));
+        f(&Point3D::new(minx, maxy, minz));
+        f(&Point3D::new(minx, maxy, maxz));
+        f(&Point3D::new(maxx, miny, minz));
+        f(&Point3D::new(maxx, miny, maxz));
+        f(&Point3D::new(maxx, maxy, minz));
+        f(&Point3D::new(maxx, maxy, maxz));
+    }
+
+    fn for_each_axis<F>(&self, f: &mut F)
+    where
+        F: FnMut(&Norm3D),
+    {
+        f(&Norm3D::norm_x());
+        f(&Norm3D::norm_y());
+        f(&Norm3D::norm_z());
+    }
+}
