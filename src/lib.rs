@@ -244,3 +244,6 @@ pub use self::cluster::*;
 
 mod sat_collider;
 pub use self::sat_collider::*;
+
+mod box_unaligned_3d;
+pub use self::box_unaligned_3d::*;

@@ -71,3 +71,5 @@ pub use crate::Precision;
 pub use crate::filters::{FilterBox2D, FilterBox3D, FilterCircle, FilterOutlier3D, FilterSphere};
 
 pub use crate::filters::{combinators::*, transformers::*};
+
+pub use crate::BoxUnaligned3D;
