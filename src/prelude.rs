@@ -73,3 +73,5 @@ pub use crate::filters::{FilterBox2D, FilterBox3D, FilterCircle, FilterOutlier3D
 pub use crate::filters::{combinators::*, transformers::*};
 
 pub use crate::BoxUnaligned3D;
+
+pub use crate::TriFace3D;
