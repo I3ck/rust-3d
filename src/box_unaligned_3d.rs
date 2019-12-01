@@ -54,13 +54,16 @@ impl BoxUnaligned3D {
         }
     }
     //@todo consider adding alternative constructors
-    pub fn new_from_z_rotation(center: Point3D, size: [f64; 3], rotation: f64) -> Self {
+    pub fn new_from_z_rotation<P>(center: &P, size: [f64; 3], rotation: f64) -> Self
+    where
+        P: Is3D,
+    {
         let mut y_dir = Point3D::new(0.0, 1.0, 0.0);
         let z_dir = [0.0, 0.0, 1.0];
 
         y_dir = rot2d(&y_dir, rotation);
         Self {
-            center,
+            center: Point3D::new_from(center),
             size,
             y_dir: [y_dir.x(), y_dir.y(), y_dir.z()],
             z_dir,
