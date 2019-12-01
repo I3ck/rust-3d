@@ -386,3 +386,30 @@ where
         result
     }
 }
+
+//------------------------------------------------------------------------------
+
+impl<HB> IsColliderContainer3D for AABBTree3D<HB>
+where
+    HB: Clone + HasColliders3D + Sized,
+{
+    fn any_element_collides_with_collider(&self, other: &dyn HasColliders3D) -> bool {
+        let mut any_collides = false;
+        self.for_each_collision_candidate(&other.bounding_box(), &mut |candidate| {
+            if !any_collides {
+                any_collides = candidate.collides_with(other);
+            }
+        });
+
+        any_collides
+    }
+
+    fn any_element_collides_with_bounding(&self, other: &dyn HasBoundingBox3D) -> bool {
+        let mut any_collides = false;
+        self.for_each_collision_candidate(&other.bounding_box(), &mut |_candidate| {
+            any_collides = true;
+        });
+
+        any_collides
+    }
+}

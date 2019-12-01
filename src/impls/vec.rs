@@ -96,3 +96,21 @@ where
         }
     }
 }
+
+impl<HB> IsColliderContainer3D for Vec<HB>
+//@todo also implement for the other std containers
+where
+    HB: HasColliders3D,
+{
+    fn any_element_collides_with_collider(&self, other: &dyn HasColliders3D) -> bool {
+        self.iter().any(|candidate| candidate.collides_with(other))
+    }
+
+    fn any_element_collides_with_bounding(&self, other: &dyn HasBoundingBox3D) -> bool {
+        self.iter().any(|candidate| {
+            other
+                .bounding_box()
+                .collides_with(&candidate.bounding_box())
+        })
+    }
+}

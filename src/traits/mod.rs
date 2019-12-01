@@ -183,3 +183,6 @@ pub use self::is_sat_object::IsSATObject;
 
 mod has_colliders_3d;
 pub use self::has_colliders_3d::HasColliders3D;
+
+mod is_collider_container_3d;
+pub use self::is_collider_container_3d::IsColliderContainer3D;
