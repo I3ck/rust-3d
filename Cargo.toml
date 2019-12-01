@@ -11,6 +11,13 @@ keywords = ["2d", "3d", "pointcloud", "mesh", "filters"]
 license = "MIT"
 edition = "2018"
 
+exclude = [
+    ".gitignore",
+    "BUGS",
+    "TODO",
+    "format-code.sh",
+]
+
 [dependencies]
 num = "0.2.0"
 byteorder = "1.2.7"
