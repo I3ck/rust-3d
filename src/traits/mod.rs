@@ -177,3 +177,6 @@ pub use self::is_direction_field_2d::IsDirectionField2D;
 
 mod is_direction_field_3d;
 pub use self::is_direction_field_3d::IsDirectionField3D;
+
+mod is_sat_object;
+pub use self::is_sat_object::IsSATObject;

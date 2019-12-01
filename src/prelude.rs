@@ -30,6 +30,8 @@ pub use crate::AABBTree2D;
 
 pub use crate::Cluster;
 
+pub use crate::SATCollider;
+
 pub use crate::{NonNegative, Positive};
 
 pub use crate::{BoundingBox2D, BoundingBox3D};
