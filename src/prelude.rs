@@ -75,3 +75,5 @@ pub use crate::filters::{combinators::*, transformers::*};
 pub use crate::BoxUnaligned3D;
 
 pub use crate::TriFace3D;
+
+pub use crate::Collider3D;

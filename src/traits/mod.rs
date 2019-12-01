@@ -180,3 +180,6 @@ pub use self::is_direction_field_3d::IsDirectionField3D;
 
 mod is_sat_object;
 pub use self::is_sat_object::IsSATObject;
+
+mod has_colliders_3d;
+pub use self::has_colliders_3d::HasColliders3D;
