@@ -238,3 +238,6 @@ pub use self::shapes::*;
 
 mod enums;
 pub use self::enums::*;
+
+mod cluster;
+pub use self::cluster::*;

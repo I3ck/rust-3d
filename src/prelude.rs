@@ -28,6 +28,8 @@ pub use crate::{algorithms::*, interpolation_2d::*, result::*, strong_types::*, 
 
 pub use crate::AABBTree2D;
 
+pub use crate::Cluster;
+
 pub use crate::{NonNegative, Positive};
 
 pub use crate::{BoundingBox2D, BoundingBox3D};
