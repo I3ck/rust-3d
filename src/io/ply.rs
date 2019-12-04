@@ -506,7 +506,9 @@ fn collect_index_line(line: &str, indices: &mut Vec<usize>) -> Result<()> {
     let words = to_words(line);
     match words.len() {
         4 => {
-            //@todo ensure words[0] == 3 for tri faces
+            if words[0] != "3" {
+                return Err(ErrorKind::PlyError(PlyError::IncorrectFaceData))
+            }
             let a = usize::from_str(words[1]).map_err(|e| e.to_error_kind())?;
             let b = usize::from_str(words[2]).map_err(|e| e.to_error_kind())?;
             let c = usize::from_str(words[3]).map_err(|e| e.to_error_kind())?;

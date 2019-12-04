@@ -67,6 +67,7 @@ pub enum PlyError {
     LoadFaceCountNotFound,
     LoadVertexCountIncorrect,
     LoadVerticesIncorrect,
+    IncorrectFaceData,
 }
 
 impl ErrorKind {
@@ -116,6 +117,7 @@ impl PlyError {
             PlyError::LoadFaceCountNotFound => "Face count of .ply not found",
             PlyError::LoadVertexCountIncorrect => "Vertex count of .ply not found",
             PlyError::LoadVerticesIncorrect => "Vertices in .ply incorrect",
+            PlyError::IncorrectFaceData => "Face definition is incorrect / can not be parsed",
         }
     }
 }

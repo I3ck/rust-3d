@@ -164,7 +164,7 @@ where
     P: Is2D + fmt::Display,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.pc.fmt(f) //@todo consider output similar to Line2D
+        self.pc.fmt(f)
     }
 }
 

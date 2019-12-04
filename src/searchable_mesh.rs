@@ -43,7 +43,7 @@ where
 {
     /// Creates a new SearchableMesh3D from an IsMesh3D
     /// This only stays valid if IMesh3D is not changed after creation
-    /// The mesh must be manifold (@todo ensure via types?)
+    /// The mesh must be manifold
     pub fn new(mesh: M) -> Self {
         let he = HalfEdge::new(&mesh);
 
