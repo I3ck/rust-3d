@@ -59,12 +59,12 @@ where
         )
     };
 
-    let mut cluster_map = FnvHashMap::default();
-    let mut clusters = Vec::new(); //@todo reserve
-
     let nv = mesh.num_vertices();
+    let mut cluster_map = FnvHashMap::default();
+    let mut clusters = Vec::with_capacity(nv);
+
     for i in 0..nv {
-        let p = mesh.vertex(VId { val: i }).unwrap(); //@todo
+        let p = mesh.vertex(VId { val: i }).unwrap(); // safe, since index in range
         let cluster = cluster_of(p);
         cluster_map.insert(cluster, i); //@todo later this must keep the 'best' vertex instead of the last
         clusters.push(cluster);

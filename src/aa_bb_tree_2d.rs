@@ -138,7 +138,7 @@ where
 
     fn bb_of(data: &Vec<HB>) -> Result<BoundingBox2D> {
         if data.len() == 0 {
-            return Err(ErrorKind::IndexOutOfBounds); //@todo better type?
+            return Err(ErrorKind::TooFewPoints);
         }
         let mut result = data[0].bounding_box();
         for x in data.iter() {
@@ -150,7 +150,7 @@ where
 }
 
 #[derive(Clone)]
-//todo describe
+/// Leaf of the AABBTree2D
 pub struct AABBTree2DLeaf<HB>
 where
     HB: HasBoundingBox2D,
@@ -213,7 +213,7 @@ where
 }
 
 #[derive(Clone)]
-//todo describe
+/// Branch of the AABBTree2D
 pub struct AABBTree2DBranch<HB>
 where
     HB: HasBoundingBox2D + Clone,

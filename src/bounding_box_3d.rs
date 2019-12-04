@@ -480,8 +480,6 @@ impl IsSATObject for BoundingBox3D {
     where
         F: FnMut(&Point3D),
     {
-        //@todo Is3D
-
         let (minx, miny, minz) = (self.min_p().x(), self.min_p().y(), self.min_p().z());
         let (maxx, maxy, maxz) = (self.max_p().x(), self.max_p().y(), self.max_p().z());
 
