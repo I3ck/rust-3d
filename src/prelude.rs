@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Exporting often used types / traits for convenience
 
-pub use crate::{algorithms::*, interpolation_2d::*, result::*, strong_types::*, traits::*};
+pub use crate::{algorithms::*, interpolate_2d::*, result::*, strong_types::*, traits::*};
 
 pub use crate::AABBTree2D;
 

@@ -114,7 +114,7 @@ pub mod factory_2d;
 pub mod filters;
 pub mod functions;
 pub mod impls;
-pub mod interpolation_2d;
+pub mod interpolate_2d;
 pub mod io;
 pub mod prelude;
 pub mod strong_types;

@@ -44,7 +44,7 @@ where
     S: IsSphereSearchable<P>,
 {
     search_distance: Positive,
-    min_neighbours: usize, //@todo should be usize >= 1 add new type for that?
+    min_neighbours: usize,
     searchable: S,
     phantom_search: PhantomData<P>,
 }

@@ -83,7 +83,6 @@ where
     Ok(pc)
 }
 
-//@todo function names dont match interpolate vs interpolation...
 /// Returns the Cosine interpolation of the given base points
 pub fn interpolate_cosine<P>(
     base_points: &PointCloud2D<P>,
