@@ -63,9 +63,7 @@ where
             }
         }
 
-        while !frontier.is_empty() {
-            let this = frontier.pop().unwrap(); // safe since checking !empty above //@todo could also just match
-
+        while let Some(this) = frontier.pop() {
             neighbour_buffer.clear();
             collect_neighbour_faces(mesh, &v_to_f, FId { val: this }, &mut neighbour_buffer);
 

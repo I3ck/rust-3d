@@ -27,7 +27,6 @@ use crate::prelude::*;
 /// Douglas Peucker algorithm for 2D https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm
 pub fn douglas_peucker_2d<P>(mut pc: PointCloud2D<P>, epsilon: f64) -> PointCloud2D<P>
 where
-    //@todo error if pc too small
     P: Is2D + Clone,
 {
     if pc.len() < 1 {
@@ -69,7 +68,6 @@ where
     return pc;
 }
 
-//@todo consider implementing in utils or via HasDistanceTo
 fn distance_point_line<P, Q, R>(p: &P, l1: &Q, l2: &R) -> f64
 where
     P: Is2D,
