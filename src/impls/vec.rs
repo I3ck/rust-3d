@@ -98,7 +98,6 @@ where
 }
 
 impl<HB> IsColliderContainer3D for Vec<HB>
-//@todo also implement for the other std containers
 where
     HB: HasColliders3D,
 {
