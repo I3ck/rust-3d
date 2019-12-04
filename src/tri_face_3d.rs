@@ -70,8 +70,7 @@ impl IsSATObject for TriFace3D {
 
 impl HasBoundingBox3D for TriFace3D {
     fn bounding_box(&self) -> BoundingBox3D {
-        //@todo should be possible to do without the clones
-        BoundingBox3D::from_iterator([self.a.clone(), self.b.clone(), self.c.clone()].iter())
+        BoundingBox3D::from_iterator([&self.a, &self.b, &self.c].iter().cloned())
             .unwrap() //@todo unwrap ensure Face is valid in constructor
     }
 }

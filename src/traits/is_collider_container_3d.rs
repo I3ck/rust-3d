@@ -26,7 +26,6 @@ use crate::prelude::*;
 
 //------------------------------------------------------------------------------
 
-//@todo better name?
 /// Trait for containers with 3D colliders
 pub trait IsColliderContainer3D {
     fn any_element_collides_with_collider(&self, other: &dyn HasColliders3D) -> bool;

@@ -32,7 +32,7 @@ where
     /// Should return the number of elements within the tree
     fn size(&self) -> usize;
     /// Should return all positions within the tree as point cloud
-    fn to_pointcloud(&self) -> PointCloud3D<P>; //@todo as trait
+    fn to_pointcloud(&self) -> PointCloud3D<P>;
     /// Should create a new tree from a given point cloud
     fn build(&mut self, pc: PointCloud3D<P>) -> Result<()>;
 }

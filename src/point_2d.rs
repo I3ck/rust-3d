@@ -91,7 +91,7 @@ where
 }
 
 impl Mul<f64> for Point2D {
-    type Output = Point2D; //@todo could later be another type
+    type Output = Point2D;
 
     fn mul(self, other: f64) -> Point2D {
         Point2D {
