@@ -24,8 +24,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::prelude::*;
 
-use std::f64::consts::PI;
-
 /// Is3D is a trait used for types which are positioned within the 3D space
 pub trait Is3D: IsND {
     /// Should return the x-coordinate
@@ -61,13 +59,13 @@ pub trait Is3D: IsND {
             .unwrap()
     }
     /// Calculates the angle to the other Is3D in radians
-    fn rad_to(&self, other: &dyn Is3D) -> Rad {
+    fn rad_to(&self, other: &dyn Is3D) -> Result<Rad> {
         if self.abs().get() == 0.0 || other.abs().get() == 0.0 {
-            return Rad { val: PI }; //@todo consider returning something else on error
+            return Err(ErrorKind::CantCalculateAngleIfZeroLength)
         }
-        Rad {
+        Ok(Rad {
             val: (self.dot(other) / (self.abs() * other.abs()).get()).acos(),
-        }
+        })
     }
     /// Transforms the position in a "x y z" string. E.g. "3.72 5.99 1.01"
     fn to_str(&self) -> String {

@@ -38,8 +38,6 @@ pub trait HasBoundingBox3DMaybe {
 
 //------------------------------------------------------------------------------
 
-//@todo consider moving somewhere else
-
 /// Wrapper helper to convert the Maybe type to the non-Maybe type
 pub struct HasBoundingBox3DConverted<T>
 where
