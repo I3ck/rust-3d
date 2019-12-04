@@ -197,9 +197,6 @@ pub use self::compressed_point_3d::CompressedPoint3D;
 mod compressed_point_cloud_3d;
 pub use self::compressed_point_cloud_3d::CompressedPointCloud3D;
 
-mod projection_to_plane;
-//pub use self::projection_to_plane::ProjectionToPlane;
-
 mod kd_tree;
 pub use self::kd_tree::KdTree;
 
