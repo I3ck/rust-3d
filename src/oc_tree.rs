@@ -266,7 +266,6 @@ where
         let my = middle.y();
         let mz = middle.z();
 
-        //@todo get rid of unwrapping
         match dir {
             Direction::PPP => BoundingBox3D::new(&middle, &max),
             Direction::PPN => {

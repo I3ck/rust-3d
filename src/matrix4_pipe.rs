@@ -36,7 +36,6 @@ pub struct Matrix4Pipe {
 }
 
 impl Matrix4Pipe {
-    //@todo might be inversed order
     /// Creates a new matrix as a result of all defined operations set within the pipe
     pub fn result(&self) -> Matrix4 {
         self.mperspective.clone()

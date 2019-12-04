@@ -175,7 +175,7 @@ where
     P: Is3D + fmt::Display,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.pc.fmt(f) //@todo consider output similar to Line3D
+        self.pc.fmt(f)
     }
 }
 

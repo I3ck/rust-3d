@@ -33,7 +33,6 @@ pub struct Matrix3Pipe {
 }
 
 impl Matrix3Pipe {
-    //@todo might be inversed order
     /// Creates a new matrix as a result of all defined operations set within the pipe
     pub fn result(&self) -> Matrix3 {
         self.mtranslation.clone() * self.mrotation.clone() * self.mscale.clone()

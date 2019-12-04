@@ -96,7 +96,6 @@ where
         }
         Ok(pc)
     }
-    //@todo make trait?
     /// Appends all elements of an IsRandomAccessible
     pub fn append_ra<RA>(&mut self, ra: &RA)
     where
