@@ -22,7 +22,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! internal utility functions
 
-use std::hash::{Hash, Hasher};
+use std::{
+    hash::{Hash, Hasher},
+    collections::HashMap,
+};
 
 /// Splits a line into a Vec of its words
 pub fn to_words(line: &str) -> Vec<&str> {
@@ -80,4 +83,25 @@ fn integer_decode(x: f64) -> (u64, i16, i8) {
     // Exponent bias + mantissa shift
     exponent -= 1023 + 52;
     (mantissa, exponent, sign)
+}
+
+/// Returns a container with duplicates removed and indices representing the original order
+pub fn pack_dupes_indexed<'a, I, T>(idata: I) -> (Vec<T>, Vec<usize>)
+where
+    I: Iterator<Item = &'a T>,
+    T: 'a + Eq + Hash + Clone,
+{
+    let mut map = HashMap::new();
+    let mut packed_data = Vec::new();
+    let mut ids = Vec::new();
+    for x in idata {
+        let id = map.entry(x).or_insert_with(|| {
+            let value = packed_data.len();
+            packed_data.push(x.clone());
+            value
+        });
+        ids.push(*id);
+    }
+
+    (packed_data, ids)
 }

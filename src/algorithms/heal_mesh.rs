@@ -22,9 +22,12 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Algorithm to remove duplicate and degenerate faces from a mesh
 
-use crate::prelude::*;
+use crate::{
+    prelude::*,
+    utils::pack_dupes_indexed,
+};
 
-use std::{collections::HashMap, hash::Hash};
+use std::hash::Hash;
 
 //------------------------------------------------------------------------------
 
@@ -45,7 +48,7 @@ where
         duped_vertices.push(v3);
     }
 
-    let (unduped, indices) = pack_dedup_indexed(duped_vertices.iter());
+    let (unduped, indices) = pack_dupes_indexed(duped_vertices.iter());
 
     let mut result = M::default();
 
@@ -63,28 +66,4 @@ where
     }
 
     Ok(result)
-}
-
-//------------------------------------------------------------------------------
-
-//@todo better name
-//@todo at least move to general utils
-pub fn pack_dedup_indexed<'a, I, T>(idata: I) -> (Vec<T>, Vec<usize>)
-where
-    I: Iterator<Item = &'a T>,
-    T: 'a + Eq + Hash + Clone,
-{
-    let mut map = HashMap::new();
-    let mut packed_data = Vec::new();
-    let mut ids = Vec::new();
-    for x in idata {
-        let id = map.entry(x).or_insert_with(|| {
-            let value = packed_data.len();
-            packed_data.push(x.clone());
-            value
-        });
-        ids.push(*id);
-    }
-
-    (packed_data, ids)
 }
