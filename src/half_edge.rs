@@ -96,23 +96,19 @@ impl HalfEdge {
         // Of this get all edges originating
         // Of these the one where next has the same tail must be the twin
         // @todo could let this fail if there is more than one valid candidate (not manifold)
+        let mut cache = Vec::new();
         for i in 0..result.edges.len() {
-            let _ = result
-                .next(EId { val: i })
-                .and_then(|next_id| {
-                    let mut cache = Vec::new(); //@todo try doing this in outer scope
-                    result.edges_originating(result.edges[next_id.val].tail, &mut cache)?;
-                    Ok(cache)
-                })
-                .map(|originating_ids| {
-                    for originating_id in originating_ids {
-                        let _ = result.next(originating_id).map(|candidate_id| {
-                            if result.edges[candidate_id.val].tail == result.edges[i].tail {
-                                result.edges[i].twin = Some(candidate_id)
-                            }
-                        });
+            cache.clear();
+            let _ = result.next(EId { val: i }).and_then(&mut |next_id: EId| {
+                result.edges_originating(result.edges[next_id.val].tail, &mut cache)
+            });
+            for originating_id in cache.iter() {
+                let _ = result.next(*originating_id).map(|candidate_id| {
+                    if result.edges[candidate_id.val].tail == result.edges[i].tail {
+                        result.edges[i].twin = Some(candidate_id)
                     }
                 });
+            }
         }
         result
     }
