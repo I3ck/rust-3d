@@ -65,7 +65,7 @@ where
 
         while let Some(this) = frontier.pop() {
             neighbour_buffer.clear();
-            collect_neighbour_faces(mesh, &v_to_f, FId { val: this }, &mut neighbour_buffer);
+            collect_neighbour_faces(mesh, &v_to_f, FId { val: this }, &mut neighbour_buffer)?;
 
             let [v1, v2, v3] = mesh.face_vertices(FId { val: this }).unwrap(); // safe since index is safe
             let n_this = normal_of_face(&v1, &v2, &v3);
@@ -141,15 +141,17 @@ fn collect_neighbour_faces<P, M>(
     v_to_f: &Vec<FnvHashSet<usize>>,
     fid: FId,
     neighbours: &mut Vec<usize>,
-) where
+) -> Result<()>
+where
     M: IsMesh<P, Face3> + Default,
     P: Is3D,
 {
-    let f = mesh.face_vertex_ids(fid).unwrap(); //@todo
+    let f = mesh.face_vertex_ids(fid)?;
     neighbours.extend(v_to_f[f.a.val].iter());
     neighbours.extend(v_to_f[f.b.val].iter());
     neighbours.extend(v_to_f[f.c.val].iter());
     neighbours.sort();
     neighbours.dedup();
-    neighbours.retain(|x| *x != fid.val)
+    neighbours.retain(|x| *x != fid.val);
+    Ok(())
 }

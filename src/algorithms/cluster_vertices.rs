@@ -75,9 +75,9 @@ where
     let new_vertex = |old_index| {
         let cluster = &clusters[old_index];
         mesh.vertex(VId {
-            val: *cluster_map.get(cluster).unwrap(),
+            val: *cluster_map.get(cluster).unwrap(), // safe since any cluster in clusters also within cluster_map
         })
-        .unwrap() //@todo
+        .unwrap() // safe, since index in range
     };
 
     let nf = mesh.num_faces();
