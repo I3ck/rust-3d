@@ -61,7 +61,7 @@ pub trait Is3D: IsND {
     /// Calculates the angle to the other Is3D in radians
     fn rad_to(&self, other: &dyn Is3D) -> Result<Rad> {
         if self.abs().get() == 0.0 || other.abs().get() == 0.0 {
-            return Err(ErrorKind::CantCalculateAngleIfZeroLength)
+            return Err(ErrorKind::CantCalculateAngleIfZeroLength);
         }
         Ok(Rad {
             val: (self.dot(other) / (self.abs() * other.abs()).get()).acos(),

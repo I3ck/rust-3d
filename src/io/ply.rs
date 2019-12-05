@@ -507,7 +507,7 @@ fn collect_index_line(line: &str, indices: &mut Vec<usize>) -> Result<()> {
     match words.len() {
         4 => {
             if words[0] != "3" {
-                return Err(ErrorKind::PlyError(PlyError::IncorrectFaceData))
+                return Err(ErrorKind::PlyError(PlyError::IncorrectFaceData));
             }
             let a = usize::from_str(words[1]).map_err(|e| e.to_error_kind())?;
             let b = usize::from_str(words[2]).map_err(|e| e.to_error_kind())?;

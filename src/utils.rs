@@ -23,8 +23,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! internal utility functions
 
 use std::{
-    hash::{Hash, Hasher},
     collections::HashMap,
+    hash::{Hash, Hasher},
 };
 
 /// Splits a line into a Vec of its words

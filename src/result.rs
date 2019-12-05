@@ -96,7 +96,9 @@ impl ErrorKind {
             ErrorKind::ColorArrayIncorrectLength => {
                 "The provided color array has an incorrect length"
             }
-            ErrorKind::CantCalculateAngleIfZeroLength => "Can't calculate the angle between 0 vectors",
+            ErrorKind::CantCalculateAngleIfZeroLength => {
+                "Can't calculate the angle between 0 vectors"
+            }
             ErrorKind::ClusterTooBig => "Clustering size is too big for given mesh",
             ErrorKind::PlyError(x) => x.as_str(),
         }
