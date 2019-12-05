@@ -87,10 +87,56 @@ impl Mul for Matrix3 {
     }
 }
 
+impl Mul<&Matrix3> for Matrix3 {
+    type Output = Self;
+
+    fn mul(self, other: &Self) -> Self {
+        let mut result = Matrix3::default();
+        for i in 0..3 {
+            for j in 0..3 {
+                result.data[i][j] = self.data[i][0] * other.data[0][j]
+                    + self.data[i][1] * other.data[1][j]
+                    + self.data[i][2] * other.data[2][j];
+            }
+        }
+        result
+    }
+}
+
+impl Mul for &Matrix3 {
+    type Output = Matrix3;
+
+    fn mul(self, other: Self) -> Matrix3 {
+        let mut result = Matrix3::default();
+        for i in 0..3 {
+            for j in 0..3 {
+                result.data[i][j] = self.data[i][0] * other.data[0][j]
+                    + self.data[i][1] * other.data[1][j]
+                    + self.data[i][2] * other.data[2][j];
+            }
+        }
+        result
+    }
+}
+
 impl Mul<f64> for Matrix3 {
     type Output = Self;
 
     fn mul(self, other: f64) -> Self {
+        let mut result = Matrix3::default();
+        for i in 0..3 {
+            for j in 0..3 {
+                result.data[i][j] = other * self.data[i][j];
+            }
+        }
+        result
+    }
+}
+
+impl Mul<f64> for &Matrix3 {
+    type Output = Matrix3;
+
+    fn mul(self, other: f64) -> Matrix3 {
         let mut result = Matrix3::default();
         for i in 0..3 {
             for j in 0..3 {

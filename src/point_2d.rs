@@ -76,6 +76,20 @@ where
     }
 }
 
+impl<P> Add<&P> for &Point2D
+where
+    P: Is2D,
+{
+    type Output = Point2D;
+
+    fn add(self, other: &P) -> Point2D {
+        Point2D {
+            x: self.x + other.x(),
+            y: self.y + other.y(),
+        }
+    }
+}
+
 impl<P> Sub<P> for Point2D
 where
     P: Is2D,
@@ -90,7 +104,32 @@ where
     }
 }
 
+impl<P> Sub<&P> for &Point2D
+where
+    P: Is2D,
+{
+    type Output = Point2D;
+
+    fn sub(self, other: &P) -> Point2D {
+        Point2D {
+            x: self.x - other.x(),
+            y: self.y - other.y(),
+        }
+    }
+}
+
 impl Mul<f64> for Point2D {
+    type Output = Point2D;
+
+    fn mul(self, other: f64) -> Point2D {
+        Point2D {
+            x: other * self.x,
+            y: other * self.y,
+        }
+    }
+}
+
+impl Mul<f64> for &Point2D {
     type Output = Point2D;
 
     fn mul(self, other: f64) -> Point2D {
@@ -112,7 +151,29 @@ impl Div<f64> for Point2D {
     }
 }
 
+impl Div<f64> for &Point2D {
+    type Output = Point2D;
+
+    fn div(self, other: f64) -> Point2D {
+        Point2D {
+            x: self.x / other,
+            y: self.y / other,
+        }
+    }
+}
+
 impl Neg for Point2D {
+    type Output = Point2D;
+
+    fn neg(self) -> Point2D {
+        Point2D {
+            x: -self.x,
+            y: -self.y,
+        }
+    }
+}
+
+impl Neg for &Point2D {
     type Output = Point2D;
 
     fn neg(self) -> Point2D {

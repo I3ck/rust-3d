@@ -181,7 +181,7 @@ impl Matrix4 {
         P: IsBuildable3D,
         N: IsNormalized3D,
     {
-        let n = target.clone().normalized()?;
+        let n = target.normalized()?;
         let u = cross(&*up, target);
         let v = cross(&n, &u);
 
@@ -236,10 +236,58 @@ impl Mul for Matrix4 {
     }
 }
 
+impl Mul<&Matrix4> for Matrix4 {
+    type Output = Self;
+
+    fn mul(self, other: &Self) -> Self {
+        let mut result = Matrix4::default();
+        for i in 0..4 {
+            for j in 0..4 {
+                result.data[i][j] = self.data[i][0] * other.data[0][j]
+                    + self.data[i][1] * other.data[1][j]
+                    + self.data[i][2] * other.data[2][j]
+                    + self.data[i][3] * other.data[3][j];
+            }
+        }
+        result
+    }
+}
+
+impl Mul for &Matrix4 {
+    type Output = Matrix4;
+
+    fn mul(self, other: Self) -> Matrix4 {
+        let mut result = Matrix4::default();
+        for i in 0..4 {
+            for j in 0..4 {
+                result.data[i][j] = self.data[i][0] * other.data[0][j]
+                    + self.data[i][1] * other.data[1][j]
+                    + self.data[i][2] * other.data[2][j]
+                    + self.data[i][3] * other.data[3][j];
+            }
+        }
+        result
+    }
+}
+
 impl Mul<f64> for Matrix4 {
     type Output = Self;
 
     fn mul(self, other: f64) -> Self {
+        let mut result = Matrix4::default();
+        for i in 0..4 {
+            for j in 0..4 {
+                result.data[i][j] = other * self.data[i][j];
+            }
+        }
+        result
+    }
+}
+
+impl Mul<f64> for &Matrix4 {
+    type Output = Matrix4;
+
+    fn mul(self, other: f64) -> Matrix4 {
         let mut result = Matrix4::default();
         for i in 0..4 {
             for j in 0..4 {

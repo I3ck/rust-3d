@@ -80,6 +80,21 @@ where
     }
 }
 
+impl<P> Add<&P> for &Point3D
+where
+    P: Is3D,
+{
+    type Output = Point3D;
+
+    fn add(self, other: &P) -> Point3D {
+        Point3D {
+            x: self.x + other.x(),
+            y: self.y + other.y(),
+            z: self.z + other.z(),
+        }
+    }
+}
+
 impl<P> Sub<P> for Point3D
 where
     P: Is3D,
@@ -95,7 +110,34 @@ where
     }
 }
 
+impl<P> Sub<&P> for &Point3D
+where
+    P: Is3D,
+{
+    type Output = Point3D;
+
+    fn sub(self, other: &P) -> Point3D {
+        Point3D {
+            x: self.x - other.x(),
+            y: self.y - other.y(),
+            z: self.z - other.z(),
+        }
+    }
+}
+
 impl Mul<f64> for Point3D {
+    type Output = Point3D;
+
+    fn mul(self, other: f64) -> Point3D {
+        Point3D {
+            x: other * self.x,
+            y: other * self.y,
+            z: other * self.z,
+        }
+    }
+}
+
+impl Mul<f64> for &Point3D {
     type Output = Point3D;
 
     fn mul(self, other: f64) -> Point3D {
@@ -119,7 +161,31 @@ impl Div<f64> for Point3D {
     }
 }
 
+impl Div<f64> for &Point3D {
+    type Output = Point3D;
+
+    fn div(self, other: f64) -> Point3D {
+        Point3D {
+            x: self.x / other,
+            y: self.y / other,
+            z: self.z / other,
+        }
+    }
+}
+
 impl Neg for Point3D {
+    type Output = Point3D;
+
+    fn neg(self) -> Point3D {
+        Point3D {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
+    }
+}
+
+impl Neg for &Point3D {
     type Output = Point3D;
 
     fn neg(self) -> Point3D {

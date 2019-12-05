@@ -66,7 +66,29 @@ impl Mul<f64> for Norm2D {
     }
 }
 
+impl Mul<f64> for &Norm2D {
+    type Output = Point2D;
+
+    fn mul(self, other: f64) -> Point2D {
+        Point2D {
+            x: other * self.x,
+            y: other * self.y,
+        }
+    }
+}
+
 impl Neg for Norm2D {
+    type Output = Norm2D;
+
+    fn neg(self) -> Norm2D {
+        Norm2D {
+            x: -self.x,
+            y: -self.y,
+        }
+    }
+}
+
+impl Neg for &Norm2D {
     type Output = Norm2D;
 
     fn neg(self) -> Norm2D {

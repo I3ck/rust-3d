@@ -35,7 +35,7 @@ pub struct Matrix3Pipe {
 impl Matrix3Pipe {
     /// Creates a new matrix as a result of all defined operations set within the pipe
     pub fn result(&self) -> Matrix3 {
-        self.mtranslation.clone() * self.mrotation.clone() * self.mscale.clone()
+        &self.mtranslation * &self.mrotation * &self.mscale
     }
     /// Adds a translation to the pipe
     pub fn add_translation(&mut self, x: f64, y: f64) {

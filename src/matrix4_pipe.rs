@@ -38,12 +38,12 @@ pub struct Matrix4Pipe {
 impl Matrix4Pipe {
     /// Creates a new matrix as a result of all defined operations set within the pipe
     pub fn result(&self) -> Matrix4 {
-        self.mperspective.clone()
-            * self.mcamlook.clone()
-            * self.mcamtrans.clone()
-            * self.mtranslation.clone()
-            * self.mrotation.clone()
-            * self.mscale.clone()
+        &self.mperspective
+            * &self.mcamlook
+            * &self.mcamtrans
+            * &self.mtranslation
+            * &self.mrotation
+            * &self.mscale
     }
     /// Adds a translation to the pipe
     pub fn add_translation(&mut self, x: f64, y: f64, z: f64) {

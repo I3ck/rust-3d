@@ -246,7 +246,6 @@ where
 }
 
 //@todo more generic types?
-//@todo many clones required, check whether sub add etc. can be implemented more efficently
 /// Finds the intersection between a ray and triangle
 pub fn intersection_ray_triangle<P>(ray: &Ray3D, v1: &P, v2: &P, v3: &P) -> Option<P>
 where
@@ -256,7 +255,7 @@ where
     let dir = &ray.line.dir;
     let n = normal_of_face(v1, v2, v3);
 
-    let w1 = orig.clone() - v1.clone();
+    let w1 = orig - v1;
     let a = -n.dot(&w1);
     let b = n.dot(dir);
 
@@ -270,22 +269,22 @@ where
         return None;
     }
 
-    let p = orig.clone() + dir.clone() * r;
+    let p = orig + &(dir * r);
 
     let e1 = v2.clone() - v1.clone();
-    let vp1 = p.clone() - v1.clone();
+    let vp1 = &p - v1;
     if n.dot(&cross(&e1, &vp1)) <= 0.0 {
         return None;
     }
 
     let e2 = v3.clone() - v2.clone();
-    let vp2 = p.clone() - v2.clone();
+    let vp2 = &p - v2;
     if n.dot(&cross(&e2, &vp2)) <= 0.0 {
         return None;
     }
 
     let e3 = v1.clone() - v3.clone();
-    let vp3 = p.clone() - v3.clone();
+    let vp3 = &p - v3;
     if n.dot(&cross(&e3, &vp3)) <= 0.0 {
         return None;
     }
@@ -459,7 +458,7 @@ pub fn intersection(l: &Line3D, b: &BoundingBox3D) -> Option<Point3D> {
     tmax = min64(tmax, max64(tz1, tz2));
 
     if tmax >= tmin && tmax >= 0.0 {
-        Some(l.anchor.clone() + l.dir.clone() * tmin) //@todo avoid cloning
+        Some(&l.anchor + &(&l.dir * tmin))
     } else {
         None
     }

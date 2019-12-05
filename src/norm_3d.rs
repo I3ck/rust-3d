@@ -69,7 +69,31 @@ impl Mul<f64> for Norm3D {
     }
 }
 
+impl Mul<f64> for &Norm3D {
+    type Output = Point3D;
+
+    fn mul(self, other: f64) -> Point3D {
+        Point3D {
+            x: other * self.x,
+            y: other * self.y,
+            z: other * self.z,
+        }
+    }
+}
+
 impl Neg for Norm3D {
+    type Output = Norm3D;
+
+    fn neg(self) -> Norm3D {
+        Norm3D {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
+    }
+}
+
+impl Neg for &Norm3D {
     type Output = Norm3D;
 
     fn neg(self) -> Norm3D {
