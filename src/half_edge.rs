@@ -41,7 +41,7 @@ pub struct HalfEdge {
 impl HalfEdge {
     /// Creates a new HalfEdge3D for the given IsMesh3D
     /// This only stays valid if IMesh3D is not changed after creation
-    /// The mesh must be manifold (@todo ensure via types?)
+    /// The mesh must be manifold
     pub fn new<T, M>(mesh: &M) -> Self
     where
         M: IsMesh<T, Face3>,

@@ -70,19 +70,16 @@ impl BoxUnaligned3D {
         }
     }
     fn d_x(&self) -> [f64; 3] {
-        //@todo would be easier implemented with proper members
         let dir = self.x_dir();
         let d = self.size[0].get();
         [0.5 * d * dir[0], 0.5 * d * dir[1], 0.5 * d * dir[2]]
     }
     fn d_y(&self) -> [f64; 3] {
-        //@todo would be easier implemented with proper members
         let dir = self.y_dir;
         let d = self.size[1].get();
         [0.5 * d * dir[0], 0.5 * d * dir[1], 0.5 * d * dir[2]]
     }
     fn d_z(&self) -> [f64; 3] {
-        //@todo would be easier implemented with proper members
         let dir = self.z_dir;
         let d = self.size[2].get();
         [0.5 * d * dir[0], 0.5 * d * dir[1], 0.5 * d * dir[2]]
