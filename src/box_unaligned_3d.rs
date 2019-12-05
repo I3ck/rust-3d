@@ -33,7 +33,7 @@ pub struct BoxUnaligned3D {
     pub center: Point3D,
     pub y_dir: [f64; 3], //fwd
     pub z_dir: [f64; 3], //up
-    pub size: [f64; 3],  //@todo use Positive
+    pub size: [Positive; 3],
 }
 
 //------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ impl BoxUnaligned3D {
         let center = Point3D::new_from(&bb.center_bb());
         let y_dir = [0.0, 1.0, 0.0];
         let z_dir = [0.0, 0.0, 1.0];
-        let size = [bb.size_x().get(), bb.size_y().get(), bb.size_z().get()];
+        let size = [bb.size_x(), bb.size_y(), bb.size_z()];
 
         Self {
             center,
@@ -54,7 +54,7 @@ impl BoxUnaligned3D {
         }
     }
     //@todo consider adding alternative constructors
-    pub fn new_from_z_rotation<P>(center: &P, size: [f64; 3], rotation: f64) -> Self
+    pub fn new_from_z_rotation<P>(center: &P, size: [Positive; 3], rotation: f64) -> Self
     where
         P: Is3D,
     {
@@ -72,19 +72,19 @@ impl BoxUnaligned3D {
     fn d_x(&self) -> [f64; 3] {
         //@todo would be easier implemented with proper members
         let dir = self.x_dir();
-        let d = self.size[0];
+        let d = self.size[0].get();
         [0.5 * d * dir[0], 0.5 * d * dir[1], 0.5 * d * dir[2]]
     }
     fn d_y(&self) -> [f64; 3] {
         //@todo would be easier implemented with proper members
         let dir = self.y_dir;
-        let d = self.size[1];
+        let d = self.size[1].get();
         [0.5 * d * dir[0], 0.5 * d * dir[1], 0.5 * d * dir[2]]
     }
     fn d_z(&self) -> [f64; 3] {
         //@todo would be easier implemented with proper members
         let dir = self.z_dir;
-        let d = self.size[2];
+        let d = self.size[2].get();
         [0.5 * d * dir[0], 0.5 * d * dir[1], 0.5 * d * dir[2]]
     }
     pub fn x_dir(&self) -> [f64; 3] {
@@ -203,14 +203,14 @@ impl HasBoundingBox3D for BoxUnaligned3D {
 
         BoundingBox3D::new(
             &Point3D::new(
-                self.center.x() - 0.5 * max_size,
-                self.center.y() - 0.5 * max_size,
-                self.center.z() - 0.5 * max_size,
+                self.center.x() - 0.5 * max_size.get(),
+                self.center.y() - 0.5 * max_size.get(),
+                self.center.z() - 0.5 * max_size.get(),
             ),
             &Point3D::new(
-                self.center.x() + 0.5 * max_size,
-                self.center.y() + 0.5 * max_size,
-                self.center.z() + 0.5 * max_size,
+                self.center.x() + 0.5 * max_size.get(),
+                self.center.y() + 0.5 * max_size.get(),
+                self.center.z() + 0.5 * max_size.get(),
             ),
         )
         .unwrap() //@todo unwrap, see above
