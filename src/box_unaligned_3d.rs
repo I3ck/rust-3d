@@ -31,8 +31,8 @@ use crate::{functions::*, prelude::*};
 pub struct BoxUnaligned3D {
     //@todo better name (Box3D vs BoxUnaligned3D vs BoundingBox3D)
     pub center: Point3D,
-    pub y_dir: [f64; 3], //fwd
-    pub z_dir: [f64; 3], //up
+    pub y_dir: Norm3D,
+    pub z_dir: Norm3D,
     pub size: [Positive; 3],
 }
 
@@ -42,8 +42,8 @@ impl BoxUnaligned3D {
     //@todo constructor from the 6 min/max values and one for corners
     pub fn new_from_bb(bb: &BoundingBox3D) -> Self {
         let center = Point3D::new_from(&bb.center_bb());
-        let y_dir = [0.0, 1.0, 0.0];
-        let z_dir = [0.0, 0.0, 1.0];
+        let y_dir = Norm3D::norm_y();
+        let z_dir = Norm3D::norm_z();
         let size = [bb.size_x(), bb.size_y(), bb.size_z()];
 
         Self {
@@ -59,38 +59,31 @@ impl BoxUnaligned3D {
         P: Is3D,
     {
         let mut y_dir = Point3D::new(0.0, 1.0, 0.0);
-        let z_dir = [0.0, 0.0, 1.0];
+        let z_dir = Norm3D::norm_z();
 
         y_dir = rot2d(&y_dir, rotation);
         Self {
             center: Point3D::new_from(center),
             size,
-            y_dir: [y_dir.x(), y_dir.y(), y_dir.z()],
+            y_dir: Norm3D::new(y_dir).unwrap(), // safe since rotation of valid length
             z_dir,
         }
     }
-    fn d_x(&self) -> [f64; 3] {
-        let dir = self.x_dir();
+    fn d_x(&self) -> Point3D {
         let d = self.size[0].get();
-        [0.5 * d * dir[0], 0.5 * d * dir[1], 0.5 * d * dir[2]]
+        Point3D::new_from(&self.x_dir()) * d
     }
-    fn d_y(&self) -> [f64; 3] {
-        let dir = self.y_dir;
+    fn d_y(&self) -> Point3D {
         let d = self.size[1].get();
-        [0.5 * d * dir[0], 0.5 * d * dir[1], 0.5 * d * dir[2]]
+        Point3D::new_from(&self.y_dir) * d
     }
-    fn d_z(&self) -> [f64; 3] {
-        let dir = self.z_dir;
+    fn d_z(&self) -> Point3D {
         let d = self.size[2].get();
-        [0.5 * d * dir[0], 0.5 * d * dir[1], 0.5 * d * dir[2]]
+        Point3D::new_from(&self.z_dir) * d
     }
-    pub fn x_dir(&self) -> [f64; 3] {
-        let n = Norm3D::new(cross(
-            &Point3D::new(self.z_dir[0], self.z_dir[1], self.z_dir[2]),
-            &Point3D::new(self.y_dir[0], self.y_dir[1], self.y_dir[2]),
-        ))
-        .unwrap(); //@todo
-        [n.x(), n.y(), n.z()]
+    pub fn x_dir(&self) -> Norm3D {
+        Norm3D::new(cross(&self.z_dir, &Point3D::new_from(&self.y_dir))).unwrap()
+        //@todo
     }
 }
 
@@ -111,76 +104,27 @@ impl IsSATObject for BoxUnaligned3D {
         F: FnMut(&Point3D),
     {
         let c = &self.center;
-        let dx = self.d_x();
-        let dy = self.d_y();
-        let dz = self.d_z();
+        let dx = &Point3D::new_from(&self.d_x());
+        let dy = &Point3D::new_from(&self.d_y());
+        let dz = &Point3D::new_from(&self.d_z());
 
-        //@todo would be better with proper types
-        f(&Point3D::new(
-            c.x() - dx[0] - dy[0] - dz[0],
-            c.y() - dx[1] - dy[1] - dz[1],
-            c.z() - dx[2] - dy[2] - dz[2],
-        ));
-
-        f(&Point3D::new(
-            c.x() - dx[0] - dy[0] + dz[0],
-            c.y() - dx[1] - dy[1] + dz[1],
-            c.z() - dx[2] - dy[2] + dz[2],
-        ));
-
-        f(&Point3D::new(
-            c.x() - dx[0] + dy[0] - dz[0],
-            c.y() - dx[1] + dy[1] - dz[1],
-            c.z() - dx[2] + dy[2] - dz[2],
-        ));
-
-        f(&Point3D::new(
-            c.x() - dx[0] + dy[0] + dz[0],
-            c.y() - dx[1] + dy[1] + dz[1],
-            c.z() - dx[2] + dy[2] + dz[2],
-        ));
-
-        f(&Point3D::new(
-            c.x() + dx[0] - dy[0] - dz[0],
-            c.y() + dx[1] - dy[1] - dz[1],
-            c.z() + dx[2] - dy[2] - dz[2],
-        ));
-
-        f(&Point3D::new(
-            c.x() + dx[0] - dy[0] + dz[0],
-            c.y() + dx[1] - dy[1] + dz[1],
-            c.z() + dx[2] - dy[2] + dz[2],
-        ));
-
-        f(&Point3D::new(
-            c.x() + dx[0] + dy[0] - dz[0],
-            c.y() + dx[1] + dy[1] - dz[1],
-            c.z() + dx[2] + dy[2] - dz[2],
-        ));
-
-        f(&Point3D::new(
-            c.x() + dx[0] + dy[0] + dz[0],
-            c.y() + dx[1] + dy[1] + dz[1],
-            c.z() + dx[2] + dy[2] + dz[2],
-        ));
+        f(&(c - &(dx - &(dy - dz))));
+        f(&(c - &(dx - &(dy + dz))));
+        f(&(c - &(dx + &(dy - dz))));
+        f(&(c - &(dx + &(dy + dz))));
+        f(&(c + &(dx - &(dy - dz))));
+        f(&(c + &(dx - &(dy + dz))));
+        f(&(c + &(dx + &(dy - dz))));
+        f(&(c + &(dx + &(dy + dz))));
     }
 
     fn for_each_axis<F>(&self, f: &mut F)
     where
         F: FnMut(&Norm3D),
     {
-        let x_dir = Norm3D::new(Point3D::new(
-            self.x_dir()[0],
-            self.x_dir()[1],
-            self.x_dir()[2],
-        ))
-        .unwrap(); //@todo hold Norm3D instead //@todo cache x_dir() result
-        let y_dir = Norm3D::new(Point3D::new(self.y_dir[0], self.y_dir[1], self.y_dir[2])).unwrap(); //@todo hold Norm3D instead
-        let z_dir = Norm3D::new(Point3D::new(self.z_dir[0], self.z_dir[1], self.z_dir[2])).unwrap(); //@todo hold Norm3D instead
-
-        f(&x_dir);
-        f(&y_dir);
-        f(&z_dir);
+        f(&self.x_dir());
+        f(&self.y_dir);
+        f(&self.z_dir);
     }
 }
 
