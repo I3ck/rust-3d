@@ -28,6 +28,16 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! Offering useful containers, structures and algorithms for 2D and 3D space.
 //! Meant as basis for numeric algorithms, viewers, game engines, ...
 //!
+//! Migration 0.29.0 -> 0.30.0
+//! --------------------------
+//! Note that the module structure changed. There's now only submodules for `io` and `impls`.  
+//! Also `prelude` was removed.  
+//! If you were using the prelude via `rust_3d::prelude::*;` you should now be able to just switch to
+//! `rust_3d::*;`.  
+//! If you were using explicit paths such as `rust_3d::filters::combinators::FilterAll` you should now use `rust_3d::FilterAll`.  
+//! Note that `io` and `impls` are still part of the module path.  
+//! This should make future usage easier, but might be painful for existing users.  
+//! Sorry `:(`
 //!
 //! Notes
 //! -----
@@ -59,7 +69,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! ```
 //!
 //! ### Generic Code Base
-//! I try and keep all algorithms and types as generic as possible (see `/src/traits`).
+//! I try and keep all algorithms and types as generic as possible.
 //! - Even rather basic types like `Is2D` are split into several versions: `IsEditable2D`, `IsBuildable2D`
 //! - `IsMesh` is defined for any vertex type and any number of vertices / face
 //! - There's traits for collections (no need to use `Vec`)
