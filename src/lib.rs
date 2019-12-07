@@ -120,9 +120,6 @@ pub use self::distances_nd::*;
 mod factory_2d;
 pub use self::factory_2d::*;
 
-mod filters;
-pub use self::filters::*;
-
 mod functions;
 pub use self::functions::*;
 
@@ -461,6 +458,59 @@ pub use self::has_colliders_3d::HasColliders3D;
 mod is_collider_container_3d;
 pub use self::is_collider_container_3d::IsColliderContainer3D;
 
-pub use crate::filters::{FilterBox2D, FilterBox3D, FilterCircle, FilterOutlier3D, FilterSphere};
+mod filter_all_random_accessible;
+pub use self::filter_all_random_accessible::FilterAllRandomAccessible;
 
-pub use crate::filters::{combinators::*, transformers::*};
+mod filter_any_random_accessible;
+pub use self::filter_any_random_accessible::FilterAnyRandomAccessible;
+
+mod filter_all;
+pub use self::filter_all::FilterAll;
+
+mod filter_any;
+pub use self::filter_any::FilterAny;
+
+mod filter_negate;
+pub use self::filter_negate::FilterNegate;
+
+mod filter_and;
+pub use self::filter_and::FilterAND;
+
+mod filter_or;
+pub use self::filter_or::FilterOR;
+
+mod filter_xor;
+pub use self::filter_xor::FilterXOR;
+
+mod filter_outer_inner;
+pub use self::filter_outer_inner::FilterOuterInner;
+
+mod filter_allow;
+pub use self::filter_allow::FilterAllow;
+
+mod filter_deny;
+pub use self::filter_deny::FilterDeny;
+
+mod filter_random_accessible;
+pub use self::filter_random_accessible::FilterRandomAccessible;
+
+mod filter_direction_field_2d;
+pub use self::filter_direction_field_2d::FilterDirectionField2D;
+
+mod filter_direction_field_3d;
+pub use self::filter_direction_field_3d::FilterDirectionField3D;
+
+mod filter_box_2d;
+pub use self::filter_box_2d::FilterBox2D;
+
+mod filter_box_3d;
+pub use self::filter_box_3d::FilterBox3D;
+
+mod filter_circle;
+pub use self::filter_circle::FilterCircle;
+
+mod filter_sphere;
+pub use self::filter_sphere::FilterSphere;
+
+mod filter_outlier_3d;
+pub use self::filter_outlier_3d::FilterOutlier3D;
