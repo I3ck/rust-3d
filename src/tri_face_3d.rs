@@ -70,7 +70,7 @@ impl IsSATObject for TriFace3D {
 
 impl HasBoundingBox3D for TriFace3D {
     fn bounding_box(&self) -> BoundingBox3D {
-        BoundingBox3D::from_iterator([&self.a, &self.b, &self.c].iter().cloned()).unwrap()
+        BoundingBox3D::from_iterator([&self.a, &self.b, &self.c].iter().map(|x| *x)).unwrap()
         //@todo unwrap ensure Face is valid in constructor
     }
 }
