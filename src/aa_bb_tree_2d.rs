@@ -46,6 +46,14 @@ where
         Self::new_rec(data, maxdepth, allowed_bucket_size, 0)
     }
 
+    pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
+        match self {
+            AABBTree2D::Empty => false,
+            AABBTree2D::Leaf(leaf) => leaf.any(f),
+            AABBTree2D::Branch(branch) => branch.any(f),
+        }
+    }
+
     pub fn bb_colliding(&self, bb: &BoundingBox2D) -> Vec<&HB> {
         match self {
             AABBTree2D::Empty => Vec::new(),
@@ -172,6 +180,16 @@ where
         }
     }
 
+    pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
+        for x in self.data.iter() {
+            if f(x) {
+                //unwrap fine due to early return in new
+                return true;
+            }
+        }
+        false
+    }
+
     pub fn bb_colliding(&self, bb: &BoundingBox2D) -> Vec<&HB> {
         let mut result = Vec::new();
         if !self.bb.collides_with(bb) {
@@ -235,6 +253,10 @@ where
             bb,
             _marker: PhantomData,
         }
+    }
+    
+    pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
+        self.left.any(f) || self.right.any(f)
     }
 
     pub fn bb_colliding(&self, bb: &BoundingBox2D) -> Vec<&HB> {
