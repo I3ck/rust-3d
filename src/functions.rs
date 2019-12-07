@@ -269,7 +269,7 @@ where
         return None;
     }
 
-    let p = orig + &(dir * r);
+    let p = orig + (dir * r);
 
     let e1 = v2.clone() - v1.clone();
     let vp1 = &p - v1;
@@ -458,7 +458,7 @@ pub fn intersection(l: &Line3D, b: &BoundingBox3D) -> Option<Point3D> {
     tmax = min64(tmax, max64(tz1, tz2));
 
     if tmax >= tmin && tmax >= 0.0 {
-        Some(&l.anchor + &(&l.dir * tmin))
+        Some(&l.anchor + &l.dir * tmin)
     } else {
         None
     }
