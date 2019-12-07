@@ -108,14 +108,14 @@ impl IsSATObject for BoxUnaligned3D {
         let dy = &Point3D::new_from(&self.d_y());
         let dz = &Point3D::new_from(&self.d_z());
 
-        f(&(c - &(dx - &(dy - dz))));
-        f(&(c - &(dx - &(dy + dz))));
-        f(&(c - &(dx + &(dy - dz))));
-        f(&(c - &(dx + &(dy + dz))));
-        f(&(c + &(dx - &(dy - dz))));
-        f(&(c + &(dx - &(dy + dz))));
-        f(&(c + &(dx + &(dy - dz))));
-        f(&(c + &(dx + &(dy + dz))));
+        f(&(c - dx - (dy - dz)));
+        f(&(c - dx - (dy + dz)));
+        f(&(c - dx + (dy - dz)));
+        f(&(c - dx + (dy + dz)));
+        f(&(c + dx - (dy - dz)));
+        f(&(c + dx - (dy + dz)));
+        f(&(c + dx + (dy - dz)));
+        f(&(c + dx + (dy + dz)));
     }
 
     fn for_each_axis<F>(&self, f: &mut F)
