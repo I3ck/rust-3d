@@ -74,33 +74,29 @@ impl ErrorKind {
     /// Returns readable text for the ErrorKind
     pub fn as_str(&self) -> &'static str {
         match self {
-            ErrorKind::MinMaxSwapped => "Passed min/max values are swapped (min > max)",
-            ErrorKind::MinMaxEqual => "Passed min/max values are equal",
-            ErrorKind::TooFewPoints => "Container had too few points for the operation",
-            ErrorKind::BoundingBoxMissing => "Bounding box is missing for the operation",
-            ErrorKind::NormalizeVecWithoutLength => "Can't normalize a vector of length 0",
-            ErrorKind::IOError => "Can't read or write a file",
-            ErrorKind::ParseError => "Can't parse data",
-            ErrorKind::IndexOutOfBounds => "Tried to access an out of bounds index",
-            ErrorKind::IncorrectFaceID => "Used an incorrect face id",
-            ErrorKind::IncorrectVertexID => "Used an incorrect vertex id",
-            ErrorKind::IncorrectEdgeID => "Used an incorrect edge id",
-            ErrorKind::IncorrectVoxelID => "Used an incorrect voxel id",
-            ErrorKind::IncorrectUnitID => "Used an incorrect unit id",
-            ErrorKind::IncorrectSegmentID => "Used an incorrect segment id",
-            ErrorKind::IncorrectDimension => "Trying to access an incorrect dimension",
-            ErrorKind::DimensionsDontMatch => "Trying to mix types with different dimensions",
-            ErrorKind::NumberConversionError => "Failed converting one number type to another",
-            ErrorKind::NumberInWrongRange => "Passed number is within the wrong range",
-            ErrorKind::ComparisionFailed => "Comparision between two values failed",
-            ErrorKind::ColorArrayIncorrectLength => {
-                "The provided color array has an incorrect length"
-            }
-            ErrorKind::CantCalculateAngleIfZeroLength => {
-                "Can't calculate the angle between 0 vectors"
-            }
-            ErrorKind::ClusterTooBig => "Clustering size is too big for given mesh",
-            ErrorKind::PlyError(x) => x.as_str(),
+            Self::MinMaxSwapped => "Passed min/max values are swapped (min > max)",
+            Self::MinMaxEqual => "Passed min/max values are equal",
+            Self::TooFewPoints => "Container had too few points for the operation",
+            Self::BoundingBoxMissing => "Bounding box is missing for the operation",
+            Self::NormalizeVecWithoutLength => "Can't normalize a vector of length 0",
+            Self::IOError => "Can't read or write a file",
+            Self::ParseError => "Can't parse data",
+            Self::IndexOutOfBounds => "Tried to access an out of bounds index",
+            Self::IncorrectFaceID => "Used an incorrect face id",
+            Self::IncorrectVertexID => "Used an incorrect vertex id",
+            Self::IncorrectEdgeID => "Used an incorrect edge id",
+            Self::IncorrectVoxelID => "Used an incorrect voxel id",
+            Self::IncorrectUnitID => "Used an incorrect unit id",
+            Self::IncorrectSegmentID => "Used an incorrect segment id",
+            Self::IncorrectDimension => "Trying to access an incorrect dimension",
+            Self::DimensionsDontMatch => "Trying to mix types with different dimensions",
+            Self::NumberConversionError => "Failed converting one number type to another",
+            Self::NumberInWrongRange => "Passed number is within the wrong range",
+            Self::ComparisionFailed => "Comparision between two values failed",
+            Self::ColorArrayIncorrectLength => "The provided color array has an incorrect length",
+            Self::CantCalculateAngleIfZeroLength => "Can't calculate the angle between 0 vectors",
+            Self::ClusterTooBig => "Clustering size is too big for given mesh",
+            Self::PlyError(x) => x.as_str(),
         }
     }
 }
@@ -109,17 +105,17 @@ impl PlyError {
     /// Returns readable text for the PlyError
     pub fn as_str(&self) -> &'static str {
         match self {
-            PlyError::LoadError => "Error while loading .ply",
-            PlyError::LoadStartNotFound => "Start of .ply header not found",
-            PlyError::LoadFormatNotFound => "Format of .ply missing or not supported",
-            PlyError::LoadWrongPropertyCount => "Property count of .ply missing or not supported",
-            PlyError::LoadVertexIndexDefinitionNotFound => "Index definition in .ply not found",
-            PlyError::LoadHeaderEndNotFound => "End of header definition of .ply not found",
-            PlyError::LoadVertexCountNotFound => "Vertex count of .ply not found",
-            PlyError::LoadFaceCountNotFound => "Face count of .ply not found",
-            PlyError::LoadVertexCountIncorrect => "Vertex count of .ply not found",
-            PlyError::LoadVerticesIncorrect => "Vertices in .ply incorrect",
-            PlyError::IncorrectFaceData => "Face definition is incorrect / can not be parsed",
+            Self::LoadError => "Error while loading .ply",
+            Self::LoadStartNotFound => "Start of .ply header not found",
+            Self::LoadFormatNotFound => "Format of .ply missing or not supported",
+            Self::LoadWrongPropertyCount => "Property count of .ply missing or not supported",
+            Self::LoadVertexIndexDefinitionNotFound => "Index definition in .ply not found",
+            Self::LoadHeaderEndNotFound => "End of header definition of .ply not found",
+            Self::LoadVertexCountNotFound => "Vertex count of .ply not found",
+            Self::LoadFaceCountNotFound => "Face count of .ply not found",
+            Self::LoadVertexCountIncorrect => "Vertex count of .ply not found",
+            Self::LoadVerticesIncorrect => "Vertices in .ply incorrect",
+            Self::IncorrectFaceData => "Face definition is incorrect / can not be parsed",
         }
     }
 }

@@ -35,10 +35,10 @@ impl View {
     /// Merges two Views
     pub fn union(&mut self, other: View) {
         match other {
-            View::Full => *self = other,
-            View::Restricted(indices_other) => match self {
-                View::Full => {}
-                View::Restricted(indices_source) => {
+            Self::Full => *self = other,
+            Self::Restricted(indices_other) => match self {
+                Self::Full => {}
+                Self::Restricted(indices_source) => {
                     indices_source.extend(&indices_other);
                 }
             },

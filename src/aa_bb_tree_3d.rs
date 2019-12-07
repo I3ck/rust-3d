@@ -48,57 +48,57 @@ where
 
     pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
         match self {
-            AABBTree3D::Empty => false,
-            AABBTree3D::Leaf(leaf) => leaf.any(f),
-            AABBTree3D::Branch(branch) => branch.any(f),
+            Self::Empty => false,
+            Self::Leaf(leaf) => leaf.any(f),
+            Self::Branch(branch) => branch.any(f),
         }
     }
 
     pub fn for_each_intersection_candidate<'a>(&'a self, line: &Line3D, f: &mut dyn FnMut(&HB)) {
         match self {
-            AABBTree3D::Empty => (),
-            AABBTree3D::Leaf(leaf) => leaf.for_each_intersection_candidate(line, f),
-            AABBTree3D::Branch(branch) => branch.for_each_intersection_candidate(line, f),
+            Self::Empty => (),
+            Self::Leaf(leaf) => leaf.for_each_intersection_candidate(line, f),
+            Self::Branch(branch) => branch.for_each_intersection_candidate(line, f),
         }
     }
 
     pub fn for_each_collision_candidate<'a>(&'a self, bb: &BoundingBox3D, f: &mut dyn FnMut(&HB)) {
         match self {
-            AABBTree3D::Empty => (),
-            AABBTree3D::Leaf(leaf) => leaf.for_each_collision_candidate(bb, f),
-            AABBTree3D::Branch(branch) => branch.for_each_collision_candidate(bb, f),
+            Self::Empty => (),
+            Self::Leaf(leaf) => leaf.for_each_collision_candidate(bb, f),
+            Self::Branch(branch) => branch.for_each_collision_candidate(bb, f),
         }
     }
 
     pub fn bb_colliding<'a>(&'a self, bb: &BoundingBox3D, result: &mut Vec<&'a HB>) {
         match self {
-            AABBTree3D::Empty => (),
-            AABBTree3D::Leaf(leaf) => leaf.bb_colliding(bb, result),
-            AABBTree3D::Branch(branch) => branch.bb_colliding(bb, result),
+            Self::Empty => (),
+            Self::Leaf(leaf) => leaf.bb_colliding(bb, result),
+            Self::Branch(branch) => branch.bb_colliding(bb, result),
         }
     }
 
     pub fn bb_crossing_x_value<'a>(&'a self, x: f64, result: &mut Vec<&'a HB>) {
         match self {
-            AABBTree3D::Empty => (),
-            AABBTree3D::Leaf(leaf) => leaf.bb_crossing_x_value(x, result),
-            AABBTree3D::Branch(branch) => branch.bb_crossing_x_value(x, result),
+            Self::Empty => (),
+            Self::Leaf(leaf) => leaf.bb_crossing_x_value(x, result),
+            Self::Branch(branch) => branch.bb_crossing_x_value(x, result),
         }
     }
 
     pub fn bb_crossing_y_value<'a>(&'a self, y: f64, result: &mut Vec<&'a HB>) {
         match self {
-            AABBTree3D::Empty => (),
-            AABBTree3D::Leaf(leaf) => leaf.bb_crossing_y_value(y, result),
-            AABBTree3D::Branch(branch) => branch.bb_crossing_y_value(y, result),
+            Self::Empty => (),
+            Self::Leaf(leaf) => leaf.bb_crossing_y_value(y, result),
+            Self::Branch(branch) => branch.bb_crossing_y_value(y, result),
         }
     }
 
     pub fn bb_crossing_z_value<'a>(&'a self, z: f64, result: &mut Vec<&'a HB>) {
         match self {
-            AABBTree3D::Empty => (),
-            AABBTree3D::Leaf(leaf) => leaf.bb_crossing_z_value(z, result),
-            AABBTree3D::Branch(branch) => branch.bb_crossing_z_value(z, result),
+            Self::Empty => (),
+            Self::Leaf(leaf) => leaf.bb_crossing_z_value(z, result),
+            Self::Branch(branch) => branch.bb_crossing_z_value(z, result),
         }
     }
 

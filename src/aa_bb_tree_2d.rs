@@ -48,41 +48,41 @@ where
 
     pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
         match self {
-            AABBTree2D::Empty => false,
-            AABBTree2D::Leaf(leaf) => leaf.any(f),
-            AABBTree2D::Branch(branch) => branch.any(f),
+            Self::Empty => false,
+            Self::Leaf(leaf) => leaf.any(f),
+            Self::Branch(branch) => branch.any(f),
         }
     }
 
     pub fn for_each_collision_candidate<'a>(&'a self, bb: &BoundingBox2D, f: &mut dyn FnMut(&HB)) {
         match self {
-            AABBTree2D::Empty => (),
-            AABBTree2D::Leaf(leaf) => leaf.for_each_collision_candidate(bb, f),
-            AABBTree2D::Branch(branch) => branch.for_each_collision_candidate(bb, f),
+            Self::Empty => (),
+            Self::Leaf(leaf) => leaf.for_each_collision_candidate(bb, f),
+            Self::Branch(branch) => branch.for_each_collision_candidate(bb, f),
         }
     }
 
     pub fn bb_colliding<'a>(&'a self, bb: &BoundingBox2D, result: &mut Vec<&'a HB>) {
         match self {
-            AABBTree2D::Empty => (),
-            AABBTree2D::Leaf(leaf) => leaf.bb_colliding(bb, result),
-            AABBTree2D::Branch(branch) => branch.bb_colliding(bb, result),
+            Self::Empty => (),
+            Self::Leaf(leaf) => leaf.bb_colliding(bb, result),
+            Self::Branch(branch) => branch.bb_colliding(bb, result),
         }
     }
 
     pub fn bb_crossing_x_value<'a>(&'a self, x: f64, result: &mut Vec<&'a HB>) {
         match self {
-            AABBTree2D::Empty => (),
-            AABBTree2D::Leaf(leaf) => leaf.bb_crossing_x_value(x, result),
-            AABBTree2D::Branch(branch) => branch.bb_crossing_x_value(x, result),
+            Self::Empty => (),
+            Self::Leaf(leaf) => leaf.bb_crossing_x_value(x, result),
+            Self::Branch(branch) => branch.bb_crossing_x_value(x, result),
         }
     }
 
     pub fn bb_crossing_y_value<'a>(&'a self, y: f64, result: &mut Vec<&'a HB>) {
         match self {
-            AABBTree2D::Empty => (),
-            AABBTree2D::Leaf(leaf) => leaf.bb_crossing_y_value(y, result),
-            AABBTree2D::Branch(branch) => branch.bb_crossing_y_value(y, result),
+            Self::Empty => (),
+            Self::Leaf(leaf) => leaf.bb_crossing_y_value(y, result),
+            Self::Branch(branch) => branch.bb_crossing_y_value(y, result),
         }
     }
 
