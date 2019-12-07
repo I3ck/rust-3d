@@ -229,9 +229,6 @@ pub use self::face3::Face3;
 mod half_edge;
 pub use self::half_edge::HalfEdge;
 
-mod shapes;
-pub use self::shapes::*;
-
 mod enums;
 pub use self::enums::*;
 
@@ -266,3 +263,15 @@ pub use self::heal_mesh::heal_mesh;
 
 mod cluster_vertices;
 pub use self::cluster_vertices::cluster_vertices;
+
+mod circle;
+pub use self::circle::Circle;
+
+mod box_2d;
+pub use self::box_2d::Box2D;
+
+mod sphere;
+pub use self::sphere::Sphere;
+
+mod box_3d;
+pub use self::box_3d::Box3D;
