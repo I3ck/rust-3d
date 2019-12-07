@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #![deny(warnings)]
 
-use rust_3d::{io::*, prelude::*, test_helper::*, convex_hull_2d};
+use rust_3d::{io::*, test_helper::*, *};
 
 #[test]
 fn convex_hull_2d_test() {

@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Spatial clustering of data on the x/y plane
 
-use crate::prelude::*;
+use crate::*;
 
 use std::collections::HashMap;
 

@@ -29,7 +29,7 @@ use std::{
     ops::{Add, Div, Mul, Neg, Sub},
 };
 
-use crate::{distances_2d::*, prelude::*, utils::hash_f64};
+use crate::*;
 
 #[derive(Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Point2D, a point / position within 2D space

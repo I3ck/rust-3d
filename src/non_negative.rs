@@ -28,7 +28,7 @@ use std::{
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign},
 };
 
-use crate::{prelude::*, utils::hash_f64};
+use crate::*;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 /// NonNegative, a wrapper for a f64 value, ensuring it is always >= 0

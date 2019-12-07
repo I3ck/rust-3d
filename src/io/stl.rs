@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for IO operations of the stl file format
 
-use crate::prelude::*;
+use crate::*;
 
 use std::{
     fs::File,

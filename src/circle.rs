@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::cmp::{Eq, Ordering};
 
-use crate::{distances_2d::*, prelude::*};
+use crate::*;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
 /// Circle, a circle in 2D space

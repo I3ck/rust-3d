@@ -30,7 +30,7 @@ use std::{
     ops::{Add, Div, Mul, Neg, Sub},
 };
 
-use crate::{distances_3d::*, prelude::*};
+use crate::*;
 
 #[derive(Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Point3D, a point / position within 3D space

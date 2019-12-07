@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::f64::consts;
 
-use rust_3d::prelude::*;
+use rust_3d::*;
 
 #[test]
 fn point_2d_test() {

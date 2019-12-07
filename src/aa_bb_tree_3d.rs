@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! AABBTree3D, an axis aligned bounding box tree in 3D for fast collision detection
 
-use crate::{functions::intersection, prelude::*};
+use crate::*;
 
 use std::marker::PhantomData;
 

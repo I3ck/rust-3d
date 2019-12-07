@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterAll, a filter to chain multiple filters with the and condition => must pass all filters to pass this filter
 
-use crate::traits::IsFilter;
+use crate::*;
 use std::marker::PhantomData;
 
 /// FilterAll, a filter to chain multiple filters with the and condition => must pass all filters to pass this filter

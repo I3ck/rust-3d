@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Algorithm to unifiy the face orientation within a mesh
 
-use crate::{functions::normal_of_face, prelude::*};
+use crate::*;
 use bitvec::bitvec;
 use fnv::FnvHashSet;
 

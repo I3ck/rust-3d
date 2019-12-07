@@ -28,7 +28,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //@todo write 2D version once KdTree also supports 2D
 
-use crate::prelude::*;
+use crate::*;
 
 use std::marker::PhantomData;
 

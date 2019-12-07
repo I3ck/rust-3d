@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #![deny(warnings)]
 
-use rust_3d::{io::*, prelude::*, test_helper::*};
+use rust_3d::{io::*, test_helper::*, *};
 
 static GENERATE_EXCEPTED_RESULT_FILES: bool = false;
 

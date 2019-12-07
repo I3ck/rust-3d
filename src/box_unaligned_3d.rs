@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Not axis aligned Box in 3D space
 
-use crate::{functions::*, prelude::*};
+use crate::*;
 
 //------------------------------------------------------------------------------
 

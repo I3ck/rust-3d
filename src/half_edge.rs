@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! HalfEdge, the half edge data structure
 
-use crate::{prelude::*, utils::safe_append_at};
+use crate::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Edge type used within the HalfEdge

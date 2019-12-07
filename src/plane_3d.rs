@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Plane3D, a plane within 3D space
 
-use crate::prelude::*;
+use crate::*;
 
 /// Plane3D, a plane within 3D space
 #[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]

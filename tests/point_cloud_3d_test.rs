@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #![deny(warnings)]
 
-use rust_3d::prelude::*;
+use rust_3d::*;
 
 #[test]
 fn test_point_cloud_3d() {

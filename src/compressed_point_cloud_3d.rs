@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use num::traits::{PrimInt, Unsigned};
 
-use crate::{compressed_point_3d::*, prelude::*};
+use crate::*;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 /// CompressedPointCloud3D

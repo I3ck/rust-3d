@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #![deny(warnings)]
 
-use rust_3d::prelude::*;
+use rust_3d::*;
 
 #[test]
 fn filter_pc_3d_test() {

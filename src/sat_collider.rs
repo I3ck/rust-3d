@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Helper to check for collisions between IsSATObject
 
-use crate::prelude::*;
+use crate::*;
 
 //------------------------------------------------------------------------------
 

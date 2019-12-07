@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterDirectionField3D, a filter which can transform any IsDirectionField3D into a filter for (Is3D, IsNormalized3D)
 
-use crate::prelude::*;
+use crate::*;
 
 /// FilterDirectionField3D, a filter which can transform any IsDirectionField3D into a filter for (Is3D, IsNormalized3D)
 pub struct FilterDirectionField3D<DF>

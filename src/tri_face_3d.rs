@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Face with 3 corners in 3D space
 
-use crate::{functions::*, prelude::*};
+use crate::*;
 
 //------------------------------------------------------------------------------
 

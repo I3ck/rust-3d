@@ -28,7 +28,7 @@ use std::{
     ops::{Mul, Neg},
 };
 
-use crate::{distances_2d::*, prelude::*, utils::hash_f64};
+use crate::*;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 /// Norm2D, a normalized vector within 2D space

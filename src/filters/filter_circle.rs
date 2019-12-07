@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterCircle, a circle filter within 2D space
 
-use crate::{distances_2d::*, prelude::*};
+use crate::*;
 
 #[derive(Debug, PartialEq, PartialOrd, Default, Clone, Eq, Ord, Hash)]
 /// FilterCircle, a circle filter within 2D space

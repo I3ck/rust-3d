@@ -24,11 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::cmp::Ordering;
 
-use crate::{
-    distances_3d::*,
-    functions::{dimension_compare, dimension_dist},
-    prelude::*,
-};
+use crate::*;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// KdTree https://en.wikipedia.org/wiki/K-d_tree

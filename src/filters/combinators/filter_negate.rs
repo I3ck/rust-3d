@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterNegate, a filter which negates another filter
 
-use crate::traits::IsFilter;
+use crate::IsFilter;
 use std::marker::PhantomData;
 
 /// FilterNegate, a filter which negates another filter

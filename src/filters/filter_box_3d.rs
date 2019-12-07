@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterBox3D, a box filter within 3D space
 
-use crate::prelude::*;
+use crate::*;
 
 #[derive(Debug, PartialEq, PartialOrd, Default, Clone, Eq, Hash, Ord)]
 /// FilterBox3D, a box filter within 3D space

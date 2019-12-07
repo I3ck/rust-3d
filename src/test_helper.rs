@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::{fs::File, io::prelude::*};
 
-use crate::{io::*, prelude::*};
+use crate::{io::*, *};
 
 /// Ensures the content of two files is equal
 pub fn assert_files_equal(filepath1: &str, filepath2: &str) {

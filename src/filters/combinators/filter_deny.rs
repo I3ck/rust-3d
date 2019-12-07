@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterDeny, a filter which always returns false
 
-use crate::traits::IsFilter;
+use crate::IsFilter;
 
 /// FilterDeny, a filter which always returns false
 pub struct FilterDeny {}

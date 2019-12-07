@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Collider enumeration for 3D space
 
-use crate::prelude::*;
+use crate::*;
 
 //------------------------------------------------------------------------------
 

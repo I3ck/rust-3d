@@ -22,9 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for IO operations of the ply file format
 
-use crate::prelude::*;
-
-use crate::{rgb::Rgb, utils::to_words};
+use crate::*;
 
 use byteorder::{BigEndian, WriteBytesExt};
 

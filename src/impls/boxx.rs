@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! rust-3d trait implementations for the standard Box
 
-use crate::prelude::*;
+use crate::*;
 
 impl<P> IsND for Box<P>
 where

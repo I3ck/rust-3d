@@ -27,11 +27,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-use crate::{
-    distances_2d::*,
-    functions::{sort_vec_2d_x, sort_vec_2d_y},
-    prelude::*,
-};
+use crate::*;
 
 #[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// PointCloud2D, a collection of positions within 2D space

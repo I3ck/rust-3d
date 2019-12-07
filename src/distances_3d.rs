@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Distances between objects in 3D space
 
-use crate::prelude::*;
+use crate::*;
 
 /// Returns the distance between two Is3D
 pub fn dist_3d<P, Q>(p: &P, q: &Q) -> f64

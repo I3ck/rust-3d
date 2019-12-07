@@ -23,7 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! Convex hull algorithm returning a Vec of the hull where the points are ordered according to the hull
 //! Using Andrew's monotone chain convex hull algorithm https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
 
-use crate::prelude::*;
+use crate::*;
 
 /// Convex hull algorithm returning a Vec of the hull where the points are ordered according to the hull
 /// Using Andrew's monotone chain convex hull algorithm https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain

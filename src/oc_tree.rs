@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::{collections::HashSet, iter::IntoIterator};
 
-use crate::{functions::center_3d, prelude::*};
+use crate::*;
 
 #[derive(Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// OcTree https://en.wikipedia.org/wiki/Octree

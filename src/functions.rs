@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::{cmp::Ordering, ops::Sub};
 
-use crate::{distances_3d::sqr_dist_3d, prelude::*};
+use crate::*;
 
 //@todo move these functions to better fitting files or make them methods of the correct types
 

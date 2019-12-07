@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for IO of the xyz file format
 
-use crate::prelude::*;
+use crate::*;
 
 use core::str::FromStr;
 use std::{

@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! rust-3d trait implementations for the standard Vec
 
-use crate::prelude::*;
+use crate::*;
 
 impl<T> IsRandomAccessible<T> for Vec<T> {
     fn len(&self) -> usize {

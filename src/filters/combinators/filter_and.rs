@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterAND, a filter which combines two filters and is true if both of its filters are true
 
-use crate::traits::IsFilter;
+use crate::IsFilter;
 use std::marker::PhantomData;
 
 /// FilterAND, a filter which combines two filters and is true if both of its filters are true

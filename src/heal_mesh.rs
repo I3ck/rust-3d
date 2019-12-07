@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Algorithm to remove duplicate and degenerate faces from a mesh
 
-use crate::{prelude::*, utils::pack_dupes_indexed};
+use crate::*;
 
 use std::hash::Hash;
 

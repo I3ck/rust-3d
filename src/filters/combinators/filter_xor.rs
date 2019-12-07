@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! FilterXOR, a filter which combines two filters and is true iff one of its filters is true
 
-use crate::traits::IsFilter;
+use crate::IsFilter;
 use std::marker::PhantomData;
 
 /// FilterXOR, a filter which combines two filters and is true iff one of its filters is true
