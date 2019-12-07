@@ -31,5 +31,5 @@ pub trait IsKNearestSearchable<Search, Find> {
     /// Should return the nearest neighbour to search, if there is any
     fn nearest(&self, search: &Search) -> Result<Find>;
     /// Should return the k nearest neighbours to search
-    fn knearest(&self, search: &Search, n: usize) -> Vec<Find>;
+    fn knearest(&self, search: &Search, n: usize, result: &mut Vec<Find>);
 }

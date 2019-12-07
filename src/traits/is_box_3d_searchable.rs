@@ -29,5 +29,5 @@ use crate::prelude::*;
 /// You should only implement this, if your solution is rather efficient
 pub trait IsBox3DSearchable<T> {
     /// Should return all elements within a box
-    fn in_box(&self, box_3d: &Box3D) -> Vec<T>;
+    fn in_box(&self, box_3d: &Box3D, result: &mut Vec<T>);
 }

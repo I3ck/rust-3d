@@ -29,5 +29,5 @@ use crate::prelude::*;
 /// You should only implement this, if your solution is rather efficient
 pub trait IsSphereSearchable<T> {
     /// Should return all elements within a sphere
-    fn in_sphere(&self, sphere: &Sphere) -> Vec<T>;
+    fn in_sphere(&self, sphere: &Sphere, result: &mut Vec<T>);
 }

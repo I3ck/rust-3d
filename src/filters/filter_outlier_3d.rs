@@ -72,14 +72,18 @@ where
     S: IsSphereSearchable<P>,
 {
     fn is_allowed(&self, p: &PSearch) -> bool {
-        let pts = self.searchable.in_sphere(&Sphere {
-            center: Point3D {
-                x: p.x(),
-                y: p.y(),
-                z: p.z(),
+        let mut pts = Vec::new(); //@todo hold as member?
+        self.searchable.in_sphere(
+            &Sphere {
+                center: Point3D {
+                    x: p.x(),
+                    y: p.y(),
+                    z: p.z(),
+                },
+                radius: self.search_distance.clone(),
             },
-            radius: self.search_distance.clone(),
-        });
+            &mut pts,
+        );
         pts.len() >= self.min_neighbours
     }
 }

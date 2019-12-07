@@ -85,20 +85,19 @@ where
     PSearch: Is3D,
     PFind: Is3D + Clone,
 {
-    fn knearest(&self, search: &PSearch, n: usize) -> Vec<PFind> {
-        let mut result = Vec::new();
+    fn knearest(&self, search: &PSearch, n: usize, result: &mut Vec<PFind>) {
         if n < 1 {
-            return result;
+            return;
         }
         if let Some(ref node) = self.root {
-            node.knearest(search, n, &mut result);
+            node.knearest(search, n, result);
         }
-        return result;
     }
 
     fn nearest(&self, search: &PSearch) -> Result<PFind> {
         //@todo implemented on its own, since the code can be faster without vecs
-        let result = self.knearest(search, 1);
+        let mut result = Vec::new();
+        self.knearest(search, 1, &mut result);
         match result.len() {
             0 => Err(ErrorKind::TooFewPoints),
             _ => {
@@ -113,12 +112,10 @@ impl<P> IsSphereSearchable<P> for KdTree<P>
 where
     P: Is3D + Clone,
 {
-    fn in_sphere(&self, sphere: &Sphere) -> Vec<P> {
-        let mut result = Vec::new();
+    fn in_sphere(&self, sphere: &Sphere, result: &mut Vec<P>) {
         if let Some(ref node) = self.root {
-            node.in_sphere(sphere, &mut result);
+            node.in_sphere(sphere, result);
         }
-        return result;
     }
 }
 
@@ -126,12 +123,10 @@ impl<P> IsBox3DSearchable<P> for KdTree<P>
 where
     P: Is3D + Clone,
 {
-    fn in_box(&self, box_3d: &Box3D) -> Vec<P> {
-        let mut result = Vec::new();
+    fn in_box(&self, box_3d: &Box3D, result: &mut Vec<P>) {
         if let Some(ref node) = self.root {
-            node.in_box(box_3d, &mut result);
+            node.in_box(box_3d, result);
         }
-        return result;
     }
 }
 
