@@ -106,7 +106,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! ------
 //! MIT (see LICENSE)
 
-pub mod algorithms;
 pub mod distances_2d;
 pub mod distances_3d;
 pub mod distances_nd;
@@ -250,3 +249,20 @@ pub use self::tri_face_3d::*;
 
 mod collider_3d;
 pub use self::collider_3d::*;
+
+mod convex_hull_2d;
+pub use self::convex_hull_2d::convex_hull_2d;
+
+mod douglas_peucker_2d;
+pub use self::douglas_peucker_2d::douglas_peucker_2d;
+
+pub mod subdivide;
+
+mod unify_faces;
+pub use self::unify_faces::unify_faces;
+
+mod heal_mesh;
+pub use self::heal_mesh::heal_mesh;
+
+mod cluster_vertices;
+pub use self::cluster_vertices::cluster_vertices;

@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Algorithm to cluster nearby vertices within a mesh
 
-use crate::{functions::conn, prelude::*};
+use crate::{functions::conn, prelude::*, heal_mesh};
 
 use fnv::FnvHashMap;
 use std::hash::Hash;
