@@ -63,7 +63,6 @@ where
     }
 
     pub fn for_each_collision_candidate<'a>(&'a self, bb: &BoundingBox3D, f: &mut dyn FnMut(&HB)) {
-        //@todo missing in 2D version
         match self {
             AABBTree3D::Empty => (),
             AABBTree3D::Leaf(leaf) => leaf.for_each_collision_candidate(bb, f),

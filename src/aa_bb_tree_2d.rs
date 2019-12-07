@@ -54,6 +54,14 @@ where
         }
     }
 
+    pub fn for_each_collision_candidate<'a>(&'a self, bb: &BoundingBox2D, f: &mut dyn FnMut(&HB)) {
+        match self {
+            AABBTree2D::Empty => (),
+            AABBTree2D::Leaf(leaf) => leaf.for_each_collision_candidate(bb, f),
+            AABBTree2D::Branch(branch) => branch.for_each_collision_candidate(bb, f),
+        }
+    }
+
     pub fn bb_colliding<'a>(&'a self, bb: &BoundingBox2D, result: &mut Vec<&'a HB>) {
         match self {
             AABBTree2D::Empty => (),
@@ -190,6 +198,17 @@ where
         false
     }
 
+    pub fn for_each_collision_candidate<'a>(&'a self, bb: &BoundingBox2D, f: &mut dyn FnMut(&HB)) {
+        if !self.bb.collides_with(bb) {
+            return;
+        }
+        for x in self.data.iter() {
+            if x.bounding_box().collides_with(bb) {
+                f(x)
+            }
+        }
+    }
+
     pub fn bb_colliding<'a>(&'a self, bb: &BoundingBox2D, result: &mut Vec<&'a HB>) {
         if self.bb.collides_with(bb) {
             for x in self.data.iter() {
@@ -248,6 +267,15 @@ where
 
     pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
         self.left.any(f) || self.right.any(f)
+    }
+
+    pub fn for_each_collision_candidate<'a>(&'a self, bb: &BoundingBox2D, f: &mut dyn FnMut(&HB)) {
+        if !self.bb.collides_with(bb) {
+            return;
+        }
+
+        self.left.for_each_collision_candidate(bb, f);
+        self.right.for_each_collision_candidate(bb, f);
     }
 
     pub fn bb_colliding<'a>(&'a self, bb: &BoundingBox2D, result: &mut Vec<&'a HB>) {
