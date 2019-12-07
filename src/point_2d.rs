@@ -90,6 +90,17 @@ where
     }
 }
 
+impl Add<Point2D> for &Point2D {
+    type Output = Point2D;
+
+    fn add(self, other: Point2D) -> Point2D {
+        Point2D {
+            x: self.x + other.x(),
+            y: self.y + other.y(),
+        }
+    }
+}
+
 impl<P> Sub<P> for Point2D
 where
     P: Is2D,
@@ -111,6 +122,17 @@ where
     type Output = Point2D;
 
     fn sub(self, other: &P) -> Point2D {
+        Point2D {
+            x: self.x - other.x(),
+            y: self.y - other.y(),
+        }
+    }
+}
+
+impl Sub<Point2D> for &Point2D {
+    type Output = Point2D;
+
+    fn sub(self, other: Point2D) -> Point2D {
         Point2D {
             x: self.x - other.x(),
             y: self.y - other.y(),

@@ -95,6 +95,18 @@ where
     }
 }
 
+impl Add<Point3D> for &Point3D {
+    type Output = Point3D;
+
+    fn add(self, other: Point3D) -> Point3D {
+        Point3D {
+            x: self.x + other.x(),
+            y: self.y + other.y(),
+            z: self.z + other.z(),
+        }
+    }
+}
+
 impl<P> Sub<P> for Point3D
 where
     P: Is3D,
@@ -117,6 +129,18 @@ where
     type Output = Point3D;
 
     fn sub(self, other: &P) -> Point3D {
+        Point3D {
+            x: self.x - other.x(),
+            y: self.y - other.y(),
+            z: self.z - other.z(),
+        }
+    }
+}
+
+impl Sub<Point3D> for &Point3D {
+    type Output = Point3D;
+
+    fn sub(self, other: Point3D) -> Point3D {
         Point3D {
             x: self.x - other.x(),
             y: self.y - other.y(),
