@@ -54,27 +54,27 @@ where
         }
     }
 
-    pub fn bb_colliding(&self, bb: &BoundingBox2D) -> Vec<&HB> {
+    pub fn bb_colliding<'a>(&'a self, bb: &BoundingBox2D, result: &mut Vec<&'a HB>) {
         match self {
-            AABBTree2D::Empty => Vec::new(),
-            AABBTree2D::Leaf(leaf) => leaf.bb_colliding(bb),
-            AABBTree2D::Branch(branch) => branch.bb_colliding(bb),
+            AABBTree2D::Empty => (),
+            AABBTree2D::Leaf(leaf) => leaf.bb_colliding(bb, result),
+            AABBTree2D::Branch(branch) => branch.bb_colliding(bb, result),
         }
     }
 
-    pub fn bb_crossing_x_value(&self, x: f64) -> Vec<&HB> {
+    pub fn bb_crossing_x_value<'a>(&'a self, x: f64, result: &mut Vec<&'a HB>) {
         match self {
-            AABBTree2D::Empty => Vec::new(),
-            AABBTree2D::Leaf(leaf) => leaf.bb_crossing_x_value(x),
-            AABBTree2D::Branch(branch) => branch.bb_crossing_x_value(x),
+            AABBTree2D::Empty => (),
+            AABBTree2D::Leaf(leaf) => leaf.bb_crossing_x_value(x, result),
+            AABBTree2D::Branch(branch) => branch.bb_crossing_x_value(x, result),
         }
     }
 
-    pub fn bb_crossing_y_value(&self, y: f64) -> Vec<&HB> {
+    pub fn bb_crossing_y_value<'a>(&'a self, y: f64, result: &mut Vec<&'a HB>) {
         match self {
-            AABBTree2D::Empty => Vec::new(),
-            AABBTree2D::Leaf(leaf) => leaf.bb_crossing_y_value(y),
-            AABBTree2D::Branch(branch) => branch.bb_crossing_y_value(y),
+            AABBTree2D::Empty => (),
+            AABBTree2D::Leaf(leaf) => leaf.bb_crossing_y_value(y, result),
+            AABBTree2D::Branch(branch) => branch.bb_crossing_y_value(y, result),
         }
     }
 
@@ -190,43 +190,34 @@ where
         false
     }
 
-    pub fn bb_colliding(&self, bb: &BoundingBox2D) -> Vec<&HB> {
-        let mut result = Vec::new();
-        if !self.bb.collides_with(bb) {
-            return result;
-        }
-        for x in self.data.iter() {
-            if x.bounding_box().collides_with(bb) {
-                result.push(x)
+    pub fn bb_colliding<'a>(&'a self, bb: &BoundingBox2D, result: &mut Vec<&'a HB>) {
+        if self.bb.collides_with(bb) {
+            for x in self.data.iter() {
+                if x.bounding_box().collides_with(bb) {
+                    result.push(x)
+                }
             }
         }
-        result
     }
 
-    pub fn bb_crossing_x_value(&self, x: f64) -> Vec<&HB> {
-        let mut result = Vec::new();
-        if !self.bb.crossing_x_value(x) {
-            return result;
-        }
-        for d in self.data.iter() {
-            if d.bounding_box().crossing_x_value(x) {
-                result.push(d)
+    pub fn bb_crossing_x_value<'a>(&'a self, x: f64, result: &mut Vec<&'a HB>) {
+        if self.bb.crossing_x_value(x) {
+            for d in self.data.iter() {
+                if d.bounding_box().crossing_x_value(x) {
+                    result.push(d)
+                }
             }
         }
-        result
     }
 
-    pub fn bb_crossing_y_value(&self, y: f64) -> Vec<&HB> {
-        let mut result = Vec::new();
-        if !self.bb.crossing_y_value(y) {
-            return result;
-        }
-        for d in self.data.iter() {
-            if d.bounding_box().crossing_y_value(y) {
-                result.push(d)
+    pub fn bb_crossing_y_value<'a>(&'a self, y: f64, result: &mut Vec<&'a HB>) {
+        if self.bb.crossing_y_value(y) {
+            for d in self.data.iter() {
+                if d.bounding_box().crossing_y_value(y) {
+                    result.push(d)
+                }
             }
         }
-        result
     }
 }
 
@@ -254,38 +245,29 @@ where
             _marker: PhantomData,
         }
     }
-    
+
     pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
         self.left.any(f) || self.right.any(f)
     }
 
-    pub fn bb_colliding(&self, bb: &BoundingBox2D) -> Vec<&HB> {
-        if !self.bb.collides_with(bb) {
-            return Vec::new();
+    pub fn bb_colliding<'a>(&'a self, bb: &BoundingBox2D, result: &mut Vec<&'a HB>) {
+        if self.bb.collides_with(bb) {
+            self.left.bb_colliding(bb, result);
+            self.right.bb_colliding(bb, result);
         }
-
-        let mut result = self.left.bb_colliding(bb);
-        result.append(&mut self.right.bb_colliding(bb));
-        result
     }
 
-    pub fn bb_crossing_x_value(&self, x: f64) -> Vec<&HB> {
-        if !self.bb.crossing_x_value(x) {
-            return Vec::new();
+    pub fn bb_crossing_x_value<'a>(&'a self, x: f64, result: &mut Vec<&'a HB>) {
+        if self.bb.crossing_x_value(x) {
+            self.left.bb_crossing_x_value(x, result);
+            self.right.bb_crossing_x_value(x, result);
         }
-
-        let mut result = self.left.bb_crossing_x_value(x);
-        result.append(&mut self.right.bb_crossing_x_value(x));
-        result
     }
 
-    pub fn bb_crossing_y_value(&self, y: f64) -> Vec<&HB> {
-        if !self.bb.crossing_y_value(y) {
-            return Vec::new();
+    pub fn bb_crossing_y_value<'a>(&'a self, y: f64, result: &mut Vec<&'a HB>) {
+        if self.bb.crossing_y_value(y) {
+            self.left.bb_crossing_y_value(y, result);
+            self.right.bb_crossing_y_value(y, result);
         }
-
-        let mut result = self.left.bb_crossing_y_value(y);
-        result.append(&mut self.right.bb_crossing_y_value(y));
-        result
     }
 }
