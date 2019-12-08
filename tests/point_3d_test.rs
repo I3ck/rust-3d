@@ -55,7 +55,7 @@ fn point_3d_test() {
     assert!(cross23.y() == 0.0 * 2.0 - 1.0 * 2.0);
     assert!(cross23.z() == 1.0 * 2.0 - 0.0 * 2.0);
 
-    assert!(p2.xyz() == (p2.x(), p2.y(), p2.z()));
+    assert!(p2.xyz() == [p2.x(), p2.y(), p2.z()]);
     let mut p2_clone = p2.clone();
     assert!(p2_clone.xyz() == p2.xyz());
     assert!(p2.to_str() == "1 0 0");

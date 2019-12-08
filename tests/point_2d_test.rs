@@ -51,7 +51,7 @@ fn point_2d_test() {
     assert!(p2.cross(&p3) == 2.0);
     assert!(p2.dot(&p3) == 2.0);
 
-    assert!(p2.xy() == (p2.x(), p2.y()));
+    assert!(p2.xy() == [p2.x(), p2.y()]);
     let mut p2_clone = p2.clone();
     assert!(p2_clone.xy() == p2.xy());
     assert!(p2.to_str() == "1 0");

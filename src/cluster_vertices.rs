@@ -39,7 +39,7 @@ where
     P: IsBuildable3D + Eq + Hash + Clone,
 {
     let bb = mesh.bounding_box_maybe()?;
-    let (sx, sy, sz) = bb.sizes();
+    let [sx, sy, sz] = bb.sizes();
     let min = P::new_from(&bb.min_p());
     let (nx, ny, nz) = (
         (sx.get() / cluster_size) as usize,
