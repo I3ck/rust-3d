@@ -132,8 +132,6 @@ impl IsSATObject for BoxUnaligned3D {
 
 impl HasBoundingBox3D for BoxUnaligned3D {
     fn bounding_box(&self) -> BoundingBox3D {
-        //@todo assumes size is valid, but currently not the case (switch to Positive)
-        //@todo not optimal solution
         let mut max_size = self.size[0];
         if self.size[1] > max_size {
             max_size = self.size[1]
@@ -166,7 +164,6 @@ impl HasBoundingBox3DMaybe for BoxUnaligned3D {
 
 //------------------------------------------------------------------------------
 
-//@todo consider moving somewhere else
 fn rot2d<P>(p: &P, phi: f64) -> P
 where
     P: IsBuildable3D,

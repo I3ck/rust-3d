@@ -53,6 +53,7 @@ pub enum ErrorKind {
     ColorArrayIncorrectLength,
     ClusterTooBig,
     CantCalculateAngleIfZeroLength,
+    TriFace3DNotSpanningVolume,
     PlyError(PlyError),
 }
 
@@ -96,6 +97,9 @@ impl ErrorKind {
             Self::ColorArrayIncorrectLength => "The provided color array has an incorrect length",
             Self::CantCalculateAngleIfZeroLength => "Can't calculate the angle between 0 vectors",
             Self::ClusterTooBig => "Clustering size is too big for given mesh",
+            Self::TriFace3DNotSpanningVolume => {
+                "TriFace3D must be constructed from points spanning a volume"
+            }
             Self::PlyError(x) => x.as_str(),
         }
     }
