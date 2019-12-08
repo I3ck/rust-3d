@@ -50,8 +50,8 @@ impl Box2D {
         )
     }
     /// Returns the sizes of the bounding box
-    pub fn sizes(&self) -> (Positive, Positive) {
-        (self.size_x, self.size_y)
+    pub fn sizes(&self) -> [Positive; 2] {
+        [self.size_x, self.size_y]
     }
 }
 

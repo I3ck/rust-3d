@@ -31,9 +31,9 @@ pub trait Is2D: IsND {
     /// Should return the y-coordinate
     fn y(&self) -> f64;
 
-    /// Returns the Position as x,y tuple
-    fn xy(&self) -> (f64, f64) {
-        (self.x(), self.y())
+    /// Returns the Position as x,y array
+    fn xy(&self) -> [f64; 2] {
+        [self.x(), self.y()]
     }
     /// Calculates the dot product with another Is2D
     fn dot(&self, other: &dyn Is2D) -> f64 {

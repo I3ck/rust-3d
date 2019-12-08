@@ -204,8 +204,8 @@ impl BoundingBox3D {
         Positive::new((self.max.z() - self.min.z()).abs()).unwrap() //safe since constrain enforced on construction
     }
     /// Returns the sizes of the bounding box
-    pub fn sizes(&self) -> (Positive, Positive, Positive) {
-        (self.size_x(), self.size_y(), self.size_z())
+    pub fn sizes(&self) -> [Positive; 3] {
+        [self.size_x(), self.size_y(), self.size_z()]
     }
     /// Returns the center of the bounding box
     pub fn center_bb(&self) -> Point3D {
