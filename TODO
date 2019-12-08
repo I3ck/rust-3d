@@ -14,8 +14,6 @@ rename either the half edge or IsSearchableMesh methods, so the names match
 
 remove / change IsTree trait
 
-add categories to cargo file
-
 some algorithms (e.g. bezier) can be ported to 3d, maybe write them directly generic over the dimension
 
 filter_and_test sometimes fails
