@@ -125,7 +125,7 @@ impl HalfEdge {
     /// Returns the ID of the twin edge (None if there isn't any) (error if id out of bounds)
     pub fn twin(&self, id: EId) -> Result<Option<EId>> {
         self.ensure_edge_id(id)?;
-        Ok(self.edges[id.val].twin.clone())
+        Ok(self.edges[id.val].twin)
     }
     /// Returns the ID of the edge after this edge (error if id out of bounds)
     pub fn next(&self, id: EId) -> Result<EId> {

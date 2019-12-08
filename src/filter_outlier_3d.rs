@@ -85,7 +85,7 @@ where
                     y: p.y(),
                     z: p.z(),
                 },
-                radius: self.search_distance.clone(),
+                radius: self.search_distance,
             },
             &mut pts,
         );
