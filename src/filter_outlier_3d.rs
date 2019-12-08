@@ -30,6 +30,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+use std::sync::Mutex;
+
 use std::marker::PhantomData;
 
 /// FilterOutlier3D, a filter which removes outliers by counting their neighbours in a search radius
@@ -37,7 +39,7 @@ use std::marker::PhantomData;
 /// Or to remove outliers within a single set
 /// For this use the same input to build this filter as to filter against
 /// Points will find themselves, so increase the required count by 1
-#[derive(Debug, PartialEq, PartialOrd, Default, Clone)]
+#[derive(Debug, Default)]
 pub struct FilterOutlier3D<S, P>
 where
     P: Is3D,
@@ -46,6 +48,7 @@ where
     search_distance: Positive,
     min_neighbours: usize,
     searchable: S,
+    cache: Mutex<Vec<P>>, 
     phantom_search: PhantomData<P>,
 }
 
@@ -60,6 +63,7 @@ where
             search_distance,
             min_neighbours,
             searchable,
+            cache: Mutex::new(Vec::new()),
             phantom_search: PhantomData,
         })
     }
@@ -72,7 +76,8 @@ where
     S: IsSphereSearchable<P>,
 {
     fn is_allowed(&self, p: &PSearch) -> bool {
-        let mut pts = Vec::new(); //@todo hold as member?
+        let mut pts = self.cache.lock().unwrap(); //@todo any way to properly handle failure here?
+        pts.clear();
         self.searchable.in_sphere(
             &Sphere {
                 center: Point3D {
