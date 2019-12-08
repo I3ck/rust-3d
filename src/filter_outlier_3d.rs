@@ -48,7 +48,7 @@ where
     search_distance: Positive,
     min_neighbours: usize,
     searchable: S,
-    cache: Mutex<Vec<P>>, 
+    cache: Mutex<Vec<P>>,
     phantom_search: PhantomData<P>,
 }
 
