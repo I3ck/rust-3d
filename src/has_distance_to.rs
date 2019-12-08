@@ -35,13 +35,3 @@ pub trait HasDistanceTo<T> {
         self.sqr_distance(other).sqrt()
     }
 }
-
-/*
-@todo currently breaks A.distance(A). Possible, once specialization hits stable
-impl<T, U> HasDistanceTo<T> for U where
-    T: HasDistanceTo<U> {
-
-    fn sqr_distance(&self, other: &T) -> NonNegative {
-        other.sqr_distance(self)
-    }
-}*/

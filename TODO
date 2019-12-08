@@ -1,5 +1,7 @@
 octree for voxel image
+
 kdtree for 2d or generic
+
 quadtree
 
 implement FooAssign where possible
@@ -27,8 +29,6 @@ same for HalfEdge (likely that the specific version can be optimized better)
 
 add more combinator filters to the random accessible filters
 
-consider removing the new() from is buildable nd
-
 trait for type with one or many normals (normal() or normal(id))
 
 make the tests folder of the exact same structure and file names as src,
@@ -39,8 +39,6 @@ many tests are missing
 filters should be directed (this could be dropped and a TransFormed wrapper applied [which inverse transformes incoming points first])
 
 drop the distances files, once the DistanceTo traits are implemented
-
-search values of the trees (e.g. in_sphere) should require a Positive
 
 make trees referencing via ids
 also consider writing wrapper types which e.g. take a PC and parse the tree internally
@@ -53,7 +51,7 @@ neighbours remove which are further than x, furthest x percent further than x ti
 median / average dist...   could take either kdtree or iterator or random access
 and be destructible to kdtree)
 
-segmantation detection
+segmentation detection
 
 IO methods for PC and mesh for all general file formats
 
@@ -63,13 +61,6 @@ octree is missing many query methods
 douglas peucker 3D version (or generic?) also consider rewriting it to not require PC as type
 proper docs / cleanup of douglas peucker
 
-implement IsMatrix4Transformable and 3 for more types
-
-reserve methods for more types or even traits
-
 bounding box < - > box code duplication
 
 use the for_each_intersecting solution at many more places, since this allows avoiding allocations easily (Trees, unifiy AABBTrees)
-
-additionally to any() for trees, add all()
- -> also consider implementing at least iter(), which can then replace any of such helper methods

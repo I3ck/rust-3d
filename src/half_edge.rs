@@ -35,7 +35,7 @@ struct Edge {
 /// HalfEdge, the half edge data structure
 pub struct HalfEdge {
     edges: Vec<Edge>,
-    vertices_start_edges: Vec<Vec<EId>>, //@todo better name
+    vertices_start_edges: Vec<Vec<EId>>,
 }
 
 impl HalfEdge {
