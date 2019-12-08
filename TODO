@@ -6,55 +6,26 @@ implement FooAssign where possible
 
 IsScalable impl missing for LineSegment (and others?)
 
-ensure as many traits as possible implemented
-
-more filter shapes
-
 some Hash impls might lose precision
 
-many more distance functions
+many more distance functions (ray, line segments, ...)
 
 rename either the half edge or IsSearchableMesh methods, so the names match
 
-remove all files from src/ toplevel and add only use sub folder
-
-basic math shapes (circle, sphere etc.)
-filters could then have e.g. a circle instead of position & radius
-
-drop conn etc. once all operators work
-
 remove / change IsTree trait
-
-search for "///@todo" and remove, since this displays within the docs
 
 add categories to cargo file
 
 some algorithms (e.g. bezier) can be ported to 3d, maybe write them directly generic over the dimension
 
-Mul and Add types where possible (Add for Matrix / Mul and Add for others
-
 filter_and_test sometimes fails
-
-distance methods for ray line line segment
 
 similar to distances, add intersections
 
-implement all operators for vec / pt etc. for both directions Mul<f64> for Foo , Mul<Foo> for f64
-
-maybe more trim().split() usages required
-
 support more ply formats or properly throw on error
-
-one of the filter tests managed to fail (possibly race condition within the test files)
-
-mark functions and traits as tested/untested?
-
-currently all meshes are tri meshes, maybe rename later (at least once quad mesh was added)
 
 searchable mesh currently only defined for tri mesh. consider making this generic / rename it
 same for HalfEdge (likely that the specific version can be optimized better)
-
-write mesh/PC file type converter program once many IO methods are implemented?
 
 add more combinator filters to the random accessible filters
 
@@ -67,21 +38,11 @@ this way it becomes very easy to ensure everything is tested
 
 many tests are missing
 
-make kd-tree n-dimensional   (maybe the octree as well, but might be easier to implement quadtree)
-
 filters should be directed (this could be dropped and a TransFormed wrapper applied [which inverse transformes incoming points first])
-
-for impls and structs only require as few traits as possible
 
 drop the distances files, once the DistanceTo traits are implemented
 
-write tutorial / examples / example program
-
 search values of the trees (e.g. in_sphere) should require a Positive
-
-within the README create a small summary (currently one has to check out the entire docs, which is also not good)
-
-try to avoid dynamic traits
 
 make trees referencing via ids
 also consider writing wrapper types which e.g. take a PC and parse the tree internally
@@ -101,38 +62,16 @@ IO methods for PC and mesh for all general file formats
 octree is missing many query methods
 (also implement quad tree once these are implemented)
 
-better tags for the crate (search related ones to find them)
-
-write as generic as possible helpers for operators and call these in the concrete types
-
-3d version of AABBTree
-
-new types such as AABBTree missing docs
-
 douglas peucker 3D version (or generic?) also consider rewriting it to not require PC as type
 proper docs / cleanup of douglas peucker
 
 implement IsMatrix4Transformable and 3 for more types
 
-avoid allocations (return of Vec)
-
-trait Colorized? or somehow offer the option to add colors to a type instead of carrying the colors extra
-
 reserve methods for more types or even traits
 
-more helper methods for bounding boxes
-
-consider going 1.0.0 soon
-
 bounding box < - > box code duplication
-
-update to 2018 edition?
-
-especially the (AABB)trees allocate too much memory
 
 use the for_each_intersecting solution at many more places, since this allows avoiding allocations easily (Trees, unifiy AABBTrees)
 
 additionally to any() for trees, add all()
  -> also consider implementing at least iter(), which can then replace any of such helper methods
-
- before next release ensure tests compile and run
