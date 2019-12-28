@@ -44,7 +44,6 @@ where
         while lower.len() >= 2
             && ccw(&lower[lower.len() - 2], &lower[lower.len() - 1], &sorted[i]) <= 0.0
         {
-            println!("pop");
             lower.pop().unwrap(); //safe, since only called if len > 0
         }
         lower.push(sorted[i].clone());
