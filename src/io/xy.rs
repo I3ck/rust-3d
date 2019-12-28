@@ -25,38 +25,40 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 
 use core::str::FromStr;
-use std::{
-    fs::File,
-    io::{prelude::*, BufReader, BufWriter},
-};
+use std::io::{Read, Write};
 
 /// Saves an IsRandomAccessible<Is2D> as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xy file format or .csv files
-pub fn save_xy<RA, P>(ra: &RA, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()>
+pub fn save_xy<RA, P, W>(write: &mut W, ra: &RA, delim_coord: &str, delim_pos: &str) -> Result<()>
 where
     RA: IsRandomAccessible<P>,
     P: Is2D,
+    W: Write,
 {
-    let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
     let n = ra.len();
     for i in 0..n {
         let ref p = ra[i];
         let buffer = p.x().to_string() + delim_coord + &p.y().to_string() + delim_pos;
-        f.write_all(buffer.as_bytes())
+        write
+            .write_all(buffer.as_bytes())
             .map_err(|e| e.to_error_kind())?;
     }
     Ok(())
 }
 
 /// Loads a IsRandomInsertible<Is2D> as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to load the .xy file format or .csv files
-pub fn load_xy<RI, P>(ri: &mut RI, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()>
+pub fn load_xy<RI, P, R>(
+    read: &mut R,
+    ri: &mut RI,
+    delim_coord: &str,
+    delim_pos: &str,
+) -> Result<()>
 where
     RI: IsRandomInsertible<P>,
     P: Is2D + IsBuildable2D,
+    R: Read,
 {
-    let mut f = BufReader::new(File::open(filepath)?);
-
     let mut content = String::new();
-    f.read_to_string(&mut content)?;
+    read.read_to_string(&mut content)?;
     let lines = content.split(delim_pos);
 
     for line in lines {

@@ -51,12 +51,15 @@ where
 
     let mut view = View::Full;
     let mut pc = PointCloud2D::<P>::new();
-    load_xy(&mut pc, "tests/data/test_square.xy", " ", "\n").unwrap();
+    let mut f = File::open("tests/data/test_square.xy").unwrap();
+    load_xy(&mut f, &mut pc, " ", "\n").unwrap();
 
     filter.filter(&pc, &mut view);
 
     pc.apply_view(&view).unwrap();
-    save_xy(&pc, &path_tmp, " ", "\n").unwrap();
+
+    let mut f_tmp = File::create(&path_tmp).unwrap();
+    save_xy(&mut f_tmp, &pc, " ", "\n").unwrap();
     assert_files_equal(path_expected, &path_tmp);
 }
 
@@ -71,12 +74,15 @@ where
 
     let mut view = View::Full;
     let mut pc = PointCloud3D::<P>::new();
-    load_xyz(&mut pc, "tests/data/test_cube.xyz", " ", "\n").unwrap();
+    let mut f = File::open("tests/data/test_cube.xyz").unwrap();
+    load_xyz(&mut f, &mut pc, " ", "\n").unwrap();
 
     filter.filter(&pc, &mut view);
 
     pc.apply_view(&view).unwrap();
-    save_xyz(&pc, &path_tmp, " ", "\n").unwrap();
+
+    let mut f_tmp = File::create(&path_tmp).unwrap();
+    save_xyz(&mut f_tmp, &pc, " ", "\n").unwrap();
     assert_files_equal(path_expected, &path_tmp);
 }
 
@@ -90,12 +96,14 @@ where
 
     let mut view = View::Full;
     let mut pc = PointCloud2D::<P>::new();
-    load_xy(&mut pc, "tests/data/test_square.xy", " ", "\n").unwrap();
+    let mut f = File::open("tests/data/test_square.xy").unwrap();
+    load_xy(&mut f, &mut pc, " ", "\n").unwrap();
 
     filter.filter(&pc, &mut view);
 
+    let mut f_expected = File::create(path_expected).unwrap();
     pc.apply_view(&view).unwrap();
-    save_xy(&pc, &path_expected, " ", "\n").unwrap();
+    save_xy(&mut f_expected, &pc, " ", "\n").unwrap();
 }
 
 /// Can be used to write the expected result of a 3D filter to later compare against in a test
@@ -108,10 +116,12 @@ where
 
     let mut view = View::Full;
     let mut pc = PointCloud3D::<P>::new();
-    load_xyz(&mut pc, "tests/data/test_cube.xyz", " ", "\n").unwrap();
+    let mut f = File::open("tests/data/test_cube.xyz").unwrap();
+    load_xyz(&mut f, &mut pc, " ", "\n").unwrap();
 
     filter.filter(&pc, &mut view);
 
+    let mut f_expected = File::create(path_expected).unwrap();
     pc.apply_view(&view).unwrap();
-    save_xyz(&pc, &path_expected, " ", "\n").unwrap();
+    save_xyz(&mut f_expected, &pc, " ", "\n").unwrap();
 }

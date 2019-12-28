@@ -24,14 +24,28 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use rust_3d::{io::*, test_helper::*, *};
 
+use std::fs::File;
+
 #[test]
 fn convex_hull_2d_test() {
     //@todo rather weak test, find better input data for this
     let mut pc = PointCloud2D::<Point2D>::new();
-    load_xy(&mut pc, "tests/data/test_square.xy", " ", "\n").unwrap();
+    load_xy(
+        &mut File::open("tests/data/test_square.xy").unwrap(),
+        &mut pc,
+        " ",
+        "\n",
+    )
+    .unwrap();
 
     let hull = convex_hull_2d(&pc);
-    save_xy(&hull, "tests/tmp/tmp_convex_hull_2d.xy", " ", "\n").unwrap();
+    save_xy(
+        &mut File::create("tests/tmp/tmp_convex_hull_2d.xy").unwrap(),
+        &hull,
+        " ",
+        "\n",
+    )
+    .unwrap();
     assert_files_equal(
         "tests/data/expected_convex_hull_2d.xy",
         "tests/tmp/tmp_convex_hull_2d.xy",

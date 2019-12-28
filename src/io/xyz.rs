@@ -25,18 +25,15 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 
 use core::str::FromStr;
-use std::{
-    fs::File,
-    io::{prelude::*, BufReader, BufWriter},
-};
+use std::io::{Read, Write};
 
 /// Saves an IsRandomAccessible<Is3D> as x y z coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xyz file format or .csv files
-pub fn save_xyz<RA, P>(ra: &RA, filepath: &str, delim_coord: &str, delim_pos: &str) -> Result<()>
+pub fn save_xyz<RA, P, W>(write: &mut W, ra: &RA, delim_coord: &str, delim_pos: &str) -> Result<()>
 where
     RA: IsRandomAccessible<P>,
     P: Is3D,
+    W: Write,
 {
-    let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
     let n = ra.len();
     for i in 0..n {
         let ref p = ra[i];
@@ -46,27 +43,27 @@ where
             + delim_coord
             + &p.z().to_string()
             + delim_pos;
-        f.write_all(buffer.as_bytes())
+        write
+            .write_all(buffer.as_bytes())
             .map_err(|e| e.to_error_kind())?;
     }
     Ok(())
 }
 
 /// Loads a IsRandomInsertible<Is3D> as x y z coordinates with a specified delimiter between coordinates and positions. E.g. used to load the .xyz file format or .csv file
-pub fn load_xyz<RI, P>(
+pub fn load_xyz<RI, P, R>(
+    read: &mut R,
     ri: &mut RI,
-    filepath: &str,
     delim_coord: &str,
     delim_pos: &str,
 ) -> Result<()>
 where
     RI: IsRandomInsertible<P>,
     P: Is3D + IsBuildable3D,
+    R: Read,
 {
-    let mut f = BufReader::new(File::open(filepath)?);
-
     let mut content = String::new();
-    f.read_to_string(&mut content)?;
+    read.read_to_string(&mut content)?;
     let lines = content.split(delim_pos);
 
     for line in lines {

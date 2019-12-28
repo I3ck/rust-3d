@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use rust_3d::{io::*, test_helper::*, *};
 
+use std::fs::File;
+
 static GENERATE_EXCEPTED_RESULT_FILES: bool = false;
 
 #[test]
@@ -39,10 +41,10 @@ fn point_cloud_2d_io_test() {
         }
 
         if GENERATE_EXCEPTED_RESULT_FILES {
-            save_xy(&pc, &path_expected, ";", "\n").unwrap();
+            save_xy(&mut File::create(&path_expected).unwrap(), &pc, ";", "\n").unwrap();
         }
 
-        save_xy(&pc, &path_tmp, ";", "\n").unwrap();
+        save_xy(&mut File::create(&path_tmp).unwrap(), &pc, ";", "\n").unwrap();
 
         assert_files_equal(path_expected, path_tmp);
     }
@@ -50,7 +52,13 @@ fn point_cloud_2d_io_test() {
     {
         //@todo also compare values
         let mut pc = PointCloud2D::<Point2D>::new();
-        load_xy(&mut pc, "tests/data/test_square.xy", " ", "\n").unwrap();
+        load_xy(
+            &mut File::open("tests/data/test_square.xy").unwrap(),
+            &mut pc,
+            " ",
+            "\n",
+        )
+        .unwrap();
         assert!(pc.len() == 20 * 20);
     }
 }

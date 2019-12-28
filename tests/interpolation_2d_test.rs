@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use rust_3d::{io::*, test_helper::*, *};
 
+use std::fs::File;
+
 static GENERATE_EXCEPTED_RESULT_FILES: bool = false;
 
 #[test]
@@ -40,10 +42,16 @@ fn interpolate_bezier_test() {
     let result = interpolate_bezier(&pc, 50).unwrap();
 
     if GENERATE_EXCEPTED_RESULT_FILES {
-        save_xy(&result, &path_expected, ";", "\n").unwrap();
+        save_xy(
+            &mut File::create(&path_expected).unwrap(),
+            &result,
+            ";",
+            "\n",
+        )
+        .unwrap();
     }
 
-    save_xy(&result, &path_tmp, ";", "\n").unwrap();
+    save_xy(&mut File::create(&path_tmp).unwrap(), &result, ";", "\n").unwrap();
 
     assert!(result.len() == 50);
 
@@ -64,10 +72,16 @@ fn interpolate_cosine_test() {
     let result = interpolate_cosine(&pc, 50).unwrap();
 
     if GENERATE_EXCEPTED_RESULT_FILES {
-        save_xy(&result, &path_expected, ";", "\n").unwrap();
+        save_xy(
+            &mut File::create(&path_expected).unwrap(),
+            &result,
+            ";",
+            "\n",
+        )
+        .unwrap();
     }
 
-    save_xy(&result, &path_tmp, ";", "\n").unwrap();
+    save_xy(&mut File::create(&path_tmp).unwrap(), &result, ";", "\n").unwrap();
 
     assert!(result.len() == 50);
 
@@ -88,10 +102,16 @@ fn interpolate_linear_test() {
     let result = interpolation_linear(&pc, 50).unwrap();
 
     if GENERATE_EXCEPTED_RESULT_FILES {
-        save_xy(&result, &path_expected, ";", "\n").unwrap();
+        save_xy(
+            &mut File::create(&path_expected).unwrap(),
+            &result,
+            ";",
+            "\n",
+        )
+        .unwrap();
     }
 
-    save_xy(&result, &path_tmp, ";", "\n").unwrap();
+    save_xy(&mut File::create(&path_tmp).unwrap(), &result, ";", "\n").unwrap();
 
     assert!(result.len() == 50);
 

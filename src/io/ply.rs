@@ -28,19 +28,15 @@ use byteorder::{BigEndian, WriteBytesExt};
 
 use core::str::FromStr;
 
-use std::{
-    fs::File,
-    io::{prelude::*, BufReader, BufWriter},
-};
+use std::io::{Read, Write};
 
 /// Saves an IsMesh3D in the ASCII .ply file format
-pub fn save_ply_ascii<M, P>(mesh: &M, filepath: &str) -> Result<()>
+pub fn save_ply_ascii<M, P, W>(write: &mut W, mesh: &M) -> Result<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
+    W: Write,
 {
-    let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
-
     let header = "ply\n".to_string()
         + "format ascii 1.0\n"
         + "comment Created by rust-3d\n"
@@ -55,37 +51,41 @@ where
         + "\n"
         + "property list uchar uint vertex_indices\n"
         + "end_header\n";
-    f.write_all(header.as_bytes())
+    write
+        .write_all(header.as_bytes())
         .map_err(|e| e.to_error_kind())?;
 
     for i in 0..mesh.num_vertices() {
         let vertex = mesh.vertex(VId { val: i })?;
-        f.write_all((vertex.to_str() + "\n").as_bytes())
+        write
+            .write_all((vertex.to_str() + "\n").as_bytes())
             .map_err(|e| e.to_error_kind())?;
     }
 
     for i in 0..mesh.num_faces() {
         let face = mesh.face_vertex_ids(FId { val: i })?;
-        f.write_all(
-            ("3 ".to_string()
-                + &face.a.to_string()
-                + " "
-                + &face.b.to_string()
-                + " "
-                + &face.c.to_string()
-                + "\n")
-                .as_bytes(),
-        )
-        .map_err(|e| e.to_error_kind())?;
+        write
+            .write_all(
+                ("3 ".to_string()
+                    + &face.a.to_string()
+                    + " "
+                    + &face.b.to_string()
+                    + " "
+                    + &face.c.to_string()
+                    + "\n")
+                    .as_bytes(),
+            )
+            .map_err(|e| e.to_error_kind())?;
     }
     Ok(())
 }
 
 /// Saves an IsMesh3D in the ASCII .ply file format with additional colors
-pub fn save_ply_ascii_colored<M, P>(mesh: &M, filepath: &str, colors: &Vec<Rgb>) -> Result<()>
+pub fn save_ply_ascii_colored<M, P, W>(write: &mut W, mesh: &M, colors: &Vec<Rgb>) -> Result<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
+    W: Write,
 {
     let n_vertices = mesh.num_vertices();
     let n_faces = mesh.num_faces();
@@ -93,8 +93,6 @@ where
     if n_vertices != colors.len() {
         return Err(ErrorKind::ColorArrayIncorrectLength);
     }
-
-    let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
 
     let header = "ply\n".to_string()
         + "format ascii 1.0\n"
@@ -113,52 +111,54 @@ where
         + "\n"
         + "property list uchar uint vertex_indices\n"
         + "end_header\n";
-    f.write_all(header.as_bytes())
+    write
+        .write_all(header.as_bytes())
         .map_err(|e| e.to_error_kind())?;
 
     for i in 0..n_vertices {
         let vertex = mesh.vertex(VId { val: i })?;
         let color = &colors[i];
-        f.write_all(
-            format!(
-                "{} {} {} {} {} {}\n",
-                vertex.x(),
-                vertex.y(),
-                vertex.z(),
-                color.r,
-                color.g,
-                color.b
+        write
+            .write_all(
+                format!(
+                    "{} {} {} {} {} {}\n",
+                    vertex.x(),
+                    vertex.y(),
+                    vertex.z(),
+                    color.r,
+                    color.g,
+                    color.b
+                )
+                .as_bytes(),
             )
-            .as_bytes(),
-        )
-        .map_err(|e| e.to_error_kind())?;
+            .map_err(|e| e.to_error_kind())?;
     }
 
     for i in 0..n_faces {
         let face = mesh.face_vertex_ids(FId { val: i })?;
-        f.write_all(
-            ("3 ".to_string()
-                + &face.a.to_string()
-                + " "
-                + &face.b.to_string()
-                + " "
-                + &face.c.to_string()
-                + "\n")
-                .as_bytes(),
-        )
-        .map_err(|e| e.to_error_kind())?;
+        write
+            .write_all(
+                ("3 ".to_string()
+                    + &face.a.to_string()
+                    + " "
+                    + &face.b.to_string()
+                    + " "
+                    + &face.c.to_string()
+                    + "\n")
+                    .as_bytes(),
+            )
+            .map_err(|e| e.to_error_kind())?;
     }
     Ok(())
 }
 
 /// Saves an IsMesh3D in the binary .ply file format
-pub fn save_ply_binary<M, P>(mesh: &M, filepath: &str, precision: &Precision) -> Result<()>
+pub fn save_ply_binary<M, P, W>(write: &mut W, mesh: &M, precision: &Precision) -> Result<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
+    W: Write,
 {
-    let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
-
     let header = match precision {
         Precision::P32 => {
             "ply\n".to_string()
@@ -194,18 +194,22 @@ where
         }
     };
 
-    f.write_all(header.as_bytes())
+    write
+        .write_all(header.as_bytes())
         .map_err(|e| e.to_error_kind())?;
 
     match precision {
         Precision::P32 => {
             for i in 0..mesh.num_vertices() {
                 let vertex = mesh.vertex(VId { val: i })?;
-                f.write_f32::<BigEndian>(vertex.position_nd(0)? as f32)
+                write
+                    .write_f32::<BigEndian>(vertex.position_nd(0)? as f32)
                     .map_err(|e| e.to_error_kind())?;
-                f.write_f32::<BigEndian>(vertex.position_nd(1)? as f32)
+                write
+                    .write_f32::<BigEndian>(vertex.position_nd(1)? as f32)
                     .map_err(|e| e.to_error_kind())?;
-                f.write_f32::<BigEndian>(vertex.position_nd(2)? as f32)
+                write
+                    .write_f32::<BigEndian>(vertex.position_nd(2)? as f32)
                     .map_err(|e| e.to_error_kind())?;
             }
         }
@@ -213,11 +217,14 @@ where
         Precision::P64 => {
             for i in 0..mesh.num_vertices() {
                 let vertex = mesh.vertex(VId { val: i })?;
-                f.write_f64::<BigEndian>(vertex.position_nd(0)?)
+                write
+                    .write_f64::<BigEndian>(vertex.position_nd(0)?)
                     .map_err(|e| e.to_error_kind())?;
-                f.write_f64::<BigEndian>(vertex.position_nd(1)?)
+                write
+                    .write_f64::<BigEndian>(vertex.position_nd(1)?)
                     .map_err(|e| e.to_error_kind())?;
-                f.write_f64::<BigEndian>(vertex.position_nd(2)?)
+                write
+                    .write_f64::<BigEndian>(vertex.position_nd(2)?)
                     .map_err(|e| e.to_error_kind())?;
             }
         }
@@ -225,12 +232,15 @@ where
 
     for i in 0..mesh.num_faces() {
         let face = mesh.face_vertex_ids(FId { val: i })?;
-        f.write_u8(3).map_err(|e| e.to_error_kind())?;
-        f.write_u32::<BigEndian>(face.a.val as u32)
+        write.write_u8(3).map_err(|e| e.to_error_kind())?;
+        write
+            .write_u32::<BigEndian>(face.a.val as u32)
             .map_err(|e| e.to_error_kind())?;
-        f.write_u32::<BigEndian>(face.b.val as u32)
+        write
+            .write_u32::<BigEndian>(face.b.val as u32)
             .map_err(|e| e.to_error_kind())?;
-        f.write_u32::<BigEndian>(face.c.val as u32)
+        write
+            .write_u32::<BigEndian>(face.c.val as u32)
             .map_err(|e| e.to_error_kind())?;
     }
 
@@ -238,15 +248,16 @@ where
 }
 
 /// Saves an IsMesh3D in the binary .ply file format with additional colors
-pub fn save_ply_binary_colored<M, P>(
+pub fn save_ply_binary_colored<M, P, W>(
+    write: &mut W,
     mesh: &M,
-    filepath: &str,
     precision: &Precision,
     colors: &Vec<Rgb>,
 ) -> Result<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
+    W: Write,
 {
     let n_vertices = mesh.num_vertices();
     let n_faces = mesh.num_faces();
@@ -255,8 +266,6 @@ where
         return Err(ErrorKind::ColorArrayIncorrectLength);
     }
 
-    let mut f = BufWriter::new(File::create(filepath).map_err(|e| e.to_error_kind())?);
-
     let header = match precision {
         Precision::P32 => {
             "ply\n".to_string()
@@ -298,7 +307,8 @@ where
         }
     };
 
-    f.write_all(header.as_bytes())
+    write
+        .write_all(header.as_bytes())
         .map_err(|e| e.to_error_kind())?;
 
     match precision {
@@ -306,15 +316,18 @@ where
             for i in 0..n_vertices {
                 let vertex = mesh.vertex(VId { val: i })?;
                 let color = &colors[i];
-                f.write_f32::<BigEndian>(vertex.position_nd(0)? as f32)
+                write
+                    .write_f32::<BigEndian>(vertex.position_nd(0)? as f32)
                     .map_err(|e| e.to_error_kind())?;
-                f.write_f32::<BigEndian>(vertex.position_nd(1)? as f32)
+                write
+                    .write_f32::<BigEndian>(vertex.position_nd(1)? as f32)
                     .map_err(|e| e.to_error_kind())?;
-                f.write_f32::<BigEndian>(vertex.position_nd(2)? as f32)
+                write
+                    .write_f32::<BigEndian>(vertex.position_nd(2)? as f32)
                     .map_err(|e| e.to_error_kind())?;
-                f.write_u8(color.r).map_err(|e| e.to_error_kind())?;
-                f.write_u8(color.g).map_err(|e| e.to_error_kind())?;
-                f.write_u8(color.b).map_err(|e| e.to_error_kind())?;
+                write.write_u8(color.r).map_err(|e| e.to_error_kind())?;
+                write.write_u8(color.g).map_err(|e| e.to_error_kind())?;
+                write.write_u8(color.b).map_err(|e| e.to_error_kind())?;
             }
         }
 
@@ -322,27 +335,33 @@ where
             for i in 0..n_vertices {
                 let vertex = mesh.vertex(VId { val: i })?;
                 let color = &colors[i];
-                f.write_f64::<BigEndian>(vertex.position_nd(0)?)
+                write
+                    .write_f64::<BigEndian>(vertex.position_nd(0)?)
                     .map_err(|e| e.to_error_kind())?;
-                f.write_f64::<BigEndian>(vertex.position_nd(1)?)
+                write
+                    .write_f64::<BigEndian>(vertex.position_nd(1)?)
                     .map_err(|e| e.to_error_kind())?;
-                f.write_f64::<BigEndian>(vertex.position_nd(2)?)
+                write
+                    .write_f64::<BigEndian>(vertex.position_nd(2)?)
                     .map_err(|e| e.to_error_kind())?;
-                f.write_u8(color.r).map_err(|e| e.to_error_kind())?;
-                f.write_u8(color.g).map_err(|e| e.to_error_kind())?;
-                f.write_u8(color.b).map_err(|e| e.to_error_kind())?;
+                write.write_u8(color.r).map_err(|e| e.to_error_kind())?;
+                write.write_u8(color.g).map_err(|e| e.to_error_kind())?;
+                write.write_u8(color.b).map_err(|e| e.to_error_kind())?;
             }
         }
     }
 
     for i in 0..n_faces {
         let face = mesh.face_vertex_ids(FId { val: i })?;
-        f.write_u8(3).map_err(|e| e.to_error_kind())?;
-        f.write_u32::<BigEndian>(face.a.val as u32)
+        write.write_u8(3).map_err(|e| e.to_error_kind())?;
+        write
+            .write_u32::<BigEndian>(face.a.val as u32)
             .map_err(|e| e.to_error_kind())?;
-        f.write_u32::<BigEndian>(face.b.val as u32)
+        write
+            .write_u32::<BigEndian>(face.b.val as u32)
             .map_err(|e| e.to_error_kind())?;
-        f.write_u32::<BigEndian>(face.c.val as u32)
+        write
+            .write_u32::<BigEndian>(face.c.val as u32)
             .map_err(|e| e.to_error_kind())?;
     }
 
@@ -351,14 +370,14 @@ where
 
 // @todo allows incorrect headers and might fail on correct ones
 /// Loads an IsMesh3D from the ASCII .ply file format
-pub fn load_ply_ascii<EM, P>(mesh: &mut EM, filepath: &str) -> Result<()>
+pub fn load_ply_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> Result<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
+    R: Read,
 {
-    let mut f = BufReader::new(File::open(filepath)?);
     let mut content = String::new();
-    f.read_to_string(&mut content)?;
+    read.read_to_string(&mut content)?;
     let lines = content.split("\n");
 
     let mut found_ply = false;

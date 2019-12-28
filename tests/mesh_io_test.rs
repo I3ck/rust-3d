@@ -24,17 +24,31 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use rust_3d::{io::*, *};
 
+use std::fs::File;
+
 #[test]
 fn mesh_io_test() {
     let mut m = Mesh3D::<Point3D>::default();
-    load_ply_ascii(&mut m, "tests/data/torus_only_vertex_data.ply").unwrap();
+    load_ply_ascii(
+        &mut File::open("tests/data/torus_only_vertex_data.ply").unwrap(),
+        &mut m,
+    )
+    .unwrap();
     assert!(m.num_faces() == 1152);
     assert!(m.num_vertices() == 576);
 
-    save_ply_ascii(&m, "tests/tmp/torus_only_vertex_data.ply").unwrap();
+    save_ply_ascii(
+        &mut File::create("tests/tmp/torus_only_vertex_data.ply").unwrap(),
+        &m,
+    )
+    .unwrap();
 
     let mut m = Mesh3D::<Point3D>::default();
-    load_ply_ascii(&mut m, "tests/tmp/torus_only_vertex_data.ply").unwrap();
+    load_ply_ascii(
+        &mut File::open("tests/tmp/torus_only_vertex_data.ply").unwrap(),
+        &mut m,
+    )
+    .unwrap();
     assert!(m.num_faces() == 1152);
     assert!(m.num_vertices() == 576);
 }
