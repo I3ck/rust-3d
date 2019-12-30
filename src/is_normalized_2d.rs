@@ -31,12 +31,20 @@ pub trait IsNormalized2D: Sized + Is2D {
     where
         P: Is2D;
 
-    /// Returns a new normalized object which only points in the x-Direction
+    /// Returns a new normalized object which only points in the positive x-Direction
     fn norm_x() -> Self {
         Self::new(Point2D::new(1.0, 0.0)).unwrap()
     }
-    /// Returns a new normalized object which only points in the y-Direction
+    /// Returns a new normalized object which only points in the positive y-Direction
     fn norm_y() -> Self {
         Self::new(Point2D::new(0.0, 1.0)).unwrap()
+    }
+    /// Returns a new normalized object which only points in the negative x-Direction
+    fn norm_x_neg() -> Self {
+        Self::new(Point2D::new(-1.0, 0.0)).unwrap()
+    }
+    /// Returns a new normalized object which only points in the negative y-Direction
+    fn norm_y_neg() -> Self {
+        Self::new(Point2D::new(0.0, -1.0)).unwrap()
     }
 }
