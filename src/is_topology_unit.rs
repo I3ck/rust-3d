@@ -30,4 +30,11 @@ pub trait IsTopologyUnit {
     fn n_vids() -> usize;
     /// Should return the vertex id of the nth element of this unit. Failure if index out of bounds
     fn vid(&self, index: usize) -> Result<VId>;
+
+    /// Applies the provided function to all indices within this unit
+    fn for_each_vid(&self, f: &mut dyn FnMut(VId)) {
+        for i in 0..Self::n_vids() {
+            f(self.vid(i).unwrap()) // safe as long as implementation isn't incorrect
+        }
+    }
 }
