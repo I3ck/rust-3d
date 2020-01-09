@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use std::{
     fmt,
     hash::{Hash, Hasher},
-    ops::{Add, AddAssign, Mul, MulAssign},
+    ops::{Add, AddAssign, Div, Mul, MulAssign},
 };
 
 use crate::*;
@@ -110,9 +110,33 @@ impl Mul for Positive {
     }
 }
 
+impl Mul<NonNegative> for Positive {
+    type Output = NonNegative;
+
+    fn mul(self, other: NonNegative) -> NonNegative {
+        other * self
+    }
+}
+
 impl MulAssign for Positive {
     fn mul_assign(&mut self, other: Positive) {
         self.val *= other.get();
+    }
+}
+
+impl Div for Positive {
+    type Output = NonNegative;
+
+    fn div(self, other: Positive) -> NonNegative {
+        NonNegative::new(self.val / other.get()).unwrap() // safe
+    }
+}
+
+impl Div<NonNegative> for Positive {
+    type Output = NonNegative;
+
+    fn div(self, other: NonNegative) -> NonNegative {
+        NonNegative::new(self.val / other.get()).unwrap() // safe
     }
 }
 
