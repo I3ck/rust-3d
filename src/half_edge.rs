@@ -26,7 +26,7 @@ use crate::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Edge type used within the HalfEdge
-struct Edge {
+pub struct Edge {
     tail: VId,
     twin: Option<EId>,
 }
