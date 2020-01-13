@@ -340,3 +340,12 @@ where
         Ok(())
     }
 }
+
+impl<P> IsDestructible<Vec<P>> for PointCloud2D<P>
+where
+    P: Is2D,
+{
+    fn destructed(self) -> Vec<P> {
+        self.data
+    }
+}

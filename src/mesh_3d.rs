@@ -202,3 +202,30 @@ where
         self.pc.move_by(x, y, z)
     }
 }
+
+impl<P> IsDestructible<(PointCloud3D<P>, Vec<VId>)> for Mesh3D<P>
+where
+    P: Is3D,
+{
+    fn destructed(self) -> (PointCloud3D<P>, Vec<VId>) {
+        (self.pc, self.topology)
+    }
+}
+
+impl<P> IsDestructible<PointCloud3D<P>> for Mesh3D<P>
+where
+    P: Is3D,
+{
+    fn destructed(self) -> PointCloud3D<P> {
+        self.pc
+    }
+}
+
+impl<P> IsDestructible<Vec<VId>> for Mesh3D<P>
+where
+    P: Is3D,
+{
+    fn destructed(self) -> Vec<VId> {
+        self.topology
+    }
+}

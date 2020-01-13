@@ -1,3 +1,5 @@
+consider analog to IsDestructible a trait for construction (likely already in std)
+
 consider From / Into implementations for Mesh etc. so buffers can be reused
   Mesh From Vec<Pos> Vec<usize>,  PC From Vec<Pos> ...
 

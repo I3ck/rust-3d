@@ -524,3 +524,6 @@ pub use self::filter_sphere::FilterSphere;
 
 mod filter_outlier_3d;
 pub use self::filter_outlier_3d::FilterOutlier3D;
+
+mod is_destructible;
+pub use self::is_destructible::IsDestructible;

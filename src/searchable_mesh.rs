@@ -212,3 +212,21 @@ where
         &self.mesh
     }
 }
+
+impl<M, T> IsDestructible<(M, HalfEdge)> for SearchableMesh<M, T>
+where
+    M: IsMesh<T, Face3>,
+{
+    fn destructed(self) -> (M, HalfEdge) {
+        (self.mesh, self.he)
+    }
+}
+
+impl<M, T> IsDestructible<M> for SearchableMesh<M, T>
+where
+    M: IsMesh<T, Face3>,
+{
+    fn destructed(self) -> M {
+        self.mesh
+    }
+}

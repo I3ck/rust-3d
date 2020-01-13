@@ -212,3 +212,21 @@ impl HalfEdge {
         Ok(())
     }
 }
+
+impl IsDestructible<(Vec<Edge>, Vec<Vec<EId>>)> for HalfEdge {
+    fn destructed(self) -> (Vec<Edge>, Vec<Vec<EId>>) {
+        (self.edges, self.vertices_start_edges)
+    }
+}
+
+impl IsDestructible<Vec<Edge>> for HalfEdge {
+    fn destructed(self) -> Vec<Edge> {
+        self.edges
+    }
+}
+
+impl IsDestructible<Vec<Vec<EId>>> for HalfEdge {
+    fn destructed(self) -> Vec<Vec<EId>> {
+        self.vertices_start_edges
+    }
+}
