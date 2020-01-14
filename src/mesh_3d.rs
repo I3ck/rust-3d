@@ -203,6 +203,18 @@ where
     }
 }
 
+impl<P> From<(PointCloud3D<P>, Vec<VId>)> for Mesh3D<P>
+where
+    P: Is3D,
+{
+    fn from(pt: (PointCloud3D<P>, Vec<VId>)) -> Self {
+        Self {
+            pc: pt.0,
+            topology: pt.1,
+        }
+    }
+}
+
 impl<P> Into<(PointCloud3D<P>, Vec<VId>)> for Mesh3D<P>
 where
     P: Is3D,

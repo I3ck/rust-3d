@@ -213,6 +213,15 @@ impl HalfEdge {
     }
 }
 
+impl From<(Vec<Edge>, Vec<Vec<EId>>)> for HalfEdge {
+    fn from(ev: (Vec<Edge>, Vec<Vec<EId>>)) -> Self {
+        Self {
+            edges: ev.0,
+            vertices_start_edges: ev.1,
+        }
+    }
+}
+
 impl Into<(Vec<Edge>, Vec<Vec<EId>>)> for HalfEdge {
     fn into(self) -> (Vec<Edge>, Vec<Vec<EId>>) {
         (self.edges, self.vertices_start_edges)

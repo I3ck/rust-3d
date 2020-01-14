@@ -360,3 +360,12 @@ where
         self.data
     }
 }
+
+impl<P> From<Vec<P>> for PointCloud3D<P>
+where
+    P: Is3D,
+{
+    fn from(data: Vec<P>) -> Self {
+        Self { data }
+    }
+}

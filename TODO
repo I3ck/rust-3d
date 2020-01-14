@@ -1,7 +1,5 @@
-consider analog to IsDestructible a trait for construction (likely already in std)
-
 consider From / Into implementations for Mesh etc. so buffers can be reused
-  Mesh From Vec<Pos> Vec<usize>,  PC From Vec<Pos> ...
+  Mesh From Vec<Pos> Vec<usize>,  PC From Vec<Pos> ... (done for case where data is used, but not solely to reuse buffer)
 
 boundingbox currently requires a positive size in all dimensions, might be possible to weaken this requirement
 

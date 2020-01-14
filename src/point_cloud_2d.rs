@@ -349,3 +349,12 @@ where
         self.data
     }
 }
+
+impl<P> From<Vec<P>> for PointCloud2D<P>
+where
+    P: Is2D,
+{
+    fn from(data: Vec<P>) -> Self {
+        Self { data }
+    }
+}

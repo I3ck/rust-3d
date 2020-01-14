@@ -221,3 +221,16 @@ where
         (self.mesh, self.he)
     }
 }
+
+impl<M, T> From<(M, HalfEdge)> for SearchableMesh<M, T>
+where
+    M: IsMesh<T, Face3>,
+{
+    fn from(me: (M, HalfEdge)) -> Self {
+        Self {
+            mesh: me.0,
+            he: me.1,
+            phantomt: PhantomData::default(),
+        }
+    }
+}
