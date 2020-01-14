@@ -341,11 +341,11 @@ where
     }
 }
 
-impl<P> IsDestructible<Vec<P>> for PointCloud2D<P>
+impl<P> Into<Vec<P>> for PointCloud2D<P>
 where
     P: Is2D,
 {
-    fn destructed(self) -> Vec<P> {
+    fn into(self) -> Vec<P> {
         self.data
     }
 }
