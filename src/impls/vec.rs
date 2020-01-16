@@ -113,3 +113,25 @@ where
         })
     }
 }
+
+impl IsIndexContainer for Vec<usize> {
+    fn reserve(&mut self, n: usize) {
+        self.reserve(n)
+    }
+
+    fn len(&self) -> usize {
+        self.len()
+    }
+
+    fn get(&self, index: usize) -> usize {
+        self[index]
+    }
+
+    fn set(&mut self, index: usize, value: usize) {
+        self[index] = value
+    }
+
+    fn push(&mut self, value: usize) {
+        self.push(value)
+    }
+}

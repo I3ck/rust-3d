@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Martin Buck
+Copyright 2020 Martin Buck
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"),
@@ -20,35 +20,23 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#![deny(warnings)]
+//! IsIndexContainer trait for containers holding indices
 
-use rust_3d::{io::*, *};
+/// IsIndexContainer trait for containers holding indices
 
-use std::fs::File;
+pub trait IsIndexContainer {
+    /// Should reserve space for n more elements
+    fn reserve(&mut self, n: usize);
 
-#[test]
-fn mesh_io_test() {
-    let mut m = Mesh3D::<Point3D, Vec<usize>>::default();
-    load_ply_ascii(
-        &mut File::open("tests/data/torus_only_vertex_data.ply").unwrap(),
-        &mut m,
-    )
-    .unwrap();
-    assert!(m.num_faces() == 1152);
-    assert!(m.num_vertices() == 576);
+    /// Should return the number of elements
+    fn len(&self) -> usize;
 
-    save_ply_ascii(
-        &mut File::create("tests/tmp/torus_only_vertex_data.ply").unwrap(),
-        &m,
-    )
-    .unwrap();
+    /// Should return the element at index
+    fn get(&self, index: usize) -> usize;
 
-    let mut m = Mesh3D::<Point3D, Vec<usize>>::default();
-    load_ply_ascii(
-        &mut File::open("tests/tmp/torus_only_vertex_data.ply").unwrap(),
-        &mut m,
-    )
-    .unwrap();
-    assert!(m.num_faces() == 1152);
-    assert!(m.num_vertices() == 576);
+    /// Should overwrite the element at index with value
+    fn set(&mut self, index: usize, value: usize);
+
+    /// Should push value to the end of the container
+    fn push(&mut self, value: usize);
 }
