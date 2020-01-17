@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /// IsIndexContainer trait for containers holding indices
 
-pub trait IsIndexContainer {
+pub trait IsIndexContainer: Clone + Default {
     /// Should reserve space for n more elements
     fn reserve(&mut self, n: usize);
 
@@ -39,4 +39,48 @@ pub trait IsIndexContainer {
 
     /// Should push value to the end of the container
     fn push(&mut self, value: usize);
+
+    /// Should return an iterator over the values
+    fn iter(&self) -> IsIndexContainerIterator<Self>;
+}
+
+pub struct IsIndexContainerIterator<'a, IC>
+where
+    IC: IsIndexContainer,
+{
+    parent: &'a IC,
+    max: usize,
+    index: usize,
+}
+
+impl<'a, IC> IsIndexContainerIterator<'a, IC>
+where
+    IC: IsIndexContainer,
+{
+    pub fn new(parent: &'a IC) -> Self {
+        Self {
+            parent,
+            max: parent.len(),
+            index: 0,
+        }
+    }
+}
+
+impl<'a, IC> Iterator for IsIndexContainerIterator<'a, IC>
+where
+    IC: IsIndexContainer,
+{
+    type Item = usize;
+
+    fn next(&mut self) -> Option<usize> {
+        let result = if self.index < self.max {
+            Some(self.parent.get(self.index))
+        } else {
+            None
+        };
+
+        self.index += 1;
+
+        result
+    }
 }

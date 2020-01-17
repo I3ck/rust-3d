@@ -33,12 +33,18 @@ pub struct Edge {
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// HalfEdge, the half edge data structure
-pub struct HalfEdge {
+pub struct HalfEdge<IC>
+where
+    IC: IsIndexContainer,
+{
     edges: Vec<Edge>,
-    vertices_start_edges: Vec<Vec<EId>>,
+    vertices_start_edges: Vec<IC>,
 }
 
-impl HalfEdge {
+impl<IC> HalfEdge<IC>
+where
+    IC: IsIndexContainer,
+{
     /// Creates a new HalfEdge3D for the given IsMesh3D
     /// This only stays valid if IMesh3D is not changed after creation
     /// The mesh must be manifold
@@ -68,21 +74,9 @@ impl HalfEdge {
                         twin: None,
                     });
 
-                    safe_append_at(
-                        &mut vertices_start_edges,
-                        face.a.val,
-                        EId { val: i * 3 + 0 },
-                    );
-                    safe_append_at(
-                        &mut vertices_start_edges,
-                        face.b.val,
-                        EId { val: i * 3 + 1 },
-                    );
-                    safe_append_at(
-                        &mut vertices_start_edges,
-                        face.c.val,
-                        EId { val: i * 3 + 2 },
-                    );
+                    safe_append_at(&mut vertices_start_edges, face.a.val, i * 3 + 0);
+                    safe_append_at(&mut vertices_start_edges, face.b.val, i * 3 + 1);
+                    safe_append_at(&mut vertices_start_edges, face.c.val, i * 3 + 2);
                 }
             }
         }
@@ -146,7 +140,11 @@ impl HalfEdge {
     /// Appends all edges originating (pointing away) from the given vertex (error if id out of bounds)
     pub fn edges_originating(&self, id: VId, result: &mut Vec<EId>) -> Result<()> {
         self.ensure_vertex_id(id)?;
-        result.extend(&self.vertices_start_edges[id.val]);
+        result.extend(
+            self.vertices_start_edges[id.val]
+                .iter()
+                .map(|x| EId { val: x }),
+        );
         Ok(())
     }
     /// Appends all edges ending (pointing at) the given vertex (error if id out of bounds)
@@ -213,8 +211,11 @@ impl HalfEdge {
     }
 }
 
-impl From<(Vec<Edge>, Vec<Vec<EId>>)> for HalfEdge {
-    fn from(ev: (Vec<Edge>, Vec<Vec<EId>>)) -> Self {
+impl<IC> From<(Vec<Edge>, Vec<IC>)> for HalfEdge<IC>
+where
+    IC: IsIndexContainer,
+{
+    fn from(ev: (Vec<Edge>, Vec<IC>)) -> Self {
         Self {
             edges: ev.0,
             vertices_start_edges: ev.1,
@@ -222,20 +223,29 @@ impl From<(Vec<Edge>, Vec<Vec<EId>>)> for HalfEdge {
     }
 }
 
-impl Into<(Vec<Edge>, Vec<Vec<EId>>)> for HalfEdge {
-    fn into(self) -> (Vec<Edge>, Vec<Vec<EId>>) {
+impl<IC> Into<(Vec<Edge>, Vec<IC>)> for HalfEdge<IC>
+where
+    IC: IsIndexContainer,
+{
+    fn into(self) -> (Vec<Edge>, Vec<IC>) {
         (self.edges, self.vertices_start_edges)
     }
 }
 
-impl Into<Vec<Edge>> for HalfEdge {
+impl<IC> Into<Vec<Edge>> for HalfEdge<IC>
+where
+    IC: IsIndexContainer,
+{
     fn into(self) -> Vec<Edge> {
         self.edges
     }
 }
 
-impl Into<Vec<Vec<EId>>> for HalfEdge {
-    fn into(self) -> Vec<Vec<EId>> {
+impl<IC> Into<Vec<IC>> for HalfEdge<IC>
+where
+    IC: IsIndexContainer,
+{
+    fn into(self) -> Vec<IC> {
         self.vertices_start_edges
     }
 }

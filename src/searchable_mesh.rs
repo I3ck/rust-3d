@@ -28,18 +28,20 @@ use std::marker::PhantomData;
 
 /// SearchableMesh, transforms IsMesh to IsSearchableMesh
 #[derive(Clone)]
-pub struct SearchableMesh<M, T>
+pub struct SearchableMesh<M, T, IC>
 where
     M: IsMesh<T, Face3>,
+    IC: IsIndexContainer,
 {
     mesh: M,
-    he: HalfEdge,
+    he: HalfEdge<IC>,
     phantomt: PhantomData<T>,
 }
 
-impl<M, T> SearchableMesh<M, T>
+impl<M, T, IC> SearchableMesh<M, T, IC>
 where
     M: IsMesh<T, Face3>,
+    IC: IsIndexContainer,
 {
     /// Creates a new SearchableMesh3D from an IsMesh3D
     /// This only stays valid if IMesh3D is not changed after creation
@@ -68,9 +70,10 @@ where
     }
 }
 
-impl<M, T> IsMesh<T, Face3> for SearchableMesh<M, T>
+impl<M, T, IC> IsMesh<T, Face3> for SearchableMesh<M, T, IC>
 where
     M: IsMesh<T, Face3>,
+    IC: IsIndexContainer,
 {
     fn num_faces(&self) -> usize {
         self.mesh.num_faces()
@@ -93,10 +96,11 @@ where
     }
 }
 
-impl<M, T> IsVertexEditableMesh<T, Face3> for SearchableMesh<M, T>
+impl<M, T, IC> IsVertexEditableMesh<T, Face3> for SearchableMesh<M, T, IC>
 where
     M: IsMesh<T, Face3> + IsVertexEditableMesh<T, Face3>,
     T: IsEditable3D + IsBuildable3D + Clone,
+    IC: IsIndexContainer,
 {
     fn add_vertex(&mut self, vertex: T) -> VId {
         self.mesh.add_vertex(vertex)
@@ -107,9 +111,10 @@ where
     }
 }
 
-impl<M, T> IsSearchableMesh<T, Face3> for SearchableMesh<M, T>
+impl<M, T, IC> IsSearchableMesh<T, Face3> for SearchableMesh<M, T, IC>
 where
     M: IsMesh<T, Face3>,
+    IC: IsIndexContainer,
 {
     fn num_edges(&self) -> usize {
         self.mesh.num_faces() * 3
@@ -177,56 +182,62 @@ where
     }
 }
 
-impl<M, T> HasBoundingBox3DMaybe for SearchableMesh<M, T>
+impl<M, T, IC> HasBoundingBox3DMaybe for SearchableMesh<M, T, IC>
 where
     M: IsMesh<T, Face3> + HasBoundingBox3DMaybe,
+    IC: IsIndexContainer,
 {
     fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
         self.mesh.bounding_box_maybe()
     }
 }
 
-impl<M, T> HasCenterOfGravity3D for SearchableMesh<M, T>
+impl<M, T, IC> HasCenterOfGravity3D for SearchableMesh<M, T, IC>
 where
     M: IsMesh<T, Face3> + HasCenterOfGravity3D,
+    IC: IsIndexContainer,
 {
     fn center_of_gravity(&self) -> Result<Point3D> {
         self.mesh.center_of_gravity()
     }
 }
 
-impl<M, T> IsScalable for SearchableMesh<M, T>
+impl<M, T, IC> IsScalable for SearchableMesh<M, T, IC>
 where
     M: IsMesh<T, Face3> + IsScalable,
+    IC: IsIndexContainer,
 {
     fn scale(&mut self, factor: Positive) {
         self.mesh.scale(factor);
     }
 }
 
-impl<M, T> AsRef<M> for SearchableMesh<M, T>
+impl<M, T, IC> AsRef<M> for SearchableMesh<M, T, IC>
 where
     M: IsMesh<T, Face3>,
+    IC: IsIndexContainer,
 {
     fn as_ref(&self) -> &M {
         &self.mesh
     }
 }
 
-impl<M, T> Into<(M, HalfEdge)> for SearchableMesh<M, T>
+impl<M, T, IC> Into<(M, HalfEdge<IC>)> for SearchableMesh<M, T, IC>
 where
     M: IsMesh<T, Face3>,
+    IC: IsIndexContainer,
 {
-    fn into(self) -> (M, HalfEdge) {
+    fn into(self) -> (M, HalfEdge<IC>) {
         (self.mesh, self.he)
     }
 }
 
-impl<M, T> From<(M, HalfEdge)> for SearchableMesh<M, T>
+impl<M, T, IC> From<(M, HalfEdge<IC>)> for SearchableMesh<M, T, IC>
 where
     M: IsMesh<T, Face3>,
+    IC: IsIndexContainer,
 {
-    fn from(me: (M, HalfEdge)) -> Self {
+    fn from(me: (M, HalfEdge<IC>)) -> Self {
         Self {
             mesh: me.0,
             he: me.1,

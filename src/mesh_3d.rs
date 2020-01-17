@@ -29,7 +29,7 @@ use crate::*;
 pub struct Mesh3D<P, IC>
 where
     P: Is3D,
-    IC: IsIndexContainer + Clone + Default,
+    IC: IsIndexContainer,
 {
     pc: PointCloud3D<P>,
     topology: IC,
@@ -38,7 +38,7 @@ where
 impl<P, IC> Mesh3D<P, IC>
 where
     P: Is3D,
-    IC: IsIndexContainer + Clone + Default,
+    IC: IsIndexContainer,
 {
     /// Reserves number of vertices
     pub fn reserve_vertices(&mut self, n: usize) {
@@ -53,7 +53,7 @@ where
 impl<P, IC> IsMesh<P, Face3> for Mesh3D<P, IC>
 where
     P: Is3D + Clone,
-    IC: IsIndexContainer + Clone + Default,
+    IC: IsIndexContainer,
 {
     fn num_faces(&self) -> usize {
         self.topology.len() / 3
@@ -108,7 +108,7 @@ where
 impl<P, IC> IsFaceEditableMesh<P, Face3> for Mesh3D<P, IC>
 where
     P: IsEditable3D + IsBuildable3D + Clone,
-    IC: IsIndexContainer + Clone + Default,
+    IC: IsIndexContainer,
 {
     fn add_face(&mut self, v1: P, v2: P, v3: P) -> FId {
         let vid1 = self.add_vertex(v1);
@@ -144,7 +144,7 @@ where
 impl<P, IC> IsVertexEditableMesh<P, Face3> for Mesh3D<P, IC>
 where
     P: IsEditable3D + IsBuildable3D + Clone,
-    IC: IsIndexContainer + Clone + Default,
+    IC: IsIndexContainer,
 {
     fn add_vertex(&mut self, vertex: P) -> VId {
         self.pc.push(vertex);
@@ -166,7 +166,7 @@ where
 impl<P, IC> HasBoundingBox3DMaybe for Mesh3D<P, IC>
 where
     P: Is3D,
-    IC: IsIndexContainer + Clone + Default,
+    IC: IsIndexContainer,
 {
     fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
         self.pc.bounding_box_maybe()
@@ -176,7 +176,7 @@ where
 impl<P, IC> HasCenterOfGravity3D for Mesh3D<P, IC>
 where
     P: Is3D,
-    IC: IsIndexContainer + Clone + Default,
+    IC: IsIndexContainer,
 {
     fn center_of_gravity(&self) -> Result<Point3D> {
         self.pc.center_of_gravity()
@@ -186,7 +186,7 @@ where
 impl<P, IC> IsScalable for Mesh3D<P, IC>
 where
     P: IsEditable3D,
-    IC: IsIndexContainer + Clone + Default,
+    IC: IsIndexContainer,
 {
     fn scale(&mut self, factor: Positive) {
         self.pc.scale(factor);
@@ -196,7 +196,7 @@ where
 impl<P, IC> IsMatrix4Transformable for Mesh3D<P, IC>
 where
     P: Is3D + IsMatrix4Transformable + Clone,
-    IC: IsIndexContainer + Clone + Default,
+    IC: IsIndexContainer,
 {
     fn transformed(&self, m: &Matrix4) -> Self {
         let mut new = self.clone();
@@ -212,7 +212,7 @@ where
 impl<P, IC> IsMovable3D for Mesh3D<P, IC>
 where
     P: Is3D + IsMovable3D,
-    IC: IsIndexContainer + Clone + Default,
+    IC: IsIndexContainer,
 {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         self.pc.move_by(x, y, z)
@@ -222,7 +222,7 @@ where
 impl<P, IC> From<(PointCloud3D<P>, IC)> for Mesh3D<P, IC>
 where
     P: Is3D,
-    IC: IsIndexContainer + Clone + Default,
+    IC: IsIndexContainer,
 {
     fn from(pt: (PointCloud3D<P>, IC)) -> Self {
         Self {
@@ -235,7 +235,7 @@ where
 impl<P, IC> Into<(PointCloud3D<P>, IC)> for Mesh3D<P, IC>
 where
     P: Is3D,
-    IC: IsIndexContainer + Clone + Default,
+    IC: IsIndexContainer,
 {
     fn into(self) -> (PointCloud3D<P>, IC) {
         (self.pc, self.topology)
@@ -245,7 +245,7 @@ where
 impl<P, IC> Into<PointCloud3D<P>> for Mesh3D<P, IC>
 where
     P: Is3D,
-    IC: IsIndexContainer + Clone + Default,
+    IC: IsIndexContainer,
 {
     fn into(self) -> PointCloud3D<P> {
         self.pc

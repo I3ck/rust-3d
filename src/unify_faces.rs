@@ -71,25 +71,25 @@ where
             let n_this = normal_of_face(&v1, &v2, &v3);
 
             for neighbour in neighbour_buffer.iter() {
-                if checked[*neighbour] {
+                if checked[neighbour] {
                     continue;
                 }
 
-                let [v1n, v2n, v3n] = mesh.face_vertices(FId { val: *neighbour }).unwrap(); // safe since index is safe
+                let [v1n, v2n, v3n] = mesh.face_vertices(FId { val: neighbour }).unwrap(); // safe since index is safe
                 let n_neighbour = normal_of_face(&v1n, &v2n, &v3n);
 
                 let are_different = n_this.dot(&n_neighbour) < 0.0;
                 let flip_this = must_flip[this];
                 must_flip.set(
-                    *neighbour,
+                    neighbour,
                     if flip_this {
                         !are_different
                     } else {
                         are_different
                     },
                 );
-                frontier.push(*neighbour);
-                checked.set(*neighbour, true);
+                frontier.push(neighbour);
+                checked.set(neighbour, true);
             }
         }
     }

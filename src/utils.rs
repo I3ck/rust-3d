@@ -27,19 +27,22 @@ use std::{
     hash::{Hash, Hasher},
 };
 
+use crate::IsIndexContainer;
+
 /// Splits a line into a Vec of its words
 pub fn to_words(line: &str) -> Vec<&str> {
     let split = line.trim().split(" ");
     split.collect::<Vec<&str>>()
 }
 
-/// Allows random adds anywhere on the Vec<Vec> by automatically resizing it with empty vectors
-pub fn safe_append_at<T>(vec: &mut Vec<Vec<T>>, i: usize, val: T)
+//@todo consider move to half_edge, since very specific now
+/// Allows random adds anywhere on the Vec<IC> by automatically resizing it with empty vectors
+pub fn safe_append_at<IC>(vec: &mut Vec<IC>, i: usize, val: usize)
 where
-    T: Clone,
+    IC: IsIndexContainer,
 {
     if i >= vec.len() {
-        vec.resize(i + 1, Vec::new());
+        vec.resize(i + 1, IC::default());
     }
 
     vec[i].push(val);
