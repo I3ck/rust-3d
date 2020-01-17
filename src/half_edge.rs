@@ -30,7 +30,7 @@ pub struct HalfEdge<IC>
 where
     IC: IsIndexContainer,
 {
-    tails: Vec<VId>,
+    tails: IC,
     twins: Vec<Option<EId>>,
     vertices_start_edges: Vec<IC>,
 }
@@ -48,7 +48,9 @@ where
     {
         let n_faces = mesh.num_faces();
 
-        let mut tails = Vec::with_capacity(3 * n_faces);
+        let mut tails = IC::default();
+        tails.reserve(3 * n_faces);
+
         let twins = vec![None; 3 * n_faces];
         let mut vertices_start_edges = Vec::new();
 
@@ -56,9 +58,9 @@ where
             match mesh.face_vertex_ids(FId { val: i }) {
                 Err(_) => {}
                 Ok(face) => {
-                    tails.push(face.a);
-                    tails.push(face.b);
-                    tails.push(face.c);
+                    tails.push(face.a.val);
+                    tails.push(face.b.val);
+                    tails.push(face.c.val);
 
                     safe_append_at(&mut vertices_start_edges, face.a.val, i * 3 + 0);
                     safe_append_at(&mut vertices_start_edges, face.b.val, i * 3 + 1);
@@ -81,11 +83,16 @@ where
         for i in 0..result.tails.len() {
             cache.clear();
             let _ = result.next(EId { val: i }).and_then(&mut |next_id: EId| {
-                result.edges_originating(result.tails[next_id.val], &mut cache)
+                result.edges_originating(
+                    VId {
+                        val: result.tails.get(next_id.val),
+                    },
+                    &mut cache,
+                )
             });
             for originating_id in cache.iter() {
                 let _ = result.next(*originating_id).map(|candidate_id| {
-                    if result.tails[candidate_id.val] == result.tails[i] {
+                    if result.tails.get(candidate_id.val) == result.tails.get(i) {
                         result.twins[i] = Some(candidate_id)
                     }
                 });
@@ -96,7 +103,9 @@ where
     /// Returns the ID of the vertex the edge originates from (error if id out of bounds)
     pub fn tail(&self, id: EId) -> Result<VId> {
         self.ensure_edge_id(id)?;
-        Ok(self.tails[id.val])
+        Ok(VId {
+            val: self.tails.get(id.val),
+        })
     }
     /// Returns the ID of the face the edge belongs to (error if id out of bounds)
     pub fn face(&self, id: EId) -> Result<FId> {
@@ -198,11 +207,11 @@ where
     }
 }
 
-impl<IC> From<(Vec<VId>, Vec<Option<EId>>, Vec<IC>)> for HalfEdge<IC>
+impl<IC> From<(IC, Vec<Option<EId>>, Vec<IC>)> for HalfEdge<IC>
 where
     IC: IsIndexContainer,
 {
-    fn from(ev: (Vec<VId>, Vec<Option<EId>>, Vec<IC>)) -> Self {
+    fn from(ev: (IC, Vec<Option<EId>>, Vec<IC>)) -> Self {
         Self {
             tails: ev.0,
             twins: ev.1,
@@ -211,21 +220,21 @@ where
     }
 }
 
-impl<IC> Into<(Vec<VId>, Vec<Option<EId>>, Vec<IC>)> for HalfEdge<IC>
+impl<IC> Into<(IC, Vec<Option<EId>>, Vec<IC>)> for HalfEdge<IC>
 where
     IC: IsIndexContainer,
 {
-    fn into(self) -> (Vec<VId>, Vec<Option<EId>>, Vec<IC>) {
+    fn into(self) -> (IC, Vec<Option<EId>>, Vec<IC>) {
         (self.tails, self.twins, self.vertices_start_edges)
     }
 }
 
 //@todo consider two separate implementations
-impl<IC> Into<(Vec<VId>, Vec<Option<EId>>)> for HalfEdge<IC>
+impl<IC> Into<(IC, Vec<Option<EId>>)> for HalfEdge<IC>
 where
     IC: IsIndexContainer,
 {
-    fn into(self) -> (Vec<VId>, Vec<Option<EId>>) {
+    fn into(self) -> (IC, Vec<Option<EId>>) {
         (self.tails, self.twins)
     }
 }
