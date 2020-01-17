@@ -25,19 +25,13 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-/// Edge type used within the HalfEdge
-pub struct Edge {
-    tail: VId,
-    twin: Option<EId>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// HalfEdge, the half edge data structure
 pub struct HalfEdge<IC>
 where
     IC: IsIndexContainer,
 {
-    edges: Vec<Edge>,
+    tails: Vec<VId>,
+    twins: Vec<Option<EId>>,
     vertices_start_edges: Vec<IC>,
 }
 
@@ -54,25 +48,17 @@ where
     {
         let n_faces = mesh.num_faces();
 
-        let mut edges = Vec::with_capacity(3 * n_faces);
+        let mut tails = Vec::with_capacity(3 * n_faces);
+        let twins = vec![None; 3 * n_faces];
         let mut vertices_start_edges = Vec::new();
 
         for i in 0..n_faces {
             match mesh.face_vertex_ids(FId { val: i }) {
                 Err(_) => {}
                 Ok(face) => {
-                    edges.push(Edge {
-                        tail: face.a,
-                        twin: None,
-                    });
-                    edges.push(Edge {
-                        tail: face.b,
-                        twin: None,
-                    });
-                    edges.push(Edge {
-                        tail: face.c,
-                        twin: None,
-                    });
+                    tails.push(face.a);
+                    tails.push(face.b);
+                    tails.push(face.c);
 
                     safe_append_at(&mut vertices_start_edges, face.a.val, i * 3 + 0);
                     safe_append_at(&mut vertices_start_edges, face.b.val, i * 3 + 1);
@@ -82,7 +68,8 @@ where
         }
 
         let mut result = HalfEdge {
-            edges: edges,
+            tails,
+            twins,
             vertices_start_edges: vertices_start_edges,
         };
 
@@ -91,15 +78,15 @@ where
         // Of these the one where next has the same tail must be the twin
         // @todo could let this fail if there is more than one valid candidate (not manifold)
         let mut cache = Vec::new();
-        for i in 0..result.edges.len() {
+        for i in 0..result.tails.len() {
             cache.clear();
             let _ = result.next(EId { val: i }).and_then(&mut |next_id: EId| {
-                result.edges_originating(result.edges[next_id.val].tail, &mut cache)
+                result.edges_originating(result.tails[next_id.val], &mut cache)
             });
             for originating_id in cache.iter() {
                 let _ = result.next(*originating_id).map(|candidate_id| {
-                    if result.edges[candidate_id.val].tail == result.edges[i].tail {
-                        result.edges[i].twin = Some(candidate_id)
+                    if result.tails[candidate_id.val] == result.tails[i] {
+                        result.twins[i] = Some(candidate_id)
                     }
                 });
             }
@@ -109,7 +96,7 @@ where
     /// Returns the ID of the vertex the edge originates from (error if id out of bounds)
     pub fn tail(&self, id: EId) -> Result<VId> {
         self.ensure_edge_id(id)?;
-        Ok(self.edges[id.val].tail)
+        Ok(self.tails[id.val])
     }
     /// Returns the ID of the face the edge belongs to (error if id out of bounds)
     pub fn face(&self, id: EId) -> Result<FId> {
@@ -119,7 +106,7 @@ where
     /// Returns the ID of the twin edge (None if there isn't any) (error if id out of bounds)
     pub fn twin(&self, id: EId) -> Result<Option<EId>> {
         self.ensure_edge_id(id)?;
-        Ok(self.edges[id.val].twin)
+        Ok(self.twins[id.val])
     }
     /// Returns the ID of the edge after this edge (error if id out of bounds)
     pub fn next(&self, id: EId) -> Result<EId> {
@@ -197,7 +184,7 @@ where
     }
     /// Fails if the edge ID is out of bounds
     pub fn ensure_edge_id(&self, id: EId) -> Result<()> {
-        if id.val >= self.edges.len() {
+        if id.val >= self.tails.len() {
             return Err(ErrorKind::IncorrectEdgeID);
         }
         Ok(())
@@ -211,33 +198,35 @@ where
     }
 }
 
-impl<IC> From<(Vec<Edge>, Vec<IC>)> for HalfEdge<IC>
+impl<IC> From<(Vec<VId>, Vec<Option<EId>>, Vec<IC>)> for HalfEdge<IC>
 where
     IC: IsIndexContainer,
 {
-    fn from(ev: (Vec<Edge>, Vec<IC>)) -> Self {
+    fn from(ev: (Vec<VId>, Vec<Option<EId>>, Vec<IC>)) -> Self {
         Self {
-            edges: ev.0,
-            vertices_start_edges: ev.1,
+            tails: ev.0,
+            twins: ev.1,
+            vertices_start_edges: ev.2,
         }
     }
 }
 
-impl<IC> Into<(Vec<Edge>, Vec<IC>)> for HalfEdge<IC>
+impl<IC> Into<(Vec<VId>, Vec<Option<EId>>, Vec<IC>)> for HalfEdge<IC>
 where
     IC: IsIndexContainer,
 {
-    fn into(self) -> (Vec<Edge>, Vec<IC>) {
-        (self.edges, self.vertices_start_edges)
+    fn into(self) -> (Vec<VId>, Vec<Option<EId>>, Vec<IC>) {
+        (self.tails, self.twins, self.vertices_start_edges)
     }
 }
 
-impl<IC> Into<Vec<Edge>> for HalfEdge<IC>
+//@todo consider two separate implementations
+impl<IC> Into<(Vec<VId>, Vec<Option<EId>>)> for HalfEdge<IC>
 where
     IC: IsIndexContainer,
 {
-    fn into(self) -> Vec<Edge> {
-        self.edges
+    fn into(self) -> (Vec<VId>, Vec<Option<EId>>) {
+        (self.tails, self.twins)
     }
 }
 
