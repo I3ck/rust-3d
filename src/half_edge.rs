@@ -46,10 +46,10 @@ where
     where
         M: IsMesh<T, Face3>,
     {
+        let n_vertices = mesh.num_vertices();
         let n_faces = mesh.num_faces();
 
-        let mut tails = IC::default();
-        tails.reserve(3 * n_faces);
+        let mut tails = IC::with_capacity_and_support_for(3 * n_faces, n_vertices);
 
         let twins = vec![None; 3 * n_faces];
         let mut vertices_start_edges = Vec::new();
