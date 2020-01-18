@@ -263,9 +263,64 @@ impl From<&Vec<usize>> for DynamicPrecisionIndexVec {
 }
 
 impl From<Vec<usize>> for DynamicPrecisionIndexVec {
-    //@todo also implement for u8 u16 u32
     fn from(vec: Vec<usize>) -> Self {
         Self::from(&vec)
+    }
+}
+
+impl From<&Vec<u32>> for DynamicPrecisionIndexVec {
+    fn from(vec: &Vec<u32>) -> Self {
+        let mut result = Self::new();
+        if let Some(max) = vec.iter().max() {
+            result.ensure_upgraded(*max as usize);
+            result.reserve(vec.len());
+            for x in vec.iter() {
+                result.push(*x as usize)
+            }
+        }
+
+        result
+    }
+}
+
+impl From<Vec<u32>> for DynamicPrecisionIndexVec {
+    fn from(vec: Vec<u32>) -> Self {
+        Self::from(&vec)
+    }
+}
+
+impl From<&Vec<u16>> for DynamicPrecisionIndexVec {
+    fn from(vec: &Vec<u16>) -> Self {
+        let mut result = Self::new();
+        if let Some(max) = vec.iter().max() {
+            result.ensure_upgraded(*max as usize);
+            result.reserve(vec.len());
+            for x in vec.iter() {
+                result.push(*x as usize)
+            }
+        }
+
+        result
+    }
+}
+
+impl From<Vec<u16>> for DynamicPrecisionIndexVec {
+    fn from(vec: Vec<u16>) -> Self {
+        Self::from(&vec)
+    }
+}
+
+impl From<&Vec<u8>> for DynamicPrecisionIndexVec {
+    fn from(vec: &Vec<u8>) -> Self {
+        Self::from(vec.clone())
+    }
+}
+
+impl From<Vec<u8>> for DynamicPrecisionIndexVec {
+    fn from(vec: Vec<u8>) -> Self {
+        Self {
+            mode: Mode::U8(vec),
+        }
     }
 }
 
