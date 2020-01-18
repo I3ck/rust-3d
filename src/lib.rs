@@ -527,3 +527,6 @@ pub use self::filter_outlier_3d::FilterOutlier3D;
 
 mod is_index_container;
 pub use self::is_index_container::{IsIndexContainer, IsIndexContainerIterator};
+
+mod dynamic_precision_index_vec;
+pub use self::dynamic_precision_index_vec::DynamicPrecisionIndexVec;
