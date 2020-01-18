@@ -249,10 +249,13 @@ impl IsIndexContainer for DynamicPrecisionIndexVec {
 impl From<&Vec<usize>> for DynamicPrecisionIndexVec {
     //@todo also implement for u8 u16 u32
     fn from(vec: &Vec<usize>) -> Self {
-        let mut result = Self::new(); //@todo reserver here and more optimizations
-        result.reserve(vec.len());
-        for x in vec.iter() {
-            result.push(x) //@todo consider iterating first to find the maximum and set mode according to it
+        let mut result = Self::new();
+        if let Some(max) = vec.iter().max() {
+            result.ensure_upgraded(max);
+            result.reserve(vec.len());
+            for x in vec.iter() {
+                result.push(x)
+            }
         }
 
         result
