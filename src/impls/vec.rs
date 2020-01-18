@@ -115,6 +115,10 @@ where
 }
 
 impl IsIndexContainer for Vec<usize> {
+    fn ensure_supported(&mut self, _x: usize) {
+        // always supported
+    }
+
     fn reserve(&mut self, n: usize) {
         self.reserve(n)
     }

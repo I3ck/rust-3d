@@ -28,6 +28,9 @@ pub trait IsIndexContainer: Clone + Default {
     /// Should reserve space for n more elements
     fn reserve(&mut self, n: usize);
 
+    /// Should ensure that given number can be supported
+    fn ensure_supported(&mut self, x: usize);
+
     /// Should return the number of elements
     fn len(&self) -> usize;
 
@@ -42,6 +45,28 @@ pub trait IsIndexContainer: Clone + Default {
 
     /// Should return an iterator over the values
     fn iter(&self) -> IsIndexContainerIterator<Self>;
+
+    /// Creates a new object with the given capacity
+    fn with_capacity(n: usize) -> Self {
+        let mut result = Self::default();
+        result.reserve(n);
+        result
+    }
+
+    /// Creates a new object that can support the given number
+    fn with_support_for(x: usize) -> Self {
+        let mut result = Self::default();
+        result.ensure_supported(x);
+        result
+    }
+
+    /// Creates a new object with the given capacity and support for the given number
+    fn with_capacity_and_support_for(n: usize, x: usize) -> Self {
+        let mut result = Self::default();
+        result.ensure_supported(x);
+        result.reserve(n);
+        result
+    }
 }
 
 pub struct IsIndexContainerIterator<'a, IC>

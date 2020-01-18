@@ -37,7 +37,7 @@ pub struct DynamicPrecisionIndexVec {
 //@todo implement as much of the Vec interface as possible
 //@todo have constructors such as with_capacity that additionally initialize with the fitting mode
 impl DynamicPrecisionIndexVec {
-    /// Creates a new DynamicPrecisionIndexVec
+    /// Creates a new DynamicPrecisionIndexVec with u8 precision
     pub fn new() -> Self {
         Self {
             mode: Mode::U8(Vec::new()),
@@ -116,20 +116,6 @@ impl DynamicPrecisionIndexVec {
         }
     }
 
-    fn ensure_upgraded(&mut self, x: usize) {
-        if x <= self.allowed_max() {
-            return;
-        }
-
-        if x > u32::MAX as usize {
-            self.upgrade_to_usize();
-        } else if x > u16::MAX as usize {
-            self.upgrade_to_u32();
-        } else if x > u8::MAX as usize {
-            self.upgrade_to_u16();
-        }
-    }
-
     fn upgrade_to_usize(&mut self) {
         if let Some(new_mode) = match self.mode {
             Mode::U8(ref vec) => {
@@ -192,6 +178,20 @@ impl DynamicPrecisionIndexVec {
 }
 
 impl IsIndexContainer for DynamicPrecisionIndexVec {
+    fn ensure_supported(&mut self, x: usize) {
+        if x <= self.allowed_max() {
+            return;
+        }
+
+        if x > u32::MAX as usize {
+            self.upgrade_to_usize();
+        } else if x > u16::MAX as usize {
+            self.upgrade_to_u32();
+        } else if x > u8::MAX as usize {
+            self.upgrade_to_u16();
+        }
+    }
+
     fn get(&self, i: usize) -> usize {
         match self.mode {
             Mode::U8(ref vec) => vec[i] as usize,
@@ -202,7 +202,7 @@ impl IsIndexContainer for DynamicPrecisionIndexVec {
     }
 
     fn set(&mut self, i: usize, x: usize) {
-        self.ensure_upgraded(x);
+        self.ensure_supported(x);
 
         match self.mode {
             Mode::U8(ref mut vec) => vec[i] = x as u8,
@@ -213,7 +213,7 @@ impl IsIndexContainer for DynamicPrecisionIndexVec {
     }
 
     fn push(&mut self, x: usize) {
-        self.ensure_upgraded(x);
+        self.ensure_supported(x);
 
         match self.mode {
             Mode::U8(ref mut vec) => vec.push(x as u8),
@@ -251,7 +251,7 @@ impl From<&Vec<usize>> for DynamicPrecisionIndexVec {
     fn from(vec: &Vec<usize>) -> Self {
         let mut result = Self::new();
         if let Some(max) = vec.iter().max() {
-            result.ensure_upgraded(max);
+            result.ensure_supported(max);
             result.reserve(vec.len());
             for x in vec.iter() {
                 result.push(x)
@@ -272,7 +272,7 @@ impl From<&Vec<u32>> for DynamicPrecisionIndexVec {
     fn from(vec: &Vec<u32>) -> Self {
         let mut result = Self::new();
         if let Some(max) = vec.iter().max() {
-            result.ensure_upgraded(*max as usize);
+            result.ensure_supported(*max as usize);
             result.reserve(vec.len());
             for x in vec.iter() {
                 result.push(*x as usize)
@@ -293,7 +293,7 @@ impl From<&Vec<u16>> for DynamicPrecisionIndexVec {
     fn from(vec: &Vec<u16>) -> Self {
         let mut result = Self::new();
         if let Some(max) = vec.iter().max() {
-            result.ensure_upgraded(*max as usize);
+            result.ensure_supported(*max as usize);
             result.reserve(vec.len());
             for x in vec.iter() {
                 result.push(*x as usize)
