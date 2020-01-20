@@ -35,19 +35,6 @@ pub fn to_words(line: &str) -> Vec<&str> {
     split.collect::<Vec<&str>>()
 }
 
-//@todo consider move to half_edge, since very specific now
-/// Allows random adds anywhere on the Vec<IC> by automatically resizing it with empty vectors
-pub fn safe_append_at<IC>(vec: &mut Vec<IC>, i: usize, val: usize)
-where
-    IC: IsIndexContainer,
-{
-    if i >= vec.len() {
-        vec.resize(i + 1, IC::default());
-    }
-
-    vec[i].push(val);
-}
-
 /// Max of two f64 values
 pub fn max_f64(a: f64, b: f64) -> f64 {
     if a > b {

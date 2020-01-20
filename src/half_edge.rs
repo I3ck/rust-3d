@@ -48,11 +48,12 @@ where
     {
         let n_vertices = mesh.num_vertices();
         let n_faces = mesh.num_faces();
+        let n_edges = 3 * n_faces;
 
-        let mut tails = IC::with_capacity_and_support_for(3 * n_faces, n_vertices);
+        let mut tails = IC::with_capacity_and_support_for(n_edges, n_vertices);
 
         let twins = vec![None; 3 * n_faces];
-        let mut vertices_start_edges = Vec::new();
+        let mut vertices_start_edges = Vec::with_capacity(n_vertices);
 
         for i in 0..n_faces {
             match mesh.face_vertex_ids(FId { val: i }) {
@@ -62,9 +63,9 @@ where
                     tails.push(face.b.val);
                     tails.push(face.c.val);
 
-                    safe_append_at(&mut vertices_start_edges, face.a.val, i * 3 + 0);
-                    safe_append_at(&mut vertices_start_edges, face.b.val, i * 3 + 1);
-                    safe_append_at(&mut vertices_start_edges, face.c.val, i * 3 + 2);
+                    safe_append_at(&mut vertices_start_edges, n_edges, face.a.val, i * 3 + 0);
+                    safe_append_at(&mut vertices_start_edges, n_edges, face.b.val, i * 3 + 1);
+                    safe_append_at(&mut vertices_start_edges, n_edges, face.c.val, i * 3 + 2);
                 }
             }
         }
@@ -246,4 +247,17 @@ where
     fn into(self) -> Vec<IC> {
         self.vertices_start_edges
     }
+}
+
+//------------------------------------------------------------------------------
+
+fn safe_append_at<IC>(vec: &mut Vec<IC>, max: usize, i: usize, val: usize)
+where
+    IC: IsIndexContainer,
+{
+    if i >= vec.len() {
+        vec.resize(i + 1, IC::with_support_for(max));
+    }
+
+    vec[i].push(val);
 }
