@@ -54,6 +54,7 @@ where
 
         let twins = vec![None; 3 * n_faces];
         let mut vertices_start_edges = Vec::with_capacity(n_vertices);
+        let estimated_edges_per_vertex = 6; // true for all vertices within regular meshes, possibly best estimate
 
         for i in 0..n_faces {
             match mesh.face_vertex_ids(FId { val: i }) {
@@ -63,9 +64,27 @@ where
                     tails.push(face.b.val);
                     tails.push(face.c.val);
 
-                    safe_append_at(&mut vertices_start_edges, n_edges, face.a.val, i * 3 + 0);
-                    safe_append_at(&mut vertices_start_edges, n_edges, face.b.val, i * 3 + 1);
-                    safe_append_at(&mut vertices_start_edges, n_edges, face.c.val, i * 3 + 2);
+                    safe_append_at(
+                        &mut vertices_start_edges,
+                        estimated_edges_per_vertex,
+                        n_edges,
+                        face.a.val,
+                        i * 3 + 0,
+                    );
+                    safe_append_at(
+                        &mut vertices_start_edges,
+                        estimated_edges_per_vertex,
+                        n_edges,
+                        face.b.val,
+                        i * 3 + 1,
+                    );
+                    safe_append_at(
+                        &mut vertices_start_edges,
+                        estimated_edges_per_vertex,
+                        n_edges,
+                        face.c.val,
+                        i * 3 + 2,
+                    );
                 }
             }
         }
@@ -251,12 +270,12 @@ where
 
 //------------------------------------------------------------------------------
 
-fn safe_append_at<IC>(vec: &mut Vec<IC>, max: usize, i: usize, val: usize)
+fn safe_append_at<IC>(vec: &mut Vec<IC>, capacity: usize, support: usize, i: usize, val: usize)
 where
     IC: IsIndexContainer,
 {
     if i >= vec.len() {
-        vec.resize(i + 1, IC::with_support_for(max));
+        vec.resize(i + 1, IC::with_capacity_and_support_for(capacity, support));
     }
 
     vec[i].push(val);
