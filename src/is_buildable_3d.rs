@@ -90,4 +90,15 @@ pub trait IsBuildable3D: Sized + Is3D + Eq + PartialEq + Ord + PartialOrd + Hash
             _ => Err(ErrorKind::ParseError),
         }
     }
+    /// Returns the center between this and other
+    fn center<P>(&self, other: &P) -> Self
+    where
+        P: Is3D,
+    {
+        Self::new(
+            0.5 * (self.x() + other.x()),
+            0.5 * (self.y() + other.y()),
+            0.5 * (self.z() + other.z()),
+        )
+    }
 }

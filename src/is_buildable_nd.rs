@@ -38,7 +38,7 @@ pub trait IsBuildableND: Sized + IsND {
         Self::new_nd(&vec![0.0; Self::n_dimensions()])
     }
     /// Returns the center between this and other
-    fn center<P>(&self, other: &P) -> Result<Self>
+    fn center_nd<P>(&self, other: &P, buffer: &mut Vec<f64>) -> Result<Self>
     where
         P: IsND,
     {
@@ -48,11 +48,11 @@ pub trait IsBuildableND: Sized + IsND {
             return Err(ErrorKind::IncorrectDimension);
         }
 
-        let mut v = Vec::with_capacity(n);
+        buffer.clear();
         for i in 0..n {
-            v.push(0.5 * (self.position_nd(i)? + other.position_nd(i)?));
+            buffer.push(0.5 * (self.position_nd(i)? + other.position_nd(i)?));
         }
 
-        Self::new_nd(&v)
+        Self::new_nd(&buffer)
     }
 }

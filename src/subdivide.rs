@@ -42,6 +42,7 @@ where
     let n_vertices = mi.num_vertices();
     let n_faces = mi.num_faces();
     let mut added_edges = HashMap::new();
+    let mut center_buffer = Vec::new();
 
     for i in 0..n_vertices {
         mo.add_vertex(mi.vertex(VId { val: i })?);
@@ -54,13 +55,13 @@ where
 
         let ia = *added_edges
             .entry((min(vi1, vi2), max(vi1, vi2)))
-            .or_insert_with(|| mo.add_vertex(v1.center(&v2).unwrap()));
+            .or_insert_with(|| mo.add_vertex(v1.center_nd(&v2, &mut center_buffer).unwrap()));
         let ib = *added_edges
             .entry((min(vi2, vi3), max(vi2, vi3)))
-            .or_insert_with(|| mo.add_vertex(v2.center(&v3).unwrap()));
+            .or_insert_with(|| mo.add_vertex(v2.center_nd(&v3, &mut center_buffer).unwrap()));
         let ic = *added_edges
             .entry((min(vi3, vi1), max(vi3, vi1)))
-            .or_insert_with(|| mo.add_vertex(v3.center(&v1).unwrap()));
+            .or_insert_with(|| mo.add_vertex(v3.center_nd(&v1, &mut center_buffer).unwrap()));
 
         mo.try_add_connection(vi1, ia, ic)?;
         mo.try_add_connection(ia, vi2, ib)?;
