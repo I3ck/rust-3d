@@ -106,6 +106,31 @@ where
     }
 }
 
+impl<P> IsDataContainer<P> for PointCloud2D<P>
+where
+    P: Is2D + IsBuildable2D + Clone,
+{
+    fn reserve_d(&mut self, n: usize) {
+        self.data.reserve(n);
+    }
+
+    fn len_d(&self) -> usize {
+        self.data.len()
+    }
+
+    fn push_d(&mut self, p: P) {
+        self.push(p)
+    }
+
+    fn get_d(&self, index: usize) -> P {
+        self.data[index].clone()
+    }
+
+    fn set_d(&mut self, index: usize, p: P) {
+        self.data[index] = p
+    }
+}
+
 impl<P> Index<usize> for PointCloud2D<P>
 where
     P: Is2D,

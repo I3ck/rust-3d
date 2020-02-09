@@ -186,6 +186,9 @@ pub use self::point_cloud_2d::PointCloud2D;
 mod point_cloud_3d;
 pub use self::point_cloud_3d::PointCloud3D;
 
+mod point_cloud_3d_f32;
+pub use self::point_cloud_3d_f32::PointCloud3Df32;
+
 mod polygon_2d;
 pub use self::polygon_2d::Polygon2D;
 
@@ -530,3 +533,6 @@ pub use self::is_index_container::{IsIndexContainer, IsIndexContainerIterator};
 
 mod dynamic_precision_index_vec;
 pub use self::dynamic_precision_index_vec::DynamicPrecisionIndexVec;
+
+mod is_data_container;
+pub use self::is_data_container::IsDataContainer;

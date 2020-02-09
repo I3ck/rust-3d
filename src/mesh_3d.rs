@@ -24,25 +24,30 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+use std::marker::PhantomData;
+
 #[derive(Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Mesh3D, a mesh with tri-faces within 3D space
-pub struct Mesh3D<P, IC>
+pub struct Mesh3D<P, ID, IC>
 where
     P: Is3D,
+    ID: IsDataContainer<P>,
     IC: IsIndexContainer,
 {
-    pc: PointCloud3D<P>,
+    pc: ID,
     topology: IC,
+    _phantom: PhantomData<P>,
 }
 
-impl<P, IC> Mesh3D<P, IC>
+impl<P, ID, IC> Mesh3D<P, ID, IC>
 where
     P: Is3D,
+    ID: IsDataContainer<P>,
     IC: IsIndexContainer,
 {
     /// Reserves number of vertices
     pub fn reserve_vertices(&mut self, n: usize) {
-        self.pc.reserve_vertices(n)
+        self.pc.reserve_d(n)
     }
     /// Reserves number of faces
     pub fn reserve_faces(&mut self, n: usize) {
@@ -50,9 +55,10 @@ where
     }
 }
 
-impl<P, IC> IsMesh<P, Face3> for Mesh3D<P, IC>
+impl<P, ID, IC> IsMesh<P, Face3> for Mesh3D<P, ID, IC>
 where
     P: Is3D + Clone,
+    ID: IsDataContainer<P>,
     IC: IsIndexContainer,
 {
     fn num_faces(&self) -> usize {
@@ -60,7 +66,7 @@ where
     }
 
     fn num_vertices(&self) -> usize {
-        self.pc.len()
+        self.pc.len_d()
     }
 
     fn face_vertex_ids(&self, faceid: FId) -> Result<Face3> {
@@ -98,16 +104,17 @@ where
     }
 
     fn vertex(&self, vertexid: VId) -> Result<P> {
-        if vertexid.val >= self.pc.len() {
+        if vertexid.val >= self.pc.len_d() {
             return Err(ErrorKind::IncorrectVertexID);
         }
-        Ok(self.pc.data[vertexid.val].clone())
+        Ok(self.pc.get_d(vertexid.val))
     }
 }
 
-impl<P, IC> IsFaceEditableMesh<P, Face3> for Mesh3D<P, IC>
+impl<P, ID, IC> IsFaceEditableMesh<P, Face3> for Mesh3D<P, ID, IC>
 where
     P: IsEditable3D + IsBuildable3D + Clone,
+    ID: IsDataContainer<P>,
     IC: IsIndexContainer,
 {
     fn add_face(&mut self, v1: P, v2: P, v3: P) -> FId {
@@ -123,9 +130,9 @@ where
     }
 
     fn try_add_connection(&mut self, vid1: VId, vid2: VId, vid3: VId) -> Result<FId> {
-        if vid1.val >= self.pc.len()
-            || vid2.val >= self.pc.len()
-            || vid3.val >= self.pc.len()
+        if vid1.val >= self.pc.len_d()
+            || vid2.val >= self.pc.len_d()
+            || vid3.val >= self.pc.len_d()
             || vid1 == vid2
             || vid1 == vid3
             || vid2 == vid3
@@ -141,21 +148,22 @@ where
     }
 }
 
-impl<P, IC> IsVertexEditableMesh<P, Face3> for Mesh3D<P, IC>
+impl<P, ID, IC> IsVertexEditableMesh<P, Face3> for Mesh3D<P, ID, IC>
 where
     P: IsEditable3D + IsBuildable3D + Clone,
+    ID: IsDataContainer<P>,
     IC: IsIndexContainer,
 {
     fn add_vertex(&mut self, vertex: P) -> VId {
-        self.pc.push(vertex);
+        self.pc.push_d(vertex);
         VId {
-            val: self.pc.len() - 1,
+            val: self.pc.len_d() - 1,
         }
     }
 
     fn change_vertex(&mut self, vid: VId, vertex: P) -> Result<()> {
-        if vid.val < self.pc.len() {
-            self.pc[vid.val] = vertex;
+        if vid.val < self.pc.len_d() {
+            self.pc.set_d(vid.val, vertex);
             Ok(())
         } else {
             Err(ErrorKind::IncorrectVertexID)
@@ -163,9 +171,10 @@ where
     }
 }
 
-impl<P, IC> HasBoundingBox3DMaybe for Mesh3D<P, IC>
+impl<P, ID, IC> HasBoundingBox3DMaybe for Mesh3D<P, ID, IC>
 where
     P: Is3D,
+    ID: IsDataContainer<P> + HasBoundingBox3DMaybe,
     IC: IsIndexContainer,
 {
     fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
@@ -173,9 +182,10 @@ where
     }
 }
 
-impl<P, IC> HasCenterOfGravity3D for Mesh3D<P, IC>
+impl<P, ID, IC> HasCenterOfGravity3D for Mesh3D<P, ID, IC>
 where
     P: Is3D,
+    ID: IsDataContainer<P> + HasCenterOfGravity3D,
     IC: IsIndexContainer,
 {
     fn center_of_gravity(&self) -> Result<Point3D> {
@@ -183,9 +193,10 @@ where
     }
 }
 
-impl<P, IC> IsScalable for Mesh3D<P, IC>
+impl<P, ID, IC> IsScalable for Mesh3D<P, ID, IC>
 where
     P: IsEditable3D,
+    ID: IsDataContainer<P> + IsScalable,
     IC: IsIndexContainer,
 {
     fn scale(&mut self, factor: Positive) {
@@ -193,9 +204,10 @@ where
     }
 }
 
-impl<P, IC> IsMatrix4Transformable for Mesh3D<P, IC>
+impl<P, ID, IC> IsMatrix4Transformable for Mesh3D<P, ID, IC>
 where
     P: Is3D + IsMatrix4Transformable + Clone,
+    ID: IsDataContainer<P> + IsMatrix4Transformable + Clone,
     IC: IsIndexContainer,
 {
     fn transformed(&self, m: &Matrix4) -> Self {
@@ -209,9 +221,10 @@ where
     }
 }
 
-impl<P, IC> IsMovable3D for Mesh3D<P, IC>
+impl<P, ID, IC> IsMovable3D for Mesh3D<P, ID, IC>
 where
     P: Is3D + IsMovable3D,
+    ID: IsDataContainer<P> + IsMovable3D,
     IC: IsIndexContainer,
 {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
@@ -219,35 +232,28 @@ where
     }
 }
 
-impl<P, IC> From<(PointCloud3D<P>, IC)> for Mesh3D<P, IC>
+impl<P, ID, IC> From<(ID, IC)> for Mesh3D<P, ID, IC>
 where
     P: Is3D,
+    ID: IsDataContainer<P>,
     IC: IsIndexContainer,
 {
-    fn from(pt: (PointCloud3D<P>, IC)) -> Self {
+    fn from(pt: (ID, IC)) -> Self {
         Self {
             pc: pt.0,
             topology: pt.1,
+            _phantom: PhantomData::default(),
         }
     }
 }
 
-impl<P, IC> Into<(PointCloud3D<P>, IC)> for Mesh3D<P, IC>
+impl<P, ID, IC> Into<(ID, IC)> for Mesh3D<P, ID, IC>
 where
     P: Is3D,
+    ID: IsDataContainer<P>,
     IC: IsIndexContainer,
 {
-    fn into(self) -> (PointCloud3D<P>, IC) {
+    fn into(self) -> (ID, IC) {
         (self.pc, self.topology)
-    }
-}
-
-impl<P, IC> Into<PointCloud3D<P>> for Mesh3D<P, IC>
-where
-    P: Is3D,
-    IC: IsIndexContainer,
-{
-    fn into(self) -> PointCloud3D<P> {
-        self.pc
     }
 }
