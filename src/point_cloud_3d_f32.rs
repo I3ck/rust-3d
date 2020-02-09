@@ -20,7 +20,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//@todo implement as many traits as possible
+//@todo implement as many traits as possible (see point_cloud_3d for reference)
 
 //! PointCloud3Df32, a collection of positions within 3D space stored lossy as f32 vector for easier usage during rendering
 
@@ -88,6 +88,32 @@ where
         self.data[3 * index + 0] = p.x() as f32;
         self.data[3 * index + 1] = p.y() as f32;
         self.data[3 * index + 2] = p.z() as f32;
+    }
+}
+
+impl<P> IsMovable3D for PointCloud3Df32<P>
+where
+    P: Is3D + IsBuildable3D,
+{
+    fn move_by(&mut self, x: f64, y: f64, z: f64) {
+        for index in 0..self.data.len() / 3 {
+            self.data[3 * index + 0] += x as f32;
+            self.data[3 * index + 1] += y as f32;
+            self.data[3 * index + 2] += z as f32;
+        }
+    }
+}
+
+impl<P> HasBoundingBox3DMaybe for PointCloud3Df32<P>
+where
+    P: Is3D + IsBuildable3D,
+{
+    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
+        BoundingBox3D::from_into_iterator(
+            self.data
+                .chunks_exact(3)
+                .map(|chunk| P::new(chunk[0] as f64, chunk[1] as f64, chunk[2] as f64)),
+        )
     }
 }
 
