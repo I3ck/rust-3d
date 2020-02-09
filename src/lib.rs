@@ -534,5 +534,8 @@ pub use self::is_index_container::{IsIndexContainer, IsIndexContainerIterator};
 mod dynamic_precision_index_vec;
 pub use self::dynamic_precision_index_vec::DynamicPrecisionIndexVec;
 
+mod u32_index_vec;
+pub use self::u32_index_vec::U32IndexVec;
+
 mod is_data_container;
 pub use self::is_data_container::IsDataContainer;
