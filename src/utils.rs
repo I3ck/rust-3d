@@ -30,9 +30,8 @@ use std::{
 use crate::*;
 
 /// Splits a line into a Vec of its words
-pub fn to_words(line: &str) -> Vec<&str> {
-    let split = line.trim().split(" ");
-    split.collect::<Vec<&str>>()
+pub fn to_words(line: &str) -> std::str::Split<'_, &str> {
+    line.trim().split(" ")
 }
 
 /// Max of two f64 values

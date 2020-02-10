@@ -412,11 +412,13 @@ where
             match vertex_count {
                 None => {
                     if line.starts_with("element vertex") {
-                        let words = to_words(line);
-                        match words.len() {
+                        let mut words = to_words(line);
+                        match words.clone().count() {
                             3 => {
-                                vertex_count =
-                                    Some(usize::from_str(words[2]).map_err(|e| e.to_error_kind())?);
+                                vertex_count = Some(
+                                    usize::from_str(words.nth(2).unwrap())
+                                        .map_err(|e| e.to_error_kind())?,
+                                );
                                 continue;
                             }
                             _ => return Err(ErrorKind::PlyError(PlyError::LoadError)),
@@ -439,11 +441,13 @@ where
             match face_count {
                 None => {
                     if line.starts_with("element face") {
-                        let words = to_words(line);
-                        match words.len() {
+                        let mut words = to_words(line);
+                        match words.clone().count() {
                             3 => {
-                                face_count =
-                                    Some(usize::from_str(words[2]).map_err(|e| e.to_error_kind())?);
+                                face_count = Some(
+                                    usize::from_str(words.nth(2).unwrap())
+                                        .map_err(|e| e.to_error_kind())?,
+                                );
                                 continue;
                             }
                             _ => return Err(ErrorKind::PlyError(PlyError::LoadError)),
@@ -515,15 +519,15 @@ where
 }
 
 fn collect_index_line(line: &str) -> Result<[usize; 3]> {
-    let words = to_words(line);
-    match words.len() {
+    let mut words = to_words(line);
+    match words.clone().count() {
         4 => {
-            if words[0] != "3" {
+            if words.next().unwrap() != "3" {
                 return Err(ErrorKind::PlyError(PlyError::IncorrectFaceData));
             }
-            let a = usize::from_str(words[1]).map_err(|e| e.to_error_kind())?;
-            let b = usize::from_str(words[2]).map_err(|e| e.to_error_kind())?;
-            let c = usize::from_str(words[3]).map_err(|e| e.to_error_kind())?;
+            let a = usize::from_str(words.next().unwrap()).map_err(|e| e.to_error_kind())?;
+            let b = usize::from_str(words.next().unwrap()).map_err(|e| e.to_error_kind())?;
+            let c = usize::from_str(words.next().unwrap()).map_err(|e| e.to_error_kind())?;
             Ok([a, b, c])
         }
         _ => Err(ErrorKind::PlyError(PlyError::LoadError)),
