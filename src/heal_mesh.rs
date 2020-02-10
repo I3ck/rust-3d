@@ -46,14 +46,16 @@ where
     }
 
     let (unduped, indices) = pack_dupes_indexed(duped_vertices.iter());
+    let nf_new = indices.len() / 3;
 
     let mut result = M::default();
+    result.reserve_vertices(unduped.len());
+    result.reserve_faces(nf_new);
 
     for x in unduped {
         result.add_vertex(x);
     }
 
-    let nf_new = indices.len() / 3;
     for f in 0..nf_new {
         let (a, b, c) = (indices[3 * f + 0], indices[3 * f + 1], indices[3 * f + 2]);
         if a == b || a == c || b == c {

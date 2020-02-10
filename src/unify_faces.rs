@@ -95,6 +95,8 @@ where
     }
 
     let mut result = M::default();
+    result.reserve_vertices(n_v_total);
+    result.reserve_faces(n_f_total);
     for i in 0..n_v_total {
         result.add_vertex(mesh.vertex(VId { val: i }).unwrap()); // safe since index safe
     }

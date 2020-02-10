@@ -37,10 +37,13 @@ where
     MO: IsFaceEditableMesh<V, Face3> + IsVertexEditableMesh<V, Face3> + Default,
     V: IsBuildableND,
 {
-    let mut mo = MO::default();
-
     let n_vertices = mi.num_vertices();
     let n_faces = mi.num_faces();
+
+    let mut mo = MO::default();
+    mo.reserve_vertices(n_vertices);
+    mo.reserve_faces(n_faces);
+
     let mut added_edges = HashMap::new();
     let mut center_buffer = Vec::new();
 

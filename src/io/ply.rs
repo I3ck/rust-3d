@@ -419,6 +419,7 @@ where
                                     usize::from_str(words.nth(2).unwrap())
                                         .map_err(|e| e.to_error_kind())?,
                                 );
+                                mesh.reserve_vertices(vertex_count.unwrap()); // safe, since assigned above
                                 continue;
                             }
                             _ => return Err(ErrorKind::PlyError(PlyError::LoadError)),
@@ -448,6 +449,7 @@ where
                                     usize::from_str(words.nth(2).unwrap())
                                         .map_err(|e| e.to_error_kind())?,
                                 );
+                                mesh.reserve_faces(face_count.unwrap()); // safe, since assigned above
                                 continue;
                             }
                             _ => return Err(ErrorKind::PlyError(PlyError::LoadError)),

@@ -81,6 +81,8 @@ where
     };
 
     let nf = mesh.num_faces();
+    result.reserve_faces(nf);
+    result.reserve_vertices(3 * nf);
     for i in 0..nf {
         let f = mesh.face_vertex_ids(FId { val: i }).unwrap();
 
