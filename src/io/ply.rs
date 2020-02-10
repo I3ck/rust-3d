@@ -386,9 +386,6 @@ where
     let mut vertex_count: Option<usize> = None;
     let mut face_count: Option<usize> = None;
 
-    let mut vertices = Vec::<P>::new();
-    let mut indices = Vec::<usize>::new();
-
     for line_result in read.lines() {
         let line = &line_result?;
         if !header_ended {
@@ -481,9 +478,9 @@ where
                 return Err(ErrorKind::PlyError(PlyError::LoadVertexCountNotFound));
             }
             Some(x) => {
-                if x > vertices.len() {
+                if x > mesh.num_vertices() {
                     let p = P::parse(line.to_string())?;
-                    vertices.push(p);
+                    mesh.add_vertex(p);
                     continue;
                 }
             }
@@ -494,8 +491,9 @@ where
                 return Err(ErrorKind::PlyError(PlyError::LoadFaceCountNotFound));
             }
             Some(x) => {
-                if x > indices.len() / 3 {
-                    collect_index_line(line, &mut indices)?;
+                if x > mesh.num_faces() {
+                    let [a, b, c] = collect_index_line(line)?;
+                    mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })?;
                     continue;
                 }
             }
@@ -507,16 +505,16 @@ where
             return Err(ErrorKind::PlyError(PlyError::LoadVertexCountNotFound));
         }
         Some(x) => {
-            if x != vertices.len() {
+            if x != mesh.num_vertices() {
                 return Err(ErrorKind::PlyError(PlyError::LoadVertexCountIncorrect));
             }
         }
     }
 
-    fill_mesh(vertices, indices, mesh)
+    Ok(())
 }
 
-fn collect_index_line(line: &str, indices: &mut Vec<usize>) -> Result<()> {
+fn collect_index_line(line: &str) -> Result<[usize; 3]> {
     let words = to_words(line);
     match words.len() {
         4 => {
@@ -526,43 +524,8 @@ fn collect_index_line(line: &str, indices: &mut Vec<usize>) -> Result<()> {
             let a = usize::from_str(words[1]).map_err(|e| e.to_error_kind())?;
             let b = usize::from_str(words[2]).map_err(|e| e.to_error_kind())?;
             let c = usize::from_str(words[3]).map_err(|e| e.to_error_kind())?;
-            indices.push(a);
-            indices.push(b);
-            indices.push(c);
-            Ok(())
+            Ok([a, b, c])
         }
         _ => Err(ErrorKind::PlyError(PlyError::LoadError)),
     }
-}
-
-fn fill_mesh<EM, P>(vertices: Vec<P>, indices: Vec<usize>, mesh: &mut EM) -> Result<()>
-where
-    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D + Clone,
-{
-    if indices.len() == 0 {
-        return Err(ErrorKind::PlyError(PlyError::LoadVerticesIncorrect));
-    }
-
-    if indices.len() % 3 != 0 {
-        return Err(ErrorKind::PlyError(PlyError::LoadVerticesIncorrect));
-    }
-
-    for vertex in vertices {
-        mesh.add_vertex(vertex);
-    }
-
-    for chunk in indices.chunks(3) {
-        if chunk.len() == 3 {
-            mesh.try_add_connection(
-                VId { val: chunk[0] },
-                VId { val: chunk[1] },
-                VId { val: chunk[2] },
-            )?;
-        } else {
-            return Err(ErrorKind::PlyError(PlyError::LoadVerticesIncorrect));
-        }
-    }
-
-    Ok(())
 }
