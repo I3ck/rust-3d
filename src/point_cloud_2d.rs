@@ -80,7 +80,7 @@ where
     P: IsBuildable2D + Clone,
 {
     /// Creates a new point cloud from an input string
-    pub fn parse(text: String) -> Result<PointCloud2D<P>> {
+    pub fn parse(text: &str) -> Result<PointCloud2D<P>> {
         let lines = text.split("\n");
 
         let mut pc = PointCloud2D::new();
