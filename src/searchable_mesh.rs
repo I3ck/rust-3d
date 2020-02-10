@@ -109,6 +109,10 @@ where
     fn change_vertex(&mut self, vid: VId, vertex: T) -> Result<()> {
         self.mesh.change_vertex(vid, vertex)
     }
+
+    fn reserve_vertices(&mut self, n: usize) {
+        self.mesh.reserve_vertices(n)
+    }
 }
 
 impl<M, T, IC> IsSearchableMesh<T, Face3> for SearchableMesh<M, T, IC>

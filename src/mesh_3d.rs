@@ -39,22 +39,6 @@ where
     _phantom: PhantomData<P>,
 }
 
-impl<P, ID, IC> Mesh3D<P, ID, IC>
-where
-    P: Is3D,
-    ID: IsDataContainer<P>,
-    IC: IsIndexContainer,
-{
-    /// Reserves number of vertices
-    pub fn reserve_vertices(&mut self, n: usize) {
-        self.pc.reserve_d(n)
-    }
-    /// Reserves number of faces
-    pub fn reserve_faces(&mut self, n: usize) {
-        self.topology.reserve(3 * n)
-    }
-}
-
 impl<P, ID, IC> IsMesh<P, Face3> for Mesh3D<P, ID, IC>
 where
     P: Is3D + Clone,
@@ -146,6 +130,10 @@ where
             val: self.topology.len() / 3 - 1,
         })
     }
+
+    fn reserve_faces(&mut self, n: usize) {
+        self.topology.reserve(3 * n)
+    }
 }
 
 impl<P, ID, IC> IsVertexEditableMesh<P, Face3> for Mesh3D<P, ID, IC>
@@ -168,6 +156,10 @@ where
         } else {
             Err(ErrorKind::IncorrectVertexID)
         }
+    }
+
+    fn reserve_vertices(&mut self, n: usize) {
+        self.pc.reserve_d(n)
     }
 }
 

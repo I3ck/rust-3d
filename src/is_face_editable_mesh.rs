@@ -33,4 +33,6 @@ where
     fn add_face(&mut self, v1: V, v2: V, v3: V) -> FId;
     /// Should add a face to the mesh by connecting the vertices via their ids. Should return the id of the newly added face
     fn try_add_connection(&mut self, vid1: VId, vid2: VId, vid3: VId) -> Result<FId>;
+    /// Should reserve space for n additional faces
+    fn reserve_faces(&mut self, n: usize);
 }
