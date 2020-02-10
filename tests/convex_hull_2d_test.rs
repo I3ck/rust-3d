@@ -24,17 +24,16 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use rust_3d::{io::*, test_helper::*, *};
 
-use std::fs::File;
+use std::{fs::File, io::BufReader};
 
 #[test]
 fn convex_hull_2d_test() {
     //@todo rather weak test, find better input data for this
     let mut pc = PointCloud2D::<Point2D>::new();
     load_xy(
-        &mut File::open("tests/data/test_square.xy").unwrap(),
+        &mut BufReader::new(File::open("tests/data/test_square.xy").unwrap()),
         &mut pc,
         " ",
-        "\n",
     )
     .unwrap();
 

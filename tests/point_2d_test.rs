@@ -114,7 +114,7 @@ fn point_2d_test() {
     assert!((-1.0 - p1.x()).abs() < eps);
     assert!((0.0 - p1.y()).abs() < eps);
 
-    match Point2D::parse("1.3 7.9".to_string()) {
+    match Point2D::parse("1.3 7.9") {
         Err(_) => assert!(false),
         Ok(bp) => {
             assert!(bp.x() == 1.3);

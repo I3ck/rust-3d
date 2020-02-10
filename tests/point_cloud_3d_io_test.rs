@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use rust_3d::{io::*, test_helper::*, *};
 
-use std::fs::File;
+use std::{fs::File, io::BufReader};
 
 static GENERATE_EXCEPTED_RESULT_FILES: bool = false;
 
@@ -53,10 +53,9 @@ fn point_cloud_3d_io_test() {
         //@todo also compare values
         let mut pc = PointCloud3D::<Point3D>::new();
         load_xyz(
-            &mut File::open("tests/data/test_cube.xyz").unwrap(),
+            &mut BufReader::new(File::open("tests/data/test_cube.xyz").unwrap()),
             &mut pc,
             " ",
-            "\n",
         )
         .unwrap();
         assert!(pc.len() == 20 * 20 * 20);

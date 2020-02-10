@@ -24,13 +24,13 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use rust_3d::{io::*, *};
 
-use std::fs::File;
+use std::{fs::File, io::BufReader};
 
 #[test]
 fn mesh_io_test() {
-    let mut m = Mesh3D::<Point3D, Vec<usize>>::default();
+    let mut m = Mesh3D::<Point3D, PointCloud3D<Point3D>, Vec<usize>>::default();
     load_ply_ascii(
-        &mut File::open("tests/data/torus_only_vertex_data.ply").unwrap(),
+        &mut BufReader::new(File::open("tests/data/torus_only_vertex_data.ply").unwrap()),
         &mut m,
     )
     .unwrap();
@@ -43,9 +43,9 @@ fn mesh_io_test() {
     )
     .unwrap();
 
-    let mut m = Mesh3D::<Point3D, Vec<usize>>::default();
+    let mut m = Mesh3D::<Point3D, PointCloud3D<Point3D>, Vec<usize>>::default();
     load_ply_ascii(
-        &mut File::open("tests/tmp/torus_only_vertex_data.ply").unwrap(),
+        &mut BufReader::new(File::open("tests/tmp/torus_only_vertex_data.ply").unwrap()),
         &mut m,
     )
     .unwrap();

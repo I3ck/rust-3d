@@ -26,7 +26,7 @@ use rust_3d::*;
 
 #[test]
 fn mesh_test() {
-    let mut mesh = Mesh3D::<Point3D, Vec<usize>>::default();
+    let mut mesh = Mesh3D::<Point3D, PointCloud3D<Point3D>, Vec<usize>>::default();
 
     assert!(mesh.num_faces() == 0);
     assert!(mesh.num_vertices() == 0);

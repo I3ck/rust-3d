@@ -107,7 +107,7 @@ fn point_3d_test() {
     assert!(p1.y() == 22.0);
     assert!(p1.z() == 28.0);
 
-    match Point3D::parse("1.3 7.9 13.7".to_string()) {
+    match Point3D::parse("1.3 7.9 13.7") {
         Err(_) => assert!(false),
         Ok(bp) => {
             assert!(bp.x() == 1.3);
