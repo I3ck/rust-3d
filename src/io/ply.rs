@@ -28,7 +28,7 @@ use byteorder::{BigEndian, WriteBytesExt};
 
 use core::str::FromStr;
 
-use std::io::{Read, Write};
+use std::io::{BufRead, Write};
 
 /// Saves an IsMesh3D in the ASCII .ply file format
 pub fn save_ply_ascii<M, P, W>(write: &mut W, mesh: &M) -> Result<()>
@@ -374,12 +374,8 @@ pub fn load_ply_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> Result<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
-    R: Read,
+    R: BufRead,
 {
-    let mut content = String::new();
-    read.read_to_string(&mut content)?;
-    let lines = content.split("\n");
-
     let mut found_ply = false;
     let mut format_found = false;
     let mut vertex_indices_found = false;
@@ -393,7 +389,8 @@ where
     let mut vertices = Vec::<P>::new();
     let mut indices = Vec::<usize>::new();
 
-    for line in lines {
+    for line_result in read.lines() {
+        let line = &line_result?;
         if !header_ended {
             if !found_ply {
                 if line == "ply" {

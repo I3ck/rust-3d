@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 
 use core::str::FromStr;
-use std::io::{Read, Write};
+use std::io::{BufRead, Write};
 
 /// Saves an IsRandomAccessible<Is3D> as x y z coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xyz file format or .csv files
 pub fn save_xyz<RA, P, W>(write: &mut W, ra: &RA, delim_coord: &str, delim_pos: &str) -> Result<()>
@@ -51,22 +51,14 @@ where
 }
 
 /// Loads a IsRandomInsertible<Is3D> as x y z coordinates with a specified delimiter between coordinates and positions. E.g. used to load the .xyz file format or .csv file
-pub fn load_xyz<RI, P, R>(
-    read: &mut R,
-    ri: &mut RI,
-    delim_coord: &str,
-    delim_pos: &str,
-) -> Result<()>
+pub fn load_xyz<RI, P, R>(read: &mut R, ri: &mut RI, delim_coord: &str) -> Result<()>
 where
     RI: IsRandomInsertible<P>,
     P: Is3D + IsBuildable3D,
-    R: Read,
+    R: BufRead,
 {
-    let mut content = String::new();
-    read.read_to_string(&mut content)?;
-    let lines = content.split(delim_pos);
-
-    for line in lines {
+    for line_result in read.lines() {
+        let line = &line_result?;
         if line == "" {
             continue;
         }
