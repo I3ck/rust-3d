@@ -85,7 +85,7 @@ where
 
         let mut pc = PointCloud2D::new();
         for line in lines {
-            P::parse(String::from(line)).map(|p| pc.push(p))?;
+            P::parse(line).map(|p| pc.push(p))?;
         }
         if pc.len() == 0 {
             return Err(ErrorKind::ParseError);

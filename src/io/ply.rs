@@ -479,7 +479,7 @@ where
             }
             Some(x) => {
                 if x > mesh.num_vertices() {
-                    let p = P::parse(line.to_string())?;
+                    let p = P::parse(line)?;
                     mesh.add_vertex(p);
                     continue;
                 }

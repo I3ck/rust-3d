@@ -77,7 +77,7 @@ pub trait IsBuildable3D: Sized + Is3D + Eq + PartialEq + Ord + PartialOrd + Hash
         Self::new(0.0, 0.0, 0.0)
     }
     /// Creates this from a "x y z" string. E.g. "32.2 14.7 1.90"
-    fn parse(text: String) -> Result<Self> {
+    fn parse(text: &str) -> Result<Self> {
         let split = text.trim().split(" ");
         let words = split.collect::<Vec<&str>>();
         match words.len() {
