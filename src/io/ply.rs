@@ -485,8 +485,7 @@ where
             }
             Some(x) => {
                 if x > mesh.num_vertices() {
-                    let p = P::parse(line)?;
-                    mesh.add_vertex(p);
+                    mesh.add_vertex(P::parse(line)?);
                     continue;
                 }
             }

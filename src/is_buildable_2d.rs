@@ -65,7 +65,7 @@ pub trait IsBuildable2D:
     }
     /// Creates this from a "x y" string. E.g. "4.3 17.29"
     fn parse(text: &str) -> Result<Self> {
-        let split = text.trim().split(" ");
+        let split = text.split(" ");
         let words = split.collect::<Vec<&str>>();
         match words.len() {
             2 => {
