@@ -522,16 +522,34 @@ where
 
 fn collect_index_line(line: &str) -> Result<[usize; 3]> {
     let mut words = to_words(line);
-    match words.clone().count() {
-        4 => {
-            if words.next().unwrap() != "3" {
-                return Err(ErrorKind::PlyError(PlyError::IncorrectFaceData));
-            }
-            let a = usize::from_str(words.next().unwrap()).map_err(|e| e.to_error_kind())?;
-            let b = usize::from_str(words.next().unwrap()).map_err(|e| e.to_error_kind())?;
-            let c = usize::from_str(words.next().unwrap()).map_err(|e| e.to_error_kind())?;
-            Ok([a, b, c])
-        }
-        _ => Err(ErrorKind::PlyError(PlyError::LoadError)),
+    if words
+        .next()
+        .ok_or(ErrorKind::PlyError(PlyError::IncorrectFaceData))?
+        != "3"
+    {
+        return Err(ErrorKind::PlyError(PlyError::IncorrectFaceData));
     }
+
+    let a = usize::from_str(
+        words
+            .next()
+            .ok_or(ErrorKind::PlyError(PlyError::IncorrectFaceData))?,
+    )
+    .map_err(|e| e.to_error_kind())?;
+
+    let b = usize::from_str(
+        words
+            .next()
+            .ok_or(ErrorKind::PlyError(PlyError::IncorrectFaceData))?,
+    )
+    .map_err(|e| e.to_error_kind())?;
+
+    let c = usize::from_str(
+        words
+            .next()
+            .ok_or(ErrorKind::PlyError(PlyError::IncorrectFaceData))?,
+    )
+    .map_err(|e| e.to_error_kind())?;
+
+    Ok([a, b, c])
 }
