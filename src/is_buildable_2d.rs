@@ -65,15 +65,18 @@ pub trait IsBuildable2D:
     }
     /// Creates this from a "x y" string. E.g. "4.3 17.29"
     fn parse(text: &str) -> Result<Self> {
-        let split = text.split(" ");
-        let words = split.collect::<Vec<&str>>();
-        match words.len() {
-            2 => {
-                let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
-                let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
-                Ok(Self::new(x, y))
-            }
-            _ => Err(ErrorKind::ParseError),
+        let mut words = text.split(" ");
+
+        let x = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)
+            .map_err(|e| e.to_error_kind())?;
+
+        let y = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)
+            .map_err(|e| e.to_error_kind())?;
+
+        if words.next().is_none() {
+            Ok(Self::new(x, y))
+        } else {
+            Err(ErrorKind::ParseError)
         }
     }
 

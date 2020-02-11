@@ -78,16 +78,21 @@ pub trait IsBuildable3D: Sized + Is3D + Eq + PartialEq + Ord + PartialOrd + Hash
     }
     /// Creates this from a "x y z" string. E.g. "32.2 14.7 1.90"
     fn parse(text: &str) -> Result<Self> {
-        let split = text.split(" ");
-        let words = split.collect::<Vec<&str>>();
-        match words.len() {
-            3 => {
-                let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
-                let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
-                let z = f64::from_str(words[2]).map_err(|e| e.to_error_kind())?;
-                Ok(Self::new(x, y, z))
-            }
-            _ => Err(ErrorKind::ParseError),
+        let mut words = text.split(" ");
+
+        let x = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)
+            .map_err(|e| e.to_error_kind())?;
+
+        let y = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)
+            .map_err(|e| e.to_error_kind())?;
+
+        let z = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)
+            .map_err(|e| e.to_error_kind())?;
+
+        if words.next().is_none() {
+            Ok(Self::new(x, y, z))
+        } else {
+            Err(ErrorKind::ParseError)
         }
     }
     /// Returns the center between this and other
