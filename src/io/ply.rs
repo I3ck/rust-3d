@@ -386,8 +386,16 @@ where
     let mut vertex_count: Option<usize> = None;
     let mut face_count: Option<usize> = None;
 
-    for line_result in read.lines() {
-        let line = &line_result?;
+    let mut line_buffer = String::new();
+
+    loop {
+        line_buffer.clear();
+        let n_read = read.read_line(&mut line_buffer)?;
+        if n_read == 0 {
+            break;
+        }
+        let line = line_buffer.trim_end();
+
         if !header_ended {
             if !found_ply {
                 if line == "ply" {
@@ -412,7 +420,7 @@ where
             match vertex_count {
                 None => {
                     if line.starts_with("element vertex") {
-                        let mut words = to_words(line);
+                        let mut words = to_words(&line);
                         match words.clone().count() {
                             3 => {
                                 vertex_count = Some(
@@ -442,7 +450,7 @@ where
             match face_count {
                 None => {
                     if line.starts_with("element face") {
-                        let mut words = to_words(line);
+                        let mut words = to_words(&line);
                         match words.clone().count() {
                             3 => {
                                 face_count = Some(
@@ -485,7 +493,7 @@ where
             }
             Some(x) => {
                 if x > mesh.num_vertices() {
-                    mesh.add_vertex(P::parse(line)?);
+                    mesh.add_vertex(P::parse(&line)?);
                     continue;
                 }
             }
@@ -497,7 +505,7 @@ where
             }
             Some(x) => {
                 if x > mesh.num_faces() {
-                    let [a, b, c] = collect_index_line(line)?;
+                    let [a, b, c] = collect_index_line(&line)?;
                     mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })?;
                     continue;
                 }
