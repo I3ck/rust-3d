@@ -55,6 +55,7 @@ pub enum ErrorKind {
     CantCalculateAngleIfZeroLength,
     TriFace3DNotSpanningVolume,
     PlyError(PlyError),
+    StlError(StlError),
 }
 
 pub enum PlyError {
@@ -69,6 +70,11 @@ pub enum PlyError {
     LoadVertexCountIncorrect,
     LoadVerticesIncorrect,
     IncorrectFaceData,
+}
+
+pub enum StlError {
+    LoadFileEndReached,
+    LoadFileInvalid, //@todo specify better
 }
 
 impl ErrorKind {
@@ -101,6 +107,7 @@ impl ErrorKind {
                 "TriFace3D must be constructed from points spanning a volume"
             }
             Self::PlyError(x) => x.as_str(),
+            Self::StlError(x) => x.as_str(),
         }
     }
 }
@@ -120,6 +127,16 @@ impl PlyError {
             Self::LoadVertexCountIncorrect => "Vertex count of .ply not found",
             Self::LoadVerticesIncorrect => "Vertices in .ply incorrect",
             Self::IncorrectFaceData => "Face definition is incorrect / can not be parsed",
+        }
+    }
+}
+
+impl StlError {
+    /// Returns readable text for the StlError
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::LoadFileEndReached => "Unexpected reach of .stl file end",
+            Self::LoadFileInvalid => "Invalid .stl file",
         }
     }
 }

@@ -81,7 +81,8 @@ where
     read.read_line(&mut line_buffer)?;
 
     loop {
-        if let Some([a, b, c]) = read_stl_facet(read, &mut line_buffer) {
+        //@todo currently simply stops on error
+        if let Ok([a, b, c]) = read_stl_facet(read, &mut line_buffer) {
             mesh.add_face(a, b, c);
         } else {
             break;
@@ -91,104 +92,89 @@ where
     Ok(())
 }
 
-fn read_stl_facet<P, R>(read: &mut R, line_buffer: &mut String) -> Option<[P; 3]>
+fn fetch_line<'a, R>(read: &mut R, line_buffer: &'a mut String) -> Result<&'a str>
+where
+    R: BufRead,
+{
+    line_buffer.clear();
+    let n_read = read.read_line(line_buffer)?;
+    if n_read == 0 {
+        return Err(ErrorKind::StlError(StlError::LoadFileEndReached));
+    }
+    Ok(line_buffer.trim_end())
+}
+
+fn read_stl_facet<P, R>(read: &mut R, line_buffer: &mut String) -> Result<[P; 3]>
 where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let mut n_read: usize;
-    //@todo simplify buffer logic with helpers
+    let mut line: &str;
 
-    line_buffer.clear();
-    n_read = read.read_line(line_buffer).ok()?;
-    if n_read == 0 {
-        return None;
-    }
-    let mut line = line_buffer.trim_end();
-
+    line = fetch_line(read, line_buffer)?;
     if !line.contains("facet") {
-        return None;
+        return Err(ErrorKind::StlError(StlError::LoadFileInvalid));
     }
 
-    line_buffer.clear();
-    n_read = read.read_line(line_buffer).ok()?;
-    if n_read == 0 {
-        return None;
-    }
-    line = line_buffer.trim_end();
-
+    line = fetch_line(read, line_buffer)?;
     if !line.contains("outer loop") {
-        return None;
+        return Err(ErrorKind::StlError(StlError::LoadFileInvalid));
     }
 
-    line_buffer.clear();
-    n_read = read.read_line(line_buffer).ok()?;
-    if n_read == 0 {
-        return None;
-    }
-    line = line_buffer.trim_end();
-
+    line = fetch_line(read, line_buffer)?;
     let a = read_stl_vertex(&line)?;
 
-    line_buffer.clear();
-    n_read = read.read_line(line_buffer).ok()?;
-    if n_read == 0 {
-        return None;
-    }
-    line = line_buffer.trim_end();
-
+    line = fetch_line(read, line_buffer)?;
     let b = read_stl_vertex(&line)?;
 
-    line_buffer.clear();
-    n_read = read.read_line(line_buffer).ok()?;
-    if n_read == 0 {
-        return None;
-    }
-    line = line_buffer.trim_end();
-
+    line = fetch_line(read, line_buffer)?;
     let c = read_stl_vertex(&line)?;
 
-    line_buffer.clear();
-    n_read = read.read_line(line_buffer).ok()?;
-    if n_read == 0 {
-        return None;
-    }
-    line = line_buffer.trim_end();
-
+    line = fetch_line(read, line_buffer)?;
     if !line.contains("endloop") {
-        //@todo unwrap
-        return None;
+        return Err(ErrorKind::StlError(StlError::LoadFileInvalid));
     }
 
-    line_buffer.clear();
-    n_read = read.read_line(line_buffer).ok()?;
-    if n_read == 0 {
-        return None;
-    }
-    line = line_buffer.trim_end();
-
+    line = fetch_line(read, line_buffer)?;
     if !line.contains("endfacet") {
-        //@todo unwrap
-        return None;
+        return Err(ErrorKind::StlError(StlError::LoadFileInvalid));
     }
 
-    Some([a, b, c])
+    Ok([a, b, c])
 }
 
-fn read_stl_vertex<P>(line: &str) -> Option<P>
+fn read_stl_vertex<P>(line: &str) -> Result<P>
 where
     P: IsBuildable3D,
 {
     let mut words = to_words(line);
 
+    //@todo fix this error mapping
     // skip "vertex"
-    words.next()?;
+    words
+        .next()
+        .ok_or(ErrorKind::StlError(StlError::LoadFileInvalid))?;
 
-    let x = f64::from_str(words.next()?).ok()?;
-    let y = f64::from_str(words.next()?).ok()?;
-    let z = f64::from_str(words.next()?).ok()?;
+    let x = f64::from_str(
+        words
+            .next()
+            .ok_or(ErrorKind::StlError(StlError::LoadFileInvalid))?,
+    )
+    .map_err(|_| ErrorKind::StlError(StlError::LoadFileInvalid))?;
+    let y = f64::from_str(
+        words
+            .next()
+            .ok_or(ErrorKind::StlError(StlError::LoadFileInvalid))?,
+    )
+    .map_err(|_| ErrorKind::StlError(StlError::LoadFileInvalid))?;
+    let z = f64::from_str(
+        words
+            .next()
+            .ok_or(ErrorKind::StlError(StlError::LoadFileInvalid))?,
+    )
+    .map_err(|_| ErrorKind::StlError(StlError::LoadFileInvalid))?;
 
-    Some(P::new(x, y, z))
+    Ok(P::new(x, y, z))
 }
 
 fn str_exp<P>(p: &P) -> String
