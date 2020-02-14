@@ -26,7 +26,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use std::io::{BufRead, Lines, Write};
+use std::io::{BufRead, Write};
 
 use core::str::FromStr;
 
@@ -75,13 +75,13 @@ where
     P: IsBuildable3D + Clone,
     R: BufRead,
 {
-    let mut i_line = read.lines();
+    let mut line_buffer = String::new();
 
     // skip 'solid'
-    i_line.next();
+    read.read_line(&mut line_buffer)?;
 
     loop {
-        if let Some([a, b, c]) = read_stl_facet(&mut i_line) {
+        if let Some([a, b, c]) = read_stl_facet(read, &mut line_buffer) {
             mesh.add_face(a, b, c);
         } else {
             break;
@@ -91,31 +91,83 @@ where
     Ok(())
 }
 
-fn read_stl_facet<P, R>(lines: &mut Lines<R>) -> Option<[P; 3]>
+fn read_stl_facet<P, R>(read: &mut R, line_buffer: &mut String) -> Option<[P; 3]>
 where
     P: IsBuildable3D,
     R: BufRead,
 {
-    if !lines.next()?.ok()?.contains("facet") {
+    let mut n_read: usize;
+    //@todo simplify buffer logic with helpers
+
+    line_buffer.clear();
+    n_read = read.read_line(line_buffer).ok()?;
+    if n_read == 0 {
+        return None;
+    }
+    let mut line = line_buffer.trim_end();
+
+    if !line.contains("facet") {
+        return None;
+    }
+
+    line_buffer.clear();
+    n_read = read.read_line(line_buffer).ok()?;
+    if n_read == 0 {
+        return None;
+    }
+    line = line_buffer.trim_end();
+
+    if !line.contains("outer loop") {
+        return None;
+    }
+
+    line_buffer.clear();
+    n_read = read.read_line(line_buffer).ok()?;
+    if n_read == 0 {
+        return None;
+    }
+    line = line_buffer.trim_end();
+
+    let a = read_stl_vertex(&line)?;
+
+    line_buffer.clear();
+    n_read = read.read_line(line_buffer).ok()?;
+    if n_read == 0 {
+        return None;
+    }
+    line = line_buffer.trim_end();
+
+    let b = read_stl_vertex(&line)?;
+
+    line_buffer.clear();
+    n_read = read.read_line(line_buffer).ok()?;
+    if n_read == 0 {
+        return None;
+    }
+    line = line_buffer.trim_end();
+
+    let c = read_stl_vertex(&line)?;
+
+    line_buffer.clear();
+    n_read = read.read_line(line_buffer).ok()?;
+    if n_read == 0 {
+        return None;
+    }
+    line = line_buffer.trim_end();
+
+    if !line.contains("endloop") {
         //@todo unwrap
         return None;
     }
 
-    if !lines.next()?.ok()?.contains("outer loop") {
-        //@todo unwrap
+    line_buffer.clear();
+    n_read = read.read_line(line_buffer).ok()?;
+    if n_read == 0 {
         return None;
     }
+    line = line_buffer.trim_end();
 
-    let a = read_stl_vertex(&lines.next()?.ok()?)?;
-    let b = read_stl_vertex(&lines.next()?.ok()?)?;
-    let c = read_stl_vertex(&lines.next()?.ok()?)?;
-
-    if !lines.next()?.ok()?.contains("endloop") {
-        //@todo unwrap
-        return None;
-    }
-
-    if !lines.next()?.ok()?.contains("endfacet") {
+    if !line.contains("endfacet") {
         //@todo unwrap
         return None;
     }
