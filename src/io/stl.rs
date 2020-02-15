@@ -26,7 +26,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use std::io::{BufRead, Write};
+use byteorder::{LittleEndian, ReadBytesExt};
+
+use std::io::{BufRead, Read, Write};
 
 use core::str::FromStr;
 
@@ -87,6 +89,45 @@ where
         } else {
             break;
         }
+    }
+
+    Ok(())
+}
+
+/// Loads a Mesh from binary .stl files
+pub fn load_stl_binary<EM, P, R>(read: &mut R, mesh: &mut EM) -> Result<()>
+where
+    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
+    P: IsBuildable3D + Clone,
+    R: Read,
+{
+    // Drop header
+    for _ in 0..80 {
+        read.read_u8()?;
+    }
+
+    let n_triangles = read.read_u32::<LittleEndian>()?;
+    mesh.reserve_vertices(3 * n_triangles as usize);
+    mesh.reserve_faces(n_triangles as usize);
+
+    let mut buffer = [0f32; 3];
+
+    for _ in 0..n_triangles {
+        // Drop normal
+        read.read_f32_into::<LittleEndian>(&mut buffer)?;
+
+        read.read_f32_into::<LittleEndian>(&mut buffer)?;
+        let a = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+
+        read.read_f32_into::<LittleEndian>(&mut buffer)?;
+        let b = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+
+        read.read_f32_into::<LittleEndian>(&mut buffer)?;
+        let c = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+
+        read.read_u16::<LittleEndian>()?;
+
+        mesh.add_face(a, b, c);
     }
 
     Ok(())
