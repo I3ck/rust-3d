@@ -70,8 +70,30 @@ where
         .map_err(|e| e.to_error_kind())
 }
 
-/// Loads a Mesh from ASCII .stl files
-pub fn load_stl_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> Result<()>
+pub fn load_stl<EM, P, R>(read: &mut R, mesh: &mut EM) -> Result<()>
+where
+    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
+    P: IsBuildable3D + Clone,
+    R: BufRead,
+{
+    let solid = "solid".as_bytes();
+
+    let mut is_ascii = true;
+    for i in 0..5 {
+        if read.read_u8()? != solid[i] {
+            is_ascii = false
+        }
+    }
+
+    if is_ascii {
+        load_stl_ascii(read, mesh)
+    } else {
+        load_stl_binary(read, mesh)
+    }
+}
+
+/// Loads a Mesh from ASCII .stl files (assuming 'solid' already dropped from input)
+fn load_stl_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> Result<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -79,7 +101,7 @@ where
 {
     let mut line_buffer = String::new();
 
-    // skip 'solid'
+    // skip first line
     read.read_line(&mut line_buffer)?;
 
     loop {
@@ -94,15 +116,15 @@ where
     Ok(())
 }
 
-/// Loads a Mesh from binary .stl files
-pub fn load_stl_binary<EM, P, R>(read: &mut R, mesh: &mut EM) -> Result<()>
+/// Loads a Mesh from binary .stl files (assuming 'solid' already dropped from input)
+fn load_stl_binary<EM, P, R>(read: &mut R, mesh: &mut EM) -> Result<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: Read,
 {
-    // Drop header
-    for _ in 0..80 {
+    // Drop header ('solid' is already dropped)
+    for _ in 0..75 {
         read.read_u8()?;
     }
 
