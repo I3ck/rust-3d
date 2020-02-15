@@ -124,8 +124,9 @@ where
     R: Read,
 {
     // Drop header ('solid' is already dropped)
-    for _ in 0..75 {
-        read.read_u8()?;
+    {
+        let mut buffer = [0u8; 75];
+        read.read_exact(&mut buffer)?;
     }
 
     let n_triangles = read.read_u32::<LittleEndian>()?;
