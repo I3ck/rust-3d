@@ -57,11 +57,16 @@ where
     P: Is3D + IsBuildable3D,
     R: BufRead,
 {
-    for line_result in read.lines() {
-        let line = &line_result?;
-        if line == "" {
-            continue;
+    let mut line_buffer = String::new();
+
+    loop {
+        line_buffer.clear();
+        let n_read = read.read_line(&mut line_buffer)?;
+        if n_read == 0 {
+            break;
         }
+        let line = line_buffer.trim_end();
+
         let mut words = line.split(delim_coord);
 
         let x = f64::from_str(
@@ -87,5 +92,6 @@ where
 
         ip.push(P::new(x, y, z));
     }
+
     Ok(())
 }
