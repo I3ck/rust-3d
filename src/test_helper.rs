@@ -55,7 +55,7 @@ where
     let mut view = View::Full;
     let mut pc = PointCloud2D::<P>::new();
     let mut f = BufReader::new(File::open("tests/data/test_square.xy").unwrap());
-    load_xy(&mut f, &mut pc, " ").unwrap();
+    load_xy(&mut f, &mut pc).unwrap();
 
     filter.filter(&pc, &mut view);
 
@@ -78,7 +78,7 @@ where
     let mut view = View::Full;
     let mut pc = PointCloud3D::<P>::new();
     let mut f = BufReader::new(File::open("tests/data/test_cube.xyz").unwrap());
-    load_xyz(&mut f, &mut pc, " ").unwrap();
+    load_xyz(&mut f, &mut pc).unwrap();
 
     filter.filter(&pc, &mut view);
 
@@ -100,7 +100,7 @@ where
     let mut view = View::Full;
     let mut pc = PointCloud2D::<P>::new();
     let mut f = BufReader::new(File::open("tests/data/test_square.xy").unwrap());
-    load_xy(&mut f, &mut pc, " ").unwrap();
+    load_xy(&mut f, &mut pc).unwrap();
 
     filter.filter(&pc, &mut view);
 
@@ -120,7 +120,7 @@ where
     let mut view = View::Full;
     let mut pc = PointCloud3D::<P>::new();
     let mut f = BufReader::new(File::open("tests/data/test_cube.xyz").unwrap());
-    load_xyz(&mut f, &mut pc, " ").unwrap();
+    load_xyz(&mut f, &mut pc).unwrap();
 
     filter.filter(&pc, &mut view);
 

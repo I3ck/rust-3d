@@ -45,13 +45,15 @@ where
     Ok(())
 }
 
-/// Loads a IsPushable<Is2D> as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to load the .xy file format or .csv files
-pub fn load_xy<IP, P, R>(read: &mut R, ip: &mut IP, delim_coord: &str) -> Result<()>
+/// Loads a IsPushable<Is2D> as x y coordinates. E.g. used to load the .xy file format or .csv files
+pub fn load_xy<IP, P, R>(read: &mut R, ip: &mut IP) -> Result<()>
 where
     IP: IsPushable<P>,
     P: Is2D + IsBuildable2D,
     R: BufRead,
 {
+    let mut delim_determined = false;
+    let mut delim: String = "".to_string();
     let mut line_buffer = String::new();
 
     loop {
@@ -62,7 +64,14 @@ where
         }
         let line = line_buffer.trim_end();
 
-        let mut words = line.split(delim_coord);
+        if !delim_determined {
+            delim = estimate_delimiter(1, &line)
+                .ok_or(ErrorKind::XyError(XyError::LoadFileInvalid))?
+                .to_string();
+            delim_determined = true;
+        }
+
+        let mut words = line.split(&delim);
 
         let x = f64::from_str(
             words

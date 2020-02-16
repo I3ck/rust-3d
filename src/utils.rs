@@ -121,6 +121,15 @@ where
         .collect()
 }
 
+pub fn estimate_delimiter(expected_count: usize, line: &str) -> Option<char> {
+    for candidate in [' ', ';', ','].iter() {
+        if line.chars().filter(|c| *c == *candidate).count() == expected_count {
+            return Some(*candidate);
+        }
+    }
+    None
+}
+
 pub fn add<P, Q>(p: &P, q: &Q) -> P
 where
     P: IsBuildable3D,
