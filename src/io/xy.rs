@@ -57,16 +57,23 @@ where
         if line == "" {
             continue;
         }
-        let split = line.split(delim_coord);
-        let words = split.collect::<Vec<&str>>();
-        match words.len() {
-            2 => {
-                let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
-                let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
-                ip.push(P::new(x, y))
-            }
-            _ => return Err(ErrorKind::ParseError),
-        }
+        let mut words = line.split(delim_coord);
+
+        let x = f64::from_str(
+            words
+                .next()
+                .ok_or(ErrorKind::XyError(XyError::LoadFileInvalid))?,
+        )
+        .map_err(|_| ErrorKind::XyError(XyError::LoadFileInvalid))?;
+
+        let y = f64::from_str(
+            words
+                .next()
+                .ok_or(ErrorKind::XyError(XyError::LoadFileInvalid))?,
+        )
+        .map_err(|_| ErrorKind::XyError(XyError::LoadFileInvalid))?;
+
+        ip.push(P::new(x, y));
     }
     Ok(())
 }

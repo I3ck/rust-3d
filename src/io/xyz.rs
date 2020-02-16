@@ -62,17 +62,30 @@ where
         if line == "" {
             continue;
         }
-        let split = line.split(delim_coord);
-        let words = split.collect::<Vec<&str>>();
-        match words.len() {
-            3 => {
-                let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
-                let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
-                let z = f64::from_str(words[2]).map_err(|e| e.to_error_kind())?;
-                ip.push(P::new(x, y, z))
-            }
-            _ => return Err(ErrorKind::ParseError),
-        }
+        let mut words = line.split(delim_coord);
+
+        let x = f64::from_str(
+            words
+                .next()
+                .ok_or(ErrorKind::XyzError(XyzError::LoadFileInvalid))?,
+        )
+        .map_err(|_| ErrorKind::XyzError(XyzError::LoadFileInvalid))?;
+
+        let y = f64::from_str(
+            words
+                .next()
+                .ok_or(ErrorKind::XyzError(XyzError::LoadFileInvalid))?,
+        )
+        .map_err(|_| ErrorKind::XyzError(XyzError::LoadFileInvalid))?;
+
+        let z = f64::from_str(
+            words
+                .next()
+                .ok_or(ErrorKind::XyzError(XyzError::LoadFileInvalid))?,
+        )
+        .map_err(|_| ErrorKind::XyzError(XyzError::LoadFileInvalid))?;
+
+        ip.push(P::new(x, y, z));
     }
     Ok(())
 }

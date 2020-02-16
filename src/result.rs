@@ -56,6 +56,8 @@ pub enum ErrorKind {
     TriFace3DNotSpanningVolume,
     PlyError(PlyError),
     StlError(StlError),
+    XyError(XyError),
+    XyzError(XyzError),
 }
 
 pub enum PlyError {
@@ -74,6 +76,14 @@ pub enum PlyError {
 
 pub enum StlError {
     LoadFileEndReached,
+    LoadFileInvalid, //@todo specify better
+}
+
+pub enum XyError {
+    LoadFileInvalid, //@todo specify better
+}
+
+pub enum XyzError {
     LoadFileInvalid, //@todo specify better
 }
 
@@ -108,6 +118,8 @@ impl ErrorKind {
             }
             Self::PlyError(x) => x.as_str(),
             Self::StlError(x) => x.as_str(),
+            Self::XyError(x) => x.as_str(),
+            Self::XyzError(x) => x.as_str(),
         }
     }
 }
@@ -137,6 +149,24 @@ impl StlError {
         match self {
             Self::LoadFileEndReached => "Unexpected reach of .stl file end",
             Self::LoadFileInvalid => "Invalid .stl file",
+        }
+    }
+}
+
+impl XyError {
+    /// Returns readable text for the XyError
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::LoadFileInvalid => "Invalid .xy file",
+        }
+    }
+}
+
+impl XyzError {
+    /// Returns readable text for the XyzError
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::LoadFileInvalid => "Invalid .xyz file",
         }
     }
 }
