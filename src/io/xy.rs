@@ -45,10 +45,10 @@ where
     Ok(())
 }
 
-/// Loads a IsRandomInsertible<Is2D> as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to load the .xy file format or .csv files
-pub fn load_xy<RI, P, R>(read: &mut R, ri: &mut RI, delim_coord: &str) -> Result<()>
+/// Loads a IsPushable<Is2D> as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to load the .xy file format or .csv files
+pub fn load_xy<IP, P, R>(read: &mut R, ip: &mut IP, delim_coord: &str) -> Result<()>
 where
-    RI: IsRandomInsertible<P>,
+    IP: IsPushable<P>,
     P: Is2D + IsBuildable2D,
     R: BufRead,
 {
@@ -63,7 +63,7 @@ where
             2 => {
                 let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
                 let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
-                ri.push(P::new(x, y))
+                ip.push(P::new(x, y))
             }
             _ => return Err(ErrorKind::ParseError),
         }

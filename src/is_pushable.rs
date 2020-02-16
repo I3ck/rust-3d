@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Martin Buck
+Copyright 2020 Martin Buck
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"),
@@ -20,12 +20,10 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//! IsRandomInsertible trait used for collections of elements which are random insertible
+//! IsPushable trait used for collections of elements which can be pushed / appended to
 
-use crate::*;
-
-/// IsRandomInsertible is a trait used for collections of elements which are random insertible
-pub trait IsRandomInsertible<T>: IsRandomAccessible<T> {
-    /// Should insert an element at the given index
-    fn insert(&mut self, index: usize, x: T) -> Result<()>;
+/// IsPushable trait used for collections of elements which can be pushed / appended to
+pub trait IsPushable<T> {
+    /// Should push an element to the end of collection
+    fn push(&mut self, x: T);
 }

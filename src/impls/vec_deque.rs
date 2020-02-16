@@ -33,16 +33,18 @@ impl<T> IsRandomAccessible<T> for VecDeque<T> {
 }
 
 impl<T> IsRandomInsertible<T> for VecDeque<T> {
-    fn push(&mut self, x: T) {
-        self.push_back(x)
-    }
-
     fn insert(&mut self, index: usize, x: T) -> Result<()> {
         if index >= self.len() {
             return Err(ErrorKind::IndexOutOfBounds);
         }
         self.insert(index, x);
         Ok(())
+    }
+}
+
+impl<T> IsPushable<T> for VecDeque<T> {
+    fn push(&mut self, x: T) {
+        self.push_back(x)
     }
 }
 

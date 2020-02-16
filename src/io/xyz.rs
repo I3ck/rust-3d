@@ -50,10 +50,10 @@ where
     Ok(())
 }
 
-/// Loads a IsRandomInsertible<Is3D> as x y z coordinates with a specified delimiter between coordinates and positions. E.g. used to load the .xyz file format or .csv file
-pub fn load_xyz<RI, P, R>(read: &mut R, ri: &mut RI, delim_coord: &str) -> Result<()>
+/// Loads a IsPushable<Is3D> as x y z coordinates with a specified delimiter between coordinates and positions. E.g. used to load the .xyz file format or .csv file
+pub fn load_xyz<IP, P, R>(read: &mut R, ip: &mut IP, delim_coord: &str) -> Result<()>
 where
-    RI: IsRandomInsertible<P>,
+    IP: IsPushable<P>,
     P: Is3D + IsBuildable3D,
     R: BufRead,
 {
@@ -69,7 +69,7 @@ where
                 let x = f64::from_str(words[0]).map_err(|e| e.to_error_kind())?;
                 let y = f64::from_str(words[1]).map_err(|e| e.to_error_kind())?;
                 let z = f64::from_str(words[2]).map_err(|e| e.to_error_kind())?;
-                ri.push(P::new(x, y, z))
+                ip.push(P::new(x, y, z))
             }
             _ => return Err(ErrorKind::ParseError),
         }

@@ -357,6 +357,9 @@ pub use self::is_random_accessible::IsRandomAccessible;
 mod is_random_insertible;
 pub use self::is_random_insertible::IsRandomInsertible;
 
+mod is_pushable;
+pub use self::is_pushable::IsPushable;
+
 mod is_face_editable_mesh;
 pub use self::is_face_editable_mesh::IsFaceEditableMesh;
 

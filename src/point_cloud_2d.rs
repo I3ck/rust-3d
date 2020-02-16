@@ -163,10 +163,6 @@ impl<P> IsRandomInsertible<P> for PointCloud2D<P>
 where
     P: Is2D,
 {
-    fn push(&mut self, point: P) {
-        self.data.push(point)
-    }
-
     fn insert(&mut self, index: usize, point: P) -> Result<()> {
         if index > self.len() {
             Err(ErrorKind::IncorrectVertexID)
@@ -174,6 +170,15 @@ where
             self.data.insert(index, point);
             Ok(())
         }
+    }
+}
+
+impl<P> IsPushable<P> for PointCloud2D<P>
+where
+    P: Is2D,
+{
+    fn push(&mut self, point: P) {
+        self.data.push(point)
     }
 }
 
