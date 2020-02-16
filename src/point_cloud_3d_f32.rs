@@ -58,6 +58,17 @@ where
     }
 }
 
+impl<P> IsPushable<P> for PointCloud3Df32<P>
+where
+    P: Is3D + IsBuildable3D,
+{
+    fn push(&mut self, p: P) {
+        self.data.push(p.x() as f32);
+        self.data.push(p.y() as f32);
+        self.data.push(p.z() as f32);
+    }
+}
+
 impl<P> IsDataContainer<P> for PointCloud3Df32<P>
 where
     P: Is3D + IsBuildable3D,
