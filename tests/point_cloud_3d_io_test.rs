@@ -55,7 +55,6 @@ fn point_cloud_3d_io_test() {
         load_xyz(
             &mut BufReader::new(File::open("tests/data/test_cube.xyz").unwrap()),
             &mut pc,
-            " ",
         )
         .unwrap();
         assert!(pc.len() == 20 * 20 * 20);

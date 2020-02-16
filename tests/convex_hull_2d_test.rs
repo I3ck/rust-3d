@@ -33,7 +33,6 @@ fn convex_hull_2d_test() {
     load_xy(
         &mut BufReader::new(File::open("tests/data/test_square.xy").unwrap()),
         &mut pc,
-        " ",
     )
     .unwrap();
 
