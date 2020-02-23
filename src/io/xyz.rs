@@ -57,7 +57,7 @@ where
 pub fn load_xyz<IP, P, R>(read: &mut R, ip: &mut IP) -> XyzResult<()>
 where
     IP: IsPushable<P>,
-    P: Is3D + IsBuildable3D,
+    P: IsBuildable3D,
     R: BufRead,
 {
     let mut delim_determined = false;

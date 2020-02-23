@@ -32,7 +32,7 @@ use std::io::BufRead;
 //@todo many valid files won't be read correctly currently
 
 /// Loads an IsMesh3D from the .obj file format
-pub fn load_obj<EM, P, R>(read: &mut R, mesh: &mut EM) -> ObjResult<()>
+pub fn load_obj_mesh<EM, P, R>(read: &mut R, mesh: &mut EM) -> ObjResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -82,6 +82,44 @@ where
             // obj indexing starts at 1
             mesh.try_add_connection(VId { val: a - 1 }, VId { val: b - 1 }, VId { val: c - 1 })
                 .map_err(|_| ObjError::InvalidMeshIndices(i_line))?;
+        }
+    }
+
+    Ok(())
+}
+
+/// Loads IsPushable<Is3D> from the .obj file format
+pub fn load_obj_points<IP, P, R>(read: &mut R, ip: &mut IP) -> ObjResult<()>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    let mut line_buffer = String::new();
+    let mut i_line = 0;
+
+    loop {
+        line_buffer.clear();
+        let n_read = read.read_line(&mut line_buffer)?;
+        if n_read == 0 {
+            break;
+        }
+        let line = line_buffer.trim_end();
+        i_line += 1;
+
+        if line.starts_with("v ") {
+            let mut words = to_words(&line);
+            // skip "v"
+            words.next().ok_or(ObjError::LineParse(i_line))?;
+            //@todo refactor all these error chains
+            let x = f64::from_str(words.next().ok_or(ObjError::LineParse(i_line))?)
+                .map_err(|_| ObjError::LineParse(i_line))?;
+            let y = f64::from_str(words.next().ok_or(ObjError::LineParse(i_line))?)
+                .map_err(|_| ObjError::LineParse(i_line))?;
+            let z = f64::from_str(words.next().ok_or(ObjError::LineParse(i_line))?)
+                .map_err(|_| ObjError::LineParse(i_line))?;
+
+            ip.push(P::new(x, y, z));
         }
     }
 

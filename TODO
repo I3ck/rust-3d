@@ -1,3 +1,5 @@
+streaming interface for IO (returning and consuming iterators)
+
 consider full abstraction over floating point type (huge change)
 
 consider From / Into implementations for Mesh etc. so buffers can be reused
