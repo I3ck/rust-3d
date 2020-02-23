@@ -264,3 +264,9 @@ impl From<ioError> for XyError {
         XyError::AccessFile
     }
 }
+
+impl From<ioError> for XyzError {
+    fn from(_error: ioError) -> Self {
+        XyzError::AccessFile
+    }
+}

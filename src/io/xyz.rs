@@ -28,7 +28,12 @@ use core::str::FromStr;
 use std::io::{BufRead, Write};
 
 /// Saves an IsRandomAccessible<Is3D> as x y z coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xyz file format or .csv files
-pub fn save_xyz<RA, P, W>(write: &mut W, ra: &RA, delim_coord: &str, delim_pos: &str) -> Result<()>
+pub fn save_xyz<RA, P, W>(
+    write: &mut W,
+    ra: &RA,
+    delim_coord: &str,
+    delim_pos: &str,
+) -> XyzResult<()>
 where
     RA: IsRandomAccessible<P>,
     P: Is3D,
@@ -43,15 +48,13 @@ where
             + delim_coord
             + &p.z().to_string()
             + delim_pos;
-        write
-            .write_all(buffer.as_bytes())
-            .map_err(|e| e.to_error_kind())?;
+        write.write_all(buffer.as_bytes())?;
     }
     Ok(())
 }
 
 /// Loads a IsPushable<Is3D> as x y z coordinates. E.g. used to load the .xyz file format or .csv file
-pub fn load_xyz<IP, P, R>(read: &mut R, ip: &mut IP) -> Result<()>
+pub fn load_xyz<IP, P, R>(read: &mut R, ip: &mut IP) -> XyzResult<()>
 where
     IP: IsPushable<P>,
     P: Is3D + IsBuildable3D,
@@ -61,6 +64,8 @@ where
     let mut delim: String = "".to_string();
     let mut line_buffer = String::new();
 
+    let mut i_line = 0;
+
     loop {
         line_buffer.clear();
         let n_read = read.read_line(&mut line_buffer)?;
@@ -68,36 +73,25 @@ where
             break;
         }
         let line = line_buffer.trim_end();
+        i_line += 1;
 
         if !delim_determined {
             delim = estimate_delimiter(2, &line)
-                .ok_or(ErrorKind::XyzError(XyzError::LoadFileInvalid))?
+                .ok_or(XyzError::LineParse(i_line))?
                 .to_string();
             delim_determined = true;
         }
 
         let mut words = line.split(&delim);
 
-        let x = f64::from_str(
-            words
-                .next()
-                .ok_or(ErrorKind::XyzError(XyzError::LoadFileInvalid))?,
-        )
-        .map_err(|_| ErrorKind::XyzError(XyzError::LoadFileInvalid))?;
+        let x = f64::from_str(words.next().ok_or(XyzError::LineParse(i_line))?)
+            .map_err(|_| XyzError::LineParse(i_line))?;
 
-        let y = f64::from_str(
-            words
-                .next()
-                .ok_or(ErrorKind::XyzError(XyzError::LoadFileInvalid))?,
-        )
-        .map_err(|_| ErrorKind::XyzError(XyzError::LoadFileInvalid))?;
+        let y = f64::from_str(words.next().ok_or(XyzError::LineParse(i_line))?)
+            .map_err(|_| XyzError::LineParse(i_line))?;
 
-        let z = f64::from_str(
-            words
-                .next()
-                .ok_or(ErrorKind::XyzError(XyzError::LoadFileInvalid))?,
-        )
-        .map_err(|_| ErrorKind::XyzError(XyzError::LoadFileInvalid))?;
+        let z = f64::from_str(words.next().ok_or(XyzError::LineParse(i_line))?)
+            .map_err(|_| XyzError::LineParse(i_line))?;
 
         ip.push(P::new(x, y, z));
     }
