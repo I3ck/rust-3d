@@ -60,7 +60,6 @@ pub enum ErrorKind {
 }
 
 pub enum PlyError {
-    LoadError,
     LoadStartNotFound,
     LoadFormatNotFound,
     LoadWrongPropertyCount,
@@ -69,8 +68,6 @@ pub enum PlyError {
     LoadVertexCountNotFound,
     LoadFaceCountNotFound,
     LoadVertexCountIncorrect,
-    LoadVerticesIncorrect,
-    IncorrectFaceData,
     AccessFile,
     ColorArrayIncorrectLength,
     InvalidMeshIndices(usize),
@@ -84,14 +81,12 @@ pub enum StlError {
 }
 
 pub enum XyError {
-    LoadFileInvalid, //@todo specify better
     EstimateDelimiter,
     AccessFile,
     LineParse(usize),
 }
 
 pub enum XyzError {
-    LoadFileInvalid, //@todo specify better
     EstimateDelimiter,
     AccessFile,
     LineParse(usize),
@@ -140,7 +135,6 @@ impl fmt::Debug for ErrorKind {
 impl fmt::Debug for PlyError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::LoadError => write!(f, "Error while loading .ply"),
             Self::LoadStartNotFound => write!(f, "Start of .ply header not found"),
             Self::LoadFormatNotFound => write!(f, "Format of .ply missing or not supported"),
             Self::LoadWrongPropertyCount => {
@@ -153,10 +147,6 @@ impl fmt::Debug for PlyError {
             Self::LoadVertexCountNotFound => write!(f, "Vertex count of .ply not found"),
             Self::LoadFaceCountNotFound => write!(f, "Face count of .ply not found"),
             Self::LoadVertexCountIncorrect => write!(f, "Vertex count of .ply not found"),
-            Self::LoadVerticesIncorrect => write!(f, "Vertices in .ply incorrect"),
-            Self::IncorrectFaceData => {
-                write!(f, "Face definition is incorrect / can not be parsed")
-            }
             Self::ColorArrayIncorrectLength => {
                 write!(f, "The provided color array has an incorrect length")
             }
@@ -182,7 +172,6 @@ impl fmt::Debug for StlError {
 impl fmt::Debug for XyError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::LoadFileInvalid => write!(f, "Invalid .xy file"),
             Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
@@ -193,7 +182,6 @@ impl fmt::Debug for XyError {
 impl fmt::Debug for XyzError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::LoadFileInvalid => write!(f, "Invalid .xyz file"),
             Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
