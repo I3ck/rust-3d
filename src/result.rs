@@ -71,8 +71,7 @@ pub enum PlyError {
     LoadVertexCountIncorrect,
     LoadVerticesIncorrect,
     IncorrectFaceData,
-    WriteFile,
-    ReadFile,
+    AccessFile,
     ColorArrayIncorrectLength,
     InvalidMeshIndices(usize),
     LineParse(usize),
@@ -158,8 +157,7 @@ impl fmt::Debug for PlyError {
                 write!(f, "The provided color array has an incorrect length")
             }
             Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
-            Self::ReadFile => write!(f, "Unable to read file"),
-            Self::WriteFile => write!(f, "Unable to write file"),
+            Self::AccessFile => write!(f, "Unable to access file"),
             Self::InvalidMeshIndices(x) => {
                 write!(f, "File contains invalid mesh indices on line {}", x)
             }
@@ -238,5 +236,11 @@ impl ToErrorKind for ioError {
 impl From<ioError> for ErrorKind {
     fn from(_error: ioError) -> Self {
         ErrorKind::IOError
+    }
+}
+
+impl From<ioError> for PlyError {
+    fn from(_error: ioError) -> Self {
+        PlyError::AccessFile
     }
 }

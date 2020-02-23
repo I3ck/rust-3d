@@ -51,31 +51,25 @@ where
         + "\n"
         + "property list uchar uint vertex_indices\n"
         + "end_header\n";
-    write
-        .write_all(header.as_bytes())
-        .map_err(|_| PlyError::WriteFile)?;
+    write.write_all(header.as_bytes())?;
 
     for i in 0..mesh.num_vertices() {
         let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating num_vertices
-        write
-            .write_all((vertex.to_str() + "\n").as_bytes())
-            .map_err(|_| PlyError::WriteFile)?;
+        write.write_all((vertex.to_str() + "\n").as_bytes())?;
     }
 
     for i in 0..mesh.num_faces() {
         let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating num_faces
-        write
-            .write_all(
-                ("3 ".to_string()
-                    + &face.a.to_string()
-                    + " "
-                    + &face.b.to_string()
-                    + " "
-                    + &face.c.to_string()
-                    + "\n")
-                    .as_bytes(),
-            )
-            .map_err(|_| PlyError::WriteFile)?;
+        write.write_all(
+            ("3 ".to_string()
+                + &face.a.to_string()
+                + " "
+                + &face.b.to_string()
+                + " "
+                + &face.c.to_string()
+                + "\n")
+                .as_bytes(),
+        )?;
     }
     Ok(())
 }
@@ -111,43 +105,37 @@ where
         + "\n"
         + "property list uchar uint vertex_indices\n"
         + "end_header\n";
-    write
-        .write_all(header.as_bytes())
-        .map_err(|_| PlyError::WriteFile)?;
+    write.write_all(header.as_bytes())?;
 
     for i in 0..n_vertices {
         let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating n_vertices
         let color = &colors[i];
-        write
-            .write_all(
-                format!(
-                    "{} {} {} {} {} {}\n",
-                    vertex.x(),
-                    vertex.y(),
-                    vertex.z(),
-                    color.r,
-                    color.g,
-                    color.b
-                )
-                .as_bytes(),
+        write.write_all(
+            format!(
+                "{} {} {} {} {} {}\n",
+                vertex.x(),
+                vertex.y(),
+                vertex.z(),
+                color.r,
+                color.g,
+                color.b
             )
-            .map_err(|_| PlyError::WriteFile)?;
+            .as_bytes(),
+        )?;
     }
 
     for i in 0..n_faces {
         let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating n_faces
-        write
-            .write_all(
-                ("3 ".to_string()
-                    + &face.a.to_string()
-                    + " "
-                    + &face.b.to_string()
-                    + " "
-                    + &face.c.to_string()
-                    + "\n")
-                    .as_bytes(),
-            )
-            .map_err(|_| PlyError::WriteFile)?;
+        write.write_all(
+            ("3 ".to_string()
+                + &face.a.to_string()
+                + " "
+                + &face.b.to_string()
+                + " "
+                + &face.c.to_string()
+                + "\n")
+                .as_bytes(),
+        )?;
     }
     Ok(())
 }
@@ -194,54 +182,34 @@ where
         }
     };
 
-    write
-        .write_all(header.as_bytes())
-        .map_err(|_| PlyError::WriteFile)?;
+    write.write_all(header.as_bytes())?;
 
     match precision {
         Precision::P32 => {
             for i in 0..mesh.num_vertices() {
                 let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating num_vertices
-                write
-                    .write_f32::<BigEndian>(vertex.x() as f32)
-                    .map_err(|_| PlyError::WriteFile)?;
-                write
-                    .write_f32::<BigEndian>(vertex.y() as f32)
-                    .map_err(|_| PlyError::WriteFile)?;
-                write
-                    .write_f32::<BigEndian>(vertex.z() as f32)
-                    .map_err(|_| PlyError::WriteFile)?;
+                write.write_f32::<BigEndian>(vertex.x() as f32)?;
+                write.write_f32::<BigEndian>(vertex.y() as f32)?;
+                write.write_f32::<BigEndian>(vertex.z() as f32)?;
             }
         }
 
         Precision::P64 => {
             for i in 0..mesh.num_vertices() {
                 let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating num_vertices
-                write
-                    .write_f64::<BigEndian>(vertex.x())
-                    .map_err(|_| PlyError::WriteFile)?;
-                write
-                    .write_f64::<BigEndian>(vertex.y())
-                    .map_err(|_| PlyError::WriteFile)?;
-                write
-                    .write_f64::<BigEndian>(vertex.z())
-                    .map_err(|_| PlyError::WriteFile)?;
+                write.write_f64::<BigEndian>(vertex.x())?;
+                write.write_f64::<BigEndian>(vertex.y())?;
+                write.write_f64::<BigEndian>(vertex.z())?;
             }
         }
     }
 
     for i in 0..mesh.num_faces() {
         let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating num_faces
-        write.write_u8(3).map_err(|_| PlyError::WriteFile)?;
-        write
-            .write_u32::<BigEndian>(face.a.val as u32)
-            .map_err(|_| PlyError::WriteFile)?;
-        write
-            .write_u32::<BigEndian>(face.b.val as u32)
-            .map_err(|_| PlyError::WriteFile)?;
-        write
-            .write_u32::<BigEndian>(face.c.val as u32)
-            .map_err(|_| PlyError::WriteFile)?;
+        write.write_u8(3)?;
+        write.write_u32::<BigEndian>(face.a.val as u32)?;
+        write.write_u32::<BigEndian>(face.b.val as u32)?;
+        write.write_u32::<BigEndian>(face.c.val as u32)?;
     }
 
     Ok(())
@@ -307,27 +275,19 @@ where
         }
     };
 
-    write
-        .write_all(header.as_bytes())
-        .map_err(|_| PlyError::WriteFile)?;
+    write.write_all(header.as_bytes())?;
 
     match precision {
         Precision::P32 => {
             for i in 0..n_vertices {
                 let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating n_vertices
                 let color = &colors[i];
-                write
-                    .write_f32::<BigEndian>(vertex.x() as f32)
-                    .map_err(|_| PlyError::WriteFile)?;
-                write
-                    .write_f32::<BigEndian>(vertex.y() as f32)
-                    .map_err(|_| PlyError::WriteFile)?;
-                write
-                    .write_f32::<BigEndian>(vertex.z() as f32)
-                    .map_err(|_| PlyError::WriteFile)?;
-                write.write_u8(color.r).map_err(|_| PlyError::WriteFile)?;
-                write.write_u8(color.g).map_err(|_| PlyError::WriteFile)?;
-                write.write_u8(color.b).map_err(|_| PlyError::WriteFile)?;
+                write.write_f32::<BigEndian>(vertex.x() as f32)?;
+                write.write_f32::<BigEndian>(vertex.y() as f32)?;
+                write.write_f32::<BigEndian>(vertex.z() as f32)?;
+                write.write_u8(color.r)?;
+                write.write_u8(color.g)?;
+                write.write_u8(color.b)?;
             }
         }
 
@@ -335,34 +295,22 @@ where
             for i in 0..n_vertices {
                 let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating n_vertices
                 let color = &colors[i];
-                write
-                    .write_f64::<BigEndian>(vertex.x())
-                    .map_err(|_| PlyError::WriteFile)?;
-                write
-                    .write_f64::<BigEndian>(vertex.y())
-                    .map_err(|_| PlyError::WriteFile)?;
-                write
-                    .write_f64::<BigEndian>(vertex.z())
-                    .map_err(|_| PlyError::WriteFile)?;
-                write.write_u8(color.r).map_err(|_| PlyError::WriteFile)?;
-                write.write_u8(color.g).map_err(|_| PlyError::WriteFile)?;
-                write.write_u8(color.b).map_err(|_| PlyError::WriteFile)?;
+                write.write_f64::<BigEndian>(vertex.x())?;
+                write.write_f64::<BigEndian>(vertex.y())?;
+                write.write_f64::<BigEndian>(vertex.z())?;
+                write.write_u8(color.r)?;
+                write.write_u8(color.g)?;
+                write.write_u8(color.b)?;
             }
         }
     }
 
     for i in 0..n_faces {
         let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating n_faces
-        write.write_u8(3).map_err(|_| PlyError::WriteFile)?;
-        write
-            .write_u32::<BigEndian>(face.a.val as u32)
-            .map_err(|_| PlyError::WriteFile)?;
-        write
-            .write_u32::<BigEndian>(face.b.val as u32)
-            .map_err(|_| PlyError::WriteFile)?;
-        write
-            .write_u32::<BigEndian>(face.c.val as u32)
-            .map_err(|_| PlyError::WriteFile)?;
+        write.write_u8(3)?;
+        write.write_u32::<BigEndian>(face.a.val as u32)?;
+        write.write_u32::<BigEndian>(face.b.val as u32)?;
+        write.write_u32::<BigEndian>(face.c.val as u32)?;
     }
 
     Ok(())
@@ -392,9 +340,7 @@ where
 
     loop {
         line_buffer.clear();
-        let n_read = read
-            .read_line(&mut line_buffer)
-            .map_err(|_| PlyError::ReadFile)?;
+        let n_read = read.read_line(&mut line_buffer)?;
         if n_read == 0 {
             break;
         }
@@ -538,9 +484,7 @@ fn collect_index_line(line: &str) -> Option<[usize; 3]> {
     }
 
     let a = usize::from_str(words.next()?).ok()?;
-
     let b = usize::from_str(words.next()?).ok()?;
-
     let c = usize::from_str(words.next()?).ok()?;
 
     Some([a, b, c])
