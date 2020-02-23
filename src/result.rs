@@ -85,11 +85,15 @@ pub enum StlError {
 
 pub enum XyError {
     LoadFileInvalid, //@todo specify better
+    EstimateDelimiter,
+    AccessFile,
     LineParse(usize),
 }
 
 pub enum XyzError {
     LoadFileInvalid, //@todo specify better
+    EstimateDelimiter,
+    AccessFile,
     LineParse(usize),
 }
 
@@ -180,6 +184,8 @@ impl fmt::Debug for XyError {
         match self {
             Self::LoadFileInvalid => write!(f, "Invalid .xy file"),
             Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::AccessFile => write!(f, "Unable to access file"),
+            Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
         }
     }
 }
@@ -189,6 +195,8 @@ impl fmt::Debug for XyzError {
         match self {
             Self::LoadFileInvalid => write!(f, "Invalid .xyz file"),
             Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::AccessFile => write!(f, "Unable to access file"),
+            Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
         }
     }
 }
@@ -248,5 +256,11 @@ impl From<ioError> for PlyError {
 impl From<ioError> for StlError {
     fn from(_error: ioError) -> Self {
         StlError::AccessFile
+    }
+}
+
+impl From<ioError> for XyError {
+    fn from(_error: ioError) -> Self {
+        XyError::AccessFile
     }
 }
