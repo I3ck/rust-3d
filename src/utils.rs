@@ -29,9 +29,14 @@ use std::{
 
 use crate::*;
 
-/// Splits a line into a Vec of its words
+/// Splits a line into its words
 pub fn to_words(line: &str) -> std::str::Split<'_, &str> {
     line.trim().split(" ")
+}
+
+/// Returns allt until delimiter
+pub fn until<'a>(line: &'a str, delimiter: &str) -> &'a str {
+    line.split(delimiter).next().unwrap_or("")
 }
 
 /// Max of two f64 values

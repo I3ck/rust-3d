@@ -33,3 +33,6 @@ pub use self::xy::*;
 
 mod xyz;
 pub use self::xyz::*;
+
+mod obj;
+pub use self::obj::*;

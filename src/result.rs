@@ -57,6 +57,7 @@ pub enum ErrorKind {
     StlError(StlError),
     XyError(XyError),
     XyzError(XyzError),
+    ObjError(ObjError),
 }
 
 pub enum PlyError {
@@ -89,6 +90,12 @@ pub enum XyError {
 pub enum XyzError {
     EstimateDelimiter,
     AccessFile,
+    LineParse(usize),
+}
+
+pub enum ObjError {
+    AccessFile,
+    InvalidMeshIndices(usize),
     LineParse(usize),
 }
 
@@ -128,6 +135,7 @@ impl fmt::Debug for ErrorKind {
             Self::StlError(x) => x.fmt(f),
             Self::XyError(x) => x.fmt(f),
             Self::XyzError(x) => x.fmt(f),
+            Self::ObjError(x) => x.fmt(f),
         }
     }
 }
@@ -189,6 +197,18 @@ impl fmt::Debug for XyzError {
     }
 }
 
+impl fmt::Debug for ObjError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::AccessFile => write!(f, "Unable to access file"),
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::InvalidMeshIndices(x) => {
+                write!(f, "File contains invalid mesh indices on line {}", x)
+            }
+        }
+    }
+}
+
 /// Result type used by rust-3d
 pub type Result<T> = result::Result<T, ErrorKind>;
 
@@ -203,6 +223,9 @@ pub type XyResult<T> = result::Result<T, XyError>;
 
 /// Result for XyzError
 pub type XyzResult<T> = result::Result<T, XyzError>;
+
+/// Result for ObjError
+pub type ObjResult<T> = result::Result<T, ObjError>;
 
 impl From<ParseFloatError> for ErrorKind {
     fn from(_error: ParseFloatError) -> Self {
@@ -246,6 +269,12 @@ impl From<XyzError> for ErrorKind {
     }
 }
 
+impl From<ObjError> for ErrorKind {
+    fn from(error: ObjError) -> Self {
+        Self::ObjError(error)
+    }
+}
+
 impl From<ioError> for PlyError {
     fn from(_error: ioError) -> Self {
         PlyError::AccessFile
@@ -267,5 +296,11 @@ impl From<ioError> for XyError {
 impl From<ioError> for XyzError {
     fn from(_error: ioError) -> Self {
         XyzError::AccessFile
+    }
+}
+
+impl From<ioError> for ObjError {
+    fn from(_error: ioError) -> Self {
+        ObjError::AccessFile
     }
 }
