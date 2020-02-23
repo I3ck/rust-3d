@@ -52,15 +52,22 @@ where
 
         if line.starts_with("v ") {
             let mut words = to_words(&line);
+
             // skip "v"
             words.next().ok_or(ObjError::LineParse(i_line))?;
-            //@todo refactor all these error chains
-            let x = f64::from_str(words.next().ok_or(ObjError::LineParse(i_line))?)
-                .map_err(|_| ObjError::LineParse(i_line))?;
-            let y = f64::from_str(words.next().ok_or(ObjError::LineParse(i_line))?)
-                .map_err(|_| ObjError::LineParse(i_line))?;
-            let z = f64::from_str(words.next().ok_or(ObjError::LineParse(i_line))?)
-                .map_err(|_| ObjError::LineParse(i_line))?;
+
+            let x = words
+                .next()
+                .and_then(|word| f64::from_str(word).ok())
+                .ok_or(ObjError::LineParse(i_line))?;
+            let y = words
+                .next()
+                .and_then(|word| f64::from_str(word).ok())
+                .ok_or(ObjError::LineParse(i_line))?;
+            let z = words
+                .next()
+                .and_then(|word| f64::from_str(word).ok())
+                .ok_or(ObjError::LineParse(i_line))?;
 
             mesh.add_vertex(P::new(x, y, z));
         } else if line.starts_with("f ") {
@@ -68,7 +75,6 @@ where
 
             // skip "f"
             words.next().ok_or(ObjError::LineParse(i_line))?;
-            //@todo refactor all these error chains
 
             let mut tmp = words.next().ok_or(ObjError::LineParse(i_line))?;
             let a = usize::from_str(until(tmp, "/")).map_err(|_| ObjError::LineParse(i_line))?;
@@ -109,15 +115,22 @@ where
 
         if line.starts_with("v ") {
             let mut words = to_words(&line);
+
             // skip "v"
             words.next().ok_or(ObjError::LineParse(i_line))?;
-            //@todo refactor all these error chains
-            let x = f64::from_str(words.next().ok_or(ObjError::LineParse(i_line))?)
-                .map_err(|_| ObjError::LineParse(i_line))?;
-            let y = f64::from_str(words.next().ok_or(ObjError::LineParse(i_line))?)
-                .map_err(|_| ObjError::LineParse(i_line))?;
-            let z = f64::from_str(words.next().ok_or(ObjError::LineParse(i_line))?)
-                .map_err(|_| ObjError::LineParse(i_line))?;
+
+            let x = words
+                .next()
+                .and_then(|word| f64::from_str(word).ok())
+                .ok_or(ObjError::LineParse(i_line))?;
+            let y = words
+                .next()
+                .and_then(|word| f64::from_str(word).ok())
+                .ok_or(ObjError::LineParse(i_line))?;
+            let z = words
+                .next()
+                .and_then(|word| f64::from_str(word).ok())
+                .ok_or(ObjError::LineParse(i_line))?;
 
             ip.push(P::new(x, y, z));
         }

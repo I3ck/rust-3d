@@ -84,14 +84,20 @@ where
 
         let mut words = line.split(&delim);
 
-        let x = f64::from_str(words.next().ok_or(XyzError::LineParse(i_line))?)
-            .map_err(|_| XyzError::LineParse(i_line))?;
+        let x = words
+            .next()
+            .and_then(|word| f64::from_str(word).ok())
+            .ok_or(XyzError::LineParse(i_line))?;
 
-        let y = f64::from_str(words.next().ok_or(XyzError::LineParse(i_line))?)
-            .map_err(|_| XyzError::LineParse(i_line))?;
+        let y = words
+            .next()
+            .and_then(|word| f64::from_str(word).ok())
+            .ok_or(XyzError::LineParse(i_line))?;
 
-        let z = f64::from_str(words.next().ok_or(XyzError::LineParse(i_line))?)
-            .map_err(|_| XyzError::LineParse(i_line))?;
+        let z = words
+            .next()
+            .and_then(|word| f64::from_str(word).ok())
+            .ok_or(XyzError::LineParse(i_line))?;
 
         ip.push(P::new(x, y, z));
     }
