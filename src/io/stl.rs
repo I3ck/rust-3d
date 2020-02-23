@@ -94,7 +94,7 @@ where
     P: IsBuildable3D + Clone,
     R: BufRead,
 {
-    let mut i_line = 1;
+    let mut i_line = 0;
     let mut line_buffer = String::new();
 
     // skip first line
@@ -102,11 +102,13 @@ where
     i_line += 1;
 
     loop {
-        //@todo currently simply stops on error
-        if let Ok([a, b, c]) = read_stl_facet(read, &mut line_buffer, &mut i_line) {
-            mesh.add_face(a, b, c);
-        } else {
-            break;
+        match read_stl_facet(read, &mut line_buffer, &mut i_line) {
+            Ok([a, b, c]) => {
+                mesh.add_face(a, b, c);
+                ()
+            }
+            Err(StlError::LoadFileEndReached) => break,
+            Err(x) => return Err(x),
         }
     }
 
@@ -178,6 +180,10 @@ where
 
     line = fetch_line(read, line_buffer)?;
     *i_line += 1;
+
+    if line.contains("endsolid") {
+        return Err(StlError::LoadFileEndReached);
+    }
 
     if !line.contains("facet") {
         return Err(StlError::LineParse(*i_line));
