@@ -204,28 +204,15 @@ pub type XyResult<T> = result::Result<T, XyError>;
 /// Result for XyzError
 pub type XyzResult<T> = result::Result<T, XyzError>;
 
-//@todo replace with From
-/// Trait used to convert other Errors to ErrorKind
-pub trait ToErrorKind {
-    /// Creates an ErrorKind from this
-    fn to_error_kind(&self) -> ErrorKind;
-}
-
-impl ToErrorKind for ParseFloatError {
-    fn to_error_kind(&self) -> ErrorKind {
+impl From<ParseFloatError> for ErrorKind {
+    fn from(_error: ParseFloatError) -> Self {
         ErrorKind::ParseError
     }
 }
 
-impl ToErrorKind for ParseIntError {
-    fn to_error_kind(&self) -> ErrorKind {
+impl From<ParseIntError> for ErrorKind {
+    fn from(_error: ParseIntError) -> ErrorKind {
         ErrorKind::ParseError
-    }
-}
-
-impl ToErrorKind for ioError {
-    fn to_error_kind(&self) -> ErrorKind {
-        ErrorKind::IOError
     }
 }
 

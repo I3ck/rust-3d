@@ -80,14 +80,9 @@ pub trait IsBuildable3D: Sized + Is3D + Eq + PartialEq + Ord + PartialOrd + Hash
     fn parse(text: &str) -> Result<Self> {
         let mut words = text.split(" ");
 
-        let x = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)
-            .map_err(|e| e.to_error_kind())?;
-
-        let y = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)
-            .map_err(|e| e.to_error_kind())?;
-
-        let z = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)
-            .map_err(|e| e.to_error_kind())?;
+        let x = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)?;
+        let y = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)?;
+        let z = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)?;
 
         if words.next().is_none() {
             Ok(Self::new(x, y, z))
