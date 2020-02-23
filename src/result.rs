@@ -72,108 +72,118 @@ pub enum PlyError {
     LoadVertexCountIncorrect,
     LoadVerticesIncorrect,
     IncorrectFaceData,
+    LineParse(usize),
 }
 
 pub enum StlError {
     LoadFileEndReached,
     LoadFileInvalid, //@todo specify better
+    LineParse(usize),
 }
 
 pub enum XyError {
     LoadFileInvalid, //@todo specify better
+    LineParse(usize),
 }
 
 pub enum XyzError {
     LoadFileInvalid, //@todo specify better
-}
-
-impl ErrorKind {
-    /// Returns readable text for the ErrorKind
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Self::MinMaxSwapped => "Passed min/max values are swapped (min > max)",
-            Self::MinMaxEqual => "Passed min/max values are equal",
-            Self::TooFewPoints => "Container had too few points for the operation",
-            Self::BoundingBoxMissing => "Bounding box is missing for the operation",
-            Self::NormalizeVecWithoutLength => "Can't normalize a vector of length 0",
-            Self::IOError => "Can't read or write a file",
-            Self::ParseError => "Can't parse data",
-            Self::IndexOutOfBounds => "Tried to access an out of bounds index",
-            Self::IncorrectFaceID => "Used an incorrect face id",
-            Self::IncorrectVertexID => "Used an incorrect vertex id",
-            Self::IncorrectEdgeID => "Used an incorrect edge id",
-            Self::IncorrectVoxelID => "Used an incorrect voxel id",
-            Self::IncorrectUnitID => "Used an incorrect unit id",
-            Self::IncorrectSegmentID => "Used an incorrect segment id",
-            Self::IncorrectDimension => "Trying to access an incorrect dimension",
-            Self::DimensionsDontMatch => "Trying to mix types with different dimensions",
-            Self::NumberConversionError => "Failed converting one number type to another",
-            Self::NumberInWrongRange => "Passed number is within the wrong range",
-            Self::ComparisionFailed => "Comparision between two values failed",
-            Self::ColorArrayIncorrectLength => "The provided color array has an incorrect length",
-            Self::CantCalculateAngleIfZeroLength => "Can't calculate the angle between 0 vectors",
-            Self::ClusterTooBig => "Clustering size is too big for given mesh",
-            Self::TriFace3DNotSpanningVolume => {
-                "TriFace3D must be constructed from points spanning a volume"
-            }
-            Self::PlyError(x) => x.as_str(),
-            Self::StlError(x) => x.as_str(),
-            Self::XyError(x) => x.as_str(),
-            Self::XyzError(x) => x.as_str(),
-        }
-    }
-}
-
-impl PlyError {
-    /// Returns readable text for the PlyError
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Self::LoadError => "Error while loading .ply",
-            Self::LoadStartNotFound => "Start of .ply header not found",
-            Self::LoadFormatNotFound => "Format of .ply missing or not supported",
-            Self::LoadWrongPropertyCount => "Property count of .ply missing or not supported",
-            Self::LoadVertexIndexDefinitionNotFound => "Index definition in .ply not found",
-            Self::LoadHeaderEndNotFound => "End of header definition of .ply not found",
-            Self::LoadVertexCountNotFound => "Vertex count of .ply not found",
-            Self::LoadFaceCountNotFound => "Face count of .ply not found",
-            Self::LoadVertexCountIncorrect => "Vertex count of .ply not found",
-            Self::LoadVerticesIncorrect => "Vertices in .ply incorrect",
-            Self::IncorrectFaceData => "Face definition is incorrect / can not be parsed",
-        }
-    }
-}
-
-impl StlError {
-    /// Returns readable text for the StlError
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Self::LoadFileEndReached => "Unexpected reach of .stl file end",
-            Self::LoadFileInvalid => "Invalid .stl file",
-        }
-    }
-}
-
-impl XyError {
-    /// Returns readable text for the XyError
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Self::LoadFileInvalid => "Invalid .xy file",
-        }
-    }
-}
-
-impl XyzError {
-    /// Returns readable text for the XyzError
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            Self::LoadFileInvalid => "Invalid .xyz file",
-        }
-    }
+    LineParse(usize),
 }
 
 impl fmt::Debug for ErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.as_str())
+        match self {
+            Self::MinMaxSwapped => write!(f, "Passed min/max values are swapped (min > max)"),
+            Self::MinMaxEqual => write!(f, "Passed min/max values are equal"),
+            Self::TooFewPoints => write!(f, "Container had too few points for the operation"),
+            Self::BoundingBoxMissing => write!(f, "Bounding box is missing for the operation"),
+            Self::NormalizeVecWithoutLength => write!(f, "Can't normalize a vector of length 0"),
+            Self::IOError => write!(f, "Can't read or write a file"),
+            Self::ParseError => write!(f, "Can't parse data"),
+            Self::IndexOutOfBounds => write!(f, "Tried to access an out of bounds index"),
+            Self::IncorrectFaceID => write!(f, "Used an incorrect face id"),
+            Self::IncorrectVertexID => write!(f, "Used an incorrect vertex id"),
+            Self::IncorrectEdgeID => write!(f, "Used an incorrect edge id"),
+            Self::IncorrectVoxelID => write!(f, "Used an incorrect voxel id"),
+            Self::IncorrectUnitID => write!(f, "Used an incorrect unit id"),
+            Self::IncorrectSegmentID => write!(f, "Used an incorrect segment id"),
+            Self::IncorrectDimension => write!(f, "Trying to access an incorrect dimension"),
+            Self::DimensionsDontMatch => write!(f, "Trying to mix types with different dimensions"),
+            Self::NumberConversionError => {
+                write!(f, "Failed converting one number type to another")
+            }
+            Self::NumberInWrongRange => write!(f, "Passed number is within the wrong range"),
+            Self::ComparisionFailed => write!(f, "Comparision between two values failed"),
+            Self::ColorArrayIncorrectLength => {
+                write!(f, "The provided color array has an incorrect length")
+            }
+            Self::CantCalculateAngleIfZeroLength => {
+                write!(f, "Can't calculate the angle between 0 vectors")
+            }
+            Self::ClusterTooBig => write!(f, "Clustering size is too big for given mesh"),
+            Self::TriFace3DNotSpanningVolume => write!(
+                f,
+                "TriFace3D must be constructed from points spanning a volume"
+            ),
+            Self::PlyError(x) => x.fmt(f),
+            Self::StlError(x) => x.fmt(f),
+            Self::XyError(x) => x.fmt(f),
+            Self::XyzError(x) => x.fmt(f),
+        }
+    }
+}
+
+impl fmt::Debug for PlyError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::LoadError => write!(f, "Error while loading .ply"),
+            Self::LoadStartNotFound => write!(f, "Start of .ply header not found"),
+            Self::LoadFormatNotFound => write!(f, "Format of .ply missing or not supported"),
+            Self::LoadWrongPropertyCount => {
+                write!(f, "Property count of .ply missing or not supported")
+            }
+            Self::LoadVertexIndexDefinitionNotFound => {
+                write!(f, "Index definition in .ply not found")
+            }
+            Self::LoadHeaderEndNotFound => write!(f, "End of header definition of .ply not found"),
+            Self::LoadVertexCountNotFound => write!(f, "Vertex count of .ply not found"),
+            Self::LoadFaceCountNotFound => write!(f, "Face count of .ply not found"),
+            Self::LoadVertexCountIncorrect => write!(f, "Vertex count of .ply not found"),
+            Self::LoadVerticesIncorrect => write!(f, "Vertices in .ply incorrect"),
+            Self::IncorrectFaceData => {
+                write!(f, "Face definition is incorrect / can not be parsed")
+            }
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+        }
+    }
+}
+
+impl fmt::Debug for StlError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::LoadFileEndReached => write!(f, "Unexpected reach of .stl file end"),
+            Self::LoadFileInvalid => write!(f, "Invalid .stl file"),
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+        }
+    }
+}
+
+impl fmt::Debug for XyError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::LoadFileInvalid => write!(f, "Invalid .xy file"),
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+        }
+    }
+}
+
+impl fmt::Debug for XyzError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::LoadFileInvalid => write!(f, "Invalid .xyz file"),
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+        }
     }
 }
 
