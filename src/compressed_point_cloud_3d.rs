@@ -90,7 +90,7 @@ where
     /// Creates a new point cloud from this
     pub fn decompress<P>(&self) -> PointCloud3D<P>
     where
-        P: Is3D + IsBuildable3D,
+        P: IsBuildable3D,
     {
         let mut pc = PointCloud3D::new();
 

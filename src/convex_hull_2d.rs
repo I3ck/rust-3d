@@ -30,7 +30,7 @@ use crate::*;
 pub fn convex_hull_2d<RA, P>(ra: &RA) -> Vec<P>
 where
     RA: IsRandomAccessible<P>,
-    P: Is2D + IsBuildable2D + Clone,
+    P: IsBuildable2D + Clone,
 {
     let n = ra.len();
 

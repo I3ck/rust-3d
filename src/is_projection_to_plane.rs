@@ -31,7 +31,7 @@ use crate::*;
 /// IsProjectionToPlane is a trait used types which can be projected onto and from planes within 3D space
 pub trait IsProjectionToPlane<P2, P3, N>: Sized
 where
-    P2: Is2D + IsBuildable2D + IsTransFormableTo3D,
+    P2: IsBuildable2D + IsTransFormableTo3D,
     P3: Is3D + IsTransFormableTo2D,
     N: IsNormalized3D,
 {

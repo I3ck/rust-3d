@@ -108,7 +108,7 @@ where
 
 impl<P> IsDataContainer<P> for PointCloud2D<P>
 where
-    P: Is2D + IsBuildable2D + Clone,
+    P: IsBuildable2D + Clone,
 {
     fn reserve_d(&mut self, n: usize) {
         self.data.reserve(n);

@@ -32,7 +32,7 @@ use std::marker::PhantomData;
 /// PointCloud3Df32, a collection of positions within 3D space stored lossy as f32 vector for easier usage during rendering
 pub struct PointCloud3Df32<P>
 where
-    P: Is3D + IsBuildable3D,
+    P: IsBuildable3D,
 {
     pub data: Vec<f32>,
     _phantom: PhantomData<P>,
@@ -40,7 +40,7 @@ where
 
 impl<P> PointCloud3Df32<P>
 where
-    P: Is3D + IsBuildable3D,
+    P: IsBuildable3D,
 {
     /// Creates a new, empty point cloud
     pub fn new() -> PointCloud3Df32<P> {
@@ -60,7 +60,7 @@ where
 
 impl<P> IsPushable<P> for PointCloud3Df32<P>
 where
-    P: Is3D + IsBuildable3D,
+    P: IsBuildable3D,
 {
     fn push(&mut self, p: P) {
         self.data.push(p.x() as f32);
@@ -71,7 +71,7 @@ where
 
 impl<P> IsDataContainer<P> for PointCloud3Df32<P>
 where
-    P: Is3D + IsBuildable3D,
+    P: IsBuildable3D,
 {
     fn reserve_d(&mut self, n: usize) {
         self.data.reserve(3 * n);
@@ -104,7 +104,7 @@ where
 
 impl<P> IsMovable3D for PointCloud3Df32<P>
 where
-    P: Is3D + IsBuildable3D,
+    P: IsBuildable3D,
 {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         for index in 0..self.data.len() / 3 {
@@ -117,7 +117,7 @@ where
 
 impl<P> HasBoundingBox3DMaybe for PointCloud3Df32<P>
 where
-    P: Is3D + IsBuildable3D,
+    P: IsBuildable3D,
 {
     fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
         BoundingBox3D::from_into_iterator(
@@ -130,7 +130,7 @@ where
 
 impl<P> Into<Vec<f32>> for PointCloud3Df32<P>
 where
-    P: Is3D + IsBuildable3D,
+    P: IsBuildable3D,
 {
     fn into(self) -> Vec<f32> {
         self.data
@@ -139,7 +139,7 @@ where
 
 impl<P> From<Vec<f32>> for PointCloud3Df32<P>
 where
-    P: Is3D + IsBuildable3D,
+    P: IsBuildable3D,
 {
     fn from(data: Vec<f32>) -> Self {
         Self {
