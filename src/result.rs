@@ -222,6 +222,30 @@ impl From<ioError> for ErrorKind {
     }
 }
 
+impl From<PlyError> for ErrorKind {
+    fn from(error: PlyError) -> Self {
+        Self::PlyError(error)
+    }
+}
+
+impl From<StlError> for ErrorKind {
+    fn from(error: StlError) -> Self {
+        Self::StlError(error)
+    }
+}
+
+impl From<XyError> for ErrorKind {
+    fn from(error: XyError) -> Self {
+        Self::XyError(error)
+    }
+}
+
+impl From<XyzError> for ErrorKind {
+    fn from(error: XyzError) -> Self {
+        Self::XyzError(error)
+    }
+}
+
 impl From<ioError> for PlyError {
     fn from(_error: ioError) -> Self {
         PlyError::AccessFile
