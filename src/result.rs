@@ -79,7 +79,7 @@ pub enum PlyError {
 
 pub enum StlError {
     LoadFileEndReached,
-    LoadFileInvalid, //@todo specify better
+    AccessFile,
     LineParse(usize),
 }
 
@@ -169,7 +169,7 @@ impl fmt::Debug for StlError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::LoadFileEndReached => write!(f, "Unexpected reach of .stl file end"),
-            Self::LoadFileInvalid => write!(f, "Invalid .stl file"),
+            Self::AccessFile => write!(f, "Unable to access file"),
             Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
         }
     }
@@ -242,5 +242,11 @@ impl From<ioError> for ErrorKind {
 impl From<ioError> for PlyError {
     fn from(_error: ioError) -> Self {
         PlyError::AccessFile
+    }
+}
+
+impl From<ioError> for StlError {
+    fn from(_error: ioError) -> Self {
+        StlError::AccessFile
     }
 }
