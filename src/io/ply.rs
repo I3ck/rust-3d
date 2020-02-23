@@ -31,7 +31,7 @@ use core::str::FromStr;
 use std::io::{BufRead, Write};
 
 /// Saves an IsMesh3D in the ASCII .ply file format
-pub fn save_ply_ascii<M, P, W>(write: &mut W, mesh: &M) -> Result<()>
+pub fn save_ply_ascii<M, P, W>(write: &mut W, mesh: &M) -> PlyResult<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
@@ -53,17 +53,17 @@ where
         + "end_header\n";
     write
         .write_all(header.as_bytes())
-        .map_err(|e| e.to_error_kind())?;
+        .map_err(|_| PlyError::WriteFile)?;
 
     for i in 0..mesh.num_vertices() {
-        let vertex = mesh.vertex(VId { val: i })?;
+        let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating num_vertices
         write
             .write_all((vertex.to_str() + "\n").as_bytes())
-            .map_err(|e| e.to_error_kind())?;
+            .map_err(|_| PlyError::WriteFile)?;
     }
 
     for i in 0..mesh.num_faces() {
-        let face = mesh.face_vertex_ids(FId { val: i })?;
+        let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating num_faces
         write
             .write_all(
                 ("3 ".to_string()
@@ -75,13 +75,13 @@ where
                     + "\n")
                     .as_bytes(),
             )
-            .map_err(|e| e.to_error_kind())?;
+            .map_err(|_| PlyError::WriteFile)?;
     }
     Ok(())
 }
 
 /// Saves an IsMesh3D in the ASCII .ply file format with additional colors
-pub fn save_ply_ascii_colored<M, P, W>(write: &mut W, mesh: &M, colors: &Vec<Rgb>) -> Result<()>
+pub fn save_ply_ascii_colored<M, P, W>(write: &mut W, mesh: &M, colors: &Vec<Rgb>) -> PlyResult<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
@@ -91,7 +91,7 @@ where
     let n_faces = mesh.num_faces();
 
     if n_vertices != colors.len() {
-        return Err(ErrorKind::ColorArrayIncorrectLength);
+        return Err(PlyError::ColorArrayIncorrectLength);
     }
 
     let header = "ply\n".to_string()
@@ -113,10 +113,10 @@ where
         + "end_header\n";
     write
         .write_all(header.as_bytes())
-        .map_err(|e| e.to_error_kind())?;
+        .map_err(|_| PlyError::WriteFile)?;
 
     for i in 0..n_vertices {
-        let vertex = mesh.vertex(VId { val: i })?;
+        let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating n_vertices
         let color = &colors[i];
         write
             .write_all(
@@ -131,11 +131,11 @@ where
                 )
                 .as_bytes(),
             )
-            .map_err(|e| e.to_error_kind())?;
+            .map_err(|_| PlyError::WriteFile)?;
     }
 
     for i in 0..n_faces {
-        let face = mesh.face_vertex_ids(FId { val: i })?;
+        let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating n_faces
         write
             .write_all(
                 ("3 ".to_string()
@@ -147,13 +147,13 @@ where
                     + "\n")
                     .as_bytes(),
             )
-            .map_err(|e| e.to_error_kind())?;
+            .map_err(|_| PlyError::WriteFile)?;
     }
     Ok(())
 }
 
 /// Saves an IsMesh3D in the binary .ply file format
-pub fn save_ply_binary<M, P, W>(write: &mut W, mesh: &M, precision: &Precision) -> Result<()>
+pub fn save_ply_binary<M, P, W>(write: &mut W, mesh: &M, precision: &Precision) -> PlyResult<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
@@ -196,52 +196,52 @@ where
 
     write
         .write_all(header.as_bytes())
-        .map_err(|e| e.to_error_kind())?;
+        .map_err(|_| PlyError::WriteFile)?;
 
     match precision {
         Precision::P32 => {
             for i in 0..mesh.num_vertices() {
-                let vertex = mesh.vertex(VId { val: i })?;
+                let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating num_vertices
                 write
-                    .write_f32::<BigEndian>(vertex.position_nd(0)? as f32)
-                    .map_err(|e| e.to_error_kind())?;
+                    .write_f32::<BigEndian>(vertex.x() as f32)
+                    .map_err(|_| PlyError::WriteFile)?;
                 write
-                    .write_f32::<BigEndian>(vertex.position_nd(1)? as f32)
-                    .map_err(|e| e.to_error_kind())?;
+                    .write_f32::<BigEndian>(vertex.y() as f32)
+                    .map_err(|_| PlyError::WriteFile)?;
                 write
-                    .write_f32::<BigEndian>(vertex.position_nd(2)? as f32)
-                    .map_err(|e| e.to_error_kind())?;
+                    .write_f32::<BigEndian>(vertex.z() as f32)
+                    .map_err(|_| PlyError::WriteFile)?;
             }
         }
 
         Precision::P64 => {
             for i in 0..mesh.num_vertices() {
-                let vertex = mesh.vertex(VId { val: i })?;
+                let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating num_vertices
                 write
-                    .write_f64::<BigEndian>(vertex.position_nd(0)?)
-                    .map_err(|e| e.to_error_kind())?;
+                    .write_f64::<BigEndian>(vertex.x())
+                    .map_err(|_| PlyError::WriteFile)?;
                 write
-                    .write_f64::<BigEndian>(vertex.position_nd(1)?)
-                    .map_err(|e| e.to_error_kind())?;
+                    .write_f64::<BigEndian>(vertex.y())
+                    .map_err(|_| PlyError::WriteFile)?;
                 write
-                    .write_f64::<BigEndian>(vertex.position_nd(2)?)
-                    .map_err(|e| e.to_error_kind())?;
+                    .write_f64::<BigEndian>(vertex.z())
+                    .map_err(|_| PlyError::WriteFile)?;
             }
         }
     }
 
     for i in 0..mesh.num_faces() {
-        let face = mesh.face_vertex_ids(FId { val: i })?;
-        write.write_u8(3).map_err(|e| e.to_error_kind())?;
+        let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating num_faces
+        write.write_u8(3).map_err(|_| PlyError::WriteFile)?;
         write
             .write_u32::<BigEndian>(face.a.val as u32)
-            .map_err(|e| e.to_error_kind())?;
+            .map_err(|_| PlyError::WriteFile)?;
         write
             .write_u32::<BigEndian>(face.b.val as u32)
-            .map_err(|e| e.to_error_kind())?;
+            .map_err(|_| PlyError::WriteFile)?;
         write
             .write_u32::<BigEndian>(face.c.val as u32)
-            .map_err(|e| e.to_error_kind())?;
+            .map_err(|_| PlyError::WriteFile)?;
     }
 
     Ok(())
@@ -253,7 +253,7 @@ pub fn save_ply_binary_colored<M, P, W>(
     mesh: &M,
     precision: &Precision,
     colors: &Vec<Rgb>,
-) -> Result<()>
+) -> PlyResult<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
@@ -263,7 +263,7 @@ where
     let n_faces = mesh.num_faces();
 
     if n_vertices != colors.len() {
-        return Err(ErrorKind::ColorArrayIncorrectLength);
+        return Err(PlyError::ColorArrayIncorrectLength);
     }
 
     let header = match precision {
@@ -309,60 +309,60 @@ where
 
     write
         .write_all(header.as_bytes())
-        .map_err(|e| e.to_error_kind())?;
+        .map_err(|_| PlyError::WriteFile)?;
 
     match precision {
         Precision::P32 => {
             for i in 0..n_vertices {
-                let vertex = mesh.vertex(VId { val: i })?;
+                let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating n_vertices
                 let color = &colors[i];
                 write
-                    .write_f32::<BigEndian>(vertex.position_nd(0)? as f32)
-                    .map_err(|e| e.to_error_kind())?;
+                    .write_f32::<BigEndian>(vertex.x() as f32)
+                    .map_err(|_| PlyError::WriteFile)?;
                 write
-                    .write_f32::<BigEndian>(vertex.position_nd(1)? as f32)
-                    .map_err(|e| e.to_error_kind())?;
+                    .write_f32::<BigEndian>(vertex.y() as f32)
+                    .map_err(|_| PlyError::WriteFile)?;
                 write
-                    .write_f32::<BigEndian>(vertex.position_nd(2)? as f32)
-                    .map_err(|e| e.to_error_kind())?;
-                write.write_u8(color.r).map_err(|e| e.to_error_kind())?;
-                write.write_u8(color.g).map_err(|e| e.to_error_kind())?;
-                write.write_u8(color.b).map_err(|e| e.to_error_kind())?;
+                    .write_f32::<BigEndian>(vertex.z() as f32)
+                    .map_err(|_| PlyError::WriteFile)?;
+                write.write_u8(color.r).map_err(|_| PlyError::WriteFile)?;
+                write.write_u8(color.g).map_err(|_| PlyError::WriteFile)?;
+                write.write_u8(color.b).map_err(|_| PlyError::WriteFile)?;
             }
         }
 
         Precision::P64 => {
             for i in 0..n_vertices {
-                let vertex = mesh.vertex(VId { val: i })?;
+                let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating n_vertices
                 let color = &colors[i];
                 write
-                    .write_f64::<BigEndian>(vertex.position_nd(0)?)
-                    .map_err(|e| e.to_error_kind())?;
+                    .write_f64::<BigEndian>(vertex.x())
+                    .map_err(|_| PlyError::WriteFile)?;
                 write
-                    .write_f64::<BigEndian>(vertex.position_nd(1)?)
-                    .map_err(|e| e.to_error_kind())?;
+                    .write_f64::<BigEndian>(vertex.y())
+                    .map_err(|_| PlyError::WriteFile)?;
                 write
-                    .write_f64::<BigEndian>(vertex.position_nd(2)?)
-                    .map_err(|e| e.to_error_kind())?;
-                write.write_u8(color.r).map_err(|e| e.to_error_kind())?;
-                write.write_u8(color.g).map_err(|e| e.to_error_kind())?;
-                write.write_u8(color.b).map_err(|e| e.to_error_kind())?;
+                    .write_f64::<BigEndian>(vertex.z())
+                    .map_err(|_| PlyError::WriteFile)?;
+                write.write_u8(color.r).map_err(|_| PlyError::WriteFile)?;
+                write.write_u8(color.g).map_err(|_| PlyError::WriteFile)?;
+                write.write_u8(color.b).map_err(|_| PlyError::WriteFile)?;
             }
         }
     }
 
     for i in 0..n_faces {
-        let face = mesh.face_vertex_ids(FId { val: i })?;
-        write.write_u8(3).map_err(|e| e.to_error_kind())?;
+        let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating n_faces
+        write.write_u8(3).map_err(|_| PlyError::WriteFile)?;
         write
             .write_u32::<BigEndian>(face.a.val as u32)
-            .map_err(|e| e.to_error_kind())?;
+            .map_err(|_| PlyError::WriteFile)?;
         write
             .write_u32::<BigEndian>(face.b.val as u32)
-            .map_err(|e| e.to_error_kind())?;
+            .map_err(|_| PlyError::WriteFile)?;
         write
             .write_u32::<BigEndian>(face.c.val as u32)
-            .map_err(|e| e.to_error_kind())?;
+            .map_err(|_| PlyError::WriteFile)?;
     }
 
     Ok(())
@@ -370,7 +370,7 @@ where
 
 // @todo allows incorrect headers and might fail on correct ones
 /// Loads an IsMesh3D from the ASCII .ply file format
-pub fn load_ply_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> Result<()>
+pub fn load_ply_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> PlyResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -388,13 +388,18 @@ where
 
     let mut line_buffer = String::new();
 
+    let mut i_line = 0;
+
     loop {
         line_buffer.clear();
-        let n_read = read.read_line(&mut line_buffer)?;
+        let n_read = read
+            .read_line(&mut line_buffer)
+            .map_err(|_| PlyError::ReadFile)?;
         if n_read == 0 {
             break;
         }
         let line = line_buffer.trim_end();
+        i_line += 1;
 
         if !header_ended {
             if !found_ply {
@@ -402,7 +407,7 @@ where
                     found_ply = true;
                     continue;
                 }
-                return Err(ErrorKind::PlyError(PlyError::LoadStartNotFound));
+                return Err(PlyError::LoadStartNotFound);
             }
 
             if !format_found {
@@ -410,7 +415,7 @@ where
                     format_found = true;
                     continue;
                 }
-                return Err(ErrorKind::PlyError(PlyError::LoadFormatNotFound));
+                return Err(PlyError::LoadFormatNotFound);
             }
 
             if line.starts_with("comment") {
@@ -425,15 +430,15 @@ where
                             3 => {
                                 vertex_count = Some(
                                     usize::from_str(words.nth(2).unwrap())
-                                        .map_err(|e| e.to_error_kind())?,
+                                        .map_err(|_| PlyError::LineParse(i_line))?,
                                 );
                                 mesh.reserve_vertices(vertex_count.unwrap()); // safe, since assigned above
                                 continue;
                             }
-                            _ => return Err(ErrorKind::PlyError(PlyError::LoadError)),
+                            _ => return Err(PlyError::LineParse(i_line)),
                         }
                     }
-                    return Err(ErrorKind::PlyError(PlyError::LoadError));
+                    return Err(PlyError::LineParse(i_line));
                 }
                 Some(_) => {}
             }
@@ -444,7 +449,7 @@ where
             }
 
             if counted_properties < 3 {
-                return Err(ErrorKind::PlyError(PlyError::LoadWrongPropertyCount));
+                return Err(PlyError::LoadWrongPropertyCount);
             }
 
             match face_count {
@@ -455,15 +460,15 @@ where
                             3 => {
                                 face_count = Some(
                                     usize::from_str(words.nth(2).unwrap())
-                                        .map_err(|e| e.to_error_kind())?,
+                                        .map_err(|_| PlyError::LineParse(i_line))?,
                                 );
                                 mesh.reserve_faces(face_count.unwrap()); // safe, since assigned above
                                 continue;
                             }
-                            _ => return Err(ErrorKind::PlyError(PlyError::LoadError)),
+                            _ => return Err(PlyError::LineParse(i_line)),
                         }
                     }
-                    return Err(ErrorKind::PlyError(PlyError::LoadError));
+                    return Err(PlyError::LineParse(i_line));
                 }
                 Some(_) => {}
             }
@@ -473,9 +478,7 @@ where
                     vertex_indices_found = true;
                     continue;
                 }
-                return Err(ErrorKind::PlyError(
-                    PlyError::LoadVertexIndexDefinitionNotFound,
-                ));
+                return Err(PlyError::LoadVertexIndexDefinitionNotFound);
             }
 
             if !header_ended {
@@ -483,17 +486,17 @@ where
                     header_ended = true;
                     continue;
                 }
-                return Err(ErrorKind::PlyError(PlyError::LoadHeaderEndNotFound));
+                return Err(PlyError::LoadHeaderEndNotFound);
             }
         }
 
         match vertex_count {
             None => {
-                return Err(ErrorKind::PlyError(PlyError::LoadVertexCountNotFound));
+                return Err(PlyError::LoadVertexCountNotFound);
             }
             Some(x) => {
                 if x > mesh.num_vertices() {
-                    mesh.add_vertex(P::parse(&line)?);
+                    mesh.add_vertex(P::parse(&line).map_err(|_| PlyError::LineParse(i_line))?);
                     continue;
                 }
             }
@@ -501,12 +504,13 @@ where
 
         match face_count {
             None => {
-                return Err(ErrorKind::PlyError(PlyError::LoadFaceCountNotFound));
+                return Err(PlyError::LoadFaceCountNotFound);
             }
             Some(x) => {
                 if x > mesh.num_faces() {
-                    let [a, b, c] = collect_index_line(&line)?;
-                    mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })?;
+                    let [a, b, c] = collect_index_line(&line).ok_or(PlyError::LineParse(i_line))?;
+                    mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
+                        .map_err(|_| PlyError::InvalidMeshIndices(i_line))?;
                     continue;
                 }
             }
@@ -515,11 +519,11 @@ where
 
     match vertex_count {
         None => {
-            return Err(ErrorKind::PlyError(PlyError::LoadVertexCountNotFound));
+            return Err(PlyError::LoadVertexCountNotFound);
         }
         Some(x) => {
             if x != mesh.num_vertices() {
-                return Err(ErrorKind::PlyError(PlyError::LoadVertexCountIncorrect));
+                return Err(PlyError::LoadVertexCountIncorrect);
             }
         }
     }
@@ -527,36 +531,17 @@ where
     Ok(())
 }
 
-fn collect_index_line(line: &str) -> Result<[usize; 3]> {
+fn collect_index_line(line: &str) -> Option<[usize; 3]> {
     let mut words = to_words(line);
-    if words
-        .next()
-        .ok_or(ErrorKind::PlyError(PlyError::IncorrectFaceData))?
-        != "3"
-    {
-        return Err(ErrorKind::PlyError(PlyError::IncorrectFaceData));
+    if words.next()? != "3" {
+        return None;
     }
 
-    let a = usize::from_str(
-        words
-            .next()
-            .ok_or(ErrorKind::PlyError(PlyError::IncorrectFaceData))?,
-    )
-    .map_err(|e| e.to_error_kind())?;
+    let a = usize::from_str(words.next()?).ok()?;
 
-    let b = usize::from_str(
-        words
-            .next()
-            .ok_or(ErrorKind::PlyError(PlyError::IncorrectFaceData))?,
-    )
-    .map_err(|e| e.to_error_kind())?;
+    let b = usize::from_str(words.next()?).ok()?;
 
-    let c = usize::from_str(
-        words
-            .next()
-            .ok_or(ErrorKind::PlyError(PlyError::IncorrectFaceData))?,
-    )
-    .map_err(|e| e.to_error_kind())?;
+    let c = usize::from_str(words.next()?).ok()?;
 
-    Ok([a, b, c])
+    Some([a, b, c])
 }

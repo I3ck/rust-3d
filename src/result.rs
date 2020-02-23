@@ -50,7 +50,6 @@ pub enum ErrorKind {
     NumberConversionError,
     NumberInWrongRange,
     ComparisionFailed,
-    ColorArrayIncorrectLength,
     ClusterTooBig,
     CantCalculateAngleIfZeroLength,
     TriFace3DNotSpanningVolume,
@@ -72,6 +71,10 @@ pub enum PlyError {
     LoadVertexCountIncorrect,
     LoadVerticesIncorrect,
     IncorrectFaceData,
+    WriteFile,
+    ReadFile,
+    ColorArrayIncorrectLength,
+    InvalidMeshIndices(usize),
     LineParse(usize),
 }
 
@@ -115,9 +118,6 @@ impl fmt::Debug for ErrorKind {
             }
             Self::NumberInWrongRange => write!(f, "Passed number is within the wrong range"),
             Self::ComparisionFailed => write!(f, "Comparision between two values failed"),
-            Self::ColorArrayIncorrectLength => {
-                write!(f, "The provided color array has an incorrect length")
-            }
             Self::CantCalculateAngleIfZeroLength => {
                 write!(f, "Can't calculate the angle between 0 vectors")
             }
@@ -154,7 +154,15 @@ impl fmt::Debug for PlyError {
             Self::IncorrectFaceData => {
                 write!(f, "Face definition is incorrect / can not be parsed")
             }
+            Self::ColorArrayIncorrectLength => {
+                write!(f, "The provided color array has an incorrect length")
+            }
             Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::ReadFile => write!(f, "Unable to read file"),
+            Self::WriteFile => write!(f, "Unable to write file"),
+            Self::InvalidMeshIndices(x) => {
+                write!(f, "File contains invalid mesh indices on line {}", x)
+            }
         }
     }
 }
@@ -190,6 +198,19 @@ impl fmt::Debug for XyzError {
 /// Result type used by rust-3d
 pub type Result<T> = result::Result<T, ErrorKind>;
 
+/// Result for PlyError
+pub type PlyResult<T> = result::Result<T, PlyError>;
+
+/// Result for StlError
+pub type StlResult<T> = result::Result<T, StlError>;
+
+/// Result for XyError
+pub type XyResult<T> = result::Result<T, XyError>;
+
+/// Result for XyzError
+pub type XyzResult<T> = result::Result<T, XyzError>;
+
+//@todo replace with From
 /// Trait used to convert other Errors to ErrorKind
 pub trait ToErrorKind {
     /// Creates an ErrorKind from this
