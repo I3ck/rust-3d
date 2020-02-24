@@ -50,7 +50,7 @@ where
         loop {
             match self.iterator.next() {
                 None => return None,
-                Some("") => return None,
+                Some("") => continue,
                 Some(x) => return Some(x),
             }
         }
