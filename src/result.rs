@@ -58,6 +58,7 @@ pub enum ErrorKind {
     XyError(XyError),
     XyzError(XyzError),
     ObjError(ObjError),
+    OffError(OffError),
 }
 
 pub enum PlyError {
@@ -94,6 +95,12 @@ pub enum XyzError {
 }
 
 pub enum ObjError {
+    AccessFile,
+    InvalidMeshIndices(usize),
+    LineParse(usize),
+}
+
+pub enum OffError {
     AccessFile,
     InvalidMeshIndices(usize),
     LineParse(usize),
@@ -136,6 +143,7 @@ impl fmt::Debug for ErrorKind {
             Self::XyError(x) => x.fmt(f),
             Self::XyzError(x) => x.fmt(f),
             Self::ObjError(x) => x.fmt(f),
+            Self::OffError(x) => x.fmt(f),
         }
     }
 }
@@ -209,6 +217,18 @@ impl fmt::Debug for ObjError {
     }
 }
 
+impl fmt::Debug for OffError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::AccessFile => write!(f, "Unable to access file"),
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::InvalidMeshIndices(x) => {
+                write!(f, "File contains invalid mesh indices on line {}", x)
+            }
+        }
+    }
+}
+
 /// Result type used by rust-3d
 pub type Result<T> = result::Result<T, ErrorKind>;
 
@@ -226,6 +246,9 @@ pub type XyzResult<T> = result::Result<T, XyzError>;
 
 /// Result for ObjError
 pub type ObjResult<T> = result::Result<T, ObjError>;
+
+/// Result for OffError
+pub type OffResult<T> = result::Result<T, OffError>;
 
 impl From<ParseFloatError> for ErrorKind {
     fn from(_error: ParseFloatError) -> Self {
@@ -275,6 +298,12 @@ impl From<ObjError> for ErrorKind {
     }
 }
 
+impl From<OffError> for ErrorKind {
+    fn from(error: OffError) -> Self {
+        Self::OffError(error)
+    }
+}
+
 impl From<ioError> for PlyError {
     fn from(_error: ioError) -> Self {
         PlyError::AccessFile
@@ -302,5 +331,11 @@ impl From<ioError> for XyzError {
 impl From<ioError> for ObjError {
     fn from(_error: ioError) -> Self {
         ObjError::AccessFile
+    }
+}
+
+impl From<ioError> for OffError {
+    fn from(_error: ioError) -> Self {
+        OffError::AccessFile
     }
 }

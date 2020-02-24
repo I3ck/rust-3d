@@ -1,3 +1,5 @@
+importers fail if separators are used mutiple times (consider skipping empty when using split next() -> next_non_empty())
+
 streaming interface for IO (returning and consuming iterators)
 
 consider full abstraction over floating point type (huge change)

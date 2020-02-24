@@ -36,3 +36,6 @@ pub use self::xyz::*;
 
 mod obj;
 pub use self::obj::*;
+
+mod off;
+pub use self::off::*;
