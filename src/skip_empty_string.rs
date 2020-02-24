@@ -51,7 +51,7 @@ where
             match self.iterator.next() {
                 None => return None,
                 Some("") => continue,
-                Some(x) => return Some(x),
+                x@Some(_) => return x,
             }
         }
     }
