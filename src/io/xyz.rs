@@ -82,7 +82,7 @@ where
             delim_determined = true;
         }
 
-        let mut words = line.split(&delim);
+        let mut words = line.split(delim.as_str()).skip_empty_string();
 
         let x = words
             .next()

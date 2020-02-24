@@ -23,6 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! Iterator that skips empty strings
 
 /// Iterator that skips empty strings
+#[derive(Clone)]
 pub struct SkipEmptyString<'a, I>
 where
     I: Iterator<Item = &'a str>,

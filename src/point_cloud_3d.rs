@@ -81,7 +81,7 @@ where
 {
     /// Creates a new point cloud from an input string
     pub fn parse(text: &str) -> Result<PointCloud3D<P>> {
-        let lines = text.split("\n");
+        let lines = text.split("\n").skip_empty_string();
 
         let mut pc = PointCloud3D::new();
         for line in lines {

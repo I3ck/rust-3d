@@ -65,7 +65,7 @@ pub trait IsBuildable2D:
     }
     /// Creates this from a "x y" string. E.g. "4.3 17.29"
     fn parse(text: &str) -> Result<Self> {
-        let mut words = text.split(" ");
+        let mut words = text.split(" ").skip_empty_string();
 
         let x = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)?;
         let y = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)?;

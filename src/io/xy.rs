@@ -66,13 +66,13 @@ where
         i_line += 1;
 
         if !delim_determined {
-            delim = estimate_delimiter(1, &line)
+            delim = estimate_delimiter(1, line)
                 .ok_or(XyError::LineParse(i_line))?
                 .to_string();
             delim_determined = true;
         }
 
-        let mut words = line.split(&delim);
+        let mut words = line.split(delim.as_str()).skip_empty_string();
 
         let x = words
             .next()

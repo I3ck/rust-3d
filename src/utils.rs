@@ -30,11 +30,11 @@ use std::{
 use crate::*;
 
 /// Splits a line into its words
-pub fn to_words(line: &str) -> std::str::Split<'_, &str> {
-    line.trim().split(" ")
+pub fn to_words(line: &str) -> SkipEmptyString<'_, std::str::Split<'_, &str>> {
+    line.trim().split(" ").skip_empty_string()
 }
 
-/// Returns allt until delimiter
+/// Returns all until delimiter
 pub fn until<'a>(line: &'a str, delimiter: &str) -> &'a str {
     line.split(delimiter).next().unwrap_or("")
 }

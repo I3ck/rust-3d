@@ -78,7 +78,7 @@ pub trait IsBuildable3D: Sized + Is3D + Eq + PartialEq + Ord + PartialOrd + Hash
     }
     /// Creates this from a "x y z" string. E.g. "32.2 14.7 1.90"
     fn parse(text: &str) -> Result<Self> {
-        let mut words = text.split(" ");
+        let mut words = text.split(" ").skip_empty_string();
 
         let x = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)?;
         let y = f64::from_str(words.next().ok_or(ErrorKind::ParseError)?)?;
