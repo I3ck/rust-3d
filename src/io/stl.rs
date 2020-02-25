@@ -264,7 +264,7 @@ where
     }
 
     let n_triangles = read.read_u32::<LittleEndian>()?;
-    mesh.reserve_vertices(3 * n_triangles as usize);
+    mesh.reserve_vertices((0.5 * n_triangles as f64) as usize);
     mesh.reserve_faces(n_triangles as usize);
 
     let mut buffer = [0f32; 3];
