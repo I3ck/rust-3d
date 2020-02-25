@@ -23,6 +23,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! Module for IO operations of the stl file format
 
 //@todo better error handling instead of yielding partial data
+//@todo _mesh / _triplet code duplication
 
 use crate::*;
 
@@ -65,7 +66,7 @@ where
     Ok(())
 }
 
-/// Loads a Mesh from .stl files
+/// Loads a Mesh from .stl file
 pub fn load_stl_mesh<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
@@ -88,6 +89,29 @@ where
     }
 }
 
+/// Loads points from .stl file as triplets into IsPushable<Is3D>
+pub fn load_stl_triplets<IP, P, R>(read: &mut R, ip: &mut IP) -> StlResult<()>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    let solid = "solid".as_bytes();
+
+    let mut is_ascii = true;
+    for i in 0..5 {
+        if read.read_u8()? != solid[i] {
+            is_ascii = false
+        }
+    }
+
+    if is_ascii {
+        load_stl_triplets_ascii(read, ip)
+    } else {
+        load_stl_triplets_binary(read, ip)
+    }
+}
+
 fn load_stl_mesh_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
@@ -105,6 +129,35 @@ where
         match read_stl_facet(read, &mut line_buffer, &mut i_line) {
             Ok([a, b, c]) => {
                 mesh.add_face(a, b, c);
+                ()
+            }
+            Err(StlError::LoadFileEndReached) => break,
+            Err(x) => return Err(x),
+        }
+    }
+
+    Ok(())
+}
+
+pub fn load_stl_triplets_ascii<IP, P, R>(read: &mut R, ip: &mut IP) -> StlResult<()>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    let mut i_line = 0;
+    let mut line_buffer = String::new();
+
+    // skip first line
+    read.read_line(&mut line_buffer)?;
+    i_line += 1;
+
+    loop {
+        match read_stl_facet(read, &mut line_buffer, &mut i_line) {
+            Ok([a, b, c]) => {
+                ip.push(a);
+                ip.push(b);
+                ip.push(c);
                 ()
             }
             Err(StlError::LoadFileEndReached) => break,
@@ -149,6 +202,44 @@ where
         read.read_u16::<LittleEndian>()?;
 
         mesh.add_face(a, b, c);
+    }
+
+    Ok(())
+}
+
+pub fn load_stl_triplets_binary<IP, P, R>(read: &mut R, ip: &mut IP) -> StlResult<()>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: Read,
+{
+    // Drop header ('solid' is already dropped)
+    {
+        let mut buffer = [0u8; 75];
+        read.read_exact(&mut buffer)?;
+    }
+
+    let n_triangles = read.read_u32::<LittleEndian>()?;
+    let mut buffer = [0f32; 3];
+
+    for _ in 0..n_triangles {
+        // Drop normal
+        read.read_f32_into::<LittleEndian>(&mut buffer)?;
+
+        read.read_f32_into::<LittleEndian>(&mut buffer)?;
+        let a = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+
+        read.read_f32_into::<LittleEndian>(&mut buffer)?;
+        let b = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+
+        read.read_f32_into::<LittleEndian>(&mut buffer)?;
+        let c = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+
+        read.read_u16::<LittleEndian>()?;
+
+        ip.push(a);
+        ip.push(b);
+        ip.push(c);
     }
 
     Ok(())
