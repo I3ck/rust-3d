@@ -65,6 +65,7 @@ where
     Ok(())
 }
 
+/// Loads a Mesh from .stl files
 pub fn load_stl<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
@@ -87,7 +88,6 @@ where
     }
 }
 
-/// Loads a Mesh from ASCII .stl files (assuming 'solid' already dropped from input)
 fn load_stl_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
@@ -115,7 +115,6 @@ where
     Ok(())
 }
 
-/// Loads a Mesh from binary .stl files (assuming 'solid' already dropped from input)
 fn load_stl_binary<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
