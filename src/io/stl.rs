@@ -31,6 +31,8 @@ use byteorder::{LittleEndian, ReadBytesExt};
 
 use std::io::{BufRead, Read, Write};
 
+use fnv::FnvHashMap;
+
 use core::str::FromStr;
 
 /// Saves an IsMesh3D in the ASCII .stl file format
@@ -89,6 +91,29 @@ where
     }
 }
 
+/// Loads a Mesh from .stl file with unique vertices
+pub fn load_stl_mesh_unique<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+where
+    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
+    P: IsBuildable3D + Clone,
+    R: BufRead,
+{
+    let solid = "solid".as_bytes();
+
+    let mut is_ascii = true;
+    for i in 0..5 {
+        if read.read_u8()? != solid[i] {
+            is_ascii = false
+        }
+    }
+
+    if is_ascii {
+        load_stl_mesh_unique_ascii(read, mesh)
+    } else {
+        load_stl_mesh_unique_binary(read, mesh)
+    }
+}
+
 /// Loads points from .stl file as triplets into IsPushable<Is3D>
 pub fn load_stl_triplets<IP, P, R>(read: &mut R, ip: &mut IP) -> StlResult<()>
 where
@@ -139,35 +164,6 @@ where
     Ok(())
 }
 
-pub fn load_stl_triplets_ascii<IP, P, R>(read: &mut R, ip: &mut IP) -> StlResult<()>
-where
-    IP: IsPushable<P>,
-    P: IsBuildable3D,
-    R: BufRead,
-{
-    let mut i_line = 0;
-    let mut line_buffer = String::new();
-
-    // skip first line
-    read.read_line(&mut line_buffer)?;
-    i_line += 1;
-
-    loop {
-        match read_stl_facet(read, &mut line_buffer, &mut i_line) {
-            Ok([a, b, c]) => {
-                ip.push(a);
-                ip.push(b);
-                ip.push(c);
-                ()
-            }
-            Err(StlError::LoadFileEndReached) => break,
-            Err(x) => return Err(x),
-        }
-    }
-
-    Ok(())
-}
-
 fn load_stl_mesh_duped_binary<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
@@ -202,6 +198,144 @@ where
         read.read_u16::<LittleEndian>()?;
 
         mesh.add_face(a, b, c);
+    }
+
+    Ok(())
+}
+
+fn load_stl_mesh_unique_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+where
+    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
+    P: IsBuildable3D + Clone,
+    R: BufRead,
+{
+    let mut i_line = 0;
+    let mut line_buffer = String::new();
+
+    // skip first line
+    read.read_line(&mut line_buffer)?;
+    i_line += 1;
+
+    let mut map = FnvHashMap::default();
+
+    loop {
+        match read_stl_facet::<P, _>(read, &mut line_buffer, &mut i_line) {
+            Ok([a, b, c]) => {
+                let id_a = *map.entry(a.clone()).or_insert_with(|| {
+                    let value = mesh.num_vertices();
+                    mesh.add_vertex(a);
+                    value
+                });
+
+                let id_b = *map.entry(b.clone()).or_insert_with(|| {
+                    let value = mesh.num_vertices();
+                    mesh.add_vertex(b);
+                    value
+                });
+
+                let id_c = *map.entry(c.clone()).or_insert_with(|| {
+                    let value = mesh.num_vertices();
+                    mesh.add_vertex(c);
+                    value
+                });
+
+                mesh.try_add_connection(VId { val: id_a }, VId { val: id_b }, VId { val: id_c })
+                    .unwrap(); // safe since added above
+                ()
+            }
+            Err(StlError::LoadFileEndReached) => break,
+            Err(x) => return Err(x),
+        }
+    }
+
+    Ok(())
+}
+
+fn load_stl_mesh_unique_binary<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+where
+    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
+    P: IsBuildable3D + Clone,
+    R: Read,
+{
+    // Drop header ('solid' is already dropped)
+    {
+        let mut buffer = [0u8; 75];
+        read.read_exact(&mut buffer)?;
+    }
+
+    let n_triangles = read.read_u32::<LittleEndian>()?;
+    mesh.reserve_vertices(3 * n_triangles as usize);
+    mesh.reserve_faces(n_triangles as usize);
+
+    let mut buffer = [0f32; 3];
+
+    //@todo FnvHashMap?
+    let mut map = FnvHashMap::default();
+
+    for _ in 0..n_triangles {
+        // Drop normal
+        read.read_f32_into::<LittleEndian>(&mut buffer)?;
+
+        read.read_f32_into::<LittleEndian>(&mut buffer)?;
+        let a = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+
+        read.read_f32_into::<LittleEndian>(&mut buffer)?;
+        let b = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+
+        read.read_f32_into::<LittleEndian>(&mut buffer)?;
+        let c = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+
+        read.read_u16::<LittleEndian>()?;
+
+        let id_a = *map.entry(a.clone()).or_insert_with(|| {
+            let value = mesh.num_vertices();
+            mesh.add_vertex(a);
+            value
+        });
+
+        let id_b = *map.entry(b.clone()).or_insert_with(|| {
+            let value = mesh.num_vertices();
+            mesh.add_vertex(b);
+            value
+        });
+
+        let id_c = *map.entry(c.clone()).or_insert_with(|| {
+            let value = mesh.num_vertices();
+            mesh.add_vertex(c);
+            value
+        });
+
+        mesh.try_add_connection(VId { val: id_a }, VId { val: id_b }, VId { val: id_c })
+            .unwrap(); // safe since added above
+    }
+
+    Ok(())
+}
+
+pub fn load_stl_triplets_ascii<IP, P, R>(read: &mut R, ip: &mut IP) -> StlResult<()>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    let mut i_line = 0;
+    let mut line_buffer = String::new();
+
+    // skip first line
+    read.read_line(&mut line_buffer)?;
+    i_line += 1;
+
+    loop {
+        match read_stl_facet(read, &mut line_buffer, &mut i_line) {
+            Ok([a, b, c]) => {
+                ip.push(a);
+                ip.push(b);
+                ip.push(c);
+                ()
+            }
+            Err(StlError::LoadFileEndReached) => break,
+            Err(x) => return Err(x),
+        }
     }
 
     Ok(())
