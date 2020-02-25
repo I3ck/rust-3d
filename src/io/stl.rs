@@ -66,8 +66,8 @@ where
     Ok(())
 }
 
-/// Loads a Mesh from .stl file
-pub fn load_stl_mesh<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+/// Loads a Mesh from .stl file with duplicate vertices
+pub fn load_stl_mesh_duped<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -83,9 +83,9 @@ where
     }
 
     if is_ascii {
-        load_stl_mesh_ascii(read, mesh)
+        load_stl_mesh_duped_ascii(read, mesh)
     } else {
-        load_stl_mesh_binary(read, mesh)
+        load_stl_mesh_duped_binary(read, mesh)
     }
 }
 
@@ -112,7 +112,7 @@ where
     }
 }
 
-fn load_stl_mesh_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+fn load_stl_mesh_duped_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -168,7 +168,7 @@ where
     Ok(())
 }
 
-fn load_stl_mesh_binary<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+fn load_stl_mesh_duped_binary<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
