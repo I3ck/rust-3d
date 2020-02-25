@@ -66,7 +66,7 @@ where
 }
 
 /// Loads a Mesh from .stl files
-pub fn load_stl<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+pub fn load_stl_mesh<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -82,13 +82,13 @@ where
     }
 
     if is_ascii {
-        load_stl_ascii(read, mesh)
+        load_stl_mesh_ascii(read, mesh)
     } else {
-        load_stl_binary(read, mesh)
+        load_stl_mesh_binary(read, mesh)
     }
 }
 
-fn load_stl_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+fn load_stl_mesh_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -115,7 +115,7 @@ where
     Ok(())
 }
 
-fn load_stl_binary<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+fn load_stl_mesh_binary<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
