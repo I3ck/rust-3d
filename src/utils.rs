@@ -127,7 +127,7 @@ where
 }
 
 pub fn estimate_delimiter(minimum_count: usize, line: &str) -> Option<char> {
-    for candidate in [' ', ';', ','].iter() {
+    for candidate in [' ', ';', ',', '\t'].iter() {
         if line.chars().filter(|c| *c == *candidate).count() >= minimum_count {
             return Some(*candidate);
         }
