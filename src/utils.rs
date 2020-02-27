@@ -126,9 +126,9 @@ where
         .collect()
 }
 
-pub fn estimate_delimiter(expected_count: usize, line: &str) -> Option<char> {
+pub fn estimate_delimiter(minimum_count: usize, line: &str) -> Option<char> {
     for candidate in [' ', ';', ','].iter() {
-        if line.chars().filter(|c| *c == *candidate).count() == expected_count {
+        if line.chars().filter(|c| *c == *candidate).count() >= minimum_count {
             return Some(*candidate);
         }
     }
