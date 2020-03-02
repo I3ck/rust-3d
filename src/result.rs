@@ -59,6 +59,7 @@ pub enum ErrorKind {
     XyzError(XyzError),
     ObjError(ObjError),
     OffError(OffError),
+    PslError(PslError),
 }
 
 pub enum PlyError {
@@ -106,6 +107,10 @@ pub enum OffError {
     LineParse(usize),
 }
 
+pub enum PslError {
+    AccessFile,
+}
+
 impl fmt::Debug for ErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -144,6 +149,7 @@ impl fmt::Debug for ErrorKind {
             Self::XyzError(x) => x.fmt(f),
             Self::ObjError(x) => x.fmt(f),
             Self::OffError(x) => x.fmt(f),
+            Self::PslError(x) => x.fmt(f),
         }
     }
 }
@@ -229,6 +235,14 @@ impl fmt::Debug for OffError {
     }
 }
 
+impl fmt::Debug for PslError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::AccessFile => write!(f, "Unable to access file"),
+        }
+    }
+}
+
 /// Result type used by rust-3d
 pub type Result<T> = result::Result<T, ErrorKind>;
 
@@ -249,6 +263,8 @@ pub type ObjResult<T> = result::Result<T, ObjError>;
 
 /// Result for OffError
 pub type OffResult<T> = result::Result<T, OffError>;
+
+pub type PslResult<T> = result::Result<T, PslError>;
 
 impl From<ParseFloatError> for ErrorKind {
     fn from(_error: ParseFloatError) -> Self {
@@ -337,5 +353,11 @@ impl From<ioError> for ObjError {
 impl From<ioError> for OffError {
     fn from(_error: ioError) -> Self {
         OffError::AccessFile
+    }
+}
+
+impl From<ioError> for PslError {
+    fn from(_error: ioError) -> Self {
+        PslError::AccessFile
     }
 }

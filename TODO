@@ -1,3 +1,5 @@
+rework IO errors (way too much code duplication currently)
+
 importers fail if separators are used mutiple times (consider skipping empty when using split next() -> next_non_empty())
 
 streaming interface for IO (returning and consuming iterators)
