@@ -33,6 +33,17 @@ pub struct Matrix4 {
 }
 
 impl Matrix4 {
+    /// Creates a new identity matrix
+    pub fn identity() -> Matrix4 {
+        Matrix4 {
+            data: [
+                [1.0, 0.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0],
+            ],
+        }
+    }
     /// Creates a new matrix which contains only zeroes
     pub fn zeroes() -> Matrix4 {
         Matrix4 {
@@ -208,14 +219,7 @@ impl Matrix4 {
 
 impl Default for Matrix4 {
     fn default() -> Self {
-        Matrix4 {
-            data: [
-                [1.0, 0.0, 0.0, 0.0],
-                [0.0, 1.0, 0.0, 0.0],
-                [0.0, 0.0, 1.0, 0.0],
-                [0.0, 0.0, 0.0, 1.0],
-            ],
-        }
+        Self::identity()
     }
 }
 

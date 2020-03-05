@@ -33,6 +33,12 @@ pub struct Matrix3 {
 }
 
 impl Matrix3 {
+    /// Creates a new identity matrix
+    pub fn identity() -> Matrix3 {
+        Matrix3 {
+            data: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
+        }
+    }
     /// Creates a new matrix which contains only zeroes
     pub fn zeroes() -> Matrix3 {
         Matrix3 {
@@ -65,9 +71,7 @@ impl Matrix3 {
 
 impl Default for Matrix3 {
     fn default() -> Self {
-        Matrix3 {
-            data: [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
-        }
+        Self::identity()
     }
 }
 
