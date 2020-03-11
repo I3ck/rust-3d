@@ -316,162 +316,200 @@ where
     Ok(())
 }
 
-// @todo allows incorrect headers and might fail on correct ones
-/// Loads an IsMesh3D from the ASCII .ply file format
-pub fn load_ply_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> PlyResult<()>
+enum PlyFormat {
+    Ascii,
+    LittleEndian,
+    BigEndian,
+}
+
+struct PlyHeader {
+    pub format: PlyFormat,
+    pub n_vertices: usize,
+    pub n_faces: usize,
+}
+
+/// Loads an IsMesh3D from the .ply file format
+pub fn load_ply<EM, P, R>(read: &mut R, mesh: &mut EM) -> PlyResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: BufRead,
 {
-    let mut found_ply = false;
-    let mut format_found = false;
-    let mut vertex_indices_found = false;
-    let mut header_ended = false;
-
-    let mut counted_properties = 0;
-
-    let mut vertex_count: Option<usize> = None;
-    let mut face_count: Option<usize> = None;
-
     let mut line_buffer = String::new();
-
     let mut i_line = 0;
+
+    let header = load_ply_header(read, &mut line_buffer, &mut i_line)?;
+
+    mesh.reserve_vertices(header.n_vertices);
+    mesh.reserve_faces(header.n_faces);
+
+    match header.format {
+        PlyFormat::Ascii => load_ply_ascii(read, mesh, &header, &mut line_buffer, &mut i_line)?,
+        _ => panic!("TODO") //@todo
+    }
+
+
+    //@todo
+
+    Ok(())
+}
+
+fn load_ply_header<R>(
+    read: &mut R,
+    line_buffer: &mut String,
+    i_line: &mut usize,
+) -> PlyResult<PlyHeader>
+where
+    R: BufRead,
+{
+    //@todo foo_found vs found_foo naming convention
+    let mut found_ply = false;
+    let mut vertex_indices_found = false;
+    let mut format = None;
+    let mut n_vertices: Option<usize> = None;
+    let mut n_faces: Option<usize> = None;
+    let mut counted_properties = 0;
 
     loop {
         line_buffer.clear();
-        let n_read = read.read_line(&mut line_buffer)?;
+        let n_read = read.read_line(line_buffer)?;
         if n_read == 0 {
             break;
         }
         let line = line_buffer.trim_end();
-        i_line += 1;
+        *i_line += 1;
 
-        if !header_ended {
-            if !found_ply {
-                if line == "ply" {
-                    found_ply = true;
-                    continue;
-                }
-                return Err(PlyError::LoadStartNotFound);
-            }
-
-            if !format_found {
-                if line == "format ascii 1.0" {
-                    format_found = true;
-                    continue;
-                }
-                return Err(PlyError::LoadFormatNotFound);
-            }
-
-            if line.starts_with("comment") {
-                continue;
-            }
-
-            match vertex_count {
-                None => {
-                    if line.starts_with("element vertex") {
-                        let mut words = to_words(&line);
-                        match words.clone().count() {
-                            3 => {
-                                vertex_count = Some(
-                                    usize::from_str(words.nth(2).unwrap())
-                                        .map_err(|_| PlyError::LineParse(i_line))?,
-                                );
-                                mesh.reserve_vertices(vertex_count.unwrap()); // safe, since assigned above
-                                continue;
-                            }
-                            _ => return Err(PlyError::LineParse(i_line)),
-                        }
-                    }
-                    return Err(PlyError::LineParse(i_line));
-                }
-                Some(_) => {}
-            }
-
-            if line.starts_with("property float") {
-                counted_properties += 1;
-                continue;
-            }
-
-            if counted_properties < 3 {
-                return Err(PlyError::LoadWrongPropertyCount);
-            }
-
-            match face_count {
-                None => {
-                    if line.starts_with("element face") {
-                        let mut words = to_words(&line);
-                        match words.clone().count() {
-                            3 => {
-                                face_count = Some(
-                                    usize::from_str(words.nth(2).unwrap())
-                                        .map_err(|_| PlyError::LineParse(i_line))?,
-                                );
-                                mesh.reserve_faces(face_count.unwrap()); // safe, since assigned above
-                                continue;
-                            }
-                            _ => return Err(PlyError::LineParse(i_line)),
-                        }
-                    }
-                    return Err(PlyError::LineParse(i_line));
-                }
-                Some(_) => {}
-            }
-
-            if !vertex_indices_found {
-                if line.ends_with("vertex_indices") {
-                    vertex_indices_found = true;
-                    continue;
-                }
-                return Err(PlyError::LoadVertexIndexDefinitionNotFound);
-            }
-
-            if !header_ended {
-                if line == "end_header" {
-                    header_ended = true;
-                    continue;
-                }
-                return Err(PlyError::LoadHeaderEndNotFound);
-            }
+        if line.starts_with("comment") {
+            continue;
         }
 
-        match vertex_count {
-            None => {
-                return Err(PlyError::LoadVertexCountNotFound);
+        if !found_ply {
+            if line == "ply" {
+                found_ply = true;
+                continue;
             }
-            Some(x) => {
-                if x > mesh.num_vertices() {
-                    mesh.add_vertex(P::parse(&line).map_err(|_| PlyError::LineParse(i_line))?);
-                    continue;
-                }
-            }
+            return Err(PlyError::LoadStartNotFound);
         }
 
-        match face_count {
+        if format.is_none() {
+            format = Some(match line {
+                "format ascii 1.0" => PlyFormat::Ascii,
+                "format binary_little_endian 1.0" => PlyFormat::LittleEndian,
+                "format binary_big_endian 1.0" => PlyFormat::BigEndian,
+                _ => return Err(PlyError::LoadFormatNotFound),
+            });
+            continue;
+        }
+
+        match n_vertices {
             None => {
-                return Err(PlyError::LoadFaceCountNotFound);
-            }
-            Some(x) => {
-                if x > mesh.num_faces() {
-                    let [a, b, c] = collect_index_line(&line).ok_or(PlyError::LineParse(i_line))?;
-                    mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
-                        .map_err(|_| PlyError::InvalidMeshIndices(i_line))?;
-                    continue;
+                if line.starts_with("element vertex") {
+                    let mut words = to_words(&line);
+                    match words.clone().count() {
+                        3 => {
+                            n_vertices = Some(
+                                usize::from_str(words.nth(2).unwrap())
+                                    .map_err(|_| PlyError::LineParse(*i_line))?,
+                            );
+                            continue;
+                        }
+                        _ => return Err(PlyError::LineParse(*i_line)),
+                    }
                 }
+                return Err(PlyError::LineParse(*i_line));
             }
+            Some(_) => {}
+        }
+
+        if line.starts_with("property float") {
+            counted_properties += 1;
+            continue;
+        }
+
+        if counted_properties < 3 {
+            return Err(PlyError::LoadWrongPropertyCount);
+        }
+
+        match n_faces {
+            None => {
+                if line.starts_with("element face") {
+                    let mut words = to_words(&line);
+                    match words.clone().count() {
+                        3 => {
+                            n_faces = Some(
+                                usize::from_str(words.nth(2).unwrap())
+                                    .map_err(|_| PlyError::LineParse(*i_line))?,
+                            );
+                            continue;
+                        }
+                        _ => return Err(PlyError::LineParse(*i_line)),
+                    }
+                }
+                return Err(PlyError::LineParse(*i_line));
+            }
+            Some(_) => {}
+        }
+
+        if !vertex_indices_found {
+            if line.ends_with("vertex_indices") {
+                vertex_indices_found = true;
+                continue;
+            }
+            return Err(PlyError::LoadVertexIndexDefinitionNotFound);
+        }
+
+        if line == "end_header"
+            && found_ply
+            && format.is_some()
+            && n_vertices.is_some()
+            && n_faces.is_some()
+        {
+            //@todo nicer way to write this
+            // safe due to if above
+            return Ok(PlyHeader {
+                format: format.unwrap(),
+                n_vertices: n_vertices.unwrap(),
+                n_faces: n_faces.unwrap(),
+            });
+        }
+        //@todo better error (header could not be parsed / incorrect)
+        return Err(PlyError::LoadHeaderEndNotFound);
+    }
+
+    Err(PlyError::LoadHeaderEndNotFound)
+}
+
+// @todo allows incorrect headers and might fail on correct ones
+fn load_ply_ascii<EM, P, R>(read: &mut R, mesh: &mut EM, header: &PlyHeader, line_buffer: &mut String, i_line: &mut usize) -> PlyResult<()>
+where
+    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
+    P: IsBuildable3D + Clone,
+    R: BufRead,
+{
+    loop {
+        line_buffer.clear();
+        let n_read = read.read_line(line_buffer)?;
+        if n_read == 0 {
+            break;
+        }
+        let line = line_buffer.trim_end();
+        *i_line += 1;
+
+        if header.n_vertices > mesh.num_vertices() {
+            mesh.add_vertex(P::parse(&line).map_err(|_| PlyError::LineParse(*i_line))?);
+            continue;
+        }
+
+        if header.n_faces > mesh.num_faces() {
+            let [a, b, c] = collect_index_line(&line).ok_or(PlyError::LineParse(*i_line))?;
+            mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
+                .map_err(|_| PlyError::InvalidMeshIndices(*i_line))?;
+            continue;
         }
     }
 
-    match vertex_count {
-        None => {
-            return Err(PlyError::LoadVertexCountNotFound);
-        }
-        Some(x) => {
-            if x != mesh.num_vertices() {
-                return Err(PlyError::LoadVertexCountIncorrect);
-            }
-        }
+    if header.n_vertices != mesh.num_vertices() {
+        return Err(PlyError::LoadVertexCountIncorrect);
     }
 
     Ok(())
