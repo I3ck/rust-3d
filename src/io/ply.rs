@@ -24,11 +24,23 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use byteorder::{BigEndian, WriteBytesExt};
+use byteorder::{BigEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 
 use core::str::FromStr;
 
-use std::io::{BufRead, Write};
+use std::io::{BufRead, Read, Write};
+
+enum PlyFormat {
+    Ascii,
+    LittleEndian,
+    BigEndian,
+}
+
+struct PlyHeader {
+    pub format: PlyFormat,
+    pub n_vertices: usize,
+    pub n_faces: usize,
+}
 
 /// Saves an IsMesh3D in the ASCII .ply file format
 pub fn save_ply_ascii<M, P, W>(write: &mut W, mesh: &M) -> PlyResult<()>
@@ -316,18 +328,6 @@ where
     Ok(())
 }
 
-enum PlyFormat {
-    Ascii,
-    LittleEndian,
-    BigEndian,
-}
-
-struct PlyHeader {
-    pub format: PlyFormat,
-    pub n_vertices: usize,
-    pub n_faces: usize,
-}
-
 /// Loads an IsMesh3D from the .ply file format
 pub fn load_ply<EM, P, R>(read: &mut R, mesh: &mut EM) -> PlyResult<()>
 where
@@ -344,14 +344,10 @@ where
     mesh.reserve_faces(header.n_faces);
 
     match header.format {
-        PlyFormat::Ascii => load_ply_ascii(read, mesh, &header, &mut line_buffer, &mut i_line)?,
-        _ => panic!("TODO") //@todo
+        PlyFormat::Ascii => load_ply_ascii(read, mesh, &header, &mut line_buffer, &mut i_line),
+        PlyFormat::LittleEndian => load_ply_binary::<LittleEndian, _, _, _>(read, mesh, &header),
+        PlyFormat::BigEndian => load_ply_binary::<BigEndian, _, _, _>(read, mesh, &header),
     }
-
-
-    //@todo
-
-    Ok(())
 }
 
 fn load_ply_header<R>(
@@ -364,7 +360,6 @@ where
 {
     //@todo foo_found vs found_foo naming convention
     let mut found_ply = false;
-    let mut vertex_indices_found = false;
     let mut format = None;
     let mut n_vertices: Option<usize> = None;
     let mut n_faces: Option<usize> = None;
@@ -380,6 +375,11 @@ where
         *i_line += 1;
 
         if line.starts_with("comment") {
+            continue;
+        }
+
+        //@todo must ensure line present and matches expected format
+        if line.starts_with("property list") {
             continue;
         }
 
@@ -450,14 +450,6 @@ where
             Some(_) => {}
         }
 
-        if !vertex_indices_found {
-            if line.ends_with("vertex_indices") {
-                vertex_indices_found = true;
-                continue;
-            }
-            return Err(PlyError::LoadVertexIndexDefinitionNotFound);
-        }
-
         if line == "end_header"
             && found_ply
             && format.is_some()
@@ -472,6 +464,7 @@ where
                 n_faces: n_faces.unwrap(),
             });
         }
+
         //@todo better error (header could not be parsed / incorrect)
         return Err(PlyError::LoadHeaderEndNotFound);
     }
@@ -479,8 +472,48 @@ where
     Err(PlyError::LoadHeaderEndNotFound)
 }
 
-// @todo allows incorrect headers and might fail on correct ones
-fn load_ply_ascii<EM, P, R>(read: &mut R, mesh: &mut EM, header: &PlyHeader, line_buffer: &mut String, i_line: &mut usize) -> PlyResult<()>
+fn load_ply_binary<BO, EM, P, R>(read: &mut R, mesh: &mut EM, header: &PlyHeader) -> PlyResult<()>
+where
+    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
+    P: IsBuildable3D + Clone,
+    R: Read,
+    BO: ByteOrder,
+{
+    {
+        let mut buffer = [0f32; 3];
+        //@todo must ensure float32/float64 is handled
+        for _ in 0..header.n_vertices {
+            read.read_f32_into::<BO>(&mut buffer)?;
+            mesh.add_vertex(P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64));
+        }
+    }
+
+    //@todo must work with any int precision
+    for _ in 0..header.n_faces {
+        let _element_count = read.read_u8()?;
+        let a = read.read_i32::<BO>()?;
+        let b = read.read_i32::<BO>()?;
+        let c = read.read_i32::<BO>()?;
+
+        //@todo new error without line information!?
+        mesh.try_add_connection(
+            VId { val: a as usize },
+            VId { val: b as usize },
+            VId { val: c as usize },
+        )
+        .map_err(|_| PlyError::InvalidMeshIndices(0))?;
+    }
+
+    Ok(())
+}
+
+fn load_ply_ascii<EM, P, R>(
+    read: &mut R,
+    mesh: &mut EM,
+    header: &PlyHeader,
+    line_buffer: &mut String,
+    i_line: &mut usize,
+) -> PlyResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
