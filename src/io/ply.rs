@@ -33,17 +33,6 @@ use core::str::FromStr;
 
 use std::io::{BufRead, Read, Write};
 
-/*
-char -> signed 1 byte
-uchar -> unsigned 1 byte
-short -> signed 2 bytes
-ushort -> unsigned 2 bytes
-int -> signed 4 bytes
-uint -> unsigned 4 bytes
-float -> 4 bytes
-double -> 8 bytes
-*/
-
 enum PlyType {
     Char,
     UChar,
@@ -371,9 +360,9 @@ where
                 + "element vertex "
                 + &mesh.num_vertices().to_string()
                 + "\n"
-                + "property float32 x\n"
-                + "property float32 y\n"
-                + "property float32 z\n"
+                + "property float x\n"
+                + "property float y\n"
+                + "property float z\n"
                 + "element face "
                 + &mesh.num_faces().to_string()
                 + "\n"
@@ -387,9 +376,9 @@ where
                 + "element vertex "
                 + &mesh.num_vertices().to_string()
                 + "\n"
-                + "property float64 x\n"
-                + "property float64 y\n"
-                + "property float64 z\n"
+                + "property double x\n"
+                + "property double y\n"
+                + "property double z\n"
                 + "element face "
                 + &mesh.num_faces().to_string()
                 + "\n"
@@ -458,9 +447,9 @@ where
                 + "element vertex "
                 + &n_vertices.to_string()
                 + "\n"
-                + "property float32 x\n"
-                + "property float32 y\n"
-                + "property float32 z\n"
+                + "property float x\n"
+                + "property float y\n"
+                + "property float z\n"
                 + "property uchar red\n"
                 + "property uchar green\n"
                 + "property uchar blue\n"
@@ -477,9 +466,9 @@ where
                 + "element vertex "
                 + &n_vertices.to_string()
                 + "\n"
-                + "property float64 x\n"
-                + "property float64 y\n"
-                + "property float64 z\n"
+                + "property double x\n"
+                + "property double y\n"
+                + "property double z\n"
                 + "property uchar red\n"
                 + "property uchar green\n"
                 + "property uchar blue\n"
