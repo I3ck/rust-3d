@@ -84,12 +84,13 @@ impl PlyType {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct BytesWords {
     pub bytes: usize,
     pub words: usize,
 }
 
+#[derive(Debug)]
 enum PlyVertexType {
     Float,
     Double,
@@ -107,6 +108,9 @@ impl PlyVertexType {
 }
 
 //@todo property list must also be considered
+//@todo must consider case where properties / to skip are defined per face and not per vertex
+//@todo settings this must track its scope (if after element vertex or element face)
+#[derive(Debug)]
 struct PlyVertexFormat {
     pub x: PlyVertexType,
     pub y: PlyVertexType,
@@ -117,12 +121,14 @@ struct PlyVertexFormat {
     pub after: BytesWords,
 }
 
+#[derive(Debug)]
 enum PlyFormat {
     Ascii,
     LittleEndian,
     BigEndian,
 }
 
+#[derive(Debug)]
 struct PlyHeader {
     pub format: PlyFormat,
     pub n_vertices: usize,
@@ -428,6 +434,8 @@ where
 
     let header = load_ply_header(read, &mut line_buffer, &mut i_line)?;
 
+    //println!("{:?}", header);
+
     mesh.reserve_vertices(header.n_vertices);
     mesh.reserve_faces(header.n_faces);
 
@@ -558,10 +566,6 @@ where
 
             continue;
         }
-
-        //if counted_properties < 3 {
-        //return Err(PlyError::LoadWrongPropertyCount);
-        //}
 
         match n_faces {
             None => {
@@ -694,7 +698,22 @@ where
         *i_line += 1;
 
         if header.n_vertices > mesh.num_vertices() {
-            mesh.add_vertex(P::parse(&line).map_err(|_| PlyError::LineParse(*i_line))?);
+            let mut words = line.split(" ").skip_empty_string();
+            for _ in 0..header.vertex_format.before.words {
+                words.next();
+            }
+            let x = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
+            for _ in 0..header.vertex_format.between_x_y.words {
+                words.next();
+            }
+            let y = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
+            for _ in 0..header.vertex_format.between_y_z.words {
+                words.next();
+            }
+            let z = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
+                                                                   // no need to skip 'after' since we're done with this line anyway
+
+            mesh.add_vertex(P::new(x, y, z));
             continue;
         }
 
