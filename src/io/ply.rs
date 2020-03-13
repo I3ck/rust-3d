@@ -24,16 +24,13 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-//@todo float32 usage wrong here?
-//@todo consider removal Ply prefix from private types
-
 use byteorder::{BigEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 
 use core::str::FromStr;
 
 use std::io::{BufRead, Read, Write};
 
-enum PlyType {
+enum Type {
     Char,
     UChar,
     Short,
@@ -77,7 +74,7 @@ impl VertexOrder {
     }
 }
 
-impl PlyType {
+impl Type {
     pub fn from_str(x: &str) -> Option<Self> {
         match x {
             "char" => Some(Self::Char),
@@ -113,24 +110,24 @@ struct BytesWords {
 }
 
 #[derive(Debug)]
-enum PlyVertexType {
+enum VertexType {
     Float,
     Double,
 }
 
-impl PlyVertexType {
+impl VertexType {
     //@todo TryFrom
-    pub fn from_ply_type(x: PlyType) -> Option<Self> {
+    pub fn from_type(x: Type) -> Option<Self> {
         match x {
-            PlyType::Float => Some(Self::Float),
-            PlyType::Double => Some(Self::Double),
+            Type::Float => Some(Self::Float),
+            Type::Double => Some(Self::Double),
             _ => None,
         }
     }
 }
 
 #[derive(Debug)]
-enum PlyFaceType {
+enum FaceType {
     Char,
     UChar,
     Short,
@@ -139,44 +136,44 @@ enum PlyFaceType {
     UInt,
 }
 
-impl PlyFaceType {
+impl FaceType {
     //@todo TryFrom
-    pub fn from_ply_type(x: PlyType) -> Option<Self> {
+    pub fn from_type(x: Type) -> Option<Self> {
         match x {
-            PlyType::Char => Some(Self::Char),
-            PlyType::UChar => Some(Self::UChar),
-            PlyType::Short => Some(Self::Short),
-            PlyType::UShort => Some(Self::UShort),
-            PlyType::Int => Some(Self::Int),
-            PlyType::UInt => Some(Self::UInt),
+            Type::Char => Some(Self::Char),
+            Type::UChar => Some(Self::UChar),
+            Type::Short => Some(Self::Short),
+            Type::UShort => Some(Self::UShort),
+            Type::Int => Some(Self::Int),
+            Type::UInt => Some(Self::UInt),
             _ => None,
         }
     }
 }
 
-fn read_face_type<BO, R>(read: &mut R, t: &PlyFaceType) -> PlyResult<usize>
+fn read_face_type<BO, R>(read: &mut R, t: &FaceType) -> PlyResult<usize>
 where
     BO: ByteOrder,
     R: Read,
 {
     Ok(match t {
-        PlyFaceType::Char => read.read_i8()? as usize,
-        PlyFaceType::UChar => read.read_u8()? as usize,
-        PlyFaceType::Short => read.read_i16::<BO>()? as usize,
-        PlyFaceType::UShort => read.read_u16::<BO>()? as usize,
-        PlyFaceType::Int => read.read_i32::<BO>()? as usize,
-        PlyFaceType::UInt => read.read_u32::<BO>()? as usize,
+        FaceType::Char => read.read_i8()? as usize,
+        FaceType::UChar => read.read_u8()? as usize,
+        FaceType::Short => read.read_i16::<BO>()? as usize,
+        FaceType::UShort => read.read_u16::<BO>()? as usize,
+        FaceType::Int => read.read_i32::<BO>()? as usize,
+        FaceType::UInt => read.read_u32::<BO>()? as usize,
     })
 }
 
-fn read_vertex_type<BO, R>(read: &mut R, t: &PlyVertexType) -> PlyResult<f64>
+fn read_vertex_type<BO, R>(read: &mut R, t: &VertexType) -> PlyResult<f64>
 where
     BO: ByteOrder,
     R: Read,
 {
     Ok(match t {
-        PlyVertexType::Float => read.read_f32::<BO>()? as f64,
-        PlyVertexType::Double => read.read_f64::<BO>()?,
+        VertexType::Float => read.read_f32::<BO>()? as f64,
+        VertexType::Double => read.read_f64::<BO>()?,
     })
 }
 
@@ -193,11 +190,11 @@ where
 //@todo must consider case where properties / to skip are defined per face and not per vertex
 //@todo settings this must track its scope (if after element vertex or element face)
 #[derive(Debug)]
-struct PlyVertexFormat {
+struct VertexFormat {
     pub order: VertexOrder,
-    pub first: PlyVertexType,
-    pub snd: PlyVertexType,
-    pub third: PlyVertexType,
+    pub first: VertexType,
+    pub snd: VertexType,
+    pub third: VertexType,
     pub before: BytesWords,
     pub between_first_snd: BytesWords,
     pub between_snd_third: BytesWords,
@@ -206,33 +203,33 @@ struct PlyVertexFormat {
 
 //@todo must also check structure itself, not just padding
 #[derive(Debug)]
-struct PlyFaceFormat {
-    pub count: PlyFaceType,
-    pub index: PlyFaceType,
+struct FaceFormat {
+    pub count: FaceType,
+    pub index: FaceType,
     pub before: BytesWords,
     pub after: BytesWords,
 }
 
 #[derive(Debug)]
-enum PlyFormat {
+enum Format {
     Ascii,
     LittleEndian,
     BigEndian,
 }
 
-enum PlyHeaderReadState {
+enum HeaderReadState {
     Meta,
     Vertex,
     Face,
 }
 
 #[derive(Debug)]
-struct PlyHeader {
-    pub format: PlyFormat,
+struct Header {
+    pub format: Format,
     pub n_vertices: usize,
     pub n_faces: usize,
-    pub vertex_format: PlyVertexFormat,
-    pub face_format: PlyFaceFormat,
+    pub vertex_format: VertexFormat,
+    pub face_format: FaceFormat,
 }
 
 /// Saves an IsMesh3D in the ASCII .ply file format
@@ -531,7 +528,7 @@ where
     let mut line_buffer = String::new();
     let mut i_line = 0;
 
-    let header = load_ply_header(read, &mut line_buffer, &mut i_line)?;
+    let header = load_header(read, &mut line_buffer, &mut i_line)?;
 
     //println!("{:?}", header);
 
@@ -539,17 +536,13 @@ where
     mesh.reserve_faces(header.n_faces);
 
     match header.format {
-        PlyFormat::Ascii => load_ply_ascii(read, mesh, &header, &mut line_buffer, &mut i_line),
-        PlyFormat::LittleEndian => load_ply_binary::<LittleEndian, _, _, _>(read, mesh, &header),
-        PlyFormat::BigEndian => load_ply_binary::<BigEndian, _, _, _>(read, mesh, &header),
+        Format::Ascii => load_ascii(read, mesh, &header, &mut line_buffer, &mut i_line),
+        Format::LittleEndian => load_binary::<LittleEndian, _, _, _>(read, mesh, &header),
+        Format::BigEndian => load_binary::<BigEndian, _, _, _>(read, mesh, &header),
     }
 }
 
-fn load_ply_header<R>(
-    read: &mut R,
-    line_buffer: &mut String,
-    i_line: &mut usize,
-) -> PlyResult<PlyHeader>
+fn load_header<R>(read: &mut R, line_buffer: &mut String, i_line: &mut usize) -> PlyResult<Header>
 where
     R: BufRead,
 {
@@ -558,7 +551,7 @@ where
 
     //@todo foo_found vs found_foo naming convention
     let mut found_ply = false;
-    let mut read_state = PlyHeaderReadState::Meta;
+    let mut read_state = HeaderReadState::Meta;
     let mut format = None;
     let mut n_vertices: Option<usize> = None;
     let mut n_faces: Option<usize> = None;
@@ -606,9 +599,9 @@ where
 
         if format.is_none() {
             format = Some(match line {
-                "format ascii 1.0" => PlyFormat::Ascii,
-                "format binary_little_endian 1.0" => PlyFormat::LittleEndian,
-                "format binary_big_endian 1.0" => PlyFormat::BigEndian,
+                "format ascii 1.0" => Format::Ascii,
+                "format binary_little_endian 1.0" => Format::LittleEndian,
+                "format binary_big_endian 1.0" => Format::BigEndian,
                 _ => return Err(PlyError::LoadFormatNotFound),
             });
             continue;
@@ -617,7 +610,7 @@ where
         match n_vertices {
             None => {
                 if line.starts_with("element vertex") {
-                    read_state = PlyHeaderReadState::Vertex;
+                    read_state = HeaderReadState::Vertex;
                     let mut words = to_words(&line);
                     match words.clone().count() {
                         3 => {
@@ -637,7 +630,7 @@ where
         match n_faces {
             None => {
                 if line.starts_with("element face") {
-                    read_state = PlyHeaderReadState::Face;
+                    read_state = HeaderReadState::Face;
                     let mut words = to_words(&line);
                     match words.clone().count() {
                         3 => {
@@ -656,24 +649,24 @@ where
 
         if line.starts_with("property") {
             match read_state {
-                PlyHeaderReadState::Vertex => {
+                HeaderReadState::Vertex => {
                     let mut words = to_words(line);
                     words.next(); // skip "property"
 
-                    let t = PlyType::from_str(words.next().unwrap()).unwrap(); //@todo error handling, invalid property line
+                    let t = Type::from_str(words.next().unwrap()).unwrap(); //@todo error handling, invalid property line
                     let id = words.next().unwrap(); //@todo see above
                     if id == "x" {
-                        x_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
+                        x_type = Some(VertexType::from_type(t).unwrap()); //@todo see above
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::X;
                         i_vertex_order += 1;
                     } else if id == "y" {
-                        y_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
+                        y_type = Some(VertexType::from_type(t).unwrap()); //@todo see above
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Y;
                         i_vertex_order += 1;
                     } else if id == "z" {
-                        z_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
+                        z_type = Some(VertexType::from_type(t).unwrap()); //@todo see above
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Z;
                         i_vertex_order += 1;
@@ -693,21 +686,19 @@ where
                         }
                     }
                 }
-                PlyHeaderReadState::Face => {
+                HeaderReadState::Face => {
                     if line.starts_with("property list") {
                         if line.contains("vertex_indices") || line.contains("vertex_index") {
                             //@todo is this properly defined?
                             let mut words = to_words(line);
                             words.next(); // skip "property"
                             words.next(); // skip "list"
-                            let t_count = PlyFaceType::from_ply_type(
-                                PlyType::from_str(words.next().unwrap()).unwrap(),
-                            )
-                            .unwrap(); //@todo error handling, invalid property line
-                            let t_index = PlyFaceType::from_ply_type(
-                                PlyType::from_str(words.next().unwrap()).unwrap(),
-                            )
-                            .unwrap(); //@todo error handling, invalid property line
+                            let t_count =
+                                FaceType::from_type(Type::from_str(words.next().unwrap()).unwrap())
+                                    .unwrap(); //@todo error handling, invalid property line
+                            let t_index =
+                                FaceType::from_type(Type::from_str(words.next().unwrap()).unwrap())
+                                    .unwrap(); //@todo error handling, invalid property line
 
                             face_count_type = Some(t_count);
                             face_index_type = Some(t_index);
@@ -723,7 +714,7 @@ where
                     } else {
                         let mut words = to_words(line);
                         words.next(); // skip "property"
-                        let t = PlyType::from_str(words.next().unwrap()).unwrap(); //@todo error handling, invalid property line
+                        let t = Type::from_str(words.next().unwrap()).unwrap(); //@todo error handling, invalid property line
                         if face_structure_found {
                             face_after.bytes += t.size_bytes();
                             face_after.words += 1;
@@ -754,11 +745,11 @@ where
         {
             //@todo nicer way to write this
             // safe due to if above
-            return Ok(PlyHeader {
+            return Ok(Header {
                 format: format.unwrap(),
                 n_vertices: n_vertices.unwrap(),
                 n_faces: n_faces.unwrap(),
-                vertex_format: PlyVertexFormat {
+                vertex_format: VertexFormat {
                     order: VertexOrder::from_arr(vertex_order).unwrap(), //@todo this unwrap is currently not safe
                     first: x_type.unwrap(),
                     snd: y_type.unwrap(),
@@ -768,7 +759,7 @@ where
                     between_snd_third,
                     after,
                 },
-                face_format: PlyFaceFormat {
+                face_format: FaceFormat {
                     before: face_before,
                     after: face_after,
                     count: face_count_type.unwrap(),
@@ -784,7 +775,7 @@ where
     Err(PlyError::LoadHeaderEndNotFound)
 }
 
-fn load_ply_binary<BO, EM, P, R>(read: &mut R, mesh: &mut EM, header: &PlyHeader) -> PlyResult<()>
+fn load_binary<BO, EM, P, R>(read: &mut R, mesh: &mut EM, header: &Header) -> PlyResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -845,10 +836,10 @@ where
     Ok(())
 }
 
-fn load_ply_ascii<EM, P, R>(
+fn load_ascii<EM, P, R>(
     read: &mut R,
     mesh: &mut EM,
-    header: &PlyHeader,
+    header: &Header,
     line_buffer: &mut String,
     i_line: &mut usize,
 ) -> PlyResult<()>
