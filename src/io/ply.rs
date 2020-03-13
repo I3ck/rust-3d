@@ -84,6 +84,12 @@ impl PlyType {
     }
 }
 
+#[derive(Default)]
+struct BytesWords {
+    pub bytes: usize,
+    pub words: usize,
+}
+
 enum PlyVertexType {
     Float,
     Double,
@@ -100,16 +106,15 @@ impl PlyVertexType {
     }
 }
 
-//@todo must also be considered in ASCII version, by storing word instead of byte count
 //@todo property list must also be considered
 struct PlyVertexFormat {
     pub x: PlyVertexType,
     pub y: PlyVertexType,
     pub z: PlyVertexType,
-    pub before: usize,
-    pub between_x_y: usize,
-    pub between_y_z: usize,
-    pub after: usize,
+    pub before: BytesWords,
+    pub between_x_y: BytesWords,
+    pub between_y_z: BytesWords,
+    pub after: BytesWords,
 }
 
 enum PlyFormat {
@@ -451,10 +456,10 @@ where
     let mut y_type = None;
     let mut z_type = None;
     let mut n_types_found = 0;
-    let mut before = 0;
-    let mut between_x_y = 0;
-    let mut between_y_z = 0;
-    let mut after = 0;
+    let mut before = BytesWords::default();
+    let mut between_x_y = BytesWords::default();
+    let mut between_y_z = BytesWords::default();
+    let mut after = BytesWords::default();
 
     loop {
         line_buffer.clear();
@@ -523,24 +528,28 @@ where
                     x_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
                     n_types_found += 1;
                 } else {
-                    before += t.size_bytes();
+                    before.bytes += t.size_bytes();
+                    before.words += 1;
                 }
             } else if n_types_found == 1 {
                 if id == "y" {
                     y_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
                     n_types_found += 1;
                 } else {
-                    between_x_y += t.size_bytes();
+                    between_x_y.bytes += t.size_bytes();
+                    between_x_y.words += 1;
                 }
             } else if n_types_found == 2 {
                 if id == "z" {
                     z_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
                     n_types_found += 1;
                 } else {
-                    between_y_z += t.size_bytes();
+                    between_y_z.bytes += t.size_bytes();
+                    between_y_z.words += 1;
                 }
             } else {
-                after += t.size_bytes();
+                after.bytes += t.size_bytes();
+                after.words += 1;
             }
 
             continue;
@@ -612,28 +621,28 @@ where
     BO: ByteOrder,
 {
     for _ in 0..header.n_vertices {
-        for _ in 0..header.vertex_format.before {
+        for _ in 0..header.vertex_format.before.bytes {
             let _ = read.read_u8();
         }
         let x = match header.vertex_format.x {
             PlyVertexType::Float => read.read_f32::<BO>()? as f64,
             PlyVertexType::Double => read.read_f64::<BO>()?,
         };
-        for _ in 0..header.vertex_format.between_x_y {
+        for _ in 0..header.vertex_format.between_x_y.bytes {
             let _ = read.read_u8();
         }
         let y = match header.vertex_format.x {
             PlyVertexType::Float => read.read_f32::<BO>()? as f64,
             PlyVertexType::Double => read.read_f64::<BO>()?,
         };
-        for _ in 0..header.vertex_format.between_y_z {
+        for _ in 0..header.vertex_format.between_y_z.bytes {
             let _ = read.read_u8();
         }
         let z = match header.vertex_format.x {
             PlyVertexType::Float => read.read_f32::<BO>()? as f64,
             PlyVertexType::Double => read.read_f64::<BO>()?,
         };
-        for _ in 0..header.vertex_format.after {
+        for _ in 0..header.vertex_format.after.bytes {
             let _ = read.read_u8();
         }
 
