@@ -24,11 +24,93 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//@todo float32 usage wrong here?
+//@todo consider removal Ply prefix from private types
+
 use byteorder::{BigEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 
 use core::str::FromStr;
 
 use std::io::{BufRead, Read, Write};
+
+/*
+char -> signed 1 byte
+uchar -> unsigned 1 byte
+short -> signed 2 bytes
+ushort -> unsigned 2 bytes
+int -> signed 4 bytes
+uint -> unsigned 4 bytes
+float -> 4 bytes
+double -> 8 bytes
+*/
+
+enum PlyType {
+    Char,
+    UChar,
+    Short,
+    UShort,
+    Int,
+    UInt,
+    Float,
+    Double,
+}
+
+impl PlyType {
+    pub fn from_str(x: &str) -> Option<Self> {
+        match x {
+            "char" => Some(Self::Char),
+            "uchar" => Some(Self::UChar),
+            "short" => Some(Self::Short),
+            "ushort" => Some(Self::UShort),
+            "int" => Some(Self::Int),
+            "uint" => Some(Self::UInt),
+            "float" => Some(Self::Float),
+            "double" => Some(Self::Double),
+            _ => None,
+        }
+    }
+
+    pub fn size_bytes(&self) -> usize {
+        match self {
+            Self::Char => 1,
+            Self::UChar => 1,
+            Self::Short => 2,
+            Self::UShort => 2,
+            Self::Int => 4,
+            Self::UInt => 4,
+            Self::Float => 4,
+            Self::Double => 8,
+        }
+    }
+}
+
+enum PlyVertexType {
+    Float,
+    Double,
+}
+
+impl PlyVertexType {
+    //@todo TryFrom
+    pub fn from_ply_type(x: PlyType) -> Option<Self> {
+        match x {
+            PlyType::Float => Some(Self::Float),
+            PlyType::Double => Some(Self::Double),
+            _ => None,
+        }
+    }
+}
+
+//@todo must also be considered in ASCII version, by storing word instead of byte count
+//@todo property list must also be considered
+struct PlyVertexFormat {
+    pub x: PlyVertexType,
+    pub y: PlyVertexType,
+    pub z: PlyVertexType,
+    pub before: usize,
+    pub between_x_y: usize,
+    pub between_y_z: usize,
+    pub after: usize,
+}
 
 enum PlyFormat {
     Ascii,
@@ -40,6 +122,7 @@ struct PlyHeader {
     pub format: PlyFormat,
     pub n_vertices: usize,
     pub n_faces: usize,
+    pub vertex_format: PlyVertexFormat,
 }
 
 /// Saves an IsMesh3D in the ASCII .ply file format
@@ -363,7 +446,15 @@ where
     let mut format = None;
     let mut n_vertices: Option<usize> = None;
     let mut n_faces: Option<usize> = None;
-    let mut counted_properties = 0;
+
+    let mut x_type = None;
+    let mut y_type = None;
+    let mut z_type = None;
+    let mut n_types_found = 0;
+    let mut before = 0;
+    let mut between_x_y = 0;
+    let mut between_y_z = 0;
+    let mut after = 0;
 
     loop {
         line_buffer.clear();
@@ -421,14 +512,43 @@ where
             Some(_) => {}
         }
 
-        if line.starts_with("property float") {
-            counted_properties += 1;
+        if line.starts_with("property") {
+            let mut words = to_words(line);
+            words.next(); // skip "property"
+
+            let t = PlyType::from_str(words.next().unwrap()).unwrap(); //@todo error handling, invalid property line
+            let id = words.next().unwrap(); //@todo see above
+            if n_types_found == 0 {
+                if id == "x" {
+                    x_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
+                    n_types_found += 1;
+                } else {
+                    before += t.size_bytes();
+                }
+            } else if n_types_found == 1 {
+                if id == "y" {
+                    y_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
+                    n_types_found += 1;
+                } else {
+                    between_x_y += t.size_bytes();
+                }
+            } else if n_types_found == 2 {
+                if id == "z" {
+                    z_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
+                    n_types_found += 1;
+                } else {
+                    between_y_z += t.size_bytes();
+                }
+            } else {
+                after += t.size_bytes();
+            }
+
             continue;
         }
 
-        if counted_properties < 3 {
-            return Err(PlyError::LoadWrongPropertyCount);
-        }
+        //if counted_properties < 3 {
+        //return Err(PlyError::LoadWrongPropertyCount);
+        //}
 
         match n_faces {
             None => {
@@ -455,6 +575,9 @@ where
             && format.is_some()
             && n_vertices.is_some()
             && n_faces.is_some()
+            && x_type.is_some()
+            && y_type.is_some()
+            && z_type.is_some()
         {
             //@todo nicer way to write this
             // safe due to if above
@@ -462,6 +585,15 @@ where
                 format: format.unwrap(),
                 n_vertices: n_vertices.unwrap(),
                 n_faces: n_faces.unwrap(),
+                vertex_format: PlyVertexFormat {
+                    x: x_type.unwrap(),
+                    y: y_type.unwrap(),
+                    z: z_type.unwrap(),
+                    before,
+                    between_x_y,
+                    between_y_z,
+                    after,
+                },
             });
         }
 
@@ -479,13 +611,33 @@ where
     R: Read,
     BO: ByteOrder,
 {
-    {
-        let mut buffer = [0f32; 3];
-        //@todo must ensure float32/float64 is handled
-        for _ in 0..header.n_vertices {
-            read.read_f32_into::<BO>(&mut buffer)?;
-            mesh.add_vertex(P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64));
+    for _ in 0..header.n_vertices {
+        for _ in 0..header.vertex_format.before {
+            let _ = read.read_u8();
         }
+        let x = match header.vertex_format.x {
+            PlyVertexType::Float => read.read_f32::<BO>()? as f64,
+            PlyVertexType::Double => read.read_f64::<BO>()?,
+        };
+        for _ in 0..header.vertex_format.between_x_y {
+            let _ = read.read_u8();
+        }
+        let y = match header.vertex_format.x {
+            PlyVertexType::Float => read.read_f32::<BO>()? as f64,
+            PlyVertexType::Double => read.read_f64::<BO>()?,
+        };
+        for _ in 0..header.vertex_format.between_y_z {
+            let _ = read.read_u8();
+        }
+        let z = match header.vertex_format.x {
+            PlyVertexType::Float => read.read_f32::<BO>()? as f64,
+            PlyVertexType::Double => read.read_f64::<BO>()?,
+        };
+        for _ in 0..header.vertex_format.after {
+            let _ = read.read_u8();
+        }
+
+        mesh.add_vertex(P::new(x, y, z));
     }
 
     //@todo must work with any int precision
