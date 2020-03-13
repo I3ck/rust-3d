@@ -474,6 +474,10 @@ where
             continue;
         }
 
+        if line.starts_with("obj_info") {
+            continue;
+        }
+
         //@todo must ensure line present and matches expected format
         if line.starts_with("property list") {
             continue;
