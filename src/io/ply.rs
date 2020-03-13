@@ -149,17 +149,28 @@ where
     })
 }
 
+fn read_vertex_type<BO, R>(read: &mut R, t: &PlyVertexType) -> PlyResult<f64>
+where
+    BO: ByteOrder,
+    R: Read,
+{
+    Ok(match t {
+        PlyVertexType::Float => read.read_f32::<BO>()? as f64,
+        PlyVertexType::Double => read.read_f64::<BO>()?,
+    })
+}
+
 //@todo property list must also be considered
 //@todo must consider case where properties / to skip are defined per face and not per vertex
 //@todo settings this must track its scope (if after element vertex or element face)
 #[derive(Debug)]
 struct PlyVertexFormat {
-    pub x: PlyVertexType,
-    pub y: PlyVertexType,
-    pub z: PlyVertexType,
+    pub first: PlyVertexType,
+    pub snd: PlyVertexType,
+    pub third: PlyVertexType,
     pub before: BytesWords,
-    pub between_x_y: BytesWords,
-    pub between_y_z: BytesWords,
+    pub between_first_snd: BytesWords,
+    pub between_snd_third: BytesWords,
     pub after: BytesWords,
 }
 
@@ -525,8 +536,8 @@ where
     let mut n_types_found = 0;
     //@todo rename these, since now misleading whether vertex or face
     let mut before = BytesWords::default();
-    let mut between_x_y = BytesWords::default();
-    let mut between_y_z = BytesWords::default();
+    let mut between_first_snd = BytesWords::default();
+    let mut between_snd_third = BytesWords::default();
     let mut after = BytesWords::default();
 
     let mut face_count_type = None;
@@ -631,16 +642,16 @@ where
                             y_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
                             n_types_found += 1;
                         } else {
-                            between_x_y.bytes += t.size_bytes();
-                            between_x_y.words += 1;
+                            between_first_snd.bytes += t.size_bytes();
+                            between_first_snd.words += 1;
                         }
                     } else if n_types_found == 2 {
                         if id == "z" {
                             z_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
                             n_types_found += 1;
                         } else {
-                            between_y_z.bytes += t.size_bytes();
-                            between_y_z.words += 1;
+                            between_snd_third.bytes += t.size_bytes();
+                            between_snd_third.words += 1;
                         }
                     } else {
                         after.bytes += t.size_bytes();
@@ -713,12 +724,12 @@ where
                 n_vertices: n_vertices.unwrap(),
                 n_faces: n_faces.unwrap(),
                 vertex_format: PlyVertexFormat {
-                    x: x_type.unwrap(),
-                    y: y_type.unwrap(),
-                    z: z_type.unwrap(),
+                    first: x_type.unwrap(),
+                    snd: y_type.unwrap(),
+                    third: z_type.unwrap(),
                     before,
-                    between_x_y,
-                    between_y_z,
+                    between_first_snd,
+                    between_snd_third,
                     after,
                 },
                 face_format: PlyFaceFormat {
@@ -748,24 +759,15 @@ where
         for _ in 0..header.vertex_format.before.bytes {
             let _ = read.read_u8();
         }
-        let x = match header.vertex_format.x {
-            PlyVertexType::Float => read.read_f32::<BO>()? as f64,
-            PlyVertexType::Double => read.read_f64::<BO>()?,
-        };
-        for _ in 0..header.vertex_format.between_x_y.bytes {
+        let x = read_vertex_type::<BO, _>(read, &header.vertex_format.first)?;
+        for _ in 0..header.vertex_format.between_first_snd.bytes {
             let _ = read.read_u8();
         }
-        let y = match header.vertex_format.x {
-            PlyVertexType::Float => read.read_f32::<BO>()? as f64,
-            PlyVertexType::Double => read.read_f64::<BO>()?,
-        };
-        for _ in 0..header.vertex_format.between_y_z.bytes {
+        let y = read_vertex_type::<BO, _>(read, &header.vertex_format.snd)?;
+        for _ in 0..header.vertex_format.between_snd_third.bytes {
             let _ = read.read_u8();
         }
-        let z = match header.vertex_format.x {
-            PlyVertexType::Float => read.read_f32::<BO>()? as f64,
-            PlyVertexType::Double => read.read_f64::<BO>()?,
-        };
+        let z = read_vertex_type::<BO, _>(read, &header.vertex_format.third)?;
         for _ in 0..header.vertex_format.after.bytes {
             let _ = read.read_u8();
         }
@@ -828,11 +830,11 @@ where
                 words.next();
             }
             let x = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
-            for _ in 0..header.vertex_format.between_x_y.words {
+            for _ in 0..header.vertex_format.between_first_snd.words {
                 words.next();
             }
             let y = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
-            for _ in 0..header.vertex_format.between_y_z.words {
+            for _ in 0..header.vertex_format.between_snd_third.words {
                 words.next();
             }
             let z = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
