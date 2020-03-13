@@ -44,6 +44,8 @@ float -> 4 bytes
 double -> 8 bytes
 */
 
+//@todo allow for any x/y/z order when loading
+
 enum PlyType {
     Char,
     UChar,
@@ -647,7 +649,7 @@ where
                 }
                 PlyHeaderReadState::Face => {
                     if line.starts_with("property list") {
-                        if line.contains("vertex_indices") {
+                        if line.contains("vertex_indices") || line.contains("vertex_index") {
                             //@todo is this properly defined?
                             let mut words = to_words(line);
                             words.next(); // skip "property"
