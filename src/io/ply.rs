@@ -30,207 +30,7 @@ use core::str::FromStr;
 
 use std::io::{BufRead, Read, Write};
 
-enum Type {
-    Char,
-    UChar,
-    Short,
-    UShort,
-    Int,
-    UInt,
-    Float,
-    Double,
-}
-
-#[derive(Debug)]
-enum Xyz {
-    X,
-    Y,
-    Z,
-}
-
-#[derive(Debug)]
-enum VertexOrder {
-    Xyz,
-    Xzy,
-    Yxz,
-    Yzx,
-    Zxy,
-    Zyx,
-}
-
-impl VertexOrder {
-    //@todo try_from
-    pub fn from_arr(x: [Xyz; 3]) -> Option<Self> {
-        println!("{:?}", x);
-        match x {
-            [Xyz::X, Xyz::Y, Xyz::Z] => Some(Self::Xyz),
-            [Xyz::X, Xyz::Z, Xyz::Y] => Some(Self::Xzy),
-            [Xyz::Y, Xyz::X, Xyz::Z] => Some(Self::Yxz),
-            [Xyz::Y, Xyz::Z, Xyz::X] => Some(Self::Yzx),
-            [Xyz::Z, Xyz::X, Xyz::Y] => Some(Self::Zxy),
-            [Xyz::Z, Xyz::Y, Xyz::X] => Some(Self::Zyx),
-            _ => None,
-        }
-    }
-}
-
-impl Type {
-    pub fn from_str(x: &str) -> Option<Self> {
-        match x {
-            "char" => Some(Self::Char),
-            "uchar" => Some(Self::UChar),
-            "short" => Some(Self::Short),
-            "ushort" => Some(Self::UShort),
-            "int" => Some(Self::Int),
-            "uint" => Some(Self::UInt),
-            "float" | "float32" => Some(Self::Float),
-            "double" | "float64" => Some(Self::Double),
-            _ => None,
-        }
-    }
-
-    pub fn size_bytes(&self) -> usize {
-        match self {
-            Self::Char => 1,
-            Self::UChar => 1,
-            Self::Short => 2,
-            Self::UShort => 2,
-            Self::Int => 4,
-            Self::UInt => 4,
-            Self::Float => 4,
-            Self::Double => 8,
-        }
-    }
-}
-
-#[derive(Default, Debug)]
-struct BytesWords {
-    pub bytes: usize,
-    pub words: usize,
-}
-
-#[derive(Debug)]
-enum VertexType {
-    Float,
-    Double,
-}
-
-impl VertexType {
-    //@todo TryFrom
-    pub fn from_type(x: Type) -> Option<Self> {
-        match x {
-            Type::Float => Some(Self::Float),
-            Type::Double => Some(Self::Double),
-            _ => None,
-        }
-    }
-}
-
-#[derive(Debug)]
-enum FaceType {
-    Char,
-    UChar,
-    Short,
-    UShort,
-    Int,
-    UInt,
-}
-
-impl FaceType {
-    //@todo TryFrom
-    pub fn from_type(x: Type) -> Option<Self> {
-        match x {
-            Type::Char => Some(Self::Char),
-            Type::UChar => Some(Self::UChar),
-            Type::Short => Some(Self::Short),
-            Type::UShort => Some(Self::UShort),
-            Type::Int => Some(Self::Int),
-            Type::UInt => Some(Self::UInt),
-            _ => None,
-        }
-    }
-}
-
-fn read_face_type<BO, R>(read: &mut R, t: &FaceType) -> PlyResult<usize>
-where
-    BO: ByteOrder,
-    R: Read,
-{
-    Ok(match t {
-        FaceType::Char => read.read_i8()? as usize,
-        FaceType::UChar => read.read_u8()? as usize,
-        FaceType::Short => read.read_i16::<BO>()? as usize,
-        FaceType::UShort => read.read_u16::<BO>()? as usize,
-        FaceType::Int => read.read_i32::<BO>()? as usize,
-        FaceType::UInt => read.read_u32::<BO>()? as usize,
-    })
-}
-
-fn read_vertex_type<BO, R>(read: &mut R, t: &VertexType) -> PlyResult<f64>
-where
-    BO: ByteOrder,
-    R: Read,
-{
-    Ok(match t {
-        VertexType::Float => read.read_f32::<BO>()? as f64,
-        VertexType::Double => read.read_f64::<BO>()?,
-    })
-}
-
-fn skip_bytes<R>(read: &mut R, n_bytes: usize)
-where
-    R: Read,
-{
-    for _ in 0..n_bytes {
-        let _ = read.read_u8();
-    }
-}
-
-//@todo property list must also be considered
-//@todo must consider case where properties / to skip are defined per face and not per vertex
-//@todo settings this must track its scope (if after element vertex or element face)
-#[derive(Debug)]
-struct VertexFormat {
-    pub order: VertexOrder,
-    pub first: VertexType,
-    pub snd: VertexType,
-    pub third: VertexType,
-    pub before: BytesWords,
-    pub between_first_snd: BytesWords,
-    pub between_snd_third: BytesWords,
-    pub after: BytesWords,
-}
-
-//@todo must also check structure itself, not just padding
-#[derive(Debug)]
-struct FaceFormat {
-    pub count: FaceType,
-    pub index: FaceType,
-    pub before: BytesWords,
-    pub after: BytesWords,
-}
-
-#[derive(Debug)]
-enum Format {
-    Ascii,
-    LittleEndian,
-    BigEndian,
-}
-
-enum HeaderReadState {
-    Meta,
-    Vertex,
-    Face,
-}
-
-#[derive(Debug)]
-struct Header {
-    pub format: Format,
-    pub n_vertices: usize,
-    pub n_faces: usize,
-    pub vertex_format: VertexFormat,
-    pub face_format: FaceFormat,
-}
+//------------------------------------------------------------------------------
 
 /// Saves an IsMesh3D in the ASCII .ply file format
 pub fn save_ply_ascii<M, P, W>(write: &mut W, mesh: &M) -> PlyResult<()>
@@ -275,6 +75,8 @@ where
     }
     Ok(())
 }
+
+//------------------------------------------------------------------------------
 
 /// Saves an IsMesh3D in the ASCII .ply file format with additional colors
 pub fn save_ply_ascii_colored<M, P, W>(write: &mut W, mesh: &M, colors: &Vec<Rgb>) -> PlyResult<()>
@@ -341,6 +143,8 @@ where
     }
     Ok(())
 }
+
+//------------------------------------------------------------------------------
 
 /// Saves an IsMesh3D in the binary .ply file format
 pub fn save_ply_binary<M, P, W>(write: &mut W, mesh: &M, precision: &Precision) -> PlyResult<()>
@@ -416,6 +220,8 @@ where
 
     Ok(())
 }
+
+//------------------------------------------------------------------------------
 
 /// Saves an IsMesh3D in the binary .ply file format with additional colors
 pub fn save_ply_binary_colored<M, P, W>(
@@ -518,6 +324,8 @@ where
     Ok(())
 }
 
+//------------------------------------------------------------------------------
+
 /// Loads an IsMesh3D from the .ply file format
 pub fn load_ply<EM, P, R>(read: &mut R, mesh: &mut EM) -> PlyResult<()>
 where
@@ -541,6 +349,10 @@ where
         Format::BigEndian => load_binary::<BigEndian, _, _, _>(read, mesh, &header),
     }
 }
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 fn load_header<R>(read: &mut R, line_buffer: &mut String, i_line: &mut usize) -> PlyResult<Header>
 where
@@ -775,6 +587,8 @@ where
     Err(PlyError::LoadHeaderEndNotFound)
 }
 
+//------------------------------------------------------------------------------
+
 fn load_binary<BO, EM, P, R>(read: &mut R, mesh: &mut EM, header: &Header) -> PlyResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
@@ -835,6 +649,8 @@ where
 
     Ok(())
 }
+
+//------------------------------------------------------------------------------
 
 fn load_ascii<EM, P, R>(
     read: &mut R,
@@ -904,6 +720,10 @@ where
     Ok(())
 }
 
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
 fn collect_index_line(line: &str) -> Option<[usize; 3]> {
     let mut words = to_words(line);
     if words.next()? != "3" {
@@ -915,4 +735,236 @@ fn collect_index_line(line: &str) -> Option<[usize; 3]> {
     let c = usize::from_str(words.next()?).ok()?;
 
     Some([a, b, c])
+}
+
+//------------------------------------------------------------------------------
+
+fn read_face_type<BO, R>(read: &mut R, t: &FaceType) -> PlyResult<usize>
+where
+    BO: ByteOrder,
+    R: Read,
+{
+    Ok(match t {
+        FaceType::Char => read.read_i8()? as usize,
+        FaceType::UChar => read.read_u8()? as usize,
+        FaceType::Short => read.read_i16::<BO>()? as usize,
+        FaceType::UShort => read.read_u16::<BO>()? as usize,
+        FaceType::Int => read.read_i32::<BO>()? as usize,
+        FaceType::UInt => read.read_u32::<BO>()? as usize,
+    })
+}
+
+//------------------------------------------------------------------------------
+
+fn read_vertex_type<BO, R>(read: &mut R, t: &VertexType) -> PlyResult<f64>
+where
+    BO: ByteOrder,
+    R: Read,
+{
+    Ok(match t {
+        VertexType::Float => read.read_f32::<BO>()? as f64,
+        VertexType::Double => read.read_f64::<BO>()?,
+    })
+}
+
+//------------------------------------------------------------------------------
+
+fn skip_bytes<R>(read: &mut R, n_bytes: usize)
+where
+    R: Read,
+{
+    for _ in 0..n_bytes {
+        let _ = read.read_u8();
+    }
+}
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+enum Type {
+    Char,
+    UChar,
+    Short,
+    UShort,
+    Int,
+    UInt,
+    Float,
+    Double,
+}
+
+impl Type {
+    pub fn from_str(x: &str) -> Option<Self> {
+        match x {
+            "char" => Some(Self::Char),
+            "uchar" => Some(Self::UChar),
+            "short" => Some(Self::Short),
+            "ushort" => Some(Self::UShort),
+            "int" => Some(Self::Int),
+            "uint" => Some(Self::UInt),
+            "float" | "float32" => Some(Self::Float),
+            "double" | "float64" => Some(Self::Double),
+            _ => None,
+        }
+    }
+
+    pub fn size_bytes(&self) -> usize {
+        match self {
+            Self::Char => 1,
+            Self::UChar => 1,
+            Self::Short => 2,
+            Self::UShort => 2,
+            Self::Int => 4,
+            Self::UInt => 4,
+            Self::Float => 4,
+            Self::Double => 8,
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+#[derive(Debug)]
+enum Xyz {
+    X,
+    Y,
+    Z,
+}
+
+//------------------------------------------------------------------------------
+
+#[derive(Debug)]
+enum VertexOrder {
+    Xyz,
+    Xzy,
+    Yxz,
+    Yzx,
+    Zxy,
+    Zyx,
+}
+
+impl VertexOrder {
+    //@todo try_from
+    pub fn from_arr(x: [Xyz; 3]) -> Option<Self> {
+        println!("{:?}", x);
+        match x {
+            [Xyz::X, Xyz::Y, Xyz::Z] => Some(Self::Xyz),
+            [Xyz::X, Xyz::Z, Xyz::Y] => Some(Self::Xzy),
+            [Xyz::Y, Xyz::X, Xyz::Z] => Some(Self::Yxz),
+            [Xyz::Y, Xyz::Z, Xyz::X] => Some(Self::Yzx),
+            [Xyz::Z, Xyz::X, Xyz::Y] => Some(Self::Zxy),
+            [Xyz::Z, Xyz::Y, Xyz::X] => Some(Self::Zyx),
+            _ => None,
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+#[derive(Default, Debug)]
+struct BytesWords {
+    pub bytes: usize,
+    pub words: usize,
+}
+
+//------------------------------------------------------------------------------
+
+#[derive(Debug)]
+enum VertexType {
+    Float,
+    Double,
+}
+
+impl VertexType {
+    //@todo TryFrom
+    pub fn from_type(x: Type) -> Option<Self> {
+        match x {
+            Type::Float => Some(Self::Float),
+            Type::Double => Some(Self::Double),
+            _ => None,
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+#[derive(Debug)]
+enum FaceType {
+    Char,
+    UChar,
+    Short,
+    UShort,
+    Int,
+    UInt,
+}
+
+impl FaceType {
+    //@todo TryFrom
+    pub fn from_type(x: Type) -> Option<Self> {
+        match x {
+            Type::Char => Some(Self::Char),
+            Type::UChar => Some(Self::UChar),
+            Type::Short => Some(Self::Short),
+            Type::UShort => Some(Self::UShort),
+            Type::Int => Some(Self::Int),
+            Type::UInt => Some(Self::UInt),
+            _ => None,
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+//@todo property list must also be considered
+//@todo must consider case where properties / to skip are defined per face and not per vertex
+//@todo settings this must track its scope (if after element vertex or element face)
+#[derive(Debug)]
+struct VertexFormat {
+    pub order: VertexOrder,
+    pub first: VertexType,
+    pub snd: VertexType,
+    pub third: VertexType,
+    pub before: BytesWords,
+    pub between_first_snd: BytesWords,
+    pub between_snd_third: BytesWords,
+    pub after: BytesWords,
+}
+
+//------------------------------------------------------------------------------
+
+//@todo must also check structure itself, not just padding
+#[derive(Debug)]
+struct FaceFormat {
+    pub count: FaceType,
+    pub index: FaceType,
+    pub before: BytesWords,
+    pub after: BytesWords,
+}
+
+//------------------------------------------------------------------------------
+
+#[derive(Debug)]
+enum Format {
+    Ascii,
+    LittleEndian,
+    BigEndian,
+}
+
+//------------------------------------------------------------------------------
+
+enum HeaderReadState {
+    Meta,
+    Vertex,
+    Face,
+}
+
+//------------------------------------------------------------------------------
+
+#[derive(Debug)]
+struct Header {
+    pub format: Format,
+    pub n_vertices: usize,
+    pub n_faces: usize,
+    pub vertex_format: VertexFormat,
+    pub face_format: FaceFormat,
 }
