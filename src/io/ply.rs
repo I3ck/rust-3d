@@ -361,8 +361,7 @@ where
     let mut vertex_order = [Xyz::X, Xyz::X, Xyz::X];
     let mut i_vertex_order = 0;
 
-    //@todo foo_found vs found_foo naming convention
-    let mut found_ply = false;
+    let mut ply_found = false;
     let mut read_state = HeaderReadState::Meta;
     let mut format = None;
     let mut n_vertices: Option<usize> = None;
@@ -401,9 +400,9 @@ where
             continue;
         }
 
-        if !found_ply {
+        if !ply_found {
             if line == "ply" {
-                found_ply = true;
+                ply_found = true;
                 continue;
             }
             return Err(PlyError::LoadStartNotFound);
@@ -545,7 +544,7 @@ where
 
         //@todo use if let
         if line == "end_header"
-            && found_ply
+            && ply_found
             && format.is_some()
             && n_vertices.is_some()
             && n_faces.is_some()
