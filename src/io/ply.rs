@@ -588,9 +588,15 @@ where
                     }
                 }
                 PlyHeaderReadState::Face => {
-                    if line.contains("vertex_indices") {
-                        //@todo later parse the real structure here
-                        face_structure_found = true
+                    if line.starts_with("property list") {
+                        if line.contains("vertex_indices") {
+                            //@todo later parse the real structure here
+                            face_structure_found = true
+                        } else {
+                            //@todo better error
+                            //@todo currently can't handle multiple property list lines (also unlikely)
+                            return Err(PlyError::LineParse(*i_line));
+                        }
                     } else {
                         let mut words = to_words(line);
                         words.next(); // skip "property"
