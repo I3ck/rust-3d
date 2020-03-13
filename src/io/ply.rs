@@ -160,6 +160,15 @@ where
     })
 }
 
+fn skip_bytes<R>(read: &mut R, n_bytes: usize)
+where
+    R: Read,
+{
+    for _ in 0..n_bytes {
+        let _ = read.read_u8();
+    }
+}
+
 //@todo property list must also be considered
 //@todo must consider case where properties / to skip are defined per face and not per vertex
 //@todo settings this must track its scope (if after element vertex or element face)
@@ -756,40 +765,37 @@ where
     BO: ByteOrder,
 {
     for _ in 0..header.n_vertices {
-        for _ in 0..header.vertex_format.before.bytes {
-            let _ = read.read_u8();
-        }
+        skip_bytes(read, header.vertex_format.before.bytes);
+
         let x = read_vertex_type::<BO, _>(read, &header.vertex_format.first)?;
-        for _ in 0..header.vertex_format.between_first_snd.bytes {
-            let _ = read.read_u8();
-        }
+
+        skip_bytes(read, header.vertex_format.between_first_snd.bytes);
+
         let y = read_vertex_type::<BO, _>(read, &header.vertex_format.snd)?;
-        for _ in 0..header.vertex_format.between_snd_third.bytes {
-            let _ = read.read_u8();
-        }
+
+        skip_bytes(read, header.vertex_format.between_snd_third.bytes);
+
         let z = read_vertex_type::<BO, _>(read, &header.vertex_format.third)?;
-        for _ in 0..header.vertex_format.after.bytes {
-            let _ = read.read_u8();
-        }
+
+        skip_bytes(read, header.vertex_format.after.bytes);
 
         mesh.add_vertex(P::new(x, y, z));
     }
 
     for _ in 0..header.n_faces {
-        for _ in 0..header.face_format.before.bytes {
-            let _ = read.read_u8();
-        }
+        skip_bytes(read, header.face_format.before.bytes);
+
         let element_count = read_face_type::<BO, _>(read, &header.face_format.count)?;
+
         if element_count != 3 {
             return Err(PlyError::LineParse(0)); //@todo incorrect face structure
         }
+
         let a = read_face_type::<BO, _>(read, &header.face_format.index)?;
         let b = read_face_type::<BO, _>(read, &header.face_format.index)?;
         let c = read_face_type::<BO, _>(read, &header.face_format.index)?;
 
-        for _ in 0..header.face_format.after.bytes {
-            let _ = read.read_u8();
-        }
+        skip_bytes(read, header.face_format.after.bytes);
 
         //@todo new error without line information!?
         mesh.try_add_connection(
