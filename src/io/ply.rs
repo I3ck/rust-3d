@@ -462,7 +462,7 @@ where
             match read_state {
                 HeaderReadState::Vertex => {
                     let mut words = to_words(line);
-                    words.next(); // skip "property"
+                    skip_n(&mut words, 1); // skip "property"
 
                     let t = Type::from_str(words.next().unwrap()).unwrap(); //@todo error handling, invalid property line
                     let id = words.next().unwrap(); //@todo see above
@@ -502,8 +502,8 @@ where
                         if line.contains("vertex_indices") || line.contains("vertex_index") {
                             //@todo is this properly defined?
                             let mut words = to_words(line);
-                            words.next(); // skip "property"
-                            words.next(); // skip "list"
+                            skip_n(&mut words, 2); // skip "property" and "list"
+
                             let t_count =
                                 FaceType::from_type(Type::from_str(words.next().unwrap()).unwrap())
                                     .unwrap(); //@todo error handling, invalid property line
@@ -524,7 +524,7 @@ where
                         }
                     } else {
                         let mut words = to_words(line);
-                        words.next(); // skip "property"
+                        skip_n(&mut words, 1); // skip "property"
                         let t = Type::from_str(words.next().unwrap()).unwrap(); //@todo error handling, invalid property line
                         if face_structure_found {
                             face_after.bytes += t.size_bytes();
@@ -675,18 +675,16 @@ where
         if header.n_vertices > mesh.num_vertices() {
             let mut words = line.split(" ").skip_empty_string();
 
-            //@todo skip words
-            for _ in 0..header.vertex_format.before.words {
-                words.next();
-            }
+            skip_n(&mut words, header.vertex_format.before.words);
+
             let first = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
-            for _ in 0..header.vertex_format.between_first_snd.words {
-                words.next();
-            }
+
+            skip_n(&mut words, header.vertex_format.between_first_snd.words);
+
             let snd = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
-            for _ in 0..header.vertex_format.between_snd_third.words {
-                words.next();
-            }
+
+            skip_n(&mut words, header.vertex_format.between_snd_third.words);
+
             let third = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
                                                                        // no need to skip 'after' since we're done with this line anyway
 
@@ -774,6 +772,15 @@ where
 {
     for _ in 0..n_bytes {
         let _ = read.read_u8();
+    }
+}
+
+fn skip_n<I>(i: &mut I, n: usize)
+where
+    I: Iterator,
+{
+    for _ in 0..n {
+        i.next();
     }
 }
 
