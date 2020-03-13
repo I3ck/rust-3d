@@ -26,7 +26,7 @@ use crate::*;
 
 use byteorder::{BigEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 
-use core::str::FromStr;
+use core::{convert::TryFrom, str::FromStr};
 
 use std::io::{BufRead, Read, Write};
 
@@ -464,20 +464,20 @@ where
                     let mut words = to_words(line);
                     skip_n(&mut words, 1); // skip "property"
 
-                    let t = Type::from_str(words.next().unwrap()).unwrap(); //@todo error handling, invalid property line
+                    let t = Type::try_from(words.next().unwrap())?; //@todo error handling, invalid property line
                     let id = words.next().unwrap(); //@todo see above
                     if id == "x" {
-                        x_type = Some(VertexType::from_type(t).unwrap()); //@todo see above
+                        x_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::X;
                         i_vertex_order += 1;
                     } else if id == "y" {
-                        y_type = Some(VertexType::from_type(t).unwrap()); //@todo see above
+                        y_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Y;
                         i_vertex_order += 1;
                     } else if id == "z" {
-                        z_type = Some(VertexType::from_type(t).unwrap()); //@todo see above
+                        z_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Z;
                         i_vertex_order += 1;
@@ -504,12 +504,12 @@ where
                             let mut words = to_words(line);
                             skip_n(&mut words, 2); // skip "property" and "list"
 
-                            let t_count =
-                                FaceType::from_type(Type::from_str(words.next().unwrap()).unwrap())
-                                    .unwrap(); //@todo error handling, invalid property line
-                            let t_index =
-                                FaceType::from_type(Type::from_str(words.next().unwrap()).unwrap())
-                                    .unwrap(); //@todo error handling, invalid property line
+                            let t_count = FaceType::try_from(Type::try_from(
+                                words.next().ok_or(PlyError::InvalidProperty(*i_line))?,
+                            )?)?;
+                            let t_index = FaceType::try_from(Type::try_from(
+                                words.next().ok_or(PlyError::InvalidProperty(*i_line))?,
+                            )?)?;
 
                             face_count_type = Some(t_count);
                             face_index_type = Some(t_index);
@@ -525,7 +525,9 @@ where
                     } else {
                         let mut words = to_words(line);
                         skip_n(&mut words, 1); // skip "property"
-                        let t = Type::from_str(words.next().unwrap()).unwrap(); //@todo error handling, invalid property line
+                        let t = Type::try_from(
+                            words.next().ok_or(PlyError::InvalidProperty(*i_line))?,
+                        )?;
                         if face_structure_found {
                             face_after.bytes += t.size_bytes();
                             face_after.words += 1;
@@ -800,20 +802,6 @@ enum Type {
 }
 
 impl Type {
-    pub fn from_str(x: &str) -> Option<Self> {
-        match x {
-            "char" => Some(Self::Char),
-            "uchar" => Some(Self::UChar),
-            "short" => Some(Self::Short),
-            "ushort" => Some(Self::UShort),
-            "int" => Some(Self::Int),
-            "uint" => Some(Self::UInt),
-            "float" | "float32" => Some(Self::Float),
-            "double" | "float64" => Some(Self::Double),
-            _ => None,
-        }
-    }
-
     pub fn size_bytes(&self) -> usize {
         match self {
             Self::Char => 1,
@@ -824,6 +812,24 @@ impl Type {
             Self::UInt => 4,
             Self::Float => 4,
             Self::Double => 8,
+        }
+    }
+}
+
+impl TryFrom<&str> for Type {
+    type Error = PlyError;
+
+    fn try_from(x: &str) -> PlyResult<Self> {
+        match x {
+            "char" => Ok(Self::Char),
+            "uchar" => Ok(Self::UChar),
+            "short" => Ok(Self::Short),
+            "ushort" => Ok(Self::UShort),
+            "int" => Ok(Self::Int),
+            "uint" => Ok(Self::UInt),
+            "float" | "float32" => Ok(Self::Float),
+            "double" | "float64" => Ok(Self::Double),
+            _ => Err(PlyError::InvalidType(x.to_string())),
         }
     }
 }
@@ -881,13 +887,14 @@ enum VertexType {
     Double,
 }
 
-impl VertexType {
-    //@todo TryFrom
-    pub fn from_type(x: Type) -> Option<Self> {
+impl TryFrom<Type> for VertexType {
+    type Error = PlyError;
+
+    fn try_from(x: Type) -> PlyResult<Self> {
         match x {
-            Type::Float => Some(Self::Float),
-            Type::Double => Some(Self::Double),
-            _ => None,
+            Type::Float => Ok(Self::Float),
+            Type::Double => Ok(Self::Double),
+            _ => Err(PlyError::InvalidVertexType),
         }
     }
 }
@@ -904,17 +911,18 @@ enum FaceType {
     UInt,
 }
 
-impl FaceType {
-    //@todo TryFrom
-    pub fn from_type(x: Type) -> Option<Self> {
+impl TryFrom<Type> for FaceType {
+    type Error = PlyError;
+
+    fn try_from(x: Type) -> PlyResult<Self> {
         match x {
-            Type::Char => Some(Self::Char),
-            Type::UChar => Some(Self::UChar),
-            Type::Short => Some(Self::Short),
-            Type::UShort => Some(Self::UShort),
-            Type::Int => Some(Self::Int),
-            Type::UInt => Some(Self::UInt),
-            _ => None,
+            Type::Char => Ok(Self::Char),
+            Type::UChar => Ok(Self::UChar),
+            Type::Short => Ok(Self::Short),
+            Type::UShort => Ok(Self::UShort),
+            Type::Int => Ok(Self::Int),
+            Type::UInt => Ok(Self::UInt),
+            _ => Err(PlyError::InvalidFaceType),
         }
     }
 }

@@ -73,8 +73,13 @@ pub enum PlyError {
     LoadVertexCountIncorrect,
     AccessFile,
     ColorArrayIncorrectLength,
+    //@todo these all could name the affected line
+    InvalidType(String),
+    InvalidVertexType, //@todo would be better to name the issue
+    InvalidFaceType,   //@todo would be better to name the issue
     InvalidMeshIndices(usize),
     LineParse(usize),
+    InvalidProperty(usize),
 }
 
 pub enum StlError {
@@ -172,11 +177,15 @@ impl fmt::Debug for PlyError {
             Self::ColorArrayIncorrectLength => {
                 write!(f, "The provided color array has an incorrect length")
             }
+            Self::InvalidType(x) => write!(f, "Invalid type in header '{}'", x),
+            Self::InvalidVertexType => write!(f, "Invalid vertex type in header"),
+            Self::InvalidFaceType => write!(f, "Invalid face type in header"),
             Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::InvalidMeshIndices(x) => {
                 write!(f, "File contains invalid mesh indices on line {}", x)
             }
+            Self::InvalidProperty(x) => write!(f, "Invalid property on line {}", x),
         }
     }
 }
