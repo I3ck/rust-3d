@@ -44,8 +44,6 @@ float -> 4 bytes
 double -> 8 bytes
 */
 
-//@todo allow for any x/y/z order when loading
-
 enum PlyType {
     Char,
     UChar,
@@ -55,6 +53,39 @@ enum PlyType {
     UInt,
     Float,
     Double,
+}
+
+#[derive(Debug)]
+enum Xyz {
+    X,
+    Y,
+    Z,
+}
+
+#[derive(Debug)]
+enum VertexOrder {
+    Xyz,
+    Xzy,
+    Yxz,
+    Yzx,
+    Zxy,
+    Zyx,
+}
+
+impl VertexOrder {
+    //@todo try_from
+    pub fn from_arr(x: [Xyz; 3]) -> Option<Self> {
+        println!("{:?}", x);
+        match x {
+            [Xyz::X, Xyz::Y, Xyz::Z] => Some(Self::Xyz),
+            [Xyz::X, Xyz::Z, Xyz::Y] => Some(Self::Xzy),
+            [Xyz::Y, Xyz::X, Xyz::Z] => Some(Self::Yxz),
+            [Xyz::Y, Xyz::Z, Xyz::X] => Some(Self::Yzx),
+            [Xyz::Z, Xyz::X, Xyz::Y] => Some(Self::Zxy),
+            [Xyz::Z, Xyz::Y, Xyz::X] => Some(Self::Zyx),
+            _ => None,
+        }
+    }
 }
 
 impl PlyType {
@@ -174,6 +205,7 @@ where
 //@todo settings this must track its scope (if after element vertex or element face)
 #[derive(Debug)]
 struct PlyVertexFormat {
+    pub order: VertexOrder,
     pub first: PlyVertexType,
     pub snd: PlyVertexType,
     pub third: PlyVertexType,
@@ -532,6 +564,9 @@ fn load_ply_header<R>(
 where
     R: BufRead,
 {
+    let mut vertex_order = [Xyz::X, Xyz::X, Xyz::X];
+    let mut i_vertex_order = 0;
+
     //@todo foo_found vs found_foo naming convention
     let mut found_ply = false;
     let mut read_state = PlyHeaderReadState::Meta;
@@ -638,33 +673,35 @@ where
 
                     let t = PlyType::from_str(words.next().unwrap()).unwrap(); //@todo error handling, invalid property line
                     let id = words.next().unwrap(); //@todo see above
-                    if n_types_found == 0 {
-                        if id == "x" {
-                            x_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
-                            n_types_found += 1;
-                        } else {
+                    if id == "x" {
+                        x_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
+                        n_types_found += 1;
+                        vertex_order[i_vertex_order] = Xyz::X;
+                        i_vertex_order += 1;
+                    } else if id == "y" {
+                        y_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
+                        n_types_found += 1;
+                        vertex_order[i_vertex_order] = Xyz::Y;
+                        i_vertex_order += 1;
+                    } else if id == "z" {
+                        z_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
+                        n_types_found += 1;
+                        vertex_order[i_vertex_order] = Xyz::Z;
+                        i_vertex_order += 1;
+                    } else {
+                        if n_types_found == 0 {
                             before.bytes += t.size_bytes();
                             before.words += 1;
-                        }
-                    } else if n_types_found == 1 {
-                        if id == "y" {
-                            y_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
-                            n_types_found += 1;
-                        } else {
+                        } else if n_types_found == 1 {
                             between_first_snd.bytes += t.size_bytes();
                             between_first_snd.words += 1;
-                        }
-                    } else if n_types_found == 2 {
-                        if id == "z" {
-                            z_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
-                            n_types_found += 1;
-                        } else {
+                        } else if n_types_found == 2 {
                             between_snd_third.bytes += t.size_bytes();
                             between_snd_third.words += 1;
+                        } else {
+                            after.bytes += t.size_bytes();
+                            after.words += 1;
                         }
-                    } else {
-                        after.bytes += t.size_bytes();
-                        after.words += 1;
                     }
                 }
                 PlyHeaderReadState::Face => {
@@ -733,6 +770,7 @@ where
                 n_vertices: n_vertices.unwrap(),
                 n_faces: n_faces.unwrap(),
                 vertex_format: PlyVertexFormat {
+                    order: VertexOrder::from_arr(vertex_order).unwrap(), //@todo this unwrap is currently not safe
                     first: x_type.unwrap(),
                     snd: y_type.unwrap(),
                     third: z_type.unwrap(),
@@ -767,19 +805,28 @@ where
     for _ in 0..header.n_vertices {
         skip_bytes(read, header.vertex_format.before.bytes);
 
-        let x = read_vertex_type::<BO, _>(read, &header.vertex_format.first)?;
+        let first = read_vertex_type::<BO, _>(read, &header.vertex_format.first)?;
 
         skip_bytes(read, header.vertex_format.between_first_snd.bytes);
 
-        let y = read_vertex_type::<BO, _>(read, &header.vertex_format.snd)?;
+        let snd = read_vertex_type::<BO, _>(read, &header.vertex_format.snd)?;
 
         skip_bytes(read, header.vertex_format.between_snd_third.bytes);
 
-        let z = read_vertex_type::<BO, _>(read, &header.vertex_format.third)?;
+        let third = read_vertex_type::<BO, _>(read, &header.vertex_format.third)?;
 
         skip_bytes(read, header.vertex_format.after.bytes);
 
-        mesh.add_vertex(P::new(x, y, z));
+        //@todo duplicate code, write helper
+        let p = match header.vertex_format.order {
+            VertexOrder::Xyz => P::new(first, snd, third),
+            VertexOrder::Xzy => P::new(first, third, snd),
+            VertexOrder::Yxz => P::new(snd, first, third),
+            VertexOrder::Yzx => P::new(snd, third, first),
+            VertexOrder::Zxy => P::new(third, first, snd),
+            VertexOrder::Zyx => P::new(third, snd, first),
+        };
+        mesh.add_vertex(p);
     }
 
     for _ in 0..header.n_faces {
@@ -832,21 +879,33 @@ where
 
         if header.n_vertices > mesh.num_vertices() {
             let mut words = line.split(" ").skip_empty_string();
+
+            //@todo skip words
             for _ in 0..header.vertex_format.before.words {
                 words.next();
             }
-            let x = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
+            let first = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
             for _ in 0..header.vertex_format.between_first_snd.words {
                 words.next();
             }
-            let y = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
+            let snd = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
             for _ in 0..header.vertex_format.between_snd_third.words {
                 words.next();
             }
-            let z = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
-                                                                   // no need to skip 'after' since we're done with this line anyway
+            let third = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
+                                                                       // no need to skip 'after' since we're done with this line anyway
 
-            mesh.add_vertex(P::new(x, y, z));
+            //@todo duplicate code, write helper
+            let p = match header.vertex_format.order {
+                VertexOrder::Xyz => P::new(first, snd, third),
+                VertexOrder::Xzy => P::new(first, third, snd),
+                VertexOrder::Yxz => P::new(snd, first, third),
+                VertexOrder::Yzx => P::new(snd, third, first),
+                VertexOrder::Zxy => P::new(third, first, snd),
+                VertexOrder::Zyx => P::new(third, snd, first),
+            };
+            mesh.add_vertex(p);
+
             continue;
         }
 
