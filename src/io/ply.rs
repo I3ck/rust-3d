@@ -107,6 +107,42 @@ impl PlyVertexType {
     }
 }
 
+#[derive(Debug)]
+enum PlyFaceType {
+    Char,
+    UChar,
+    Short,
+    UShort,
+    Int,
+    UInt,
+}
+
+impl PlyFaceType {
+    //@todo TryFrom
+    pub fn from_ply_type(x: PlyType) -> Option<Self> {
+        match x {
+            PlyType::Char=> Some(Self::Char),
+            PlyType::UChar=> Some(Self::UChar),
+            PlyType::Short => Some(Self::Short),
+            PlyType::UShort => Some(Self::UShort),
+            PlyType::Int => Some(Self::Int),
+            PlyType::UInt => Some(Self::UInt),
+            _ => None,
+        }
+    }
+}
+
+fn read_face_type<BO, R>(read: &mut R, t: &PlyFaceType) -> PlyResult<usize> where BO: ByteOrder, R: Read {
+    Ok(match t {
+        PlyFaceType::Char => read.read_i8()? as usize,
+        PlyFaceType::UChar => read.read_u8()? as usize,
+        PlyFaceType::Short => read.read_i16::<BO>()? as usize,
+        PlyFaceType::UShort => read.read_u16::<BO>()? as usize,
+        PlyFaceType::Int => read.read_i32::<BO>()? as usize,
+        PlyFaceType::UInt => read.read_u32::<BO>()? as usize,
+    })
+}
+
 //@todo property list must also be considered
 //@todo must consider case where properties / to skip are defined per face and not per vertex
 //@todo settings this must track its scope (if after element vertex or element face)
@@ -124,6 +160,8 @@ struct PlyVertexFormat {
 //@todo must also check structure itself, not just padding
 #[derive(Debug)]
 struct PlyFaceFormat {
+    pub count: PlyFaceType,
+    pub index: PlyFaceType,
     pub before: BytesWords,
     pub after: BytesWords,
 }
@@ -485,6 +523,8 @@ where
     let mut between_y_z = BytesWords::default();
     let mut after = BytesWords::default();
 
+    let mut face_count_type = None;
+    let mut face_index_type = None;
     let mut face_before = BytesWords::default();
     let mut face_after = BytesWords::default();
     let mut face_structure_found = false;
@@ -503,11 +543,6 @@ where
         }
 
         if line.starts_with("obj_info") {
-            continue;
-        }
-
-        //@todo must ensure line present and matches expected format
-        if line.starts_with("property list") {
             continue;
         }
 
@@ -545,7 +580,26 @@ where
                         _ => return Err(PlyError::LineParse(*i_line)),
                     }
                 }
-                return Err(PlyError::LineParse(*i_line));
+            }
+            Some(_) => {}
+        }
+
+        match n_faces {
+            None => {
+                if line.starts_with("element face") {
+                    read_state = PlyHeaderReadState::Face;
+                    let mut words = to_words(&line);
+                    match words.clone().count() {
+                        3 => {
+                            n_faces = Some(
+                                usize::from_str(words.nth(2).unwrap())
+                                    .map_err(|_| PlyError::LineParse(*i_line))?,
+                            );
+                            continue;
+                        }
+                        _ => return Err(PlyError::LineParse(*i_line)),
+                    }
+                }
             }
             Some(_) => {}
         }
@@ -590,6 +644,16 @@ where
                 PlyHeaderReadState::Face => {
                     if line.starts_with("property list") {
                         if line.contains("vertex_indices") {
+                            let mut words = to_words(line);
+                            words.next(); // skip "property"
+                            words.next(); // skip "list"
+                            let t_count = PlyFaceType::from_ply_type(PlyType::from_str(words.next().unwrap()).unwrap()).unwrap(); //@todo error handling, invalid property line
+                            let t_index = PlyFaceType::from_ply_type(PlyType::from_str(words.next().unwrap()).unwrap()).unwrap(); //@todo error handling, invalid property line
+
+                            face_count_type = Some(t_count);
+                            face_index_type = Some(t_index);
+
+                            //@todo remove bool
                             //@todo later parse the real structure here
                             face_structure_found = true
                         } else {
@@ -617,26 +681,6 @@ where
             continue;
         }
 
-        match n_faces {
-            None => {
-                if line.starts_with("element face") {
-                    read_state = PlyHeaderReadState::Face;
-                    let mut words = to_words(&line);
-                    match words.clone().count() {
-                        3 => {
-                            n_faces = Some(
-                                usize::from_str(words.nth(2).unwrap())
-                                    .map_err(|_| PlyError::LineParse(*i_line))?,
-                            );
-                            continue;
-                        }
-                        _ => return Err(PlyError::LineParse(*i_line)),
-                    }
-                }
-                return Err(PlyError::LineParse(*i_line));
-            }
-            Some(_) => {}
-        }
         //@todo use if let
         if line == "end_header"
             && found_ply
@@ -646,6 +690,8 @@ where
             && x_type.is_some()
             && y_type.is_some()
             && z_type.is_some()
+            && face_count_type.is_some()
+            && face_index_type.is_some()
         {
             //@todo nicer way to write this
             // safe due to if above
@@ -665,6 +711,8 @@ where
                 face_format: PlyFaceFormat {
                     before: face_before,
                     after: face_after,
+                    count: face_count_type.unwrap(),
+                    index: face_index_type.unwrap(),
                 },
             });
         }
@@ -712,15 +760,17 @@ where
         mesh.add_vertex(P::new(x, y, z));
     }
 
-    //@todo must work with any int precision
     for _ in 0..header.n_faces {
         for _ in 0..header.face_format.before.bytes {
             let _ = read.read_u8();
         }
-        let _element_count = read.read_u8()?; //@todo fail if not == 3
-        let a = read.read_i32::<BO>()?;
-        let b = read.read_i32::<BO>()?;
-        let c = read.read_i32::<BO>()?;
+        let element_count = read_face_type::<BO, _>(read, &header.face_format.count)?;
+        if element_count != 3 {
+            return Err(PlyError::LineParse(0)); //@todo incorrect face structure
+        }
+        let a = read_face_type::<BO, _>(read, &header.face_format.index)?;
+        let b = read_face_type::<BO, _>(read, &header.face_format.index)?;
+        let c = read_face_type::<BO, _>(read, &header.face_format.index)?;
 
         for _ in 0..header.face_format.after.bytes {
             let _ = read.read_u8();
