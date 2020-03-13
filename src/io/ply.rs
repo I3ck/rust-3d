@@ -64,8 +64,8 @@ impl PlyType {
             "ushort" => Some(Self::UShort),
             "int" => Some(Self::Int),
             "uint" => Some(Self::UInt),
-            "float" => Some(Self::Float),
-            "double" => Some(Self::Double),
+            "float" | "float32" => Some(Self::Float),
+            "double" | "float64" => Some(Self::Double),
             _ => None,
         }
     }
