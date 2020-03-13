@@ -121,8 +121,8 @@ impl PlyFaceType {
     //@todo TryFrom
     pub fn from_ply_type(x: PlyType) -> Option<Self> {
         match x {
-            PlyType::Char=> Some(Self::Char),
-            PlyType::UChar=> Some(Self::UChar),
+            PlyType::Char => Some(Self::Char),
+            PlyType::UChar => Some(Self::UChar),
             PlyType::Short => Some(Self::Short),
             PlyType::UShort => Some(Self::UShort),
             PlyType::Int => Some(Self::Int),
@@ -132,7 +132,11 @@ impl PlyFaceType {
     }
 }
 
-fn read_face_type<BO, R>(read: &mut R, t: &PlyFaceType) -> PlyResult<usize> where BO: ByteOrder, R: Read {
+fn read_face_type<BO, R>(read: &mut R, t: &PlyFaceType) -> PlyResult<usize>
+where
+    BO: ByteOrder,
+    R: Read,
+{
     Ok(match t {
         PlyFaceType::Char => read.read_i8()? as usize,
         PlyFaceType::UChar => read.read_u8()? as usize,
@@ -644,11 +648,18 @@ where
                 PlyHeaderReadState::Face => {
                     if line.starts_with("property list") {
                         if line.contains("vertex_indices") {
+                            //@todo is this properly defined?
                             let mut words = to_words(line);
                             words.next(); // skip "property"
                             words.next(); // skip "list"
-                            let t_count = PlyFaceType::from_ply_type(PlyType::from_str(words.next().unwrap()).unwrap()).unwrap(); //@todo error handling, invalid property line
-                            let t_index = PlyFaceType::from_ply_type(PlyType::from_str(words.next().unwrap()).unwrap()).unwrap(); //@todo error handling, invalid property line
+                            let t_count = PlyFaceType::from_ply_type(
+                                PlyType::from_str(words.next().unwrap()).unwrap(),
+                            )
+                            .unwrap(); //@todo error handling, invalid property line
+                            let t_index = PlyFaceType::from_ply_type(
+                                PlyType::from_str(words.next().unwrap()).unwrap(),
+                            )
+                            .unwrap(); //@todo error handling, invalid property line
 
                             face_count_type = Some(t_count);
                             face_index_type = Some(t_index);
