@@ -121,11 +121,24 @@ struct PlyVertexFormat {
     pub after: BytesWords,
 }
 
+//@todo must also check structure itself, not just padding
+#[derive(Debug)]
+struct PlyFaceFormat {
+    pub before: BytesWords,
+    pub after: BytesWords,
+}
+
 #[derive(Debug)]
 enum PlyFormat {
     Ascii,
     LittleEndian,
     BigEndian,
+}
+
+enum PlyHeaderReadState {
+    Meta,
+    Vertex,
+    Face,
 }
 
 #[derive(Debug)]
@@ -134,6 +147,7 @@ struct PlyHeader {
     pub n_vertices: usize,
     pub n_faces: usize,
     pub vertex_format: PlyVertexFormat,
+    pub face_format: PlyFaceFormat,
 }
 
 /// Saves an IsMesh3D in the ASCII .ply file format
@@ -456,6 +470,7 @@ where
 {
     //@todo foo_found vs found_foo naming convention
     let mut found_ply = false;
+    let mut read_state = PlyHeaderReadState::Meta;
     let mut format = None;
     let mut n_vertices: Option<usize> = None;
     let mut n_faces: Option<usize> = None;
@@ -464,10 +479,15 @@ where
     let mut y_type = None;
     let mut z_type = None;
     let mut n_types_found = 0;
+    //@todo rename these, since now misleading whether vertex or face
     let mut before = BytesWords::default();
     let mut between_x_y = BytesWords::default();
     let mut between_y_z = BytesWords::default();
     let mut after = BytesWords::default();
+
+    let mut face_before = BytesWords::default();
+    let mut face_after = BytesWords::default();
+    let mut face_structure_found = false;
 
     loop {
         line_buffer.clear();
@@ -512,6 +532,7 @@ where
         match n_vertices {
             None => {
                 if line.starts_with("element vertex") {
+                    read_state = PlyHeaderReadState::Vertex;
                     let mut words = to_words(&line);
                     match words.clone().count() {
                         3 => {
@@ -530,38 +551,61 @@ where
         }
 
         if line.starts_with("property") {
-            let mut words = to_words(line);
-            words.next(); // skip "property"
+            match read_state {
+                PlyHeaderReadState::Vertex => {
+                    let mut words = to_words(line);
+                    words.next(); // skip "property"
 
-            let t = PlyType::from_str(words.next().unwrap()).unwrap(); //@todo error handling, invalid property line
-            let id = words.next().unwrap(); //@todo see above
-            if n_types_found == 0 {
-                if id == "x" {
-                    x_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
-                    n_types_found += 1;
-                } else {
-                    before.bytes += t.size_bytes();
-                    before.words += 1;
+                    let t = PlyType::from_str(words.next().unwrap()).unwrap(); //@todo error handling, invalid property line
+                    let id = words.next().unwrap(); //@todo see above
+                    if n_types_found == 0 {
+                        if id == "x" {
+                            x_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
+                            n_types_found += 1;
+                        } else {
+                            before.bytes += t.size_bytes();
+                            before.words += 1;
+                        }
+                    } else if n_types_found == 1 {
+                        if id == "y" {
+                            y_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
+                            n_types_found += 1;
+                        } else {
+                            between_x_y.bytes += t.size_bytes();
+                            between_x_y.words += 1;
+                        }
+                    } else if n_types_found == 2 {
+                        if id == "z" {
+                            z_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
+                            n_types_found += 1;
+                        } else {
+                            between_y_z.bytes += t.size_bytes();
+                            between_y_z.words += 1;
+                        }
+                    } else {
+                        after.bytes += t.size_bytes();
+                        after.words += 1;
+                    }
                 }
-            } else if n_types_found == 1 {
-                if id == "y" {
-                    y_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
-                    n_types_found += 1;
-                } else {
-                    between_x_y.bytes += t.size_bytes();
-                    between_x_y.words += 1;
+                PlyHeaderReadState::Face => {
+                    if line.contains("vertex_indices") {
+                        //@todo later parse the real structure here
+                        face_structure_found = true
+                    } else {
+                        let mut words = to_words(line);
+                        words.next(); // skip "property"
+                        let t = PlyType::from_str(words.next().unwrap()).unwrap(); //@todo error handling, invalid property line
+                        if face_structure_found {
+                            face_after.bytes += t.size_bytes();
+                            face_after.words += 1;
+                        } else {
+                            face_before.bytes += t.size_bytes();
+                            face_before.words += 1;
+                        }
+                    }
+                    //@todo
                 }
-            } else if n_types_found == 2 {
-                if id == "z" {
-                    z_type = Some(PlyVertexType::from_ply_type(t).unwrap()); //@todo see above
-                    n_types_found += 1;
-                } else {
-                    between_y_z.bytes += t.size_bytes();
-                    between_y_z.words += 1;
-                }
-            } else {
-                after.bytes += t.size_bytes();
-                after.words += 1;
+                _ => return Err(PlyError::LineParse(*i_line)), //@todo better error
             }
 
             continue;
@@ -570,6 +614,7 @@ where
         match n_faces {
             None => {
                 if line.starts_with("element face") {
+                    read_state = PlyHeaderReadState::Face;
                     let mut words = to_words(&line);
                     match words.clone().count() {
                         3 => {
@@ -586,7 +631,7 @@ where
             }
             Some(_) => {}
         }
-
+        //@todo use if let
         if line == "end_header"
             && found_ply
             && format.is_some()
@@ -610,6 +655,10 @@ where
                     between_x_y,
                     between_y_z,
                     after,
+                },
+                face_format: PlyFaceFormat {
+                    before: face_before,
+                    after: face_after,
                 },
             });
         }
@@ -659,10 +708,17 @@ where
 
     //@todo must work with any int precision
     for _ in 0..header.n_faces {
-        let _element_count = read.read_u8()?;
+        for _ in 0..header.face_format.before.bytes {
+            let _ = read.read_u8();
+        }
+        let _element_count = read.read_u8()?; //@todo fail if not == 3
         let a = read.read_i32::<BO>()?;
         let b = read.read_i32::<BO>()?;
         let c = read.read_i32::<BO>()?;
+
+        for _ in 0..header.face_format.after.bytes {
+            let _ = read.read_u8();
+        }
 
         //@todo new error without line information!?
         mesh.try_add_connection(
