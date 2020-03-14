@@ -363,13 +363,14 @@ where
 
     let mut ply_found = false;
     let mut read_state = HeaderReadState::Meta;
-    let mut format = None;
-    let mut n_vertices: Option<usize> = None;
-    let mut n_faces: Option<usize> = None;
+    let mut opt_format = None;
+    let mut opt_n_vertices: Option<usize> = None;
+    let mut opt_n_faces: Option<usize> = None;
 
-    let mut x_type = None;
-    let mut y_type = None;
-    let mut z_type = None;
+    //@todo rename first snd third
+    let mut opt_x_type = None;
+    let mut opt_y_type = None;
+    let mut opt_z_type = None;
     let mut n_types_found = 0;
     //@todo rename these, since now misleading whether vertex or face
     let mut before = BytesWords::default();
@@ -377,8 +378,8 @@ where
     let mut between_snd_third = BytesWords::default();
     let mut after = BytesWords::default();
 
-    let mut face_count_type = None;
-    let mut face_index_type = None;
+    let mut opt_face_count_type = None;
+    let mut opt_face_index_type = None;
     let mut face_before = BytesWords::default();
     let mut face_after = BytesWords::default();
     let mut face_structure_found = false;
@@ -408,8 +409,8 @@ where
             return Err(PlyError::LoadStartNotFound);
         }
 
-        if format.is_none() {
-            format = Some(match line {
+        if opt_format.is_none() {
+            opt_format = Some(match line {
                 "format ascii 1.0" => Format::Ascii,
                 "format binary_little_endian 1.0" => Format::LittleEndian,
                 "format binary_big_endian 1.0" => Format::BigEndian,
@@ -418,7 +419,7 @@ where
             continue;
         }
 
-        match n_vertices {
+        match opt_n_vertices {
             None => {
                 if line.starts_with("element vertex") {
                     read_state = HeaderReadState::Vertex;
@@ -426,7 +427,7 @@ where
                     match words.clone().count() {
                         //@todo avoid copy
                         3 => {
-                            n_vertices = Some(
+                            opt_n_vertices = Some(
                                 usize::from_str(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
                                     .map_err(|_| PlyError::LineParse(*i_line))?,
                             );
@@ -439,7 +440,7 @@ where
             Some(_) => {}
         }
 
-        match n_faces {
+        match opt_n_faces {
             None => {
                 if line.starts_with("element face") {
                     read_state = HeaderReadState::Face;
@@ -447,7 +448,7 @@ where
                     match words.clone().count() {
                         //@todo avoid copy
                         3 => {
-                            n_faces = Some(
+                            opt_n_faces = Some(
                                 usize::from_str(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
                                     .map_err(|_| PlyError::LineParse(*i_line))?,
                             );
@@ -470,17 +471,17 @@ where
                         Type::try_from(words.next().ok_or(PlyError::InvalidProperty(*i_line))?)?;
                     let id = words.next().ok_or(PlyError::InvalidProperty(*i_line))?;
                     if id == "x" {
-                        x_type = Some(VertexType::try_from(t)?);
+                        opt_x_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::X;
                         i_vertex_order += 1;
                     } else if id == "y" {
-                        y_type = Some(VertexType::try_from(t)?);
+                        opt_y_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Y;
                         i_vertex_order += 1;
                     } else if id == "z" {
-                        z_type = Some(VertexType::try_from(t)?);
+                        opt_z_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Z;
                         i_vertex_order += 1;
@@ -514,8 +515,8 @@ where
                                 words.next().ok_or(PlyError::InvalidProperty(*i_line))?,
                             )?)?;
 
-                            face_count_type = Some(t_count);
-                            face_index_type = Some(t_index);
+                            opt_face_count_type = Some(t_count);
+                            opt_face_index_type = Some(t_index);
 
                             //@todo remove bool
                             //@todo later parse the real structure here
@@ -547,41 +548,48 @@ where
             continue;
         }
 
-        //@todo use if let
-        if line == "end_header"
-            && ply_found
-            && format.is_some()
-            && n_vertices.is_some()
-            && n_faces.is_some()
-            && x_type.is_some()
-            && y_type.is_some()
-            && z_type.is_some()
-            && face_count_type.is_some()
-            && face_index_type.is_some()
-        {
-            //@todo nicer way to write this
-            // safe due to if above
-            return Ok(Header {
-                format: format.unwrap(),
-                n_vertices: n_vertices.unwrap(),
-                n_faces: n_faces.unwrap(),
-                vertex_format: VertexFormat {
-                    order: VertexOrder::from_arr(vertex_order).unwrap(), //@todo this unwrap is currently not safe
-                    first: x_type.unwrap(),
-                    snd: y_type.unwrap(),
-                    third: z_type.unwrap(),
-                    before,
-                    between_first_snd,
-                    between_snd_third,
-                    after,
-                },
-                face_format: FaceFormat {
-                    before: face_before,
-                    after: face_after,
-                    count: face_count_type.unwrap(),
-                    index: face_index_type.unwrap(),
-                },
-            });
+        if line == "end_header" && ply_found {
+            if let (
+                Some(format),
+                Some(n_vertices),
+                Some(n_faces),
+                Some(x_type),
+                Some(y_type),
+                Some(z_type),
+                Some(face_count_type),
+                Some(face_index_type),
+            ) = (
+                opt_format,
+                opt_n_vertices,
+                opt_n_faces,
+                opt_x_type,
+                opt_y_type,
+                opt_z_type,
+                opt_face_count_type,
+                opt_face_index_type,
+            ) {
+                return Ok(Header {
+                    format,
+                    n_vertices,
+                    n_faces,
+                    vertex_format: VertexFormat {
+                        order: VertexOrder::try_from(vertex_order)?,
+                        first: x_type,
+                        snd: y_type,
+                        third: z_type,
+                        before,
+                        between_first_snd,
+                        between_snd_third,
+                        after,
+                    },
+                    face_format: FaceFormat {
+                        before: face_before,
+                        after: face_after,
+                        count: face_count_type,
+                        index: face_index_type,
+                    },
+                });
+            }
         }
 
         //@todo better error (header could not be parsed / incorrect)
@@ -861,18 +869,18 @@ enum VertexOrder {
     Zyx,
 }
 
-impl VertexOrder {
-    //@todo try_from
-    pub fn from_arr(x: [Xyz; 3]) -> Option<Self> {
-        println!("{:?}", x);
+impl TryFrom<[Xyz; 3]> for VertexOrder {
+    type Error = PlyError;
+
+    fn try_from(x: [Xyz; 3]) -> PlyResult<Self> {
         match x {
-            [Xyz::X, Xyz::Y, Xyz::Z] => Some(Self::Xyz),
-            [Xyz::X, Xyz::Z, Xyz::Y] => Some(Self::Xzy),
-            [Xyz::Y, Xyz::X, Xyz::Z] => Some(Self::Yxz),
-            [Xyz::Y, Xyz::Z, Xyz::X] => Some(Self::Yzx),
-            [Xyz::Z, Xyz::X, Xyz::Y] => Some(Self::Zxy),
-            [Xyz::Z, Xyz::Y, Xyz::X] => Some(Self::Zyx),
-            _ => None,
+            [Xyz::X, Xyz::Y, Xyz::Z] => Ok(Self::Xyz),
+            [Xyz::X, Xyz::Z, Xyz::Y] => Ok(Self::Xzy),
+            [Xyz::Y, Xyz::X, Xyz::Z] => Ok(Self::Yxz),
+            [Xyz::Y, Xyz::Z, Xyz::X] => Ok(Self::Yzx),
+            [Xyz::Z, Xyz::X, Xyz::Y] => Ok(Self::Zxy),
+            [Xyz::Z, Xyz::Y, Xyz::X] => Ok(Self::Zyx),
+            _ => Err(PlyError::InvalidVertexDimensionDefinition),
         }
     }
 }

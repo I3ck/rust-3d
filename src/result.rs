@@ -81,6 +81,7 @@ pub enum PlyError {
     LineParse(usize),
     InvalidProperty(usize),
     InvalidVertex(usize),
+    InvalidVertexDimensionDefinition,
 }
 
 pub enum StlError {
@@ -188,6 +189,9 @@ impl fmt::Debug for PlyError {
             }
             Self::InvalidProperty(x) => write!(f, "Invalid property on line {}", x),
             Self::InvalidVertex(x) => write!(f, "Invalid vertex definition on line {}", x),
+            Self::InvalidVertexDimensionDefinition => {
+                write!(f, "Invalid order / definition of vertex dimension order")
+            }
         }
     }
 }
