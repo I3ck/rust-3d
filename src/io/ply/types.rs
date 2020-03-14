@@ -167,9 +167,6 @@ impl TryFrom<Type> for FaceType {
 
 //------------------------------------------------------------------------------
 
-//@todo property list must also be considered
-//@todo must consider case where properties / to skip are defined per face and not per vertex
-//@todo settings this must track its scope (if after element vertex or element face)
 #[derive(Debug)]
 pub struct VertexFormat {
     pub order: VertexOrder,
@@ -184,7 +181,6 @@ pub struct VertexFormat {
 
 //------------------------------------------------------------------------------
 
-//@todo must also check structure itself, not just padding
 #[derive(Debug)]
 pub struct FaceFormat {
     pub count: FaceType,
