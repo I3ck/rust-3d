@@ -236,7 +236,7 @@ where
                         }
                     }
                 }
-                _ => return Err(PlyError::LineParse(*i_line)), //@todo better error
+                _ => return Err(PlyError::PropertyLineLocation(*i_line)),
             }
 
             continue;
@@ -330,7 +330,7 @@ where
         let element_count = read_face_type::<BO, _>(read, header.face_format.count)?;
 
         if element_count != 3 {
-            return Err(PlyError::LineParse(0)); //@todo incorrect face structure
+            return Err(PlyError::FaceStructure);
         }
 
         let a = read_face_type::<BO, _>(read, header.face_format.index)?;
@@ -339,13 +339,12 @@ where
 
         skip_bytes(read, header.face_format.after.bytes);
 
-        //@todo new error without line information!?
         mesh.try_add_connection(
             VId { val: a as usize },
             VId { val: b as usize },
             VId { val: c as usize },
         )
-        .map_err(|_| PlyError::InvalidMeshIndices(0))?;
+        .map_err(|_| PlyError::InvalidMeshIndices(None))?;
     }
 
     Ok(())
@@ -405,9 +404,9 @@ where
         }
 
         if header.n_faces > mesh.num_faces() {
-            let [a, b, c] = collect_index_line(&line).ok_or(PlyError::LineParse(*i_line))?;
+            let [a, b, c] = collect_index_line(&line).ok_or(PlyError::FaceStructure)?;
             mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
-                .map_err(|_| PlyError::InvalidMeshIndices(*i_line))?;
+                .map_err(|_| PlyError::InvalidMeshIndices(Some(*i_line)))?;
             continue;
         }
     }

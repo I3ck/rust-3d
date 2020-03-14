@@ -77,10 +77,12 @@ pub enum PlyError {
     InvalidType(String),
     InvalidVertexType, //@todo would be better to name the issue
     InvalidFaceType,   //@todo would be better to name the issue
-    InvalidMeshIndices(usize),
+    InvalidMeshIndices(Option<usize>),
     LineParse(usize),
     InvalidProperty(usize),
     InvalidVertex(usize),
+    PropertyLineLocation(usize),
+    FaceStructure,
     InvalidVertexDimensionDefinition,
 }
 
@@ -184,14 +186,24 @@ impl fmt::Debug for PlyError {
             Self::InvalidFaceType => write!(f, "Invalid face type in header"),
             Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
             Self::AccessFile => write!(f, "Unable to access file"),
-            Self::InvalidMeshIndices(x) => {
-                write!(f, "File contains invalid mesh indices on line {}", x)
-            }
+            Self::InvalidMeshIndices(opt_x) => match opt_x {
+                Some(x) => write!(f, "File contains invalid mesh indices on line {}", x),
+                None => write!(f, "File contains invalid mesh indices"),
+            },
             Self::InvalidProperty(x) => write!(f, "Invalid property on line {}", x),
             Self::InvalidVertex(x) => write!(f, "Invalid vertex definition on line {}", x),
             Self::InvalidVertexDimensionDefinition => {
                 write!(f, "Invalid order / definition of vertex dimension order")
             }
+            Self::PropertyLineLocation(x) => write!(
+                f,
+                "Found property line at unexpected location on line {}",
+                x
+            ),
+            Self::FaceStructure => write!(
+                f,
+                "Invalid face structure, only supporting 3 vertices per face"
+            ),
         }
     }
 }
