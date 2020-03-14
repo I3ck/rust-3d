@@ -46,8 +46,6 @@ where
 
     let header = load_header(read, &mut line_buffer, &mut i_line)?;
 
-    //println!("{:?}", header);
-
     mesh.reserve_vertices(header.n_vertices);
     mesh.reserve_faces(header.n_faces);
 
@@ -75,22 +73,19 @@ where
     let mut opt_n_vertices: Option<usize> = None;
     let mut opt_n_faces: Option<usize> = None;
 
-    //@todo rename first snd third
-    let mut opt_x_type = None;
-    let mut opt_y_type = None;
-    let mut opt_z_type = None;
+    let mut opt_fst_type = None;
+    let mut opt_snd_type = None;
+    let mut opt_third_type = None;
     let mut n_types_found = 0;
-    //@todo rename these, since now misleading whether vertex or face
-    let mut before = BytesWords::default();
-    let mut between_first_snd = BytesWords::default();
-    let mut between_snd_third = BytesWords::default();
+    let mut vertex_before = BytesWords::default();
+    let mut vertex_between_first_snd = BytesWords::default();
+    let mut vertex_between_snd_third = BytesWords::default();
     let mut after = BytesWords::default();
 
     let mut opt_face_count_type = None;
     let mut opt_face_index_type = None;
     let mut face_before = BytesWords::default();
     let mut face_after = BytesWords::default();
-    let mut face_structure_found = false;
 
     loop {
         line_buffer.clear();
@@ -179,30 +174,30 @@ where
                         Type::try_from(words.next().ok_or(PlyError::InvalidProperty(*i_line))?)?;
                     let id = words.next().ok_or(PlyError::InvalidProperty(*i_line))?;
                     if id == "x" {
-                        opt_x_type = Some(VertexType::try_from(t)?);
+                        opt_fst_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::X;
                         i_vertex_order += 1;
                     } else if id == "y" {
-                        opt_y_type = Some(VertexType::try_from(t)?);
+                        opt_snd_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Y;
                         i_vertex_order += 1;
                     } else if id == "z" {
-                        opt_z_type = Some(VertexType::try_from(t)?);
+                        opt_third_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Z;
                         i_vertex_order += 1;
                     } else {
                         if n_types_found == 0 {
-                            before.bytes += t.size_bytes();
-                            before.words += 1;
+                            vertex_before.bytes += t.size_bytes();
+                            vertex_before.words += 1;
                         } else if n_types_found == 1 {
-                            between_first_snd.bytes += t.size_bytes();
-                            between_first_snd.words += 1;
+                            vertex_between_first_snd.bytes += t.size_bytes();
+                            vertex_between_first_snd.words += 1;
                         } else if n_types_found == 2 {
-                            between_snd_third.bytes += t.size_bytes();
-                            between_snd_third.words += 1;
+                            vertex_between_snd_third.bytes += t.size_bytes();
+                            vertex_between_snd_third.words += 1;
                         } else {
                             after.bytes += t.size_bytes();
                             after.words += 1;
@@ -211,8 +206,8 @@ where
                 }
                 HeaderReadState::Face => {
                     if line.starts_with("property list") {
+                        //@todo is this properly defined or are there other identifiers?
                         if line.contains("vertex_indices") || line.contains("vertex_index") {
-                            //@todo is this properly defined?
                             let mut words = to_words(line);
                             skip_n(&mut words, 2); // skip "property" and "list"
 
@@ -225,14 +220,6 @@ where
 
                             opt_face_count_type = Some(t_count);
                             opt_face_index_type = Some(t_index);
-
-                            //@todo remove bool
-                            //@todo later parse the real structure here
-                            face_structure_found = true
-                        } else {
-                            //@todo better error
-                            //@todo currently can't handle multiple property list lines (also unlikely)
-                            return Err(PlyError::LineParse(*i_line));
                         }
                     } else {
                         let mut words = to_words(line);
@@ -240,7 +227,7 @@ where
                         let t = Type::try_from(
                             words.next().ok_or(PlyError::InvalidProperty(*i_line))?,
                         )?;
-                        if face_structure_found {
+                        if opt_face_count_type.is_some() {
                             face_after.bytes += t.size_bytes();
                             face_after.words += 1;
                         } else {
@@ -248,7 +235,6 @@ where
                             face_before.words += 1;
                         }
                     }
-                    //@todo
                 }
                 _ => return Err(PlyError::LineParse(*i_line)), //@todo better error
             }
@@ -270,9 +256,9 @@ where
                 opt_format,
                 opt_n_vertices,
                 opt_n_faces,
-                opt_x_type,
-                opt_y_type,
-                opt_z_type,
+                opt_fst_type,
+                opt_snd_type,
+                opt_third_type,
                 opt_face_count_type,
                 opt_face_index_type,
             ) {
@@ -285,9 +271,9 @@ where
                         first: x_type,
                         snd: y_type,
                         third: z_type,
-                        before,
-                        between_first_snd,
-                        between_snd_third,
+                        before: vertex_before,
+                        between_first_snd: vertex_between_first_snd,
+                        between_snd_third: vertex_between_snd_third,
                         after,
                     },
                     face_format: FaceFormat {
@@ -300,11 +286,10 @@ where
             }
         }
 
-        //@todo better error (header could not be parsed / incorrect)
-        return Err(PlyError::LoadHeaderEndNotFound);
+        return Err(PlyError::LoadHeaderInvalid);
     }
 
-    Err(PlyError::LoadHeaderEndNotFound)
+    Err(PlyError::LoadHeaderInvalid)
 }
 
 //------------------------------------------------------------------------------
@@ -319,42 +304,38 @@ where
     for _ in 0..header.n_vertices {
         skip_bytes(read, header.vertex_format.before.bytes);
 
-        let first = read_vertex_type::<BO, _>(read, &header.vertex_format.first)?;
+        let first = read_vertex_type::<BO, _>(read, header.vertex_format.first)?;
 
         skip_bytes(read, header.vertex_format.between_first_snd.bytes);
 
-        let snd = read_vertex_type::<BO, _>(read, &header.vertex_format.snd)?;
+        let snd = read_vertex_type::<BO, _>(read, header.vertex_format.snd)?;
 
         skip_bytes(read, header.vertex_format.between_snd_third.bytes);
 
-        let third = read_vertex_type::<BO, _>(read, &header.vertex_format.third)?;
+        let third = read_vertex_type::<BO, _>(read, header.vertex_format.third)?;
 
         skip_bytes(read, header.vertex_format.after.bytes);
 
-        //@todo duplicate code, write helper
-        let p = match header.vertex_format.order {
-            VertexOrder::Xyz => P::new(first, snd, third),
-            VertexOrder::Xzy => P::new(first, third, snd),
-            VertexOrder::Yxz => P::new(snd, first, third),
-            VertexOrder::Yzx => P::new(snd, third, first),
-            VertexOrder::Zxy => P::new(third, first, snd),
-            VertexOrder::Zyx => P::new(third, snd, first),
-        };
-        mesh.add_vertex(p);
+        mesh.add_vertex(point_with_order(
+            first,
+            snd,
+            third,
+            header.vertex_format.order,
+        ));
     }
 
     for _ in 0..header.n_faces {
         skip_bytes(read, header.face_format.before.bytes);
 
-        let element_count = read_face_type::<BO, _>(read, &header.face_format.count)?;
+        let element_count = read_face_type::<BO, _>(read, header.face_format.count)?;
 
         if element_count != 3 {
             return Err(PlyError::LineParse(0)); //@todo incorrect face structure
         }
 
-        let a = read_face_type::<BO, _>(read, &header.face_format.index)?;
-        let b = read_face_type::<BO, _>(read, &header.face_format.index)?;
-        let c = read_face_type::<BO, _>(read, &header.face_format.index)?;
+        let a = read_face_type::<BO, _>(read, header.face_format.index)?;
+        let b = read_face_type::<BO, _>(read, header.face_format.index)?;
+        let c = read_face_type::<BO, _>(read, header.face_format.index)?;
 
         skip_bytes(read, header.face_format.after.bytes);
 
@@ -412,16 +393,13 @@ where
                 .map_err(|_| PlyError::InvalidVertex(*i_line))?;
 
             // no need to skip 'after' since we're done with this line anyway
-            //@todo duplicate code, write helper
-            let p = match header.vertex_format.order {
-                VertexOrder::Xyz => P::new(first, snd, third),
-                VertexOrder::Xzy => P::new(first, third, snd),
-                VertexOrder::Yxz => P::new(snd, first, third),
-                VertexOrder::Yzx => P::new(snd, third, first),
-                VertexOrder::Zxy => P::new(third, first, snd),
-                VertexOrder::Zyx => P::new(third, snd, first),
-            };
-            mesh.add_vertex(p);
+
+            mesh.add_vertex(point_with_order(
+                first,
+                snd,
+                third,
+                header.vertex_format.order,
+            ));
 
             continue;
         }

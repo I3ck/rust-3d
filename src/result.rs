@@ -67,7 +67,7 @@ pub enum PlyError {
     LoadFormatNotFound,
     LoadWrongPropertyCount,
     LoadVertexIndexDefinitionNotFound,
-    LoadHeaderEndNotFound,
+    LoadHeaderInvalid,
     LoadVertexCountNotFound,
     LoadFaceCountNotFound,
     LoadVertexCountIncorrect,
@@ -172,7 +172,7 @@ impl fmt::Debug for PlyError {
             Self::LoadVertexIndexDefinitionNotFound => {
                 write!(f, "Index definition in .ply not found")
             }
-            Self::LoadHeaderEndNotFound => write!(f, "End of header definition of .ply not found"),
+            Self::LoadHeaderInvalid => write!(f, "Header of .ply seems to be invalid"),
             Self::LoadVertexCountNotFound => write!(f, "Vertex count of .ply not found"),
             Self::LoadFaceCountNotFound => write!(f, "Face count of .ply not found"),
             Self::LoadVertexCountIncorrect => write!(f, "Vertex count of .ply not found"),

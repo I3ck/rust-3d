@@ -49,7 +49,7 @@ pub fn collect_index_line(line: &str) -> Option<[usize; 3]> {
 
 //------------------------------------------------------------------------------
 
-pub fn read_face_type<BO, R>(read: &mut R, t: &FaceType) -> PlyResult<usize>
+pub fn read_face_type<BO, R>(read: &mut R, t: FaceType) -> PlyResult<usize>
 where
     BO: ByteOrder,
     R: Read,
@@ -66,7 +66,7 @@ where
 
 //------------------------------------------------------------------------------
 
-pub fn read_vertex_type<BO, R>(read: &mut R, t: &VertexType) -> PlyResult<f64>
+pub fn read_vertex_type<BO, R>(read: &mut R, t: VertexType) -> PlyResult<f64>
 where
     BO: ByteOrder,
     R: Read,
@@ -94,5 +94,21 @@ where
 {
     for _ in 0..n {
         i.next();
+    }
+}
+
+//------------------------------------------------------------------------------
+
+pub fn point_with_order<P>(fst: f64, snd: f64, third: f64, order: VertexOrder) -> P
+where
+    P: IsBuildable3D,
+{
+    match order {
+        VertexOrder::Xyz => P::new(fst, snd, third),
+        VertexOrder::Xzy => P::new(fst, third, snd),
+        VertexOrder::Yxz => P::new(snd, fst, third),
+        VertexOrder::Yzx => P::new(snd, third, fst),
+        VertexOrder::Zxy => P::new(third, fst, snd),
+        VertexOrder::Zyx => P::new(third, snd, fst),
     }
 }

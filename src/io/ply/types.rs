@@ -28,6 +28,7 @@ use core::convert::TryFrom;
 
 //------------------------------------------------------------------------------
 
+#[derive(Copy, Clone)]
 pub enum Type {
     Char,
     UChar,
@@ -74,7 +75,7 @@ impl TryFrom<&str> for Type {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Xyz {
     X,
     Y,
@@ -83,7 +84,7 @@ pub enum Xyz {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum VertexOrder {
     Xyz,
     Xzy,
@@ -119,7 +120,7 @@ pub struct BytesWords {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum VertexType {
     Float,
     Double,
@@ -139,7 +140,7 @@ impl TryFrom<Type> for VertexType {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum FaceType {
     Char,
     UChar,
@@ -191,7 +192,7 @@ pub struct FaceFormat {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub enum Format {
     Ascii,
     LittleEndian,
@@ -200,6 +201,7 @@ pub enum Format {
 
 //------------------------------------------------------------------------------
 
+#[derive(Copy, Clone)]
 pub enum HeaderReadState {
     Meta,
     Vertex,
