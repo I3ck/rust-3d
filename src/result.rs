@@ -80,6 +80,7 @@ pub enum PlyError {
     InvalidMeshIndices(usize),
     LineParse(usize),
     InvalidProperty(usize),
+    InvalidVertex(usize),
 }
 
 pub enum StlError {
@@ -186,6 +187,7 @@ impl fmt::Debug for PlyError {
                 write!(f, "File contains invalid mesh indices on line {}", x)
             }
             Self::InvalidProperty(x) => write!(f, "Invalid property on line {}", x),
+            Self::InvalidVertex(x) => write!(f, "Invalid vertex definition on line {}", x),
         }
     }
 }

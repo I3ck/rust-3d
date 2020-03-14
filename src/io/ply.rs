@@ -424,9 +424,10 @@ where
                     read_state = HeaderReadState::Vertex;
                     let mut words = to_words(&line);
                     match words.clone().count() {
+                        //@todo avoid copy
                         3 => {
                             n_vertices = Some(
-                                usize::from_str(words.nth(2).unwrap())
+                                usize::from_str(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
                                     .map_err(|_| PlyError::LineParse(*i_line))?,
                             );
                             continue;
@@ -444,9 +445,10 @@ where
                     read_state = HeaderReadState::Face;
                     let mut words = to_words(&line);
                     match words.clone().count() {
+                        //@todo avoid copy
                         3 => {
                             n_faces = Some(
-                                usize::from_str(words.nth(2).unwrap())
+                                usize::from_str(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
                                     .map_err(|_| PlyError::LineParse(*i_line))?,
                             );
                             continue;
@@ -464,8 +466,9 @@ where
                     let mut words = to_words(line);
                     skip_n(&mut words, 1); // skip "property"
 
-                    let t = Type::try_from(words.next().unwrap())?; //@todo error handling, invalid property line
-                    let id = words.next().unwrap(); //@todo see above
+                    let t =
+                        Type::try_from(words.next().ok_or(PlyError::InvalidProperty(*i_line))?)?;
+                    let id = words.next().ok_or(PlyError::InvalidProperty(*i_line))?;
                     if id == "x" {
                         x_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
@@ -679,17 +682,20 @@ where
 
             skip_n(&mut words, header.vertex_format.before.words);
 
-            let first = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
+            let first = f64::from_str(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
+                .map_err(|_| PlyError::InvalidVertex(*i_line))?;
 
             skip_n(&mut words, header.vertex_format.between_first_snd.words);
 
-            let snd = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
+            let snd = f64::from_str(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
+                .map_err(|_| PlyError::InvalidVertex(*i_line))?;
 
             skip_n(&mut words, header.vertex_format.between_snd_third.words);
 
-            let third = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
-                                                                       // no need to skip 'after' since we're done with this line anyway
+            let third = f64::from_str(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
+                .map_err(|_| PlyError::InvalidVertex(*i_line))?;
 
+            // no need to skip 'after' since we're done with this line anyway
             //@todo duplicate code, write helper
             let p = match header.vertex_format.order {
                 VertexOrder::Xyz => P::new(first, snd, third),
