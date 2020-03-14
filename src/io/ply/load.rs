@@ -127,17 +127,11 @@ where
                 if line.starts_with("element vertex") {
                     read_state = HeaderReadState::Vertex;
                     let mut words = to_words(&line);
-                    match words.clone().count() {
-                        //@todo avoid copy
-                        3 => {
-                            opt_n_vertices = Some(
-                                usize::from_str(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
-                                    .map_err(|_| PlyError::LineParse(*i_line))?,
-                            );
-                            continue;
-                        }
-                        _ => return Err(PlyError::LineParse(*i_line)),
-                    }
+                    opt_n_vertices = Some(
+                        usize::from_str(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
+                            .map_err(|_| PlyError::LineParse(*i_line))?,
+                    );
+                    continue;
                 }
             }
             Some(_) => {}
@@ -148,17 +142,11 @@ where
                 if line.starts_with("element face") {
                     read_state = HeaderReadState::Face;
                     let mut words = to_words(&line);
-                    match words.clone().count() {
-                        //@todo avoid copy
-                        3 => {
-                            opt_n_faces = Some(
-                                usize::from_str(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
-                                    .map_err(|_| PlyError::LineParse(*i_line))?,
-                            );
-                            continue;
-                        }
-                        _ => return Err(PlyError::LineParse(*i_line)),
-                    }
+                    opt_n_faces = Some(
+                        usize::from_str(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
+                            .map_err(|_| PlyError::LineParse(*i_line))?,
+                    );
+                    continue;
                 }
             }
             Some(_) => {}
