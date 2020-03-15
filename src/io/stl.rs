@@ -75,16 +75,7 @@ where
     P: IsBuildable3D + Clone,
     R: BufRead,
 {
-    let solid = "solid".as_bytes();
-
-    let mut is_ascii = true;
-    for i in 0..5 {
-        if read.read_u8()? != solid[i] {
-            is_ascii = false
-        }
-    }
-
-    if is_ascii {
+    if is_ascii(read)? {
         load_stl_mesh_duped_ascii(read, mesh)
     } else {
         load_stl_mesh_duped_binary(read, mesh)
@@ -98,16 +89,7 @@ where
     P: IsBuildable3D + Clone,
     R: BufRead,
 {
-    let solid = "solid".as_bytes();
-
-    let mut is_ascii = true;
-    for i in 0..5 {
-        if read.read_u8()? != solid[i] {
-            is_ascii = false
-        }
-    }
-
-    if is_ascii {
+    if is_ascii(read)? {
         load_stl_mesh_unique_ascii(read, mesh)
     } else {
         load_stl_mesh_unique_binary(read, mesh)
@@ -121,20 +103,24 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let solid = "solid".as_bytes();
-
-    let mut is_ascii = true;
-    for i in 0..5 {
-        if read.read_u8()? != solid[i] {
-            is_ascii = false
-        }
-    }
-
-    if is_ascii {
+    if is_ascii(read)? {
         load_stl_triplets_ascii(read, ip)
     } else {
         load_stl_triplets_binary(read, ip)
     }
+}
+
+fn is_ascii<R>(read: &mut R) -> StlResult<bool> where R: BufRead {
+    let solid = "solid".as_bytes();
+
+    let mut result = true;
+    for i in 0..5 {
+        if read.read_u8()? != solid[i] {
+            result = false
+        }
+    }
+
+    Ok(result)
 }
 
 fn load_stl_mesh_duped_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
