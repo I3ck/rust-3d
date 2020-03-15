@@ -35,6 +35,20 @@ use fnv::FnvHashMap;
 
 use core::str::FromStr;
 
+/// Whether format shall be considered to be binary/ASCII or auto determined
+#[derive(Copy, Clone)]
+pub enum StlFormat {
+    Ascii,
+    Binary,
+    Auto,
+}
+
+impl Default for StlFormat {
+    fn default() -> Self {
+        Self::Auto
+    }
+}
+
 /// Saves an IsMesh3D in the ASCII .stl file format
 pub fn save_stl_ascii<M, P, W>(write: &mut W, mesh: &M) -> StlResult<()>
 where
@@ -69,13 +83,17 @@ where
 }
 
 /// Loads a Mesh from .stl file with duplicate vertices
-pub fn load_stl_mesh_duped<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+pub fn load_stl_mesh_duped<EM, P, R>(
+    read: &mut R,
+    format: StlFormat,
+    mesh: &mut EM,
+) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: BufRead,
 {
-    if is_ascii(read)? {
+    if is_ascii(read, format)? {
         load_stl_mesh_duped_ascii(read, mesh)
     } else {
         load_stl_mesh_duped_binary(read, mesh)
@@ -83,13 +101,17 @@ where
 }
 
 /// Loads a Mesh from .stl file with unique vertices
-pub fn load_stl_mesh_unique<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+pub fn load_stl_mesh_unique<EM, P, R>(
+    read: &mut R,
+    format: StlFormat,
+    mesh: &mut EM,
+) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: BufRead,
 {
-    if is_ascii(read)? {
+    if is_ascii(read, format)? {
         load_stl_mesh_unique_ascii(read, mesh)
     } else {
         load_stl_mesh_unique_binary(read, mesh)
@@ -97,20 +119,23 @@ where
 }
 
 /// Loads points from .stl file as triplets into IsPushable<Is3D>
-pub fn load_stl_triplets<IP, P, R>(read: &mut R, ip: &mut IP) -> StlResult<()>
+pub fn load_stl_triplets<IP, P, R>(read: &mut R, format: StlFormat, ip: &mut IP) -> StlResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
-    if is_ascii(read)? {
+    if is_ascii(read, format)? {
         load_stl_triplets_ascii(read, ip)
     } else {
         load_stl_triplets_binary(read, ip)
     }
 }
 
-fn is_ascii<R>(read: &mut R) -> StlResult<bool> where R: BufRead {
+fn is_ascii<R>(read: &mut R, format: StlFormat) -> StlResult<bool>
+where
+    R: BufRead,
+{
     let solid = "solid".as_bytes();
 
     let mut result = true;
@@ -120,7 +145,12 @@ fn is_ascii<R>(read: &mut R) -> StlResult<bool> where R: BufRead {
         }
     }
 
-    Ok(result)
+    // It is important to always consume the bytes above, even if format defines the result
+    Ok(match format {
+        StlFormat::Ascii => true,
+        StlFormat::Binary => false,
+        StlFormat::Auto => result,
+    })
 }
 
 fn load_stl_mesh_duped_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
