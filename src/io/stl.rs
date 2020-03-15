@@ -100,7 +100,7 @@ where
     }
 }
 
-/// Loads a Mesh from .stl file with unique vertices
+/// Loads a Mesh from .stl file with unique vertices, dropping invalid triangles
 pub fn load_stl_mesh_unique<EM, P, R>(
     read: &mut R,
     format: StlFormat,
@@ -255,9 +255,13 @@ where
                     value
                 });
 
-                mesh.try_add_connection(VId { val: id_a }, VId { val: id_b }, VId { val: id_c })
-                    .unwrap(); // safe since added above
-                ()
+                // Ignore this issues since this only fails if a triangle uses a vertex multiple times
+                // Simply do not add this triangle
+                let _ = mesh.try_add_connection(
+                    VId { val: id_a },
+                    VId { val: id_b },
+                    VId { val: id_c },
+                );
             }
             Err(StlError::LoadFileEndReached) => break,
             Err(x) => return Err(x),
@@ -285,7 +289,6 @@ where
 
     let mut buffer = [0f32; 3];
 
-    //@todo FnvHashMap?
     let mut map = FnvHashMap::default();
 
     for _ in 0..n_triangles {
@@ -321,8 +324,9 @@ where
             value
         });
 
-        mesh.try_add_connection(VId { val: id_a }, VId { val: id_b }, VId { val: id_c })
-            .unwrap(); // safe since added above
+        // Ignore this issues since this only fails if a triangle uses a vertex multiple times
+        // Simply do not add this triangle
+        let _ = mesh.try_add_connection(VId { val: id_a }, VId { val: id_b }, VId { val: id_c });
     }
 
     Ok(())
