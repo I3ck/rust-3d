@@ -83,52 +83,62 @@ where
 }
 
 /// Loads a Mesh from .stl file with duplicate vertices
-pub fn load_stl_mesh_duped<EM, P, R>(
+pub fn load_stl_mesh_duped<EM, P, R, IPN>(
     read: &mut R,
     format: StlFormat,
     mesh: &mut EM,
+    face_normals: &mut IPN,
 ) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: BufRead,
+    IPN: IsPushable<P>,
 {
     if is_ascii(read, format)? {
-        load_stl_mesh_duped_ascii(read, mesh)
+        load_stl_mesh_duped_ascii(read, mesh, face_normals)
     } else {
-        load_stl_mesh_duped_binary(read, mesh)
+        load_stl_mesh_duped_binary(read, mesh, face_normals)
     }
 }
 
 /// Loads a Mesh from .stl file with unique vertices, dropping invalid triangles
-pub fn load_stl_mesh_unique<EM, P, R>(
+pub fn load_stl_mesh_unique<EM, P, R, IPN>(
     read: &mut R,
     format: StlFormat,
     mesh: &mut EM,
+    face_normals: &mut IPN,
 ) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: BufRead,
+    IPN: IsPushable<P>,
 {
     if is_ascii(read, format)? {
-        load_stl_mesh_unique_ascii(read, mesh)
+        load_stl_mesh_unique_ascii(read, mesh, face_normals)
     } else {
-        load_stl_mesh_unique_binary(read, mesh)
+        load_stl_mesh_unique_binary(read, mesh, face_normals)
     }
 }
 
 /// Loads points from .stl file as triplets into IsPushable<Is3D>
-pub fn load_stl_triplets<IP, P, R>(read: &mut R, format: StlFormat, ip: &mut IP) -> StlResult<()>
+pub fn load_stl_triplets<IP, P, R, IPN>(
+    read: &mut R,
+    format: StlFormat,
+    ip: &mut IP,
+    face_normals: &mut IPN,
+) -> StlResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
+    IPN: IsPushable<P>,
 {
     if is_ascii(read, format)? {
-        load_stl_triplets_ascii(read, ip)
+        load_stl_triplets_ascii(read, ip, face_normals)
     } else {
-        load_stl_triplets_binary(read, ip)
+        load_stl_triplets_binary(read, ip, face_normals)
     }
 }
 
@@ -153,11 +163,16 @@ where
     })
 }
 
-fn load_stl_mesh_duped_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+fn load_stl_mesh_duped_ascii<EM, P, R, IPN>(
+    read: &mut R,
+    mesh: &mut EM,
+    face_normals: &mut IPN,
+) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: BufRead,
+    IPN: IsPushable<P>,
 {
     let mut i_line = 0;
     let mut line_buffer = String::new();
@@ -168,8 +183,9 @@ where
 
     loop {
         match read_stl_facet(read, &mut line_buffer, &mut i_line) {
-            Ok([a, b, c]) => {
+            Ok([a, b, c, n]) => {
                 mesh.add_face(a, b, c);
+                face_normals.push(n);
                 ()
             }
             Err(StlError::LoadFileEndReached) => break,
@@ -180,11 +196,16 @@ where
     Ok(())
 }
 
-fn load_stl_mesh_duped_binary<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+fn load_stl_mesh_duped_binary<EM, P, R, IPN>(
+    read: &mut R,
+    mesh: &mut EM,
+    face_normals: &mut IPN,
+) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: Read,
+    IPN: IsPushable<P>,
 {
     // Drop header ('solid' is already dropped)
     {
@@ -199,8 +220,8 @@ where
     let mut buffer = [0f32; 3];
 
     for _ in 0..n_triangles {
-        // Drop normal
         read.read_f32_into::<LittleEndian>(&mut buffer)?;
+        let n = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
 
         read.read_f32_into::<LittleEndian>(&mut buffer)?;
         let a = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
@@ -214,16 +235,22 @@ where
         read.read_u16::<LittleEndian>()?;
 
         mesh.add_face(a, b, c);
+        face_normals.push(n)
     }
 
     Ok(())
 }
 
-fn load_stl_mesh_unique_ascii<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+fn load_stl_mesh_unique_ascii<EM, P, R, IPN>(
+    read: &mut R,
+    mesh: &mut EM,
+    face_normals: &mut IPN,
+) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: BufRead,
+    IPN: IsPushable<P>,
 {
     let mut i_line = 0;
     let mut line_buffer = String::new();
@@ -236,7 +263,7 @@ where
 
     loop {
         match read_stl_facet::<P, _>(read, &mut line_buffer, &mut i_line) {
-            Ok([a, b, c]) => {
+            Ok([a, b, c, n]) => {
                 let id_a = *map.entry(a.clone()).or_insert_with(|| {
                     let value = mesh.num_vertices();
                     mesh.add_vertex(a);
@@ -256,12 +283,17 @@ where
                 });
 
                 // Ignore this issues since this only fails if a triangle uses a vertex multiple times
-                // Simply do not add this triangle
-                let _ = mesh.try_add_connection(
+                // Simply do not add this triangle and normal
+                match mesh.try_add_connection(
                     VId { val: id_a },
                     VId { val: id_b },
                     VId { val: id_c },
-                );
+                ) {
+                    Ok(_) => {
+                        face_normals.push(n);
+                    }
+                    Err(_) => (),
+                }
             }
             Err(StlError::LoadFileEndReached) => break,
             Err(x) => return Err(x),
@@ -271,11 +303,16 @@ where
     Ok(())
 }
 
-fn load_stl_mesh_unique_binary<EM, P, R>(read: &mut R, mesh: &mut EM) -> StlResult<()>
+fn load_stl_mesh_unique_binary<EM, P, R, IPN>(
+    read: &mut R,
+    mesh: &mut EM,
+    face_normals: &mut IPN,
+) -> StlResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: Read,
+    IPN: IsPushable<P>,
 {
     // Drop header ('solid' is already dropped)
     {
@@ -292,8 +329,8 @@ where
     let mut map = FnvHashMap::default();
 
     for _ in 0..n_triangles {
-        // Drop normal
         read.read_f32_into::<LittleEndian>(&mut buffer)?;
+        let n = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
 
         read.read_f32_into::<LittleEndian>(&mut buffer)?;
         let a = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
@@ -326,17 +363,27 @@ where
 
         // Ignore this issues since this only fails if a triangle uses a vertex multiple times
         // Simply do not add this triangle
-        let _ = mesh.try_add_connection(VId { val: id_a }, VId { val: id_b }, VId { val: id_c });
+        match mesh.try_add_connection(VId { val: id_a }, VId { val: id_b }, VId { val: id_c }) {
+            Ok(_) => {
+                face_normals.push(n);
+            }
+            Err(_) => (),
+        }
     }
 
     Ok(())
 }
 
-pub fn load_stl_triplets_ascii<IP, P, R>(read: &mut R, ip: &mut IP) -> StlResult<()>
+fn load_stl_triplets_ascii<IP, P, R, IPN>(
+    read: &mut R,
+    ip: &mut IP,
+    face_normals: &mut IPN,
+) -> StlResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
+    IPN: IsPushable<P>,
 {
     let mut i_line = 0;
     let mut line_buffer = String::new();
@@ -347,10 +394,11 @@ where
 
     loop {
         match read_stl_facet(read, &mut line_buffer, &mut i_line) {
-            Ok([a, b, c]) => {
+            Ok([a, b, c, n]) => {
                 ip.push(a);
                 ip.push(b);
                 ip.push(c);
+                face_normals.push(n);
                 ()
             }
             Err(StlError::LoadFileEndReached) => break,
@@ -361,11 +409,16 @@ where
     Ok(())
 }
 
-pub fn load_stl_triplets_binary<IP, P, R>(read: &mut R, ip: &mut IP) -> StlResult<()>
+fn load_stl_triplets_binary<IP, P, R, IPN>(
+    read: &mut R,
+    ip: &mut IP,
+    face_normals: &mut IPN,
+) -> StlResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
     R: Read,
+    IPN: IsPushable<P>,
 {
     // Drop header ('solid' is already dropped)
     {
@@ -377,8 +430,8 @@ where
     let mut buffer = [0f32; 3];
 
     for _ in 0..n_triangles {
-        // Drop normal
         read.read_f32_into::<LittleEndian>(&mut buffer)?;
+        let n = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
 
         read.read_f32_into::<LittleEndian>(&mut buffer)?;
         let a = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
@@ -394,6 +447,8 @@ where
         ip.push(a);
         ip.push(b);
         ip.push(c);
+
+        face_normals.push(n)
     }
 
     Ok(())
@@ -415,7 +470,7 @@ fn read_stl_facet<P, R>(
     read: &mut R,
     line_buffer: &mut String,
     i_line: &mut usize,
-) -> StlResult<[P; 3]>
+) -> StlResult<[P; 4]>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -432,6 +487,8 @@ where
     if !line.contains("facet") {
         return Err(StlError::LineParse(*i_line));
     }
+
+    let n = read_stl_normal(&line).ok_or(StlError::LineParse(*i_line))?;
 
     line = fetch_line(read, line_buffer)?;
     *i_line += 1;
@@ -469,7 +526,7 @@ where
         return Err(StlError::LineParse(*i_line));
     }
 
-    Ok([a, b, c])
+    Ok([a, b, c, n])
 }
 
 fn read_stl_vertex<P>(line: &str) -> Option<P>
@@ -478,6 +535,7 @@ where
 {
     let mut words = to_words(line);
 
+    // skip "vertex"
     words.next()?;
 
     let x = f64::from_str(words.next()?).ok()?;
@@ -485,6 +543,25 @@ where
     let z = f64::from_str(words.next()?).ok()?;
 
     Some(P::new(x, y, z))
+}
+
+fn read_stl_normal<P>(line: &str) -> Option<P>
+where
+    P: IsBuildable3D,
+{
+    let mut words = to_words(line);
+
+    // skip "facet"
+    words.next()?;
+
+    // skip "normal"
+    words.next()?;
+
+    let i = f64::from_str(words.next()?).ok()?;
+    let j = f64::from_str(words.next()?).ok()?;
+    let k = f64::from_str(words.next()?).ok()?;
+
+    Some(P::new(i, j, k))
 }
 
 fn str_exp<P>(p: &P) -> String
