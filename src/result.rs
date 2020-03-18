@@ -55,6 +55,7 @@ pub enum ErrorKind {
     TriFace3DNotSpanningVolume,
     PlyError(PlyError),
     StlError(StlError),
+    PtxError(PtxError),
     XyError(XyError),
     XyzError(XyzError),
     ObjError(ObjError),
@@ -87,6 +88,12 @@ pub enum PlyError {
 }
 
 pub enum StlError {
+    LoadFileEndReached,
+    AccessFile,
+    LineParse(usize),
+}
+
+pub enum PtxError {
     LoadFileEndReached,
     AccessFile,
     LineParse(usize),
@@ -154,6 +161,7 @@ impl fmt::Debug for ErrorKind {
             ),
             Self::PlyError(x) => x.fmt(f),
             Self::StlError(x) => x.fmt(f),
+            Self::PtxError(x) => x.fmt(f),
             Self::XyError(x) => x.fmt(f),
             Self::XyzError(x) => x.fmt(f),
             Self::ObjError(x) => x.fmt(f),
@@ -212,6 +220,16 @@ impl fmt::Debug for StlError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::LoadFileEndReached => write!(f, "Unexpected reach of .stl file end"),
+            Self::AccessFile => write!(f, "Unable to access file"),
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+        }
+    }
+}
+
+impl fmt::Debug for PtxError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::LoadFileEndReached => write!(f, "Unexpected reach of .ptx file end"),
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
         }
@@ -279,6 +297,9 @@ pub type PlyResult<T> = result::Result<T, PlyError>;
 /// Result for StlError
 pub type StlResult<T> = result::Result<T, StlError>;
 
+/// Result for PtxError
+pub type PtxResult<T> = result::Result<T, PtxError>;
+
 /// Result for XyError
 pub type XyResult<T> = result::Result<T, XyError>;
 
@@ -291,6 +312,7 @@ pub type ObjResult<T> = result::Result<T, ObjError>;
 /// Result for OffError
 pub type OffResult<T> = result::Result<T, OffError>;
 
+/// Result for PslError
 pub type PslResult<T> = result::Result<T, PslError>;
 
 impl From<ParseFloatError> for ErrorKind {
@@ -356,6 +378,12 @@ impl From<ioError> for PlyError {
 impl From<ioError> for StlError {
     fn from(_error: ioError) -> Self {
         StlError::AccessFile
+    }
+}
+
+impl From<ioError> for PtxError {
+    fn from(_error: ioError) -> Self {
+        PtxError::AccessFile
     }
 }
 

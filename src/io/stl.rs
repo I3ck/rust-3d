@@ -454,6 +454,7 @@ where
     Ok(())
 }
 
+//@todo duplicate code
 fn fetch_line<'a, R>(read: &mut R, line_buffer: &'a mut String) -> StlResult<&'a str>
 where
     R: BufRead,
