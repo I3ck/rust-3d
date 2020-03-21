@@ -97,6 +97,10 @@ pub enum PtxError {
     LoadFileEndReached,
     AccessFile,
     LineParse(usize),
+    Columns(usize),
+    Rows(usize),
+    Matrix(usize),
+    Point(usize),
 }
 
 pub enum XyError {
@@ -232,6 +236,10 @@ impl fmt::Debug for PtxError {
             Self::LoadFileEndReached => write!(f, "Unexpected reach of .ptx file end"),
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::Columns(x) => write!(f, "Columns could not be parsed on line {}", x),
+            Self::Rows(x) => write!(f, "Rows could not be parsed on line {}", x),
+            Self::Matrix(x) => write!(f, "Transformation matrix could not be parsed on line {}", x),
+            Self::Point(x) => write!(f, "Point could not be parsed on line {}", x),
         }
     }
 }

@@ -49,13 +49,15 @@ where
             }
             i_line += 1;
 
-            columns = usize::from_str(first_line.unwrap()).unwrap(); // unwrap on first_line safe //@todo proper error
+            columns =
+                usize::from_str(first_line.unwrap()).map_err(|_| PtxError::Columns(i_line))?;
+            // safe, since first_line being err causing break
         }
 
         line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
 
-        let rows = usize::from_str(line).unwrap(); //@todo proper error
+        let rows = usize::from_str(line).map_err(|_| PtxError::Rows(i_line))?;
 
         // skip scanner position line
         fetch_line(read, &mut line_buffer)?;
@@ -75,19 +77,19 @@ where
 
         line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
-        let [m11, m12, m13, m14] = read_matrix_row(line).unwrap(); //@todo unwrap
+        let [m11, m12, m13, m14] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
 
         line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
-        let [m21, m22, m23, m24] = read_matrix_row(line).unwrap(); //@todo unwrap
+        let [m21, m22, m23, m24] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
 
         line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
-        let [m31, m32, m33, m34] = read_matrix_row(line).unwrap(); //@todo unwrap
+        let [m31, m32, m33, m34] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
 
         line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
-        let [m41, m42, m43, m44] = read_matrix_row(line).unwrap(); //@todo unwrap
+        let [m41, m42, m43, m44] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
 
         let m = Matrix4 {
             data: [
@@ -100,17 +102,18 @@ where
 
         let must_transform = m != Matrix4::identity();
 
-        println!("line is: {}", i_line); //@todo remove, only present since i_line would be unused with this improper error handling
-
         for _ in 0..columns * rows {
             line = fetch_line(read, &mut line_buffer)?;
             i_line += 1;
 
             let mut words = to_words(line);
 
-            let x = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
-            let y = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
-            let z = f64::from_str(words.next().unwrap()).unwrap(); //@todo unwrap
+            let x = f64::from_str(words.next().ok_or(PtxError::Point(i_line))?)
+                .map_err(|_| PtxError::Point(i_line))?;
+            let y = f64::from_str(words.next().ok_or(PtxError::Point(i_line))?)
+                .map_err(|_| PtxError::Point(i_line))?;
+            let z = f64::from_str(words.next().ok_or(PtxError::Point(i_line))?)
+                .map_err(|_| PtxError::Point(i_line))?;
 
             let mut p = P::new(x, y, z);
 
@@ -137,7 +140,7 @@ where
     Ok(line_buffer.trim_end())
 }
 
-fn read_matrix_row(line: &str) -> Option<[f64; 4]> //@todo f32?
+fn read_matrix_row(line: &str) -> Option<[f64; 4]>
 {
     let mut words = to_words(line);
 
