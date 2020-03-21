@@ -46,4 +46,7 @@ pub use self::psl::*;
 mod ptx;
 pub use self::ptx::*;
 
+mod gcode;
+pub use self::gcode::*;
+
 mod utils;
