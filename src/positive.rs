@@ -30,6 +30,8 @@ use std::{
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 /// Positive, a wrapper for a f64 value, ensuring it is always > 0
 pub struct Positive {
@@ -59,6 +61,8 @@ impl Positive {
         }
     }
 }
+
+//------------------------------------------------------------------------------
 
 impl Eq for Positive {}
 

@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// HasCenterOfGravity3D is a trait for types which might have a center of gravity
 pub trait HasCenterOfGravity3D {
     /// Should return the center of gravity

@@ -26,6 +26,8 @@ use std::cmp::{Eq, Ordering};
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
 /// Sphere, a sphere in 3D space
 pub struct Sphere {

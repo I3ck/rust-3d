@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// HasBoundingBox2D is a trait for types which have a bounding box
 pub trait HasBoundingBox2D: HasBoundingBox2DMaybe {
     /// Should return the bounding box if it can be calculated

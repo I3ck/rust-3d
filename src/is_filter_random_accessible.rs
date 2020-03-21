@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsFilterRandomAccessible is a trait used for filters for random accessible collections
 pub trait IsFilterRandomAccessible<RA, T>
 where

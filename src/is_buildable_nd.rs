@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsBuildableND is a trait used for types which are positioned in n-dimensional space and can be constructed
 pub trait IsBuildableND: Sized + IsND {
     /// Should build an object from the correct number of coordinates

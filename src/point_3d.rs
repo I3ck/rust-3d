@@ -32,6 +32,8 @@ use std::{
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Point3D, a point / position within 3D space
 pub struct Point3D {

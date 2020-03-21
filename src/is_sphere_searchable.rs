@@ -25,6 +25,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsSphereSearchable trait used for search structures which can be queried for elements within a sphere
 /// You should only implement this, if your solution is rather efficient
 pub trait IsSphereSearchable<T> {

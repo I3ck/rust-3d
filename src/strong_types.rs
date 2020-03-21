@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::fmt;
 
+//------------------------------------------------------------------------------
+
 macro_rules! strong_usize {
     ($NEW_NAME:ident) => {
         #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -89,6 +91,8 @@ macro_rules! strong_f64 {
         }
     };
 }
+
+//------------------------------------------------------------------------------
 
 strong_usize!(VId);
 strong_usize!(FId);

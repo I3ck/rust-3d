@@ -25,6 +25,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::IsFilter;
 use std::marker::PhantomData;
 
+//------------------------------------------------------------------------------
+
 /// FilterAND, a filter which combines two filters and is true if both of its filters are true
 pub struct FilterAND<F1, F2, T>
 where

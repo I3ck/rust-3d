@@ -26,6 +26,8 @@ use std::fmt;
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Eq, Clone, Hash)]
 /// LineSegment2D, a line segment within 2D space
 pub struct LineSegment2D {

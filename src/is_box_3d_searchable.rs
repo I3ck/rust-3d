@@ -25,6 +25,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsBox3DSearchable trait used for search structures which can be queried for elements within a 3D box
 /// You should only implement this, if your solution is rather efficient
 pub trait IsBox3DSearchable<T> {

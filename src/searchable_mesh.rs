@@ -26,6 +26,8 @@ use crate::*;
 
 use std::marker::PhantomData;
 
+//------------------------------------------------------------------------------
+
 /// SearchableMesh, transforms IsMesh to IsSearchableMesh
 #[derive(Clone)]
 pub struct SearchableMesh<M, T, IC>

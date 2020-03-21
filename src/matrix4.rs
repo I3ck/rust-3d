@@ -26,6 +26,8 @@ use std::ops::Mul;
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 /// Matrix4, a matrix with 4 rows and columns
 pub struct Matrix4 {
@@ -216,6 +218,8 @@ impl Matrix4 {
         Ok(result)
     }
 }
+
+//------------------------------------------------------------------------------
 
 impl Default for Matrix4 {
     fn default() -> Self {

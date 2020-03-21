@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsMesh3D is trait used for meshes in 3D space
 pub trait IsMesh3D<P>: IsMesh<P, Face3>
 where

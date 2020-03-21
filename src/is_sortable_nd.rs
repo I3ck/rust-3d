@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsSortableND trait used for collections which can be sorted by certain dimensions. E.g. x,y,z
 pub trait IsSortableND {
     /// Should return the number of dimensions. E.g. 2 for 2D space, 3 for 3D space etc.

@@ -26,6 +26,8 @@ use std::fmt;
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Polygon3D, a polygon within 3D space
 pub struct Polygon3D<P>

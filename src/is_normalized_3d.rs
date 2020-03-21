@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsNormalized3D is a trait used for types which are positioned within the 3D space and normalized
 pub trait IsNormalized3D: Sized + Is3D {
     /// Should construct a new object and only fail if it can't be normalized

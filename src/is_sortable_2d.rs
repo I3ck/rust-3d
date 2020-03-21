@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsSortable2D trait used for collections which can be sorted by x or y
 pub trait IsSortable2D: IsSortableND {
     /// Should sort all elements by x

@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// Returns the distance between two IsND in case their number of dimensions match
 pub fn dist_nd<P, U>(p1: &P, p2: &U) -> Result<f64>
 where

@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// BoundingBox2D, an axis aligned bounding box within 2D space
 pub struct BoundingBox2D {
@@ -241,6 +243,8 @@ impl BoundingBox2D {
         NonNegative::new(dx * dx + dy * dy).unwrap()
     }
 }
+
+//------------------------------------------------------------------------------
 
 impl Default for BoundingBox2D {
     fn default() -> Self {

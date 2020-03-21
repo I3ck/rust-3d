@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsTopologyUnit trait used for single units of a topology. E.g. size 1 for paths, size 3 for tri meshes, size 4 for quad meshes
 pub trait IsTopologyUnit {
     /// Should return the number of indices a unit is defined with. (e.g. 3 for a tri mesh)

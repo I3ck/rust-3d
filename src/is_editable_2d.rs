@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsEditable2D is a trait used for types which are positioned in 2D space and their position can be changed
 pub trait IsEditable2D: Is2D + IsEditableND {
     /// Should set the position in x

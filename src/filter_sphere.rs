@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Default, Clone, Hash, Eq, Ord)]
 /// FilterSphere, a sphere filter within 3D space
 pub struct FilterSphere {

@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsTree3D is a trait used for types which are any type of tree within 3D space
 pub trait IsTree3D<P>
 where

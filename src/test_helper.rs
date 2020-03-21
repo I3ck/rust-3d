@@ -29,6 +29,8 @@ use std::{
 
 use crate::{io::*, *};
 
+//------------------------------------------------------------------------------
+
 /// Ensures the content of two files is equal
 pub fn assert_files_equal(filepath1: &str, filepath2: &str) {
     let mut f1 = File::open(filepath1).unwrap();

@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 impl<T> IsRandomAccessible<T> for Vec<T> {
     fn len(&self) -> usize {
         self.len()

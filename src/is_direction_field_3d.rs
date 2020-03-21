@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsDirectionField3D is a trait used for fields of directions within 3D space
 pub trait IsDirectionField3D {
     /// Should return the direction at the given position

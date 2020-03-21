@@ -31,6 +31,8 @@ use std::{
 
 use crate::io::*;
 
+//------------------------------------------------------------------------------
+
 /// The Error Enum used by rust-3d
 pub enum ErrorKind {
     MinMaxSwapped,
@@ -64,6 +66,8 @@ pub enum ErrorKind {
     OffError(OffError),
     PslError(PslError),
 }
+
+//------------------------------------------------------------------------------
 
 impl fmt::Debug for ErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -108,6 +112,8 @@ impl fmt::Debug for ErrorKind {
         }
     }
 }
+
+//------------------------------------------------------------------------------
 
 /// Result type used by rust-3d
 pub type Result<T> = result::Result<T, ErrorKind>;

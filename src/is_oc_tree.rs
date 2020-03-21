@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsOcTree is a trait used for OcTrees
 pub trait IsOcTree<P>: IsTree3D<P>
 where

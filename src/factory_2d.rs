@@ -26,6 +26,8 @@ use std::f64::consts::PI;
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// Creates a 2D rectangle from given center width and height
 pub fn rectangle<P>(center: &P, width: Positive, height: Positive) -> PointCloud2D<P>
 where

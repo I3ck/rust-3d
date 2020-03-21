@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// FilterDirectionField2D, a filter which can transform any IsDirectionField2D into a filter for (Is2D, IsNormalized2D)
 pub struct FilterDirectionField2D<DF>
 where

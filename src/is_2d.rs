@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// Is2D is a trait used for types which are positioned within the 2D space
 pub trait Is2D: IsND {
     /// Should return the x-coordinate

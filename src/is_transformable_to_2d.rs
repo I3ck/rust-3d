@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsTransFormableTo2D is a trait used for any type which can be transformed 2D space
 pub trait IsTransFormableTo2D: Is3D {
     /// Should create representation of self within the 2D space

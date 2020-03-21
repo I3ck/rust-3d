@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsEditable3D is a trait used for types which are positioned in 3D space and their position can be changed
 pub trait IsEditable3D: Is3D + IsEditableND {
     /// Should set the position in x

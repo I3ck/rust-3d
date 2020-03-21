@@ -25,6 +25,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::IsFilter;
 use std::marker::PhantomData;
 
+//------------------------------------------------------------------------------
+
 /// FilterNegate, a filter which negates another filter
 pub struct FilterNegate<F, T>
 where

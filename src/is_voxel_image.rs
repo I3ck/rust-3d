@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsVoxelImage is a trait used for any type of voxel image
 pub trait IsVoxelImage<T> {
     /// Should return the number of voxels in x-direction

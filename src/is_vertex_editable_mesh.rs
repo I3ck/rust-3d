@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsVertexEditableMesh trait used for meshes with editable vertex data
 pub trait IsVertexEditableMesh<V, TU>: IsMesh<V, TU>
 where

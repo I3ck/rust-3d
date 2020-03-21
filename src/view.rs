@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::collections::HashSet;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 /// View, which defines a restricted / full view onto any T. E.g. used when filtering collections of points.
 pub enum View {

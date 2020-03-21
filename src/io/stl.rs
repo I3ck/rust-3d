@@ -40,19 +40,7 @@ use core::str::FromStr;
 
 use super::utils::*;
 
-/// Whether format shall be considered to be binary/ASCII or auto determined
-#[derive(Copy, Clone)]
-pub enum StlFormat {
-    Ascii,
-    Binary,
-    Auto,
-}
-
-impl Default for StlFormat {
-    fn default() -> Self {
-        Self::Auto
-    }
-}
+//------------------------------------------------------------------------------
 
 /// Saves an IsMesh3D in the ASCII .stl file format
 pub fn save_stl_ascii<M, P, W>(write: &mut W, mesh: &M) -> StlResult<()>
@@ -87,6 +75,8 @@ where
     Ok(())
 }
 
+//------------------------------------------------------------------------------
+
 /// Loads a Mesh from .stl file with duplicate vertices
 pub fn load_stl_mesh_duped<EM, P, R, IPN>(
     read: &mut R,
@@ -106,6 +96,8 @@ where
         load_stl_mesh_duped_binary(read, mesh, face_normals)
     }
 }
+
+//------------------------------------------------------------------------------
 
 /// Loads a Mesh from .stl file with unique vertices, dropping invalid triangles
 pub fn load_stl_mesh_unique<EM, P, R, IPN>(
@@ -127,6 +119,8 @@ where
     }
 }
 
+//------------------------------------------------------------------------------
+
 /// Loads points from .stl file as triplets into IsPushable<Is3D>
 pub fn load_stl_triplets<IP, P, R, IPN>(
     read: &mut R,
@@ -146,6 +140,10 @@ where
         load_stl_triplets_binary(read, ip, face_normals)
     }
 }
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 fn is_ascii<R>(read: &mut R, format: StlFormat) -> StlResult<bool>
 where
@@ -167,6 +165,8 @@ where
         StlFormat::Auto => result,
     })
 }
+
+//------------------------------------------------------------------------------
 
 fn load_stl_mesh_duped_ascii<EM, P, R, IPN>(
     read: &mut R,
@@ -200,6 +200,8 @@ where
 
     Ok(())
 }
+
+//------------------------------------------------------------------------------
 
 fn load_stl_mesh_duped_binary<EM, P, R, IPN>(
     read: &mut R,
@@ -245,6 +247,8 @@ where
 
     Ok(())
 }
+
+//------------------------------------------------------------------------------
 
 fn load_stl_mesh_unique_ascii<EM, P, R, IPN>(
     read: &mut R,
@@ -307,6 +311,8 @@ where
 
     Ok(())
 }
+
+//------------------------------------------------------------------------------
 
 fn load_stl_mesh_unique_binary<EM, P, R, IPN>(
     read: &mut R,
@@ -379,6 +385,8 @@ where
     Ok(())
 }
 
+//------------------------------------------------------------------------------
+
 fn load_stl_triplets_ascii<IP, P, R, IPN>(
     read: &mut R,
     ip: &mut IP,
@@ -413,6 +421,8 @@ where
 
     Ok(())
 }
+
+//------------------------------------------------------------------------------
 
 fn load_stl_triplets_binary<IP, P, R, IPN>(
     read: &mut R,
@@ -458,6 +468,8 @@ where
 
     Ok(())
 }
+
+//------------------------------------------------------------------------------
 
 fn read_stl_facet<P, R>(
     read: &mut R,
@@ -522,6 +534,8 @@ where
     Ok([a, b, c, n])
 }
 
+//------------------------------------------------------------------------------
+
 fn read_stl_vertex<P>(line: &str) -> Option<P>
 where
     P: IsBuildable3D,
@@ -537,6 +551,8 @@ where
 
     Some(P::new(x, y, z))
 }
+
+//------------------------------------------------------------------------------
 
 fn read_stl_normal<P>(line: &str) -> Option<P>
 where
@@ -557,11 +573,29 @@ where
     Some(P::new(i, j, k))
 }
 
+//------------------------------------------------------------------------------
+
 fn str_exp<P>(p: &P) -> String
 where
     P: Is3D,
 {
     format!("{:e} {:e} {:e}", p.x(), p.y(), p.z()).to_string()
+}
+
+//------------------------------------------------------------------------------
+
+/// Whether format shall be considered to be binary/ASCII or auto determined
+#[derive(Copy, Clone)]
+pub enum StlFormat {
+    Ascii,
+    Binary,
+    Auto,
+}
+
+impl Default for StlFormat {
+    fn default() -> Self {
+        Self::Auto
+    }
 }
 
 //------------------------------------------------------------------------------

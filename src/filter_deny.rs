@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::IsFilter;
 
+//------------------------------------------------------------------------------
+
 /// FilterDeny, a filter which always returns false
 pub struct FilterDeny {}
 

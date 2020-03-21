@@ -26,6 +26,8 @@ use std::f64::consts::PI;
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 fn factorial(number: usize) -> usize {
     let mut result = 1;
 

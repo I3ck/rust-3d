@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// Is3D is a trait used for types which are positioned within the 3D space
 pub trait Is3D: IsND {
     /// Should return the x-coordinate

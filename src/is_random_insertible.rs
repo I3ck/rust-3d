@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsRandomInsertible is a trait used for collections of elements which are random insertible
 pub trait IsRandomInsertible<T>: IsRandomAccessible<T> {
     /// Should insert an element at the given index

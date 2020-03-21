@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 //@todo finish trait and add implementation
 //@todo better method names
 //@todo maybe implement projection methods within the pc

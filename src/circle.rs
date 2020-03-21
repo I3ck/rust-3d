@@ -26,6 +26,8 @@ use std::cmp::{Eq, Ordering};
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
 /// Circle, a circle in 2D space
 pub struct Circle {

@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsMatrix4Transformable trait used for types that can be transformed by a 4x4 Matrix
 pub trait IsMatrix4Transformable {
     /// Should return self transformed by the Matrix

@@ -26,6 +26,8 @@ use std::collections::VecDeque;
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 impl<T> IsRandomAccessible<T> for VecDeque<T> {
     fn len(&self) -> usize {
         self.len()

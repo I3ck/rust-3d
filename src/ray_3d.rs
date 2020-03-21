@@ -26,6 +26,8 @@ use std::fmt;
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Ray3D, a ray within 3D space
 pub struct Ray3D {

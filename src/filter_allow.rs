@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::IsFilter;
 
+//------------------------------------------------------------------------------
+
 /// FilterAllow, a filter which always returns true
 pub struct FilterAllow {}
 

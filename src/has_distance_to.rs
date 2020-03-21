@@ -25,6 +25,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// HasDistanceTo trait used for types which have a defined distance towards another T.
 /// Implementing HasDistanceTo<T> for U also implements HasDistanceTo<U> for T
 pub trait HasDistanceTo<T> {

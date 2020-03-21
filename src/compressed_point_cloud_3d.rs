@@ -26,6 +26,8 @@ use num::traits::{PrimInt, Unsigned};
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 /// CompressedPointCloud3D
 pub struct CompressedPointCloud3D<T>

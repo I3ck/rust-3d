@@ -26,6 +26,8 @@ use std::cmp::Ordering;
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// KdTree https://en.wikipedia.org/wiki/K-d_tree
 pub struct KdTree<P>
@@ -34,6 +36,8 @@ where
 {
     root: Option<KdNode<P>>,
 }
+
+//------------------------------------------------------------------------------
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct KdNode<P>
@@ -45,6 +49,8 @@ where
     pub val: P,
     pub dimension: i8,
 }
+
+//------------------------------------------------------------------------------
 
 impl<P> IsTree3D<P> for KdTree<P>
 where
@@ -75,6 +81,8 @@ where
         }
     }
 }
+
+//------------------------------------------------------------------------------
 
 impl<PSearch, PFind> IsKNearestSearchable<PSearch, PFind> for KdTree<PFind>
 where

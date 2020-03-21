@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsND is a trait used for types which are positioned within the n-dimensional space
 pub trait IsND {
     /// Should return the number of dimensions. E.g. 2 for points in 2D space, 3 for points in 3D space etc.

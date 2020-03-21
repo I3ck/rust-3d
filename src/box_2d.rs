@@ -26,6 +26,8 @@ use std::cmp::{Eq, Ordering};
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
 /// Box2D, a box in 2D space
 pub struct Box2D {
@@ -54,6 +56,8 @@ impl Box2D {
         [self.size_x, self.size_y]
     }
 }
+
+//------------------------------------------------------------------------------
 
 impl Eq for Box2D {}
 

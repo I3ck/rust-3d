@@ -26,6 +26,8 @@ use std::cmp::{Eq, Ordering};
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Clone, Hash, Default)]
 /// Box3D, a box in 3D space
 pub struct Box3D {
@@ -57,6 +59,8 @@ impl Box3D {
         [self.size_x, self.size_y, self.size_z]
     }
 }
+
+//------------------------------------------------------------------------------
 
 impl Eq for Box3D {}
 

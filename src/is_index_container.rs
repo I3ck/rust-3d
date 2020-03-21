@@ -69,6 +69,8 @@ pub trait IsIndexContainer: Clone + Default {
     }
 }
 
+//------------------------------------------------------------------------------
+
 pub struct IsIndexContainerIterator<'a, IC>
 where
     IC: IsIndexContainer,

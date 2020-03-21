@@ -26,6 +26,8 @@ use std::fmt;
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Line2D, a line within 2D space
 pub struct Line2D {

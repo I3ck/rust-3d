@@ -26,6 +26,8 @@ use crate::*;
 
 use std::marker::PhantomData;
 
+//------------------------------------------------------------------------------
+
 #[derive(Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// Mesh3D, a mesh with tri-faces within 3D space
 pub struct Mesh3D<P, ID, IC>

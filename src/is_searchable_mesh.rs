@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsSearchableMesh trait used for meshes which have extended search methods
 pub trait IsSearchableMesh<V, TU>: IsMesh<V, Face3> {
     /// Should return the edge ids of the given face. Error if id invalid

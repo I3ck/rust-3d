@@ -26,6 +26,8 @@ use crate::*;
 
 use std::marker::PhantomData;
 
+//------------------------------------------------------------------------------
+
 #[derive(Clone)]
 /// AABBTree2D, an axis aligned bounding box tree in 2D for fast collision detection
 pub enum AABBTree2D<HB>
@@ -36,6 +38,8 @@ where
     Leaf(AABBTree2DLeaf<HB>),
     Branch(AABBTree2DBranch<HB>),
 }
+
+//------------------------------------------------------------------------------
 
 // currently often calculates the bounding box, try cache it
 impl<HB> AABBTree2D<HB>
@@ -165,6 +169,8 @@ where
     }
 }
 
+//------------------------------------------------------------------------------
+
 #[derive(Clone)]
 /// Leaf of the AABBTree2D
 pub struct AABBTree2DLeaf<HB>
@@ -239,6 +245,8 @@ where
         }
     }
 }
+
+//------------------------------------------------------------------------------
 
 #[derive(Clone)]
 /// Branch of the AABBTree2D

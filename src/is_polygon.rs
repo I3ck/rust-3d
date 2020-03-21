@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsPolygon is a trait used for closed polygons
 pub trait IsPolygon<V> {
     /// Should return the number of segments within the polygon

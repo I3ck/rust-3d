@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsNormalized2D is a trait used for types which are positioned within the 2D space and normalized
 pub trait IsNormalized2D: Sized + Is2D {
     /// Should construct a new object and only fail if it can't be normalized

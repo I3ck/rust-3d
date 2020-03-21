@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// Returns the distance between two Is2D
 pub fn dist_2d<P, Q>(p: &P, q: &Q) -> f64
 where

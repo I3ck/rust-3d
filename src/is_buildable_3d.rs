@@ -27,6 +27,8 @@ use std::hash::Hash;
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsBuildable3D is a trait used for types which are positioned in 3D space and can be constructed
 pub trait IsBuildable3D: Sized + Is3D + Eq + PartialEq + Ord + PartialOrd + Hash {
     /// Should build an object from x, y and z coordinates

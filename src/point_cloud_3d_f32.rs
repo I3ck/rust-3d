@@ -28,6 +28,8 @@ use crate::*;
 
 use std::marker::PhantomData;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Clone, Default)]
 /// PointCloud3Df32, a collection of positions within 3D space stored lossy as f32 vector for easier usage during rendering
 pub struct PointCloud3Df32<P>
@@ -57,6 +59,8 @@ where
         }
     }
 }
+
+//------------------------------------------------------------------------------
 
 impl<P> IsPushable<P> for PointCloud3Df32<P>
 where

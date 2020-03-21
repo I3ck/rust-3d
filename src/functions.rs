@@ -26,6 +26,8 @@ use std::{cmp::Ordering, ops::Sub};
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 //@todo move these functions to better fitting files or make them methods of the correct types
 
 /// Returns the center of two IsBuildable2D

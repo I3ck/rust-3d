@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsPlane3D is a trait used for planes within 3D space
 pub trait IsPlane3D<P, N>: Sized
 where

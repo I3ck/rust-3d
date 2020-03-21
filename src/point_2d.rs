@@ -31,6 +31,8 @@ use std::{
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Point2D, a point / position within 2D space
 pub struct Point2D {

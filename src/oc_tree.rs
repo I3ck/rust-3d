@@ -26,6 +26,8 @@ use std::{collections::HashSet, iter::IntoIterator};
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Default, Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// OcTree https://en.wikipedia.org/wiki/Octree
 pub struct OcTree<P>

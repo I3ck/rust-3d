@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Default, Clone, Hash, Eq, Ord)]
 /// FilterBox2D, a box filter within 2D space
 pub struct FilterBox2D {
@@ -36,6 +38,8 @@ impl FilterBox2D {
         FilterBox2D { box_2d }
     }
 }
+
+//------------------------------------------------------------------------------
 
 impl IsND for FilterBox2D {
     fn n_dimensions() -> usize {

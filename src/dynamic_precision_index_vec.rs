@@ -177,6 +177,8 @@ impl DynamicPrecisionIndexVec {
     }
 }
 
+//------------------------------------------------------------------------------
+
 impl IsIndexContainer for DynamicPrecisionIndexVec {
     fn ensure_supported(&mut self, x: usize) {
         if x <= self.allowed_max() {

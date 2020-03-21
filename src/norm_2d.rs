@@ -30,6 +30,8 @@ use std::{
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 /// Norm2D, a normalized vector within 2D space
 pub struct Norm2D {

@@ -26,6 +26,8 @@ use std::collections::LinkedList;
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 impl<T> IsViewBuildable for LinkedList<T>
 where
     T: Clone,

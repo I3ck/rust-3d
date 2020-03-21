@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsViewBuildable trait used for types which can be constructed from a view / have a view applied to them
 pub trait IsViewBuildable: Sized {
     /// Should apply the view and only keep items indexed within the view. Should return an error if any index is out of bounds

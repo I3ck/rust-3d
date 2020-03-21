@@ -29,6 +29,8 @@ use std::{
     collections::HashMap,
 };
 
+//------------------------------------------------------------------------------
+
 /// Subdivides a mesh linearly by creating four faces for each input face
 /// This will not smoothen the input mesh, since new vertices are placed only on existing edges
 pub fn linear<V, MI, MO>(mi: &MI) -> Result<MO>

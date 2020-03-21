@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Default, Debug, PartialEq, PartialOrd, Clone)]
 /// Matrix4Pipe, which makes it easier to pipe different matrices in a defined order
 pub struct Matrix4Pipe {

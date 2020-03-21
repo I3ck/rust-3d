@@ -67,6 +67,8 @@ where
     Ok(line_buffer.trim_end())
 }
 
+//------------------------------------------------------------------------------
+
 /// Error type for the fetch_line function
 pub struct FetchLineError;
 

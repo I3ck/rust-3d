@@ -25,6 +25,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 use std::marker::PhantomData;
 
+//------------------------------------------------------------------------------
+
 /// FilterAll, a filter to chain multiple filters with the and condition => must pass all filters to pass this filter
 pub struct FilterAll<T> {
     pub filters: Vec<Box<dyn IsFilter<T>>>,

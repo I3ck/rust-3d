@@ -29,6 +29,8 @@ use std::{
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Ord, Eq, Clone, Hash)]
 /// PointCloud3D, a collection of positions within 3D space
 pub struct PointCloud3D<P>
@@ -105,6 +107,8 @@ where
         }
     }
 }
+
+//------------------------------------------------------------------------------
 
 impl<P> IsDataContainer<P> for PointCloud3D<P>
 where

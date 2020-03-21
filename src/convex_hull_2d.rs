@@ -25,6 +25,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// Convex hull algorithm returning a Vec of the hull where the points are ordered according to the hull
 /// Using Andrew's monotone chain convex hull algorithm https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
 pub fn convex_hull_2d<RA, P>(ra: &RA) -> Vec<P>
@@ -71,6 +73,8 @@ where
     result.extend(upper);
     result
 }
+
+//------------------------------------------------------------------------------
 
 fn ccw<P1, P2, P3>(p1: &P1, p2: &P2, p3: &P3) -> f64
 where

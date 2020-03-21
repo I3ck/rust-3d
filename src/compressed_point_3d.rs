@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use num::traits::{PrimInt, Unsigned};
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 /// CompressedPoint3D
 pub struct CompressedPoint3D<T>

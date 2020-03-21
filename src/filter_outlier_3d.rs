@@ -34,6 +34,8 @@ use std::sync::Mutex;
 
 use std::marker::PhantomData;
 
+//------------------------------------------------------------------------------
+
 /// FilterOutlier3D, a filter which removes outliers by counting their neighbours in a search radius
 /// This can be used to compare two sets of points by removing those in A which aren't close enough to B
 /// Or to remove outliers within a single set

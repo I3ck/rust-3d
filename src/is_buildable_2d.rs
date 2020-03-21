@@ -27,6 +27,8 @@ use std::hash::Hash;
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsBuildable2D is a trait used for types which are positioned in 2D space and can be constructed
 pub trait IsBuildable2D:
     Sized + Is2D + IsBuildableND + Eq + PartialEq + Ord + PartialOrd + Hash

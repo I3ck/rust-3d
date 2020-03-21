@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// HalfEdge, the half edge data structure
 pub struct HalfEdge<IC>
@@ -226,6 +228,8 @@ where
         Ok(())
     }
 }
+
+//------------------------------------------------------------------------------
 
 impl<IC> From<(IC, Vec<Option<EId>>, Vec<IC>)> for HalfEdge<IC>
 where

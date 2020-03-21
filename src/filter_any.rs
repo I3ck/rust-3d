@@ -25,6 +25,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::IsFilter;
 use std::marker::PhantomData;
 
+//------------------------------------------------------------------------------
+
 /// FilterAny, a filter to chain multiple filters with the or condition => must pass any filter to pass this filter
 pub struct FilterAny<T> {
     pub filters: Vec<Box<dyn IsFilter<T>>>,

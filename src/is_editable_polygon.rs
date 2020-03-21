@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsEditablePolygon trait used for polygons which can be edited
 pub trait IsEditablePolygon<V>: IsPolygon<V> {
     /// Should add a vertex to the end and return its id

@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 /// IsDirectionField2D is a trait used for fields of directions within 2D space
 pub trait IsDirectionField2D {
     /// Should return the direction at the given position

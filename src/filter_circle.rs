@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+//------------------------------------------------------------------------------
+
 #[derive(Debug, PartialEq, PartialOrd, Default, Clone, Eq, Ord, Hash)]
 /// FilterCircle, a circle filter within 2D space
 pub struct FilterCircle {
@@ -35,6 +37,8 @@ impl FilterCircle {
         FilterCircle { circle }
     }
 }
+
+//------------------------------------------------------------------------------
 
 impl IsND for FilterCircle {
     fn n_dimensions() -> usize {
