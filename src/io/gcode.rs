@@ -32,7 +32,6 @@ use std::{
 
 //------------------------------------------------------------------------------
 
-//@todo this could be extended to consider way more commands besides G1
 //@todo code duplication
 
 /// Loads a IsPushable<Is3D> as x y z coordinates from gcode
@@ -61,78 +60,88 @@ where
         let line = line_buffer.trim_end();
         i_line += 1;
 
-        if line.starts_with("G1 ")
-            || line.starts_with("G0 ")
-            || line.starts_with("G2 ")
-            || line.starts_with("G3 ")
-        {
-            // Move according to absolute/relative
-            let mut any_changed = false;
-            //@todo more specific errors
-            let [opt_x, opt_y, opt_z] = g1_command(line).ok_or(GcodeError::LineParse(i_line))?;
+        if line.len() < 2 {
+            continue;
+        }
 
-            if let Some(new_x) = opt_x {
-                any_changed = true;
-                match ra {
-                    RelativeAbsolute::Absolute => x = new_x,
-                    RelativeAbsolute::Relative => x += new_x,
+        let (first, rest) = line.split_at(1);
+
+        if first == "G" {
+            if rest.starts_with("1 ")
+                || rest.starts_with("0 ")
+                || rest.starts_with("2 ")
+                || rest.starts_with("3 ")
+            {
+                // Move according to absolute/relative
+                let mut any_changed = false;
+                //@todo more specific errors
+                let [opt_x, opt_y, opt_z] =
+                    g1_command(rest).ok_or(GcodeError::LineParse(i_line))?;
+
+                if let Some(new_x) = opt_x {
+                    any_changed = true;
+                    match ra {
+                        RelativeAbsolute::Absolute => x = new_x,
+                        RelativeAbsolute::Relative => x += new_x,
+                    }
                 }
-            }
 
-            if let Some(new_y) = opt_y {
-                any_changed = true;
-                match ra {
-                    RelativeAbsolute::Absolute => y = new_y,
-                    RelativeAbsolute::Relative => y += new_y,
+                if let Some(new_y) = opt_y {
+                    any_changed = true;
+                    match ra {
+                        RelativeAbsolute::Absolute => y = new_y,
+                        RelativeAbsolute::Relative => y += new_y,
+                    }
                 }
-            }
 
-            if let Some(new_z) = opt_z {
-                any_changed = true;
-                match ra {
-                    RelativeAbsolute::Absolute => z = new_z,
-                    RelativeAbsolute::Relative => z += new_z,
+                if let Some(new_z) = opt_z {
+                    any_changed = true;
+                    match ra {
+                        RelativeAbsolute::Absolute => z = new_z,
+                        RelativeAbsolute::Relative => z += new_z,
+                    }
                 }
-            }
 
-            if any_changed {
-                if !start_pushed {
-                    ip.push(P::new(0.0, 0.0, 0.0));
-                    start_pushed = true
+                if any_changed {
+                    if !start_pushed {
+                        ip.push(P::new(0.0, 0.0, 0.0));
+                        start_pushed = true
+                    }
+                    ip.push(P::new(x, y, z));
                 }
-                ip.push(P::new(x, y, z));
-            }
-        } else if line.starts_with("G90 ") {
-            ra = RelativeAbsolute::Absolute;
-        } else if line.starts_with("G91 ") {
-            ra = RelativeAbsolute::Relative;
-        } else if line.starts_with("G92 ") {
-            // Move according absolute
-            let mut any_changed = false;
-            //@todo more specific error
-            let [opt_x, opt_y, opt_z] = g1_command(line).ok_or(GcodeError::LineParse(i_line))?;
+            } else if rest.starts_with("90 ") {
+                ra = RelativeAbsolute::Absolute;
+            } else if rest.starts_with("91 ") {
+                ra = RelativeAbsolute::Relative;
+            } else if rest.starts_with("92 ") {
+                // Move according absolute
+                let mut any_changed = false;
+                //@todo more specific error
+                let [opt_x, opt_y, opt_z] =
+                    g1_command(rest).ok_or(GcodeError::LineParse(i_line))?;
 
-            if let Some(new_x) = opt_x {
-                any_changed = true;
-                x = new_x
-            }
-
-            if let Some(new_y) = opt_y {
-                any_changed = true;
-                y = new_y
-            }
-
-            if let Some(new_z) = opt_z {
-                any_changed = true;
-                z = new_z
-            }
-
-            if any_changed {
-                if !start_pushed {
-                    ip.push(P::new(0.0, 0.0, 0.0));
-                    start_pushed = true
+                if let Some(new_x) = opt_x {
+                    any_changed = true;
+                    x = new_x
                 }
-                ip.push(P::new(x, y, z));
+
+                if let Some(new_y) = opt_y {
+                    any_changed = true;
+                    y = new_y
+                }
+
+                if let Some(new_z) = opt_z {
+                    any_changed = true;
+                    z = new_z
+                }
+
+                if any_changed {
+                    if !start_pushed {
+                        ip.push(P::new(0.0, 0.0, 0.0));
+                        start_pushed = true
+                    }
+                    ip.push(P::new(x, y, z));
+                }
             }
         }
     }
@@ -151,25 +160,20 @@ fn g1_command(line: &str) -> Option<[Option<f64>; 3]> {
     words.next().unwrap(); // safe since starts_with above ensures at least one word present
 
     for word in words {
-        //@todo faster way to access first char?
-        match word.chars().nth(0) {
-            Some(';') => break,
-            Some('X') => x = Some(f64::from_str(skip_first_char(word)).ok()?),
-            Some('Y') => y = Some(f64::from_str(skip_first_char(word)).ok()?),
-            Some('Z') => z = Some(f64::from_str(skip_first_char(word)).ok()?),
-
-            Some(_) | None => (),
+        if word.len() < 2 {
+            continue;
+        }
+        let (first, rest) = word.split_at(1);
+        match first {
+            ";" => break,
+            "X" => x = Some(f64::from_str(rest).ok()?),
+            "Y" => y = Some(f64::from_str(rest).ok()?),
+            "Z" => z = Some(f64::from_str(rest).ok()?),
+            _ => (),
         }
     }
 
     Some([x, y, z])
-}
-
-//@todo more efficient way?
-fn skip_first_char(text: &str) -> &str {
-    let mut cs = text.chars();
-    cs.next();
-    cs.as_str()
 }
 
 enum RelativeAbsolute {
