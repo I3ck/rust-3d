@@ -102,6 +102,7 @@ where
     (packed_data, ids)
 }
 
+/// Calculates the normals of a mesh
 pub fn normals_of_mesh<P, M>(mesh: &M) -> Vec<Norm3D>
 where
     M: IsMesh<P, Face3>,
@@ -128,6 +129,7 @@ where
         .collect()
 }
 
+/// Estimates the used delimiter within a string
 pub fn estimate_delimiter(minimum_count: usize, line: &str) -> Option<char> {
     for candidate in [' ', ';', ',', '\t'].iter() {
         if line.chars().filter(|c| *c == *candidate).count() >= minimum_count {
@@ -137,6 +139,7 @@ pub fn estimate_delimiter(minimum_count: usize, line: &str) -> Option<char> {
     None
 }
 
+/// Adds two Is3D values
 pub fn add<P, Q>(p: &P, q: &Q) -> P
 where
     P: IsBuildable3D,
