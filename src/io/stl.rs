@@ -29,11 +29,16 @@ use crate::*;
 
 use byteorder::{LittleEndian, ReadBytesExt};
 
-use std::io::{BufRead, Read, Write};
+use std::{
+    fmt,
+    io::{BufRead, Error as ioError, Read, Write},
+};
 
 use fnv::FnvHashMap;
 
 use core::str::FromStr;
+
+use super::utils::*;
 
 /// Whether format shall be considered to be binary/ASCII or auto determined
 #[derive(Copy, Clone)]
@@ -454,19 +459,6 @@ where
     Ok(())
 }
 
-//@todo duplicate code
-fn fetch_line<'a, R>(read: &mut R, line_buffer: &'a mut String) -> StlResult<&'a str>
-where
-    R: BufRead,
-{
-    line_buffer.clear();
-    let n_read = read.read_line(line_buffer)?;
-    if n_read == 0 {
-        return Err(StlError::LoadFileEndReached);
-    }
-    Ok(line_buffer.trim_end())
-}
-
 fn read_stl_facet<P, R>(
     read: &mut R,
     line_buffer: &mut String,
@@ -570,4 +562,38 @@ where
     P: Is3D,
 {
     format!("{:e} {:e} {:e}", p.x(), p.y(), p.z()).to_string()
+}
+
+//------------------------------------------------------------------------------
+
+/// Error type for .stl file operations
+pub enum StlError {
+    LoadFileEndReached,
+    AccessFile,
+    LineParse(usize),
+}
+
+impl fmt::Debug for StlError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::LoadFileEndReached => write!(f, "Unexpected reach of .stl file end"),
+            Self::AccessFile => write!(f, "Unable to access file"),
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+        }
+    }
+}
+
+/// Result for StlError
+pub type StlResult<T> = std::result::Result<T, StlError>;
+
+impl From<ioError> for StlError {
+    fn from(_error: ioError) -> Self {
+        StlError::AccessFile
+    }
+}
+
+impl From<FetchLineError> for StlError {
+    fn from(_error: FetchLineError) -> Self {
+        StlError::LoadFileEndReached
+    }
 }

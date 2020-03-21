@@ -89,12 +89,6 @@ pub enum PlyError {
     InvalidVertexDimensionDefinition,
 }
 
-pub enum StlError {
-    LoadFileEndReached,
-    AccessFile,
-    LineParse(usize),
-}
-
 pub enum XyError {
     EstimateDelimiter,
     AccessFile,
@@ -212,16 +206,6 @@ impl fmt::Debug for PlyError {
     }
 }
 
-impl fmt::Debug for StlError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::LoadFileEndReached => write!(f, "Unexpected reach of .stl file end"),
-            Self::AccessFile => write!(f, "Unable to access file"),
-            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
-        }
-    }
-}
-
 impl fmt::Debug for XyError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -279,9 +263,6 @@ pub type Result<T> = result::Result<T, ErrorKind>;
 
 /// Result for PlyError
 pub type PlyResult<T> = result::Result<T, PlyError>;
-
-/// Result for StlError
-pub type StlResult<T> = result::Result<T, StlError>;
 
 /// Result for XyError
 pub type XyResult<T> = result::Result<T, XyError>;
@@ -355,12 +336,6 @@ impl From<OffError> for ErrorKind {
 impl From<ioError> for PlyError {
     fn from(_error: ioError) -> Self {
         PlyError::AccessFile
-    }
-}
-
-impl From<ioError> for StlError {
-    fn from(_error: ioError) -> Self {
-        StlError::AccessFile
     }
 }
 
