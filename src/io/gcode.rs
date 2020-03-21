@@ -59,7 +59,7 @@ where
         let line = line_buffer.trim_end();
         i_line += 1;
 
-        if line.starts_with("G1 ") {
+        if line.starts_with("G1 ") || line.starts_with("G92 ") {
             //@todo more specific error
             let mut any_changed = false;
             let [opt_x, opt_y, opt_z] = g1_command(line).ok_or(GcodeError::LineParse(i_line))?;
