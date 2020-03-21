@@ -20,7 +20,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//! Module for interal util functions for IO operations of the ply file format
+//! Module for interal utility functions for IO operations of the ply file format
 
 use crate::*;
 
@@ -75,26 +75,6 @@ where
         VertexType::Float => read.read_f32::<BO>()? as f64,
         VertexType::Double => read.read_f64::<BO>()?,
     })
-}
-
-//------------------------------------------------------------------------------
-
-pub fn skip_bytes<R>(read: &mut R, n_bytes: usize)
-where
-    R: Read,
-{
-    for _ in 0..n_bytes {
-        let _ = read.read_u8();
-    }
-}
-
-pub fn skip_n<I>(i: &mut I, n: usize)
-where
-    I: Iterator,
-{
-    for _ in 0..n {
-        i.next();
-    }
 }
 
 //------------------------------------------------------------------------------

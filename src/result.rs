@@ -29,6 +29,8 @@ use std::{
     result,
 };
 
+use crate::io::*;
+
 /// The Error Enum used by rust-3d
 pub enum ErrorKind {
     MinMaxSwapped,
@@ -91,16 +93,6 @@ pub enum StlError {
     LoadFileEndReached,
     AccessFile,
     LineParse(usize),
-}
-
-pub enum PtxError {
-    LoadFileEndReached,
-    AccessFile,
-    LineParse(usize),
-    Columns(usize),
-    Rows(usize),
-    Matrix(usize),
-    Point(usize),
 }
 
 pub enum XyError {
@@ -230,20 +222,6 @@ impl fmt::Debug for StlError {
     }
 }
 
-impl fmt::Debug for PtxError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::LoadFileEndReached => write!(f, "Unexpected reach of .ptx file end"),
-            Self::AccessFile => write!(f, "Unable to access file"),
-            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
-            Self::Columns(x) => write!(f, "Columns could not be parsed on line {}", x),
-            Self::Rows(x) => write!(f, "Rows could not be parsed on line {}", x),
-            Self::Matrix(x) => write!(f, "Transformation matrix could not be parsed on line {}", x),
-            Self::Point(x) => write!(f, "Point could not be parsed on line {}", x),
-        }
-    }
-}
-
 impl fmt::Debug for XyError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -304,9 +282,6 @@ pub type PlyResult<T> = result::Result<T, PlyError>;
 
 /// Result for StlError
 pub type StlResult<T> = result::Result<T, StlError>;
-
-/// Result for PtxError
-pub type PtxResult<T> = result::Result<T, PtxError>;
 
 /// Result for XyError
 pub type XyResult<T> = result::Result<T, XyError>;
@@ -386,12 +361,6 @@ impl From<ioError> for PlyError {
 impl From<ioError> for StlError {
     fn from(_error: ioError) -> Self {
         StlError::AccessFile
-    }
-}
-
-impl From<ioError> for PtxError {
-    fn from(_error: ioError) -> Self {
-        PtxError::AccessFile
     }
 }
 

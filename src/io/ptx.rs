@@ -24,9 +24,16 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use std::io::BufRead;
+use std::{
+    fmt,
+    io::{BufRead, Error as ioError},
+};
 
 use core::str::FromStr;
+
+use super::utils::*;
+
+//------------------------------------------------------------------------------
 
 /// Loads points from .ptx file into IsPushable<Is3D>
 pub fn load_ptx<IP, P, R>(read: &mut R, ip: &mut IP) -> PtxResult<()>
@@ -127,21 +134,9 @@ where
     Ok(())
 }
 
-//@todo duplicate code
-fn fetch_line<'a, R>(read: &mut R, line_buffer: &'a mut String) -> PtxResult<&'a str>
-where
-    R: BufRead,
-{
-    line_buffer.clear();
-    let n_read = read.read_line(line_buffer)?;
-    if n_read == 0 {
-        return Err(PtxError::LoadFileEndReached);
-    }
-    Ok(line_buffer.trim_end())
-}
+//------------------------------------------------------------------------------
 
-fn read_matrix_row(line: &str) -> Option<[f64; 4]>
-{
+fn read_matrix_row(line: &str) -> Option<[f64; 4]> {
     let mut words = to_words(line);
 
     let a = f64::from_str(words.next()?).ok()?;
@@ -150,4 +145,46 @@ fn read_matrix_row(line: &str) -> Option<[f64; 4]>
     let d = f64::from_str(words.next()?).ok()?;
 
     Some([a, b, c, d])
+}
+
+//------------------------------------------------------------------------------
+
+/// Error type for .ptx file operations
+pub enum PtxError {
+    LoadFileEndReached,
+    AccessFile,
+    LineParse(usize),
+    Columns(usize),
+    Rows(usize),
+    Matrix(usize),
+    Point(usize),
+}
+
+impl fmt::Debug for PtxError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::LoadFileEndReached => write!(f, "Unexpected reach of .ptx file end"),
+            Self::AccessFile => write!(f, "Unable to access file"),
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::Columns(x) => write!(f, "Columns could not be parsed on line {}", x),
+            Self::Rows(x) => write!(f, "Rows could not be parsed on line {}", x),
+            Self::Matrix(x) => write!(f, "Transformation matrix could not be parsed on line {}", x),
+            Self::Point(x) => write!(f, "Point could not be parsed on line {}", x),
+        }
+    }
+}
+
+/// Result for PtxError
+pub type PtxResult<T> = std::result::Result<T, PtxError>;
+
+impl From<ioError> for PtxError {
+    fn from(_error: ioError) -> Self {
+        PtxError::AccessFile
+    }
+}
+
+impl From<FetchLineError> for PtxError {
+    fn from(_error: FetchLineError) -> Self {
+        PtxError::LoadFileEndReached
+    }
 }
