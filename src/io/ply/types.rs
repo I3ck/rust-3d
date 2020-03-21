@@ -22,9 +22,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for interal types for IO operations of the ply file format
 
-use crate::*;
-
 use core::convert::TryFrom;
+
+use std::{fmt, io::Error as ioError};
 
 //------------------------------------------------------------------------------
 
@@ -217,4 +217,85 @@ pub struct Header {
     pub n_faces: usize,
     pub vertex_format: VertexFormat,
     pub face_format: FaceFormat,
+}
+
+//------------------------------------------------------------------------------
+
+/// Error type for .ply file operations
+pub enum PlyError {
+    LoadStartNotFound,
+    LoadFormatNotFound,
+    LoadWrongPropertyCount,
+    LoadVertexIndexDefinitionNotFound,
+    LoadHeaderInvalid,
+    LoadVertexCountNotFound,
+    LoadFaceCountNotFound,
+    LoadVertexCountIncorrect,
+    AccessFile,
+    ColorArrayIncorrectLength,
+    //@todo these all could name the affected line
+    InvalidType(String),
+    InvalidVertexType, //@todo would be better to name the issue
+    InvalidFaceType,   //@todo would be better to name the issue
+    InvalidMeshIndices(Option<usize>),
+    LineParse(usize),
+    InvalidProperty(usize),
+    InvalidVertex(usize),
+    PropertyLineLocation(usize),
+    FaceStructure,
+    InvalidVertexDimensionDefinition,
+}
+
+/// Result type for .ply file operations
+pub type PlyResult<T> = std::result::Result<T, PlyError>;
+
+impl fmt::Debug for PlyError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::LoadStartNotFound => write!(f, "Start of .ply header not found"),
+            Self::LoadFormatNotFound => write!(f, "Format of .ply missing or not supported"),
+            Self::LoadWrongPropertyCount => {
+                write!(f, "Property count of .ply missing or not supported")
+            }
+            Self::LoadVertexIndexDefinitionNotFound => {
+                write!(f, "Index definition in .ply not found")
+            }
+            Self::LoadHeaderInvalid => write!(f, "Header of .ply seems to be invalid"),
+            Self::LoadVertexCountNotFound => write!(f, "Vertex count of .ply not found"),
+            Self::LoadFaceCountNotFound => write!(f, "Face count of .ply not found"),
+            Self::LoadVertexCountIncorrect => write!(f, "Vertex count of .ply not found"),
+            Self::ColorArrayIncorrectLength => {
+                write!(f, "The provided color array has an incorrect length")
+            }
+            Self::InvalidType(x) => write!(f, "Invalid type in header '{}'", x),
+            Self::InvalidVertexType => write!(f, "Invalid vertex type in header"),
+            Self::InvalidFaceType => write!(f, "Invalid face type in header"),
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::AccessFile => write!(f, "Unable to access file"),
+            Self::InvalidMeshIndices(opt_x) => match opt_x {
+                Some(x) => write!(f, "File contains invalid mesh indices on line {}", x),
+                None => write!(f, "File contains invalid mesh indices"),
+            },
+            Self::InvalidProperty(x) => write!(f, "Invalid property on line {}", x),
+            Self::InvalidVertex(x) => write!(f, "Invalid vertex definition on line {}", x),
+            Self::InvalidVertexDimensionDefinition => {
+                write!(f, "Invalid order / definition of vertex dimension order")
+            }
+            Self::PropertyLineLocation(x) => write!(
+                f,
+                "Found property line at unexpected location on line {}",
+                x
+            ),
+            Self::FaceStructure => write!(
+                f,
+                "Invalid face structure, only supporting 3 vertices per face"
+            ),
+        }
+    }
+}
+
+impl From<ioError> for PlyError {
+    fn from(_error: ioError) -> Self {
+        PlyError::AccessFile
+    }
 }

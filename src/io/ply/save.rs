@@ -24,6 +24,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
+use super::types::*;
+
 use byteorder::{BigEndian, WriteBytesExt};
 
 use std::io::Write;

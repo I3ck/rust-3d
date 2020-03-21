@@ -24,9 +24,14 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use std::io::Read;
+use std::{
+    fmt,
+    io::{Error as ioError, Read},
+};
 
 use byteorder::{LittleEndian, ReadBytesExt};
+
+//------------------------------------------------------------------------------
 
 /// Loads a IsPushable<Is3D> as x y z coordinates from .psl files
 pub fn load_psl<IP, P, R>(read: &mut R, ip: &mut IP) -> PslResult<()>
@@ -96,4 +101,28 @@ where
     }
 
     Ok(())
+}
+
+//------------------------------------------------------------------------------
+
+/// Error type for .psl file operations
+pub enum PslError {
+    AccessFile,
+}
+
+/// Result type for .psl file operations
+pub type PslResult<T> = std::result::Result<T, PslError>;
+
+impl fmt::Debug for PslError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::AccessFile => write!(f, "Unable to access file"),
+        }
+    }
+}
+
+impl From<ioError> for PslError {
+    fn from(_error: ioError) -> Self {
+        PslError::AccessFile
+    }
 }

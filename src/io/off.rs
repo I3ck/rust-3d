@@ -26,7 +26,12 @@ use crate::*;
 
 use core::str::FromStr;
 
-use std::io::BufRead;
+use std::{
+    fmt,
+    io::{BufRead, Error as ioError},
+};
+
+//------------------------------------------------------------------------------
 
 /// Loads an IsMesh3D from the off file format
 pub fn load_off_mesh<EM, P, R>(read: &mut R, mesh: &mut EM) -> OffResult<()>
@@ -198,4 +203,34 @@ where
     }
 
     Ok(())
+}
+
+//------------------------------------------------------------------------------
+
+/// Error type for .off file operations
+pub enum OffError {
+    AccessFile,
+    InvalidMeshIndices(usize),
+    LineParse(usize),
+}
+
+/// Result type for .off file operations
+pub type OffResult<T> = std::result::Result<T, OffError>;
+
+impl fmt::Debug for OffError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::AccessFile => write!(f, "Unable to access file"),
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::InvalidMeshIndices(x) => {
+                write!(f, "File contains invalid mesh indices on line {}", x)
+            }
+        }
+    }
+}
+
+impl From<ioError> for OffError {
+    fn from(_error: ioError) -> Self {
+        OffError::AccessFile
+    }
 }

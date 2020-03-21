@@ -26,7 +26,12 @@ use crate::*;
 
 use core::str::FromStr;
 
-use std::io::BufRead;
+use std::{
+    fmt,
+    io::{BufRead, Error as ioError},
+};
+
+//------------------------------------------------------------------------------
 
 //@todo offer both point cloud and mesh loading? (applies to .ply as well?)
 //@todo many valid files won't be read correctly currently
@@ -137,4 +142,34 @@ where
     }
 
     Ok(())
+}
+
+//------------------------------------------------------------------------------
+
+/// Error type for .obj file operations
+pub enum ObjError {
+    AccessFile,
+    InvalidMeshIndices(usize),
+    LineParse(usize),
+}
+
+/// Result type for .obj file operations
+pub type ObjResult<T> = std::result::Result<T, ObjError>;
+
+impl fmt::Debug for ObjError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::AccessFile => write!(f, "Unable to access file"),
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::InvalidMeshIndices(x) => {
+                write!(f, "File contains invalid mesh indices on line {}", x)
+            }
+        }
+    }
+}
+
+impl From<ioError> for ObjError {
+    fn from(_error: ioError) -> Self {
+        ObjError::AccessFile
+    }
 }

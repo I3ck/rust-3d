@@ -573,6 +573,9 @@ pub enum StlError {
     LineParse(usize),
 }
 
+/// Result type for .stl file operations
+pub type StlResult<T> = std::result::Result<T, StlError>;
+
 impl fmt::Debug for StlError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -582,9 +585,6 @@ impl fmt::Debug for StlError {
         }
     }
 }
-
-/// Result for StlError
-pub type StlResult<T> = std::result::Result<T, StlError>;
 
 impl From<ioError> for StlError {
     fn from(_error: ioError) -> Self {

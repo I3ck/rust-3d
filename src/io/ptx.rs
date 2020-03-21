@@ -160,6 +160,9 @@ pub enum PtxError {
     Point(usize),
 }
 
+/// Result type for .ptx file operations
+pub type PtxResult<T> = std::result::Result<T, PtxError>;
+
 impl fmt::Debug for PtxError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -173,9 +176,6 @@ impl fmt::Debug for PtxError {
         }
     }
 }
-
-/// Result for PtxError
-pub type PtxResult<T> = std::result::Result<T, PtxError>;
 
 impl From<ioError> for PtxError {
     fn from(_error: ioError) -> Self {

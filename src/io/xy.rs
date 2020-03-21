@@ -25,7 +25,12 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 
 use core::str::FromStr;
-use std::io::{BufRead, Write};
+use std::{
+    fmt,
+    io::{BufRead, Error as ioError, Write},
+};
+
+//------------------------------------------------------------------------------
 
 /// Saves an IsRandomAccessible<Is2D> as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xy file format or .csv files
 pub fn save_xy<RA, P, W>(write: &mut W, ra: &RA, delim_coord: &str, delim_pos: &str) -> XyResult<()>
@@ -88,4 +93,32 @@ where
     }
 
     Ok(())
+}
+
+//------------------------------------------------------------------------------
+
+/// Error type for .xy file operations
+pub enum XyError {
+    EstimateDelimiter,
+    AccessFile,
+    LineParse(usize),
+}
+
+/// Result type for .xy file operations
+pub type XyResult<T> = std::result::Result<T, XyError>;
+
+impl fmt::Debug for XyError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::AccessFile => write!(f, "Unable to access file"),
+            Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
+        }
+    }
+}
+
+impl From<ioError> for XyError {
+    fn from(_error: ioError) -> Self {
+        XyError::AccessFile
+    }
 }
