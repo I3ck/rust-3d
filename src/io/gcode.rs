@@ -75,8 +75,7 @@ where
                 // Move according to absolute/relative
                 let mut any_changed = false;
                 //@todo more specific errors
-                let [opt_x, opt_y, opt_z] =
-                    g1_command(rest).ok_or(GcodeError::LineParse(i_line))?;
+                let [opt_x, opt_y, opt_z] = command(rest).ok_or(GcodeError::LineParse(i_line))?;
 
                 if let Some(new_x) = opt_x {
                     any_changed = true;
@@ -117,8 +116,7 @@ where
                 // Move according absolute
                 let mut any_changed = false;
                 //@todo more specific error
-                let [opt_x, opt_y, opt_z] =
-                    g1_command(rest).ok_or(GcodeError::LineParse(i_line))?;
+                let [opt_x, opt_y, opt_z] = command(rest).ok_or(GcodeError::LineParse(i_line))?;
 
                 if let Some(new_x) = opt_x {
                     any_changed = true;
@@ -151,7 +149,8 @@ where
 
 //------------------------------------------------------------------------------
 
-fn g1_command(line: &str) -> Option<[Option<f64>; 3]> {
+fn command(line: &str) -> Option<[Option<f64>; 3]> {
+    let mut n_found = 0;
     let mut x = None;
     let mut y = None;
     let mut z = None;
@@ -160,15 +159,27 @@ fn g1_command(line: &str) -> Option<[Option<f64>; 3]> {
     words.next().unwrap(); // safe since starts_with above ensures at least one word present
 
     for word in words {
+        if n_found == 3 {
+            break;
+        }
         if word.len() < 2 {
             continue;
         }
         let (first, rest) = word.split_at(1);
         match first {
             ";" => break,
-            "X" => x = Some(f64::from_str(rest).ok()?),
-            "Y" => y = Some(f64::from_str(rest).ok()?),
-            "Z" => z = Some(f64::from_str(rest).ok()?),
+            "X" => {
+                x = Some(f64::from_str(rest).ok()?);
+                n_found += 1
+            }
+            "Y" => {
+                y = Some(f64::from_str(rest).ok()?);
+                n_found += 1
+            }
+            "Z" => {
+                z = Some(f64::from_str(rest).ok()?);
+                n_found += 1
+            }
             _ => (),
         }
     }
