@@ -61,7 +61,12 @@ where
         let line = line_buffer.trim_end();
         i_line += 1;
 
-        if line.starts_with("G1 ") {
+        if line.starts_with("G1 ")
+            || line.starts_with("G0 ")
+            || line.starts_with("G2 ")
+            || line.starts_with("G3 ")
+        {
+            // Move according to absolute/relative
             let mut any_changed = false;
             //@todo more specific errors
             let [opt_x, opt_y, opt_z] = g1_command(line).ok_or(GcodeError::LineParse(i_line))?;
@@ -102,6 +107,7 @@ where
         } else if line.starts_with("G91 ") {
             ra = RelativeAbsolute::Relative;
         } else if line.starts_with("G92 ") {
+            // Move according absolute
             let mut any_changed = false;
             //@todo more specific error
             let [opt_x, opt_y, opt_z] = g1_command(line).ok_or(GcodeError::LineParse(i_line))?;
