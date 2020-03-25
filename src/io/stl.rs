@@ -270,11 +270,7 @@ where
         read.read_exact(&mut buffer)?;
     }
 
-    let n_triangles = {
-        let mut buffer = [0u8; 4];
-        read.read_exact(&mut buffer)?;
-        u32::from_le_bytes(buffer)
-    };
+    let n_triangles = LittleReader::read_u32(read)?;
 
     mesh.reserve_vertices(3 * n_triangles as usize);
     mesh.reserve_faces(n_triangles as usize);
@@ -378,11 +374,7 @@ where
         read.read_exact(&mut buffer)?;
     }
 
-    let n_triangles = {
-        let mut buffer = [0u8; 4];
-        read.read_exact(&mut buffer)?;
-        u32::from_le_bytes(buffer)
-    };
+    let n_triangles = LittleReader::read_u32(read)?;
 
     mesh.reserve_vertices((0.5 * n_triangles as f64) as usize);
     mesh.reserve_faces(n_triangles as usize);
@@ -485,11 +477,7 @@ where
         read.read_exact(&mut buffer)?;
     }
 
-    let n_triangles = {
-        let mut buffer = [0u8; 4];
-        read.read_exact(&mut buffer)?;
-        u32::from_le_bytes(buffer)
-    };
+    let n_triangles = LittleReader::read_u32(read)?;
 
     for _ in 0..n_triangles {
         let t = read_stl_triangle(read)?;

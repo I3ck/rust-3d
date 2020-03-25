@@ -29,23 +29,7 @@ use std::{
     io::{Error as ioError, Read},
 };
 
-fn read_i32_le<R>(read: &mut R) -> std::io::Result<i32>
-where
-    R: Read,
-{
-    let mut buffer = [0u8; 4];
-    read.read_exact(&mut buffer)?;
-    Ok(i32::from_le_bytes(buffer))
-}
-
-fn read_f32_le<R>(read: &mut R) -> std::io::Result<f32>
-where
-    R: Read,
-{
-    let mut buffer = [0u8; 4];
-    read.read_exact(&mut buffer)?;
-    Ok(f32::from_le_bytes(buffer))
-}
+use super::utils::*;
 
 //------------------------------------------------------------------------------
 
@@ -63,7 +47,7 @@ where
         read.read_exact(&mut buffer)?;
     }
 
-    let _version = read_i32_le(read)?;
+    let _version = LittleReader::read_i32(read)?;
 
     // comments
     {
@@ -71,9 +55,9 @@ where
         read.read_exact(&mut buffer)?;
     }
 
-    let n_passes = read_i32_le(read)?;
+    let n_passes = LittleReader::read_i32(read)?;
 
-    let _digitizing_vector_flag = read_i32_le(read)?;
+    let _digitizing_vector_flag = LittleReader::read_i32(read)?;
 
     // reserved 92*i32
     {
@@ -82,8 +66,8 @@ where
     }
 
     for _ in 0..n_passes {
-        let n_lines = read_i32_le(read)?;
-        let _scanner_id = read_i32_le(read)?;
+        let n_lines = LittleReader::read_i32(read)?;
+        let _scanner_id = LittleReader::read_i32(read)?;
 
         // reserved 14*i32
         {
@@ -92,7 +76,7 @@ where
         }
 
         for _ in 0..n_lines {
-            let n_points = read_i32_le(read)?;
+            let n_points = LittleReader::read_i32(read)?;
 
             // ijk 3*f32
             {
@@ -107,9 +91,9 @@ where
             }
 
             for _ in 0..n_points {
-                let x = read_f32_le(read)?;
-                let y = read_f32_le(read)?;
-                let z = read_f32_le(read)?;
+                let x = LittleReader::read_f32(read)?;
+                let y = LittleReader::read_f32(read)?;
+                let z = LittleReader::read_f32(read)?;
 
                 ip.push(P::new(x as f64, y as f64, z as f64));
             }

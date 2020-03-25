@@ -29,6 +29,51 @@ use std::{
 
 //------------------------------------------------------------------------------
 
+pub trait ByteReader {
+    fn read_i32<R>(read: &mut R) -> std::io::Result<i32>
+    where
+        R: Read;
+    fn read_u32<R>(read: &mut R) -> std::io::Result<u32>
+    where
+        R: Read;
+    fn read_f32<R>(read: &mut R) -> std::io::Result<f32>
+    where
+        R: Read;
+}
+
+pub struct LittleReader {}
+
+impl ByteReader for LittleReader {
+    fn read_i32<R>(read: &mut R) -> std::io::Result<i32>
+    where
+        R: Read,
+    {
+        let mut buffer = [0u8; 4];
+        read.read_exact(&mut buffer)?;
+        Ok(i32::from_le_bytes(buffer))
+    }
+
+    fn read_u32<R>(read: &mut R) -> std::io::Result<u32>
+    where
+        R: Read,
+    {
+        let mut buffer = [0u8; 4];
+        read.read_exact(&mut buffer)?;
+        Ok(u32::from_le_bytes(buffer))
+    }
+
+    fn read_f32<R>(read: &mut R) -> std::io::Result<f32>
+    where
+        R: Read,
+    {
+        let mut buffer = [0u8; 4];
+        read.read_exact(&mut buffer)?;
+        Ok(f32::from_le_bytes(buffer))
+    }
+}
+
+//------------------------------------------------------------------------------
+
 /// Skip number of bytes
 pub fn skip_bytes<R>(read: &mut R, n_bytes: usize) -> std::io::Result<()>
 where
