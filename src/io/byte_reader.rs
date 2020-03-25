@@ -20,58 +20,62 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//! Module containing the ByteReader trait and Little/BigReader implementations for reading binary data
+//! Module containing the IsByteReader trait and Little/BigReader implementations for reading binary data
 
-use std::io::Read;
+use std::io::{Read, Result as iRes};
 
 //------------------------------------------------------------------------------
 
-pub trait ByteReader {
-    fn read_i8<R>(read: &mut R) -> std::io::Result<i8>
+/// Trait for binary data readers
+pub trait IsByteReader {
+    fn read_i8<R>(read: &mut R) -> iRes<i8>
     where
         R: Read;
 
-    fn read_u8<R>(read: &mut R) -> std::io::Result<u8>
+    fn read_u8<R>(read: &mut R) -> iRes<u8>
     where
         R: Read;
 
-    fn read_i16<R>(read: &mut R) -> std::io::Result<i16>
+    fn read_i16<R>(read: &mut R) -> iRes<i16>
     where
         R: Read;
 
-    fn read_u16<R>(read: &mut R) -> std::io::Result<u16>
+    fn read_u16<R>(read: &mut R) -> iRes<u16>
     where
         R: Read;
 
-    fn read_i32<R>(read: &mut R) -> std::io::Result<i32>
+    fn read_i32<R>(read: &mut R) -> iRes<i32>
     where
         R: Read;
 
-    fn read_u32<R>(read: &mut R) -> std::io::Result<u32>
+    fn read_u32<R>(read: &mut R) -> iRes<u32>
     where
         R: Read;
 
-    fn read_f32<R>(read: &mut R) -> std::io::Result<f32>
+    fn read_f32<R>(read: &mut R) -> iRes<f32>
     where
         R: Read;
 
-    fn read_i64<R>(read: &mut R) -> std::io::Result<i64>
+    fn read_i64<R>(read: &mut R) -> iRes<i64>
     where
         R: Read;
 
-    fn read_u64<R>(read: &mut R) -> std::io::Result<u64>
+    fn read_u64<R>(read: &mut R) -> iRes<u64>
     where
         R: Read;
 
-    fn read_f64<R>(read: &mut R) -> std::io::Result<f64>
+    fn read_f64<R>(read: &mut R) -> iRes<f64>
     where
         R: Read;
 }
 
+//------------------------------------------------------------------------------
+
+/// Reader for binary data using little endian
 pub struct LittleReader {}
 
-impl ByteReader for LittleReader {
-    fn read_i8<R>(read: &mut R) -> std::io::Result<i8>
+impl IsByteReader for LittleReader {
+    fn read_i8<R>(read: &mut R) -> iRes<i8>
     where
         R: Read,
     {
@@ -80,7 +84,7 @@ impl ByteReader for LittleReader {
         Ok(i8::from_le_bytes(buffer))
     }
 
-    fn read_u8<R>(read: &mut R) -> std::io::Result<u8>
+    fn read_u8<R>(read: &mut R) -> iRes<u8>
     where
         R: Read,
     {
@@ -89,7 +93,7 @@ impl ByteReader for LittleReader {
         Ok(u8::from_le_bytes(buffer))
     }
 
-    fn read_i16<R>(read: &mut R) -> std::io::Result<i16>
+    fn read_i16<R>(read: &mut R) -> iRes<i16>
     where
         R: Read,
     {
@@ -98,7 +102,7 @@ impl ByteReader for LittleReader {
         Ok(i16::from_le_bytes(buffer))
     }
 
-    fn read_u16<R>(read: &mut R) -> std::io::Result<u16>
+    fn read_u16<R>(read: &mut R) -> iRes<u16>
     where
         R: Read,
     {
@@ -107,7 +111,7 @@ impl ByteReader for LittleReader {
         Ok(u16::from_le_bytes(buffer))
     }
 
-    fn read_i32<R>(read: &mut R) -> std::io::Result<i32>
+    fn read_i32<R>(read: &mut R) -> iRes<i32>
     where
         R: Read,
     {
@@ -116,7 +120,7 @@ impl ByteReader for LittleReader {
         Ok(i32::from_le_bytes(buffer))
     }
 
-    fn read_u32<R>(read: &mut R) -> std::io::Result<u32>
+    fn read_u32<R>(read: &mut R) -> iRes<u32>
     where
         R: Read,
     {
@@ -125,7 +129,7 @@ impl ByteReader for LittleReader {
         Ok(u32::from_le_bytes(buffer))
     }
 
-    fn read_f32<R>(read: &mut R) -> std::io::Result<f32>
+    fn read_f32<R>(read: &mut R) -> iRes<f32>
     where
         R: Read,
     {
@@ -134,7 +138,7 @@ impl ByteReader for LittleReader {
         Ok(f32::from_le_bytes(buffer))
     }
 
-    fn read_i64<R>(read: &mut R) -> std::io::Result<i64>
+    fn read_i64<R>(read: &mut R) -> iRes<i64>
     where
         R: Read,
     {
@@ -143,7 +147,7 @@ impl ByteReader for LittleReader {
         Ok(i64::from_le_bytes(buffer))
     }
 
-    fn read_u64<R>(read: &mut R) -> std::io::Result<u64>
+    fn read_u64<R>(read: &mut R) -> iRes<u64>
     where
         R: Read,
     {
@@ -152,7 +156,7 @@ impl ByteReader for LittleReader {
         Ok(u64::from_le_bytes(buffer))
     }
 
-    fn read_f64<R>(read: &mut R) -> std::io::Result<f64>
+    fn read_f64<R>(read: &mut R) -> iRes<f64>
     where
         R: Read,
     {
@@ -162,10 +166,13 @@ impl ByteReader for LittleReader {
     }
 }
 
+//------------------------------------------------------------------------------
+
+/// Reader for binary data using big endian
 pub struct BigReader {}
 
-impl ByteReader for BigReader {
-    fn read_i8<R>(read: &mut R) -> std::io::Result<i8>
+impl IsByteReader for BigReader {
+    fn read_i8<R>(read: &mut R) -> iRes<i8>
     where
         R: Read,
     {
@@ -174,7 +181,7 @@ impl ByteReader for BigReader {
         Ok(i8::from_be_bytes(buffer))
     }
 
-    fn read_u8<R>(read: &mut R) -> std::io::Result<u8>
+    fn read_u8<R>(read: &mut R) -> iRes<u8>
     where
         R: Read,
     {
@@ -183,7 +190,7 @@ impl ByteReader for BigReader {
         Ok(u8::from_be_bytes(buffer))
     }
 
-    fn read_i16<R>(read: &mut R) -> std::io::Result<i16>
+    fn read_i16<R>(read: &mut R) -> iRes<i16>
     where
         R: Read,
     {
@@ -192,7 +199,7 @@ impl ByteReader for BigReader {
         Ok(i16::from_be_bytes(buffer))
     }
 
-    fn read_u16<R>(read: &mut R) -> std::io::Result<u16>
+    fn read_u16<R>(read: &mut R) -> iRes<u16>
     where
         R: Read,
     {
@@ -201,7 +208,7 @@ impl ByteReader for BigReader {
         Ok(u16::from_be_bytes(buffer))
     }
 
-    fn read_i32<R>(read: &mut R) -> std::io::Result<i32>
+    fn read_i32<R>(read: &mut R) -> iRes<i32>
     where
         R: Read,
     {
@@ -210,7 +217,7 @@ impl ByteReader for BigReader {
         Ok(i32::from_be_bytes(buffer))
     }
 
-    fn read_u32<R>(read: &mut R) -> std::io::Result<u32>
+    fn read_u32<R>(read: &mut R) -> iRes<u32>
     where
         R: Read,
     {
@@ -219,7 +226,7 @@ impl ByteReader for BigReader {
         Ok(u32::from_be_bytes(buffer))
     }
 
-    fn read_f32<R>(read: &mut R) -> std::io::Result<f32>
+    fn read_f32<R>(read: &mut R) -> iRes<f32>
     where
         R: Read,
     {
@@ -228,7 +235,7 @@ impl ByteReader for BigReader {
         Ok(f32::from_be_bytes(buffer))
     }
 
-    fn read_i64<R>(read: &mut R) -> std::io::Result<i64>
+    fn read_i64<R>(read: &mut R) -> iRes<i64>
     where
         R: Read,
     {
@@ -237,7 +244,7 @@ impl ByteReader for BigReader {
         Ok(i64::from_be_bytes(buffer))
     }
 
-    fn read_u64<R>(read: &mut R) -> std::io::Result<u64>
+    fn read_u64<R>(read: &mut R) -> iRes<u64>
     where
         R: Read,
     {
@@ -246,7 +253,7 @@ impl ByteReader for BigReader {
         Ok(u64::from_be_bytes(buffer))
     }
 
-    fn read_f64<R>(read: &mut R) -> std::io::Result<f64>
+    fn read_f64<R>(read: &mut R) -> iRes<f64>
     where
         R: Read,
     {

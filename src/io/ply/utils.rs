@@ -49,7 +49,7 @@ pub fn collect_index_line(line: &str) -> Option<[usize; 3]> {
 
 pub fn read_face_type<BR, R>(read: &mut R, t: FaceType) -> PlyResult<usize>
 where
-    BR: ByteReader,
+    BR: IsByteReader,
     R: Read,
 {
     Ok(match t {
@@ -66,7 +66,7 @@ where
 
 pub fn read_vertex_type<BR, R>(read: &mut R, t: VertexType) -> PlyResult<f64>
 where
-    BR: ByteReader,
+    BR: IsByteReader,
     R: Read,
 {
     Ok(match t {

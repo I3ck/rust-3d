@@ -287,7 +287,7 @@ where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: Read,
-    BR: ByteReader,
+    BR: IsByteReader,
 {
     for _ in 0..header.n_vertices {
         skip_bytes(read, header.vertex_format.before.bytes)?;
