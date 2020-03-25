@@ -29,7 +29,7 @@ use std::{
     io::{Error as ioError, Read},
 };
 
-use super::utils::*;
+use super::byte_reader::*;
 
 //------------------------------------------------------------------------------
 

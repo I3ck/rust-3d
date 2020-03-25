@@ -37,7 +37,7 @@ use fnv::FnvHashMap;
 
 use core::str::FromStr;
 
-use super::utils::*;
+use super::{byte_reader::*, utils::*};
 
 //------------------------------------------------------------------------------
 

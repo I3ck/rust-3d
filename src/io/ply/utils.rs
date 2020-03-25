@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use super::{super::utils::*, types::*};
+use super::{super::byte_reader::*, types::*};
 
 use std::io::Read;
 

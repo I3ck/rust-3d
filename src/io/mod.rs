@@ -50,3 +50,5 @@ mod gcode;
 pub use self::gcode::*;
 
 mod utils;
+
+mod byte_reader;
