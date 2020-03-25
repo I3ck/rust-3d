@@ -27,18 +27,19 @@ use std::{
     io::{BufRead, Error as ioError, Read},
 };
 
-use byteorder::ReadBytesExt;
-
 //------------------------------------------------------------------------------
 
 /// Skip number of bytes
-pub fn skip_bytes<R>(read: &mut R, n_bytes: usize)
+pub fn skip_bytes<R>(read: &mut R, n_bytes: usize) -> std::io::Result<()>
 where
     R: Read,
 {
+    let mut buffer = [0u8; 1];
     for _ in 0..n_bytes {
-        let _ = read.read_u8();
+        let _ = read.read_exact(&mut buffer)?;
     }
+
+    Ok(())
 }
 
 /// Skip number of elements

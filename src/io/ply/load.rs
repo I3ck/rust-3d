@@ -292,19 +292,19 @@ where
     BO: ByteOrder,
 {
     for _ in 0..header.n_vertices {
-        skip_bytes(read, header.vertex_format.before.bytes);
+        skip_bytes(read, header.vertex_format.before.bytes)?;
 
         let first = read_vertex_type::<BO, _>(read, header.vertex_format.first)?;
 
-        skip_bytes(read, header.vertex_format.between_first_snd.bytes);
+        skip_bytes(read, header.vertex_format.between_first_snd.bytes)?;
 
         let snd = read_vertex_type::<BO, _>(read, header.vertex_format.snd)?;
 
-        skip_bytes(read, header.vertex_format.between_snd_third.bytes);
+        skip_bytes(read, header.vertex_format.between_snd_third.bytes)?;
 
         let third = read_vertex_type::<BO, _>(read, header.vertex_format.third)?;
 
-        skip_bytes(read, header.vertex_format.after.bytes);
+        skip_bytes(read, header.vertex_format.after.bytes)?;
 
         mesh.add_vertex(point_with_order(
             first,
@@ -315,7 +315,7 @@ where
     }
 
     for _ in 0..header.n_faces {
-        skip_bytes(read, header.face_format.before.bytes);
+        skip_bytes(read, header.face_format.before.bytes)?;
 
         let element_count = read_face_type::<BO, _>(read, header.face_format.count)?;
 
@@ -327,7 +327,7 @@ where
         let b = read_face_type::<BO, _>(read, header.face_format.index)?;
         let c = read_face_type::<BO, _>(read, header.face_format.index)?;
 
-        skip_bytes(read, header.face_format.after.bytes);
+        skip_bytes(read, header.face_format.after.bytes)?;
 
         mesh.try_add_connection(
             VId { val: a as usize },
