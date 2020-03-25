@@ -24,8 +24,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use byteorder::{BigEndian, ByteOrder, LittleEndian};
-
 use core::{convert::TryFrom, str::FromStr};
 
 use std::io::{BufRead, Read};
@@ -53,8 +51,8 @@ where
 
     match header.format {
         Format::Ascii => load_ascii(read, mesh, &header, &mut line_buffer, &mut i_line),
-        Format::LittleEndian => load_binary::<LittleEndian, _, _, _>(read, mesh, &header),
-        Format::BigEndian => load_binary::<BigEndian, _, _, _>(read, mesh, &header),
+        Format::LittleEndian => load_binary::<LittleReader, _, _, _>(read, mesh, &header),
+        Format::BigEndian => load_binary::<BigReader, _, _, _>(read, mesh, &header),
     }
 }
 
@@ -284,25 +282,25 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_binary<BO, EM, P, R>(read: &mut R, mesh: &mut EM, header: &Header) -> PlyResult<()>
+fn load_binary<BR, EM, P, R>(read: &mut R, mesh: &mut EM, header: &Header) -> PlyResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: Read,
-    BO: ByteOrder,
+    BR: ByteReader,
 {
     for _ in 0..header.n_vertices {
         skip_bytes(read, header.vertex_format.before.bytes)?;
 
-        let first = read_vertex_type::<BO, _>(read, header.vertex_format.first)?;
+        let first = read_vertex_type::<BR, _>(read, header.vertex_format.first)?;
 
         skip_bytes(read, header.vertex_format.between_first_snd.bytes)?;
 
-        let snd = read_vertex_type::<BO, _>(read, header.vertex_format.snd)?;
+        let snd = read_vertex_type::<BR, _>(read, header.vertex_format.snd)?;
 
         skip_bytes(read, header.vertex_format.between_snd_third.bytes)?;
 
-        let third = read_vertex_type::<BO, _>(read, header.vertex_format.third)?;
+        let third = read_vertex_type::<BR, _>(read, header.vertex_format.third)?;
 
         skip_bytes(read, header.vertex_format.after.bytes)?;
 
@@ -317,15 +315,15 @@ where
     for _ in 0..header.n_faces {
         skip_bytes(read, header.face_format.before.bytes)?;
 
-        let element_count = read_face_type::<BO, _>(read, header.face_format.count)?;
+        let element_count = read_face_type::<BR, _>(read, header.face_format.count)?;
 
         if element_count != 3 {
             return Err(PlyError::FaceStructure);
         }
 
-        let a = read_face_type::<BO, _>(read, header.face_format.index)?;
-        let b = read_face_type::<BO, _>(read, header.face_format.index)?;
-        let c = read_face_type::<BO, _>(read, header.face_format.index)?;
+        let a = read_face_type::<BR, _>(read, header.face_format.index)?;
+        let b = read_face_type::<BR, _>(read, header.face_format.index)?;
+        let c = read_face_type::<BR, _>(read, header.face_format.index)?;
 
         skip_bytes(read, header.face_format.after.bytes)?;
 

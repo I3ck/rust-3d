@@ -24,9 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use super::types::*;
-
-use byteorder::{ByteOrder, ReadBytesExt};
+use super::{super::utils::*, types::*};
 
 use std::io::Read;
 
@@ -49,31 +47,31 @@ pub fn collect_index_line(line: &str) -> Option<[usize; 3]> {
 
 //------------------------------------------------------------------------------
 
-pub fn read_face_type<BO, R>(read: &mut R, t: FaceType) -> PlyResult<usize>
+pub fn read_face_type<BR, R>(read: &mut R, t: FaceType) -> PlyResult<usize>
 where
-    BO: ByteOrder,
+    BR: ByteReader,
     R: Read,
 {
     Ok(match t {
-        FaceType::Char => read.read_i8()? as usize,
-        FaceType::UChar => read.read_u8()? as usize,
-        FaceType::Short => read.read_i16::<BO>()? as usize,
-        FaceType::UShort => read.read_u16::<BO>()? as usize,
-        FaceType::Int => read.read_i32::<BO>()? as usize,
-        FaceType::UInt => read.read_u32::<BO>()? as usize,
+        FaceType::Char => BR::read_i8(read)? as usize,
+        FaceType::UChar => BR::read_u8(read)? as usize,
+        FaceType::Short => BR::read_i16(read)? as usize,
+        FaceType::UShort => BR::read_u16(read)? as usize,
+        FaceType::Int => BR::read_i32(read)? as usize,
+        FaceType::UInt => BR::read_u32(read)? as usize,
     })
 }
 
 //------------------------------------------------------------------------------
 
-pub fn read_vertex_type<BO, R>(read: &mut R, t: VertexType) -> PlyResult<f64>
+pub fn read_vertex_type<BR, R>(read: &mut R, t: VertexType) -> PlyResult<f64>
 where
-    BO: ByteOrder,
+    BR: ByteReader,
     R: Read,
 {
     Ok(match t {
-        VertexType::Float => read.read_f32::<BO>()? as f64,
-        VertexType::Double => read.read_f64::<BO>()?,
+        VertexType::Float => BR::read_f32(read)? as f64,
+        VertexType::Double => BR::read_f64(read)?,
     })
 }
 
