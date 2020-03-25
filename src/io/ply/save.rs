@@ -26,8 +26,6 @@ use crate::*;
 
 use super::types::*;
 
-use byteorder::{BigEndian, WriteBytesExt};
-
 use std::io::Write;
 
 //------------------------------------------------------------------------------
@@ -194,28 +192,28 @@ where
         Precision::P32 => {
             for i in 0..mesh.num_vertices() {
                 let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating num_vertices
-                write.write_f32::<BigEndian>(vertex.x() as f32)?;
-                write.write_f32::<BigEndian>(vertex.y() as f32)?;
-                write.write_f32::<BigEndian>(vertex.z() as f32)?;
+                write.write(&(vertex.x() as f32).to_be_bytes())?;
+                write.write(&(vertex.y() as f32).to_be_bytes())?;
+                write.write(&(vertex.z() as f32).to_be_bytes())?;
             }
         }
 
         Precision::P64 => {
             for i in 0..mesh.num_vertices() {
                 let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating num_vertices
-                write.write_f64::<BigEndian>(vertex.x())?;
-                write.write_f64::<BigEndian>(vertex.y())?;
-                write.write_f64::<BigEndian>(vertex.z())?;
+                write.write(&(vertex.x()).to_be_bytes())?;
+                write.write(&(vertex.y()).to_be_bytes())?;
+                write.write(&(vertex.z()).to_be_bytes())?;
             }
         }
     }
 
     for i in 0..mesh.num_faces() {
         let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating num_faces
-        write.write_u8(3)?;
-        write.write_u32::<BigEndian>(face.a.val as u32)?;
-        write.write_u32::<BigEndian>(face.b.val as u32)?;
-        write.write_u32::<BigEndian>(face.c.val as u32)?;
+        write.write(&3u8.to_be_bytes())?;
+        write.write(&(face.a.val as u32).to_be_bytes())?;
+        write.write(&(face.b.val as u32).to_be_bytes())?;
+        write.write(&(face.c.val as u32).to_be_bytes())?;
     }
 
     Ok(())
@@ -290,12 +288,12 @@ where
             for i in 0..n_vertices {
                 let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating n_vertices
                 let color = &colors[i];
-                write.write_f32::<BigEndian>(vertex.x() as f32)?;
-                write.write_f32::<BigEndian>(vertex.y() as f32)?;
-                write.write_f32::<BigEndian>(vertex.z() as f32)?;
-                write.write_u8(color.r)?;
-                write.write_u8(color.g)?;
-                write.write_u8(color.b)?;
+                write.write(&(vertex.x() as f32).to_be_bytes())?;
+                write.write(&(vertex.y() as f32).to_be_bytes())?;
+                write.write(&(vertex.z() as f32).to_be_bytes())?;
+                write.write(&color.r.to_be_bytes())?;
+                write.write(&color.g.to_be_bytes())?;
+                write.write(&color.b.to_be_bytes())?;
             }
         }
 
@@ -303,22 +301,22 @@ where
             for i in 0..n_vertices {
                 let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating n_vertices
                 let color = &colors[i];
-                write.write_f64::<BigEndian>(vertex.x())?;
-                write.write_f64::<BigEndian>(vertex.y())?;
-                write.write_f64::<BigEndian>(vertex.z())?;
-                write.write_u8(color.r)?;
-                write.write_u8(color.g)?;
-                write.write_u8(color.b)?;
+                write.write(&(vertex.x()).to_be_bytes())?;
+                write.write(&(vertex.y()).to_be_bytes())?;
+                write.write(&(vertex.z()).to_be_bytes())?;
+                write.write(&color.r.to_be_bytes())?;
+                write.write(&color.g.to_be_bytes())?;
+                write.write(&color.b.to_be_bytes())?;
             }
         }
     }
 
     for i in 0..n_faces {
         let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating n_faces
-        write.write_u8(3)?;
-        write.write_u32::<BigEndian>(face.a.val as u32)?;
-        write.write_u32::<BigEndian>(face.b.val as u32)?;
-        write.write_u32::<BigEndian>(face.c.val as u32)?;
+        write.write(&3u8.to_be_bytes())?;
+        write.write(&(face.a.val as u32).to_be_bytes())?;
+        write.write(&(face.b.val as u32).to_be_bytes())?;
+        write.write(&(face.c.val as u32).to_be_bytes())?;
     }
 
     Ok(())
