@@ -29,7 +29,23 @@ use std::{
     io::{Error as ioError, Read},
 };
 
-use byteorder::{LittleEndian, ReadBytesExt};
+fn read_i32_le<R>(read: &mut R) -> std::io::Result<i32>
+where
+    R: Read,
+{
+    let mut buffer = [0u8; 4];
+    read.read_exact(&mut buffer)?;
+    Ok(i32::from_le_bytes(buffer))
+}
+
+fn read_f32_le<R>(read: &mut R) -> std::io::Result<f32>
+where
+    R: Read,
+{
+    let mut buffer = [0u8; 4];
+    read.read_exact(&mut buffer)?;
+    Ok(f32::from_le_bytes(buffer))
+}
 
 //------------------------------------------------------------------------------
 
@@ -47,8 +63,7 @@ where
         read.read_exact(&mut buffer)?;
     }
 
-    //@todo ensure version is '1'?
-    let _version = read.read_i32::<LittleEndian>()?;
+    let _version = read_i32_le(read)?;
 
     // comments
     {
@@ -56,46 +71,47 @@ where
         read.read_exact(&mut buffer)?;
     }
 
-    let n_passes = read.read_i32::<LittleEndian>()?;
+    let n_passes = read_i32_le(read)?;
 
-    let _digitizing_vector_flag = read.read_i32::<LittleEndian>()?;
+    let _digitizing_vector_flag = read_i32_le(read)?;
 
-    // reserved
+    // reserved 92*i32
     {
-        let mut buffer = [0i32; 92];
-        read.read_i32_into::<LittleEndian>(&mut buffer)?;
+        let mut buffer = [0u8; 368];
+        read.read_exact(&mut buffer)?;
     }
 
     for _ in 0..n_passes {
-        let n_lines = read.read_i32::<LittleEndian>()?;
-        let _scanner_id = read.read_i32::<LittleEndian>()?;
+        let n_lines = read_i32_le(read)?;
+        let _scanner_id = read_i32_le(read)?;
 
-        // reserved
+        // reserved 14*i32
         {
-            let mut buffer = [0i32; 14];
-            read.read_i32_into::<LittleEndian>(&mut buffer)?;
+            let mut buffer = [0u8; 56];
+            read.read_exact(&mut buffer)?;
         }
 
         for _ in 0..n_lines {
-            let n_points = read.read_i32::<LittleEndian>()?;
+            let n_points = read_i32_le(read)?;
 
-            // ijk
+            // ijk 3*f32
             {
-                let mut buffer = [0f32; 3];
-                read.read_f32_into::<LittleEndian>(&mut buffer)?;
+                let mut buffer = [0u8; 12];
+                read.read_exact(&mut buffer)?;
             }
 
-            // reserved
+            // reserved 12*i32
             {
-                let mut buffer = [0i32; 12];
-                read.read_i32_into::<LittleEndian>(&mut buffer)?;
+                let mut buffer = [0u8; 48];
+                read.read_exact(&mut buffer)?;
             }
 
             for _ in 0..n_points {
-                let mut buffer = [0f32; 3];
-                read.read_f32_into::<LittleEndian>(&mut buffer)?;
+                let x = read_f32_le(read)?;
+                let y = read_f32_le(read)?;
+                let z = read_f32_le(read)?;
 
-                ip.push(P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64));
+                ip.push(P::new(x as f64, y as f64, z as f64));
             }
         }
     }
