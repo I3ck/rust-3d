@@ -27,9 +27,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use byteorder::{LittleEndian, ReadBytesExt};
-
 use std::{
+    convert::TryInto,
     fmt,
     io::{BufRead, Error as ioError, Read, Write},
 };
@@ -150,10 +149,13 @@ where
     R: BufRead,
 {
     let solid = "solid".as_bytes();
+    let mut buffer = [0u8; 5];
 
     let mut result = true;
+    read.read_exact(&mut buffer)?;
+
     for i in 0..5 {
-        if read.read_u8()? != solid[i] {
+        if buffer[i] != solid[i] {
             result = false
         }
     }
@@ -201,6 +203,54 @@ where
     Ok(())
 }
 
+struct StlTriangle {
+    pub nx: f32, //4
+    pub ny: f32, //8
+    pub nz: f32, //12
+
+    pub ax: f32, //16
+    pub ay: f32, //20
+    pub az: f32, //24
+
+    pub bx: f32, //28
+    pub by: f32, //32
+    pub bz: f32, //36
+
+    pub cx: f32, //40
+    pub cy: f32, //44
+    pub cz: f32, //48
+
+    pub garbage: u16, //50
+}
+
+fn read_stl_triangle<R>(read: &mut R) -> StlResult<StlTriangle>
+where
+    R: Read,
+{
+    let mut buffer = [0u8; 50];
+    read.read_exact(&mut buffer)?;
+
+    Ok(StlTriangle {
+        nx: f32::from_le_bytes(buffer[0..4].try_into()?),
+        ny: f32::from_le_bytes(buffer[4..8].try_into()?),
+        nz: f32::from_le_bytes(buffer[8..12].try_into()?),
+
+        ax: f32::from_le_bytes(buffer[12..16].try_into()?),
+        ay: f32::from_le_bytes(buffer[16..20].try_into()?),
+        az: f32::from_le_bytes(buffer[20..24].try_into()?),
+
+        bx: f32::from_le_bytes(buffer[24..28].try_into()?),
+        by: f32::from_le_bytes(buffer[28..32].try_into()?),
+        bz: f32::from_le_bytes(buffer[32..36].try_into()?),
+
+        cx: f32::from_le_bytes(buffer[36..40].try_into()?),
+        cy: f32::from_le_bytes(buffer[40..44].try_into()?),
+        cz: f32::from_le_bytes(buffer[44..48].try_into()?),
+
+        garbage: u16::from_le_bytes(buffer[48..50].try_into()?),
+    })
+}
+
 //------------------------------------------------------------------------------
 
 fn load_stl_mesh_duped_binary<EM, P, R, IPN>(
@@ -220,26 +270,23 @@ where
         read.read_exact(&mut buffer)?;
     }
 
-    let n_triangles = read.read_u32::<LittleEndian>()?;
+    let n_triangles = {
+        let mut buffer = [0u8; 4];
+        read.read_exact(&mut buffer)?;
+        u32::from_le_bytes(buffer)
+    };
+
     mesh.reserve_vertices(3 * n_triangles as usize);
     mesh.reserve_faces(n_triangles as usize);
 
-    let mut buffer = [0f32; 3];
-
     for _ in 0..n_triangles {
-        read.read_f32_into::<LittleEndian>(&mut buffer)?;
-        let n = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+        let t = read_stl_triangle(read)?;
 
-        read.read_f32_into::<LittleEndian>(&mut buffer)?;
-        let a = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+        let n = P::new(t.nx as f64, t.ny as f64, t.nz as f64);
 
-        read.read_f32_into::<LittleEndian>(&mut buffer)?;
-        let b = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
-
-        read.read_f32_into::<LittleEndian>(&mut buffer)?;
-        let c = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
-
-        read.read_u16::<LittleEndian>()?;
+        let a = P::new(t.ax as f64, t.ay as f64, t.az as f64);
+        let b = P::new(t.bx as f64, t.by as f64, t.bz as f64);
+        let c = P::new(t.cx as f64, t.cy as f64, t.cz as f64);
 
         mesh.add_face(a, b, c);
         face_normals.push(n)
@@ -331,28 +378,25 @@ where
         read.read_exact(&mut buffer)?;
     }
 
-    let n_triangles = read.read_u32::<LittleEndian>()?;
+    let n_triangles = {
+        let mut buffer = [0u8; 4];
+        read.read_exact(&mut buffer)?;
+        u32::from_le_bytes(buffer)
+    };
+
     mesh.reserve_vertices((0.5 * n_triangles as f64) as usize);
     mesh.reserve_faces(n_triangles as usize);
-
-    let mut buffer = [0f32; 3];
 
     let mut map = FnvHashMap::default();
 
     for _ in 0..n_triangles {
-        read.read_f32_into::<LittleEndian>(&mut buffer)?;
-        let n = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+        let t = read_stl_triangle(read)?;
 
-        read.read_f32_into::<LittleEndian>(&mut buffer)?;
-        let a = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+        let n = P::new(t.nx as f64, t.ny as f64, t.nz as f64);
 
-        read.read_f32_into::<LittleEndian>(&mut buffer)?;
-        let b = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
-
-        read.read_f32_into::<LittleEndian>(&mut buffer)?;
-        let c = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
-
-        read.read_u16::<LittleEndian>()?;
+        let a = P::new(t.ax as f64, t.ay as f64, t.az as f64);
+        let b = P::new(t.bx as f64, t.by as f64, t.bz as f64);
+        let c = P::new(t.cx as f64, t.cy as f64, t.cz as f64);
 
         let id_a = *map.entry(a.clone()).or_insert_with(|| {
             let value = mesh.num_vertices();
@@ -441,23 +485,20 @@ where
         read.read_exact(&mut buffer)?;
     }
 
-    let n_triangles = read.read_u32::<LittleEndian>()?;
-    let mut buffer = [0f32; 3];
+    let n_triangles = {
+        let mut buffer = [0u8; 4];
+        read.read_exact(&mut buffer)?;
+        u32::from_le_bytes(buffer)
+    };
 
     for _ in 0..n_triangles {
-        read.read_f32_into::<LittleEndian>(&mut buffer)?;
-        let n = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+        let t = read_stl_triangle(read)?;
 
-        read.read_f32_into::<LittleEndian>(&mut buffer)?;
-        let a = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
+        let n = P::new(t.nx as f64, t.ny as f64, t.nz as f64);
 
-        read.read_f32_into::<LittleEndian>(&mut buffer)?;
-        let b = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
-
-        read.read_f32_into::<LittleEndian>(&mut buffer)?;
-        let c = P::new(buffer[0] as f64, buffer[1] as f64, buffer[2] as f64);
-
-        read.read_u16::<LittleEndian>()?;
+        let a = P::new(t.ax as f64, t.ay as f64, t.az as f64);
+        let b = P::new(t.bx as f64, t.by as f64, t.bz as f64);
+        let c = P::new(t.cx as f64, t.cy as f64, t.cz as f64);
 
         ip.push(a);
         ip.push(b);
@@ -604,6 +645,7 @@ impl Default for StlFormat {
 pub enum StlError {
     LoadFileEndReached,
     AccessFile,
+    BinaryData,
     LineParse(usize),
 }
 
@@ -615,6 +657,7 @@ impl fmt::Debug for StlError {
         match self {
             Self::LoadFileEndReached => write!(f, "Unexpected reach of .stl file end"),
             Self::AccessFile => write!(f, "Unable to access file"),
+            Self::BinaryData => write!(f, "Binary data seems to be invalid"),
             Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
         }
     }
@@ -623,6 +666,11 @@ impl fmt::Debug for StlError {
 impl From<ioError> for StlError {
     fn from(_error: ioError) -> Self {
         StlError::AccessFile
+    }
+}
+impl From<std::array::TryFromSliceError> for StlError {
+    fn from(_error: std::array::TryFromSliceError) -> Self {
+        StlError::BinaryData
     }
 }
 
