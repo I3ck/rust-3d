@@ -219,14 +219,13 @@ struct StlTriangle {
     pub cx: f32, //40
     pub cy: f32, //44
     pub cz: f32, //48
-
-    pub garbage: u16, //50
 }
 
 fn read_stl_triangle<R>(read: &mut R) -> StlResult<StlTriangle>
 where
     R: Read,
 {
+    // size for StlTriangle + u16 garbage
     let mut buffer = [0u8; 50];
     read.read_exact(&mut buffer)?;
 
@@ -246,8 +245,6 @@ where
         cx: f32::from_le_bytes(buffer[36..40].try_into()?),
         cy: f32::from_le_bytes(buffer[40..44].try_into()?),
         cz: f32::from_le_bytes(buffer[44..48].try_into()?),
-
-        garbage: u16::from_le_bytes(buffer[48..50].try_into()?),
     })
 }
 
