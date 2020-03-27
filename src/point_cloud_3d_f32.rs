@@ -127,10 +127,53 @@ where
     P: IsBuildable3D,
 {
     fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
-        BoundingBox3D::from_into_iterator(
-            self.data
-                .chunks_exact(3)
-                .map(|chunk| P::new(chunk[0] as f64, chunk[1] as f64, chunk[2] as f64)),
+        let d = &self.data;
+        let n_p = d.len() / 3;
+
+        if n_p <= 2 {
+            return Err(ErrorKind::TooFewPoints);
+        }
+
+        let mut minx = d[0];
+        let mut miny = d[1];
+        let mut minz = d[2];
+        let mut maxx = d[0];
+        let mut maxy = d[1];
+        let mut maxz = d[2];
+
+        for i in 1..n_p {
+            let [x, y, z] = [d[3 * i + 0], d[3 * i + 1], d[3 * i + 2]];
+            if x < minx {
+                minx = x;
+            }
+            if y < miny {
+                miny = y;
+            }
+            if z < minz {
+                minz = z;
+            }
+            if x > maxx {
+                maxx = x;
+            }
+            if y > maxy {
+                maxy = y;
+            }
+            if z > maxz {
+                maxz = z;
+            }
+        }
+
+        BoundingBox3D::new(
+            &Point3D {
+                x: minx as f64,
+                y: miny as f64,
+                z: minz as f64,
+            },
+            &Point3D {
+                x: maxx as f64,
+                y: maxy as f64,
+                z: maxz as f64,
+            },
         )
     }
 }
