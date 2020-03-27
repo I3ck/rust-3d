@@ -71,6 +71,9 @@ where
         self.data.push(p.y() as f32);
         self.data.push(p.z() as f32);
     }
+    fn reserve(&mut self, n: usize) {
+        self.data.reserve(3 * n)
+    }
 }
 
 impl<P> IsDataContainer<P> for PointCloud3Df32<P>

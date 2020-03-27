@@ -109,7 +109,11 @@ where
 
         let must_transform = m != Matrix4::identity();
 
-        for _ in 0..columns * rows {
+        let n = columns * rows;
+
+        ip.reserve(n);
+
+        for _ in 0..n {
             line = fetch_line(read, &mut line_buffer)?;
             i_line += 1;
 

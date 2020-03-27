@@ -172,6 +172,7 @@ where
                     .and_then(|word| usize::from_str(word).ok())
                     .ok_or(OffError::LineParse(i_line))?,
             );
+            ip.reserve(n_vertices.unwrap());
 
             continue;
         }

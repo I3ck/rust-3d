@@ -184,6 +184,9 @@ where
     fn push(&mut self, point: P) {
         self.data.push(point)
     }
+    fn reserve(&mut self, n: usize) {
+        self.data.reserve(n)
+    }
 }
 
 impl<P> IsMovable3D for PointCloud3D<P>

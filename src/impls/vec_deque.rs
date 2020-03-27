@@ -48,6 +48,9 @@ impl<T> IsPushable<T> for VecDeque<T> {
     fn push(&mut self, x: T) {
         self.push_back(x)
     }
+    fn reserve(&mut self, n: usize) {
+        self.reserve(n)
+    }
 }
 
 impl<T> IsViewBuildable for VecDeque<T>

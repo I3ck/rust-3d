@@ -46,6 +46,10 @@ impl<T> IsPushable<T> for Vec<T> {
     fn push(&mut self, x: T) {
         self.push(x)
     }
+
+    fn reserve(&mut self, n: usize) {
+        self.reserve(n)
+    }
 }
 
 impl<T> IsViewBuildable for Vec<T>

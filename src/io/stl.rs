@@ -272,6 +272,8 @@ where
     mesh.reserve_vertices(3 * n_triangles as usize);
     mesh.reserve_faces(n_triangles as usize);
 
+    face_normals.reserve(n_triangles as usize);
+
     for _ in 0..n_triangles {
         let t = read_stl_triangle(read)?;
 
@@ -376,6 +378,8 @@ where
     mesh.reserve_vertices((0.5 * n_triangles as f64) as usize);
     mesh.reserve_faces(n_triangles as usize);
 
+    face_normals.reserve(n_triangles as usize);
+
     let mut map = FnvHashMap::default();
 
     for _ in 0..n_triangles {
@@ -475,6 +479,9 @@ where
     }
 
     let n_triangles = LittleReader::read_u32(read)?;
+
+    ip.reserve(3 * n_triangles as usize);
+    face_normals.reserve(n_triangles as usize);
 
     for _ in 0..n_triangles {
         let t = read_stl_triangle(read)?;
