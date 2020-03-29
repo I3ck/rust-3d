@@ -31,6 +31,7 @@ use crate::*;
 //@todo move these functions to better fitting files or make them methods of the correct types
 
 /// Returns the center of two IsBuildable2D
+#[inline(always)]
 pub fn center_2d<P>(p1: &P, p2: &P) -> P
 where
     P: IsBuildable2D,
@@ -42,6 +43,7 @@ where
 }
 
 /// Returns the center of two IsBuildable3D
+#[inline(always)]
 pub fn center_3d<P>(p1: &P, p2: &P) -> P
 where
     P: IsBuildable3D,
@@ -54,6 +56,7 @@ where
 }
 
 /// Returns the cross product between a Is3D and a IsBuildable3D
+#[inline(always)]
 pub fn cross<P, U>(first: &P, other: &U) -> U
 where
     P: Is3D,
@@ -193,6 +196,7 @@ where
 //@todo rename or overload operators
 //@todo implement for 2D as well, maybe move to traits
 /// Calculates the vector between two positions
+#[inline(always)]
 pub fn conn<P>(p_from: &P, p_to: &P) -> P
 where
     P: IsBuildable3D,
