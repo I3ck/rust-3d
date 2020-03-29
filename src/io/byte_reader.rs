@@ -75,6 +75,7 @@ pub trait IsByteReader {
 pub struct LittleReader {}
 
 impl IsByteReader for LittleReader {
+    #[inline(always)]
     fn read_i8<R>(read: &mut R) -> iRes<i8>
     where
         R: Read,
@@ -84,6 +85,7 @@ impl IsByteReader for LittleReader {
         Ok(i8::from_le_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_u8<R>(read: &mut R) -> iRes<u8>
     where
         R: Read,
@@ -93,6 +95,7 @@ impl IsByteReader for LittleReader {
         Ok(u8::from_le_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_i16<R>(read: &mut R) -> iRes<i16>
     where
         R: Read,
@@ -102,6 +105,7 @@ impl IsByteReader for LittleReader {
         Ok(i16::from_le_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_u16<R>(read: &mut R) -> iRes<u16>
     where
         R: Read,
@@ -111,6 +115,7 @@ impl IsByteReader for LittleReader {
         Ok(u16::from_le_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_i32<R>(read: &mut R) -> iRes<i32>
     where
         R: Read,
@@ -120,6 +125,7 @@ impl IsByteReader for LittleReader {
         Ok(i32::from_le_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_u32<R>(read: &mut R) -> iRes<u32>
     where
         R: Read,
@@ -129,6 +135,7 @@ impl IsByteReader for LittleReader {
         Ok(u32::from_le_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_f32<R>(read: &mut R) -> iRes<f32>
     where
         R: Read,
@@ -138,6 +145,7 @@ impl IsByteReader for LittleReader {
         Ok(f32::from_le_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_i64<R>(read: &mut R) -> iRes<i64>
     where
         R: Read,
@@ -147,6 +155,7 @@ impl IsByteReader for LittleReader {
         Ok(i64::from_le_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_u64<R>(read: &mut R) -> iRes<u64>
     where
         R: Read,
@@ -156,6 +165,7 @@ impl IsByteReader for LittleReader {
         Ok(u64::from_le_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_f64<R>(read: &mut R) -> iRes<f64>
     where
         R: Read,
@@ -172,6 +182,7 @@ impl IsByteReader for LittleReader {
 pub struct BigReader {}
 
 impl IsByteReader for BigReader {
+    #[inline(always)]
     fn read_i8<R>(read: &mut R) -> iRes<i8>
     where
         R: Read,
@@ -181,6 +192,7 @@ impl IsByteReader for BigReader {
         Ok(i8::from_be_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_u8<R>(read: &mut R) -> iRes<u8>
     where
         R: Read,
@@ -190,6 +202,7 @@ impl IsByteReader for BigReader {
         Ok(u8::from_be_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_i16<R>(read: &mut R) -> iRes<i16>
     where
         R: Read,
@@ -199,6 +212,7 @@ impl IsByteReader for BigReader {
         Ok(i16::from_be_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_u16<R>(read: &mut R) -> iRes<u16>
     where
         R: Read,
@@ -208,6 +222,7 @@ impl IsByteReader for BigReader {
         Ok(u16::from_be_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_i32<R>(read: &mut R) -> iRes<i32>
     where
         R: Read,
@@ -217,6 +232,7 @@ impl IsByteReader for BigReader {
         Ok(i32::from_be_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_u32<R>(read: &mut R) -> iRes<u32>
     where
         R: Read,
@@ -226,6 +242,7 @@ impl IsByteReader for BigReader {
         Ok(u32::from_be_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_f32<R>(read: &mut R) -> iRes<f32>
     where
         R: Read,
@@ -235,6 +252,7 @@ impl IsByteReader for BigReader {
         Ok(f32::from_be_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_i64<R>(read: &mut R) -> iRes<i64>
     where
         R: Read,
@@ -244,6 +262,7 @@ impl IsByteReader for BigReader {
         Ok(i64::from_be_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_u64<R>(read: &mut R) -> iRes<u64>
     where
         R: Read,
@@ -253,6 +272,7 @@ impl IsByteReader for BigReader {
         Ok(u64::from_be_bytes(buffer))
     }
 
+    #[inline(always)]
     fn read_f64<R>(read: &mut R) -> iRes<f64>
     where
         R: Read,

@@ -30,6 +30,7 @@ use std::{
 //------------------------------------------------------------------------------
 
 /// Skip number of bytes
+#[inline(always)]
 pub fn skip_bytes<R>(read: &mut R, n_bytes: usize) -> std::io::Result<()>
 where
     R: Read,
@@ -43,6 +44,7 @@ where
 }
 
 /// Skip number of elements
+#[inline(always)]
 pub fn skip_n<I>(i: &mut I, n: usize)
 where
     I: Iterator,
@@ -55,6 +57,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Fetch a single line
+#[inline(always)]
 pub fn fetch_line<'a, R>(read: &mut R, line_buffer: &'a mut String) -> FetchLineResult<&'a str>
 where
     R: BufRead,

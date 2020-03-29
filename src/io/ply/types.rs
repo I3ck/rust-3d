@@ -41,6 +41,7 @@ pub enum Type {
 }
 
 impl Type {
+    #[inline(always)]
     pub fn size_bytes(&self) -> usize {
         match self {
             Self::Char => 1,

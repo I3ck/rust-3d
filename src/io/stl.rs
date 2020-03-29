@@ -221,6 +221,7 @@ struct StlTriangle {
     pub cz: f32, //48
 }
 
+#[inline(always)]
 fn read_stl_triangle<R>(read: &mut R) -> StlResult<StlTriangle>
 where
     R: Read,

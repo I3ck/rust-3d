@@ -140,6 +140,7 @@ where
 
 //------------------------------------------------------------------------------
 
+#[inline(always)]
 fn read_matrix_row(line: &str) -> Option<[f64; 4]> {
     let mut words = to_words(line);
 

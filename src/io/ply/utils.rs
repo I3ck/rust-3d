@@ -32,6 +32,7 @@ use core::str::FromStr;
 
 //------------------------------------------------------------------------------
 
+#[inline(always)]
 pub fn collect_index_line(line: &str) -> Option<[usize; 3]> {
     let mut words = to_words(line);
     if words.next()? != "3" {
@@ -47,6 +48,7 @@ pub fn collect_index_line(line: &str) -> Option<[usize; 3]> {
 
 //------------------------------------------------------------------------------
 
+#[inline(always)]
 pub fn read_face_type<BR, R>(read: &mut R, t: FaceType) -> PlyResult<usize>
 where
     BR: IsByteReader,
@@ -64,6 +66,7 @@ where
 
 //------------------------------------------------------------------------------
 
+#[inline(always)]
 pub fn read_vertex_type<BR, R>(read: &mut R, t: VertexType) -> PlyResult<f64>
 where
     BR: IsByteReader,
@@ -77,6 +80,7 @@ where
 
 //------------------------------------------------------------------------------
 
+#[inline(always)]
 pub fn point_with_order<P>(fst: f64, snd: f64, third: f64, order: VertexOrder) -> P
 where
     P: IsBuildable3D,
