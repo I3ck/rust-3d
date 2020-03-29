@@ -60,6 +60,7 @@ impl Ord for Point3D {
 }
 
 impl Hash for Point3D {
+    #[inline(always)]
     fn hash<H: Hasher>(&self, state: &mut H) {
         hash_f64(self.x, state);
         hash_f64(self.y, state);

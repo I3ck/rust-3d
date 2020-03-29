@@ -67,6 +67,7 @@ impl Positive {
 impl Eq for Positive {}
 
 impl Hash for Positive {
+    #[inline(always)]
     fn hash<H: Hasher>(&self, state: &mut H) {
         hash_f64(self.val, state);
     }

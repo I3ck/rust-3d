@@ -52,6 +52,7 @@ impl Ord for Norm3D {
 }
 
 impl Hash for Norm3D {
+    #[inline(always)]
     fn hash<H: Hasher>(&self, state: &mut H) {
         hash_f64(self.x, state);
         hash_f64(self.y, state);

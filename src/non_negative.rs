@@ -77,6 +77,7 @@ impl From<Positive> for NonNegative {
 impl Eq for NonNegative {}
 
 impl Hash for NonNegative {
+    #[inline(always)]
     fn hash<H: Hasher>(&self, state: &mut H) {
         hash_f64(self.val, state);
     }
