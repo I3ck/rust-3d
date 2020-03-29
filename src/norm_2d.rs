@@ -116,10 +116,12 @@ impl IsND for Norm2D {
 }
 
 impl Is2D for Norm2D {
+    #[inline(always)]
     fn x(&self) -> f64 {
         self.x
     }
 
+    #[inline(always)]
     fn y(&self) -> f64 {
         self.y
     }

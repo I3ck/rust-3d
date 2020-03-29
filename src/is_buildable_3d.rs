@@ -39,6 +39,7 @@ pub trait IsBuildable3D: Sized + Is3D + Eq + PartialEq + Ord + PartialOrd + Hash
         P: Is3D;
 
     /// Uses the coordinates of other to create a new
+    #[inline(always)]
     fn new_from<P>(other: &P) -> Self
     where
         P: Is3D,
@@ -75,6 +76,7 @@ pub trait IsBuildable3D: Sized + Is3D + Eq + PartialEq + Ord + PartialOrd + Hash
         ))
     }
     /// Returns a new object with 0/0/0 as coordinates
+    #[inline(always)]
     fn zero() -> Self {
         Self::new(0.0, 0.0, 0.0)
     }

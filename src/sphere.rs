@@ -61,20 +61,24 @@ impl IsND for Sphere {
 }
 
 impl Is3D for Sphere {
+    #[inline(always)]
     fn x(&self) -> f64 {
         self.center.x()
     }
 
+    #[inline(always)]
     fn y(&self) -> f64 {
         self.center.y()
     }
 
+    #[inline(always)]
     fn z(&self) -> f64 {
         self.center.y()
     }
 }
 
 impl IsBuildableND for Sphere {
+    #[inline(always)]
     fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(Sphere {
             center: Point3D::new_nd(coords)?,
@@ -82,6 +86,7 @@ impl IsBuildableND for Sphere {
         })
     }
 
+    #[inline(always)]
     fn from_nd<P>(&mut self, other: P) -> Result<()>
     where
         P: IsBuildableND,
@@ -91,6 +96,7 @@ impl IsBuildableND for Sphere {
 }
 
 impl IsBuildable3D for Sphere {
+    #[inline(always)]
     fn new(x: f64, y: f64, z: f64) -> Self {
         Sphere {
             center: Point3D { x, y, z },
@@ -98,6 +104,7 @@ impl IsBuildable3D for Sphere {
         }
     }
 
+    #[inline(always)]
     fn from<P>(&mut self, other: &P)
     where
         P: Is3D,
@@ -113,14 +120,17 @@ impl IsEditableND for Sphere {
 }
 
 impl IsEditable3D for Sphere {
+    #[inline(always)]
     fn set_x(&mut self, val: f64) {
         self.center.set_x(val);
     }
 
+    #[inline(always)]
     fn set_y(&mut self, val: f64) {
         self.center.set_y(val);
     }
 
+    #[inline(always)]
     fn set_z(&mut self, val: f64) {
         self.center.set_z(val);
     }

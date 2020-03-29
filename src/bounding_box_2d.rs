@@ -266,10 +266,12 @@ impl IsND for BoundingBox2D {
 }
 
 impl Is2D for BoundingBox2D {
+    #[inline(always)]
     fn x(&self) -> f64 {
         self.center_bb().x()
     }
 
+    #[inline(always)]
     fn y(&self) -> f64 {
         self.center_bb().y()
     }

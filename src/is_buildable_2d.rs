@@ -41,6 +41,7 @@ pub trait IsBuildable2D:
         P: Is2D;
 
     /// Uses the coordinates of other to create a new
+    #[inline(always)]
     fn new_from<P>(other: &P) -> Self
     where
         P: Is2D,
@@ -56,6 +57,7 @@ pub trait IsBuildable2D:
         Ok(Self::new(self.x() / l.get(), self.y() / l.get()))
     }
     /// Returns a new object with 0/0 as coordinates
+    #[inline(always)]
     fn zero() -> Self {
         Self::new(0.0, 0.0)
     }

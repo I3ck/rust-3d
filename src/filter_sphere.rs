@@ -50,24 +50,29 @@ impl IsND for FilterSphere {
 }
 
 impl Is3D for FilterSphere {
+    #[inline(always)]
     fn x(&self) -> f64 {
         self.sphere.x()
     }
 
+    #[inline(always)]
     fn y(&self) -> f64 {
         self.sphere.y()
     }
 
+    #[inline(always)]
     fn z(&self) -> f64 {
         self.sphere.y()
     }
 }
 
 impl IsBuildableND for FilterSphere {
+    #[inline(always)]
     fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(FilterSphere::new(Sphere::new_nd(coords)?))
     }
 
+    #[inline(always)]
     fn from_nd<P>(&mut self, other: P) -> Result<()>
     where
         P: IsBuildableND,
@@ -77,10 +82,12 @@ impl IsBuildableND for FilterSphere {
 }
 
 impl IsBuildable3D for FilterSphere {
+    #[inline(always)]
     fn new(x: f64, y: f64, z: f64) -> Self {
         FilterSphere::new(Sphere::new(x, y, z))
     }
 
+    #[inline(always)]
     fn from<P>(&mut self, other: &P)
     where
         P: Is3D,
@@ -96,14 +103,17 @@ impl IsEditableND for FilterSphere {
 }
 
 impl IsEditable3D for FilterSphere {
+    #[inline(always)]
     fn set_x(&mut self, val: f64) {
         self.sphere.set_x(val);
     }
 
+    #[inline(always)]
     fn set_y(&mut self, val: f64) {
         self.sphere.set_y(val);
     }
 
+    #[inline(always)]
     fn set_z(&mut self, val: f64) {
         self.sphere.set_z(val);
     }

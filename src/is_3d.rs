@@ -36,26 +36,32 @@ pub trait Is3D: IsND {
     fn z(&self) -> f64;
 
     /// Returns the position as x,y,z array
+    #[inline(always)]
     fn xyz(&self) -> [f64; 3] {
         [self.x(), self.y(), self.z()]
     }
     /// Returns the components of the position as array
+    #[inline(always)]
     fn xy(&self) -> [f64; 2] {
         [self.x(), self.y()]
     }
     /// Returns the components of the position as array
+    #[inline(always)]
     fn xz(&self) -> [f64; 2] {
         [self.x(), self.z()]
     }
     /// Returns the components of the position as array
+    #[inline(always)]
     fn yz(&self) -> [f64; 2] {
         [self.y(), self.z()]
     }
     /// Calculates the dot product with another Is3D
+    #[inline(always)]
     fn dot(&self, other: &dyn Is3D) -> f64 {
         self.x() * other.x() + self.y() * other.y() + self.z() * other.z()
     }
     /// The absolute / length of this position
+    #[inline(always)]
     fn abs(&self) -> NonNegative {
         NonNegative::new(((self.x()).powi(2) + (self.y()).powi(2) + (self.z()).powi(2)).sqrt())
             .unwrap()

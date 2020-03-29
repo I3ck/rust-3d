@@ -344,14 +344,17 @@ impl IsND for BoundingBox3D {
 }
 
 impl Is3D for BoundingBox3D {
+    #[inline(always)]
     fn x(&self) -> f64 {
         self.center_bb().x()
     }
 
+    #[inline(always)]
     fn y(&self) -> f64 {
         self.center_bb().y()
     }
 
+    #[inline(always)]
     fn z(&self) -> f64 {
         self.center_bb().z()
     }

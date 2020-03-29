@@ -52,20 +52,24 @@ impl IsND for FilterBox2D {
 }
 
 impl Is2D for FilterBox2D {
+    #[inline(always)]
     fn x(&self) -> f64 {
         self.box_2d.x()
     }
 
+    #[inline(always)]
     fn y(&self) -> f64 {
         self.box_2d.y()
     }
 }
 
 impl IsBuildableND for FilterBox2D {
+    #[inline(always)]
     fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(FilterBox2D::new(Box2D::new_nd(coords)?))
     }
 
+    #[inline(always)]
     fn from_nd<P>(&mut self, other: P) -> Result<()>
     where
         P: IsBuildableND,
@@ -75,10 +79,12 @@ impl IsBuildableND for FilterBox2D {
 }
 
 impl IsBuildable2D for FilterBox2D {
+    #[inline(always)]
     fn new(x: f64, y: f64) -> Self {
         FilterBox2D::new(Box2D::new(x, y))
     }
 
+    #[inline(always)]
     fn from<P>(&mut self, other: &P)
     where
         P: Is2D,
@@ -94,10 +100,12 @@ impl IsEditableND for FilterBox2D {
 }
 
 impl IsEditable2D for FilterBox2D {
+    #[inline(always)]
     fn set_x(&mut self, val: f64) {
         self.box_2d.set_x(val);
     }
 
+    #[inline(always)]
     fn set_y(&mut self, val: f64) {
         self.box_2d.set_y(val);
     }

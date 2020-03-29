@@ -88,16 +88,19 @@ impl IsND for Box2D {
 }
 
 impl Is2D for Box2D {
+    #[inline(always)]
     fn x(&self) -> f64 {
         self.center.x()
     }
 
+    #[inline(always)]
     fn y(&self) -> f64 {
         self.center.y()
     }
 }
 
 impl IsBuildableND for Box2D {
+    #[inline(always)]
     fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(Box2D {
             center: Point2D::new_nd(coords)?,
@@ -106,6 +109,7 @@ impl IsBuildableND for Box2D {
         })
     }
 
+    #[inline(always)]
     fn from_nd<P>(&mut self, other: P) -> Result<()>
     where
         P: IsBuildableND,
@@ -115,6 +119,7 @@ impl IsBuildableND for Box2D {
 }
 
 impl IsBuildable2D for Box2D {
+    #[inline(always)]
     fn new(x: f64, y: f64) -> Self {
         Box2D {
             center: Point2D { x: x, y: y },
@@ -123,6 +128,7 @@ impl IsBuildable2D for Box2D {
         }
     }
 
+    #[inline(always)]
     fn from<P>(&mut self, other: &P)
     where
         P: Is2D,
@@ -138,10 +144,12 @@ impl IsEditableND for Box2D {
 }
 
 impl IsEditable2D for Box2D {
+    #[inline(always)]
     fn set_x(&mut self, val: f64) {
         self.center.set_x(val);
     }
 
+    #[inline(always)]
     fn set_y(&mut self, val: f64) {
         self.center.set_y(val);
     }

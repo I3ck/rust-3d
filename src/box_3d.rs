@@ -94,20 +94,24 @@ impl IsND for Box3D {
 }
 
 impl Is3D for Box3D {
+    #[inline(always)]
     fn x(&self) -> f64 {
         self.center.x()
     }
 
+    #[inline(always)]
     fn y(&self) -> f64 {
         self.center.y()
     }
 
+    #[inline(always)]
     fn z(&self) -> f64 {
         self.center.z()
     }
 }
 
 impl IsBuildableND for Box3D {
+    #[inline(always)]
     fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(Box3D {
             center: Point3D::new_nd(coords)?,
@@ -117,6 +121,7 @@ impl IsBuildableND for Box3D {
         })
     }
 
+    #[inline(always)]
     fn from_nd<P>(&mut self, other: P) -> Result<()>
     where
         P: IsBuildableND,
@@ -126,6 +131,7 @@ impl IsBuildableND for Box3D {
 }
 
 impl IsBuildable3D for Box3D {
+    #[inline(always)]
     fn new(x: f64, y: f64, z: f64) -> Self {
         Box3D {
             center: Point3D { x: x, y: y, z: z },
@@ -135,6 +141,7 @@ impl IsBuildable3D for Box3D {
         }
     }
 
+    #[inline(always)]
     fn from<P>(&mut self, other: &P)
     where
         P: Is3D,
@@ -150,14 +157,17 @@ impl IsEditableND for Box3D {
 }
 
 impl IsEditable3D for Box3D {
+    #[inline(always)]
     fn set_x(&mut self, val: f64) {
         self.center.set_x(val);
     }
 
+    #[inline(always)]
     fn set_y(&mut self, val: f64) {
         self.center.set_y(val);
     }
 
+    #[inline(always)]
     fn set_z(&mut self, val: f64) {
         self.center.set_z(val);
     }

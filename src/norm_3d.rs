@@ -123,14 +123,17 @@ impl IsND for Norm3D {
 }
 
 impl Is3D for Norm3D {
+    #[inline(always)]
     fn x(&self) -> f64 {
         self.x
     }
 
+    #[inline(always)]
     fn y(&self) -> f64 {
         self.y
     }
 
+    #[inline(always)]
     fn z(&self) -> f64 {
         self.z
     }

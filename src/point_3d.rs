@@ -247,20 +247,22 @@ impl IsND for Point3D {
 }
 
 impl Is3D for Point3D {
+    #[inline(always)]
     fn x(&self) -> f64 {
         self.x
     }
-
+    #[inline(always)]
     fn y(&self) -> f64 {
         self.y
     }
-
+    #[inline(always)]
     fn z(&self) -> f64 {
         self.z
     }
 }
 
 impl IsBuildableND for Point3D {
+    #[inline(always)]
     fn new_nd(coords: &[f64]) -> Result<Self> {
         if coords.len() != 3 {
             return Err(ErrorKind::DimensionsDontMatch);
@@ -272,6 +274,7 @@ impl IsBuildableND for Point3D {
         })
     }
 
+    #[inline(always)]
     fn from_nd<P>(&mut self, other: P) -> Result<()>
     where
         P: IsBuildableND,
@@ -288,10 +291,12 @@ impl IsBuildableND for Point3D {
 }
 
 impl IsBuildable3D for Point3D {
+    #[inline(always)]
     fn new(x: f64, y: f64, z: f64) -> Self {
         Point3D { x: x, y: y, z: z }
     }
 
+    #[inline(always)]
     fn from<P>(&mut self, other: &P)
     where
         P: Is3D,
@@ -315,14 +320,17 @@ impl IsEditableND for Point3D {
 }
 
 impl IsEditable3D for Point3D {
+    #[inline(always)]
     fn set_x(&mut self, val: f64) {
         self.x = val;
     }
 
+    #[inline(always)]
     fn set_y(&mut self, val: f64) {
         self.y = val;
     }
 
+    #[inline(always)]
     fn set_z(&mut self, val: f64) {
         self.z = val;
     }

@@ -61,16 +61,19 @@ impl IsND for Circle {
 }
 
 impl Is2D for Circle {
+    #[inline(always)]
     fn x(&self) -> f64 {
         self.center.x()
     }
 
+    #[inline(always)]
     fn y(&self) -> f64 {
         self.center.y()
     }
 }
 
 impl IsBuildableND for Circle {
+    #[inline(always)]
     fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(Circle {
             center: Point2D::new_nd(coords)?,
@@ -78,6 +81,7 @@ impl IsBuildableND for Circle {
         })
     }
 
+    #[inline(always)]
     fn from_nd<P>(&mut self, other: P) -> Result<()>
     where
         P: IsBuildableND,
@@ -87,6 +91,7 @@ impl IsBuildableND for Circle {
 }
 
 impl IsBuildable2D for Circle {
+    #[inline(always)]
     fn new(x: f64, y: f64) -> Self {
         Circle {
             center: Point2D { x: x, y: y },
@@ -94,6 +99,7 @@ impl IsBuildable2D for Circle {
         }
     }
 
+    #[inline(always)]
     fn from<P>(&mut self, other: &P)
     where
         P: Is2D,
@@ -109,10 +115,12 @@ impl IsEditableND for Circle {
 }
 
 impl IsEditable2D for Circle {
+    #[inline(always)]
     fn set_x(&mut self, val: f64) {
         self.center.set_x(val);
     }
 
+    #[inline(always)]
     fn set_y(&mut self, val: f64) {
         self.center.set_y(val);
     }

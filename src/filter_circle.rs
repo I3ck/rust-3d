@@ -51,20 +51,24 @@ impl IsND for FilterCircle {
 }
 
 impl Is2D for FilterCircle {
+    #[inline(always)]
     fn x(&self) -> f64 {
         self.circle.x()
     }
 
+    #[inline(always)]
     fn y(&self) -> f64 {
         self.circle.y()
     }
 }
 
 impl IsBuildableND for FilterCircle {
+    #[inline(always)]
     fn new_nd(coords: &[f64]) -> Result<Self> {
         Ok(FilterCircle::new(Circle::new_nd(coords)?))
     }
 
+    #[inline(always)]
     fn from_nd<P>(&mut self, other: P) -> Result<()>
     where
         P: IsBuildableND,
@@ -74,10 +78,12 @@ impl IsBuildableND for FilterCircle {
 }
 
 impl IsBuildable2D for FilterCircle {
+    #[inline(always)]
     fn new(x: f64, y: f64) -> Self {
         FilterCircle::new(Circle::new(x, y))
     }
 
+    #[inline(always)]
     fn from<P>(&mut self, other: &P)
     where
         P: Is2D,
@@ -93,10 +99,12 @@ impl IsEditableND for FilterCircle {
 }
 
 impl IsEditable2D for FilterCircle {
+    #[inline(always)]
     fn set_x(&mut self, val: f64) {
         self.circle.set_x(val);
     }
 
+    #[inline(always)]
     fn set_y(&mut self, val: f64) {
         self.circle.set_y(val);
     }

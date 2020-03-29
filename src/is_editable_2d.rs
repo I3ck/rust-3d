@@ -34,6 +34,7 @@ pub trait IsEditable2D: Is2D + IsEditableND {
     fn set_y(&mut self, val: f64);
 
     /// Sets the position from x and y values
+    #[inline(always)]
     fn set_xy(&mut self, x: f64, y: f64) {
         self.set_x(x);
         self.set_y(y);

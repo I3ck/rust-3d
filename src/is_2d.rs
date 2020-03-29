@@ -34,18 +34,22 @@ pub trait Is2D: IsND {
     fn y(&self) -> f64;
 
     /// Returns the Position as x,y array
+    #[inline(always)]
     fn xy(&self) -> [f64; 2] {
         [self.x(), self.y()]
     }
     /// Calculates the dot product with another Is2D
+    #[inline(always)]
     fn dot(&self, other: &dyn Is2D) -> f64 {
         self.x() * other.x() + self.y() * other.y()
     }
     /// Calculates the cross product with another Is2D
+    #[inline(always)]
     fn cross(&self, other: &dyn Is2D) -> f64 {
         self.x() * other.y() - self.y() * other.x()
     }
     /// The absolute / length of this position
+    #[inline(always)]
     fn abs(&self) -> NonNegative {
         NonNegative::new(((self.x()).powi(2) + (self.y()).powi(2)).sqrt()).unwrap()
     }

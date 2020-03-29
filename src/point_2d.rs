@@ -230,16 +230,19 @@ impl IsND for Point2D {
 }
 
 impl Is2D for Point2D {
+    #[inline(always)]
     fn x(&self) -> f64 {
         self.x
     }
 
+    #[inline(always)]
     fn y(&self) -> f64 {
         self.y
     }
 }
 
 impl IsBuildableND for Point2D {
+    #[inline(always)]
     fn new_nd(coords: &[f64]) -> Result<Self> {
         if coords.len() != 2 {
             return Err(ErrorKind::DimensionsDontMatch);
@@ -250,6 +253,7 @@ impl IsBuildableND for Point2D {
         })
     }
 
+    #[inline(always)]
     fn from_nd<P>(&mut self, other: P) -> Result<()>
     where
         P: IsBuildableND,
@@ -265,10 +269,12 @@ impl IsBuildableND for Point2D {
 }
 
 impl IsBuildable2D for Point2D {
+    #[inline(always)]
     fn new(x: f64, y: f64) -> Self {
         Point2D { x: x, y: y }
     }
 
+    #[inline(always)]
     fn from<P>(&mut self, other: &P)
     where
         P: Is2D,
@@ -290,10 +296,12 @@ impl IsEditableND for Point2D {
 }
 
 impl IsEditable2D for Point2D {
+    #[inline(always)]
     fn set_x(&mut self, val: f64) {
         self.x = val;
     }
 
+    #[inline(always)]
     fn set_y(&mut self, val: f64) {
         self.y = val;
     }
