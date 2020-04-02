@@ -75,7 +75,8 @@ where
                 // Move according to absolute/relative
                 let mut any_changed = false;
                 //@todo more specific errors
-                let [opt_x, opt_y, opt_z] = command(rest).ok_or(GcodeError::LineParse(i_line))?;
+                let [opt_x, opt_y, opt_z] =
+                    command(&rest[2..]).ok_or(GcodeError::LineParse(i_line))?;
 
                 if let Some(new_x) = opt_x {
                     any_changed = true;
@@ -116,7 +117,8 @@ where
                 // Move according absolute
                 let mut any_changed = false;
                 //@todo more specific error
-                let [opt_x, opt_y, opt_z] = command(rest).ok_or(GcodeError::LineParse(i_line))?;
+                let [opt_x, opt_y, opt_z] =
+                    command(&rest[3..]).ok_or(GcodeError::LineParse(i_line))?;
 
                 if let Some(new_x) = opt_x {
                     any_changed = true;
@@ -154,14 +156,9 @@ fn command(line: &str) -> Option<[Option<f64>; 3]> {
     let mut x = None;
     let mut y = None;
     let mut z = None;
-    let mut words = to_words(line);
-
-    words.next().unwrap(); // safe since starts_with above ensures at least one word present
+    let words = to_words(line);
 
     for word in words {
-        if n_found == 3 {
-            break;
-        }
         if word.len() < 2 {
             continue;
         }
@@ -181,6 +178,10 @@ fn command(line: &str) -> Option<[Option<f64>; 3]> {
                 n_found += 1
             }
             _ => (),
+        }
+
+        if n_found == 3 {
+            break;
         }
     }
 
