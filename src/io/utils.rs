@@ -73,7 +73,7 @@ pub fn trim_start(text: &[u8]) -> &[u8] {
 
 /// Fetch a single line
 #[inline(always)]
-pub fn fetch_line2<'a, R>(read: &mut R, line_buffer: &'a mut Vec<u8>) -> FetchLineResult<&'a [u8]>
+pub fn fetch_line<'a, R>(read: &mut R, line_buffer: &'a mut Vec<u8>) -> FetchLineResult<&'a [u8]>
 where
     R: BufRead,
 {

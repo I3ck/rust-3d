@@ -52,7 +52,7 @@ where
     loop {
         let columns: usize;
         {
-            let first_line = fetch_line2(read, &mut line_buffer);
+            let first_line = fetch_line(read, &mut line_buffer);
             if first_line.is_err() {
                 break;
             }
@@ -65,7 +65,7 @@ where
             // safe, since first_line being err causing break
         }
 
-        line = fetch_line2(read, &mut line_buffer)?;
+        line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
 
         let rows =
@@ -73,34 +73,34 @@ where
                 .map_err(|_| PtxError::Rows(i_line))?;
 
         // skip scanner position line
-        fetch_line2(read, &mut line_buffer)?;
+        fetch_line(read, &mut line_buffer)?;
         i_line += 1;
 
         // skip scanner x-axis line
-        fetch_line2(read, &mut line_buffer)?;
+        fetch_line(read, &mut line_buffer)?;
         i_line += 1;
 
         // skip scanner y-axis line
-        fetch_line2(read, &mut line_buffer)?;
+        fetch_line(read, &mut line_buffer)?;
         i_line += 1;
 
         // skip scanner z-axis line
-        fetch_line2(read, &mut line_buffer)?;
+        fetch_line(read, &mut line_buffer)?;
         i_line += 1;
 
-        line = fetch_line2(read, &mut line_buffer)?;
+        line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
         let [m11, m12, m13, m14] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
 
-        line = fetch_line2(read, &mut line_buffer)?;
+        line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
         let [m21, m22, m23, m24] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
 
-        line = fetch_line2(read, &mut line_buffer)?;
+        line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
         let [m31, m32, m33, m34] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
 
-        line = fetch_line2(read, &mut line_buffer)?;
+        line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
         let [m41, m42, m43, m44] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
 
@@ -120,7 +120,7 @@ where
         ip.reserve(n);
 
         for _ in 0..n {
-            line = fetch_line2(read, &mut line_buffer)?;
+            line = fetch_line(read, &mut line_buffer)?;
             i_line += 1;
 
             //@todo also as helper?

@@ -516,7 +516,7 @@ where
 {
     let mut line: &[u8];
 
-    line = trim_start(fetch_line2(read, line_buffer)?);
+    line = trim_start(fetch_line(read, line_buffer)?);
     *i_line += 1;
 
     if line.starts_with(b"endsolid") {
@@ -529,36 +529,36 @@ where
 
     let n = read_stl_normal(&line).ok_or(StlError::LineParse(*i_line))?;
 
-    line = fetch_line2(read, line_buffer)?;
+    line = fetch_line(read, line_buffer)?;
     *i_line += 1;
 
     if !line.starts_with(b"outer loop") {
         return Err(StlError::LineParse(*i_line));
     }
 
-    line = fetch_line2(read, line_buffer)?;
+    line = fetch_line(read, line_buffer)?;
     *i_line += 1;
 
     let a = read_stl_vertex(&line).ok_or(StlError::LineParse(*i_line))?;
 
-    line = fetch_line2(read, line_buffer)?;
+    line = fetch_line(read, line_buffer)?;
     *i_line += 1;
 
     let b = read_stl_vertex(&line).ok_or(StlError::LineParse(*i_line))?;
 
-    line = fetch_line2(read, line_buffer)?;
+    line = fetch_line(read, line_buffer)?;
     *i_line += 1;
 
     let c = read_stl_vertex(&line).ok_or(StlError::LineParse(*i_line))?;
 
-    line = fetch_line2(read, line_buffer)?;
+    line = fetch_line(read, line_buffer)?;
     *i_line += 1;
 
     if !line.starts_with(b"endloop") {
         return Err(StlError::LineParse(*i_line));
     }
 
-    line = fetch_line2(read, line_buffer)?;
+    line = fetch_line(read, line_buffer)?;
     *i_line += 1;
 
     if !line.starts_with(b"endfacet") {
