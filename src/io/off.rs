@@ -65,7 +65,7 @@ where
         }
 
         if counts.is_none() {
-            let mut words = to_words(&line);
+            let mut words = to_words_skip_empty(&line);
             let n_vertices = words
                 .next()
                 .and_then(|word| usize::from_str(word).ok())
@@ -84,7 +84,7 @@ where
 
         // safe since checked above
         if mesh.num_vertices() < counts.unwrap()[0] {
-            let mut words = to_words(&line);
+            let mut words = to_words_skip_empty(&line);
 
             let x = words
                 .next()
@@ -103,7 +103,7 @@ where
 
             mesh.add_vertex(P::new(x, y, z));
         } else {
-            let mut words = to_words(&line);
+            let mut words = to_words_skip_empty(&line);
 
             let count_face = words.next().ok_or(OffError::LineParse(i_line))?;
 
@@ -165,7 +165,7 @@ where
         }
 
         if n_vertices.is_none() {
-            let mut words = to_words(&line);
+            let mut words = to_words_skip_empty(&line);
             n_vertices = Some(
                 words
                     .next()
@@ -179,7 +179,7 @@ where
 
         // safe since checked above
         if n_added < n_vertices.unwrap() {
-            let mut words = to_words(&line);
+            let mut words = to_words_skip_empty(&line);
 
             let x = words
                 .next()

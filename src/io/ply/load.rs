@@ -126,7 +126,7 @@ where
             None => {
                 if line.starts_with("element vertex") {
                     read_state = HeaderReadState::Vertex;
-                    let mut words = to_words(&line);
+                    let mut words = to_words_skip_empty(&line);
                     opt_n_vertices = Some(
                         usize::from_str(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
                             .map_err(|_| PlyError::LineParse(*i_line))?,
@@ -141,7 +141,7 @@ where
             None => {
                 if line.starts_with("element face") {
                     read_state = HeaderReadState::Face;
-                    let mut words = to_words(&line);
+                    let mut words = to_words_skip_empty(&line);
                     opt_n_faces = Some(
                         usize::from_str(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
                             .map_err(|_| PlyError::LineParse(*i_line))?,
@@ -155,7 +155,7 @@ where
         if line.starts_with("property") {
             match read_state {
                 HeaderReadState::Vertex => {
-                    let mut words = to_words(line);
+                    let mut words = to_words_skip_empty(line);
                     skip_n(&mut words, 1); // skip "property"
 
                     let t =
@@ -196,7 +196,7 @@ where
                     if line.starts_with("property list") {
                         //@todo is this properly defined or are there other identifiers?
                         if line.contains("vertex_indices") || line.contains("vertex_index") {
-                            let mut words = to_words(line);
+                            let mut words = to_words_skip_empty(line);
                             skip_n(&mut words, 2); // skip "property" and "list"
 
                             let t_count = FaceType::try_from(Type::try_from(
@@ -210,7 +210,7 @@ where
                             opt_face_index_type = Some(t_index);
                         }
                     } else {
-                        let mut words = to_words(line);
+                        let mut words = to_words_skip_empty(line);
                         skip_n(&mut words, 1); // skip "property"
                         let t = Type::try_from(
                             words.next().ok_or(PlyError::InvalidProperty(*i_line))?,

@@ -31,8 +31,8 @@ use crate::*;
 
 //------------------------------------------------------------------------------
 
-/// Splits a line into its words
-pub fn to_words(line: &str) -> SkipEmptyString<'_, std::str::Split<'_, &str>> {
+/// Splits a string into its words, skipping empty elements
+pub fn to_words_skip_empty(line: &str) -> SkipEmptyString<'_, std::str::Split<'_, &str>> {
     line.trim().split(" ").skip_empty_string()
 }
 

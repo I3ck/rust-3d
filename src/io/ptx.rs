@@ -117,7 +117,7 @@ where
             line = fetch_line(read, &mut line_buffer)?;
             i_line += 1;
 
-            let mut words = to_words(line);
+            let mut words = to_words_skip_empty(line);
 
             let x = f64::from_str(words.next().ok_or(PtxError::Point(i_line))?)
                 .map_err(|_| PtxError::Point(i_line))?;
@@ -142,7 +142,7 @@ where
 
 #[inline(always)]
 fn read_matrix_row(line: &str) -> Option<[f64; 4]> {
-    let mut words = to_words(line);
+    let mut words = to_words_skip_empty(line);
 
     let a = f64::from_str(words.next()?).ok()?;
     let b = f64::from_str(words.next()?).ok()?;

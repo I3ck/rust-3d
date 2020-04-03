@@ -56,7 +56,7 @@ where
         i_line += 1;
 
         if line.starts_with("v ") {
-            let mut words = to_words(&line);
+            let mut words = to_words_skip_empty(&line);
 
             // skip "v"
             words.next().ok_or(ObjError::LineParse(i_line))?;
@@ -76,7 +76,7 @@ where
 
             mesh.add_vertex(P::new(x, y, z));
         } else if line.starts_with("f ") {
-            let mut words = to_words(&line);
+            let mut words = to_words_skip_empty(&line);
 
             // skip "f"
             words.next().ok_or(ObjError::LineParse(i_line))?;
@@ -119,7 +119,7 @@ where
         i_line += 1;
 
         if line.starts_with("v ") {
-            let mut words = to_words(&line);
+            let mut words = to_words_skip_empty(&line);
 
             // skip "v"
             words.next().ok_or(ObjError::LineParse(i_line))?;

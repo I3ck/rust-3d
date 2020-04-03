@@ -34,7 +34,7 @@ use core::str::FromStr;
 
 #[inline(always)]
 pub fn collect_index_line(line: &str) -> Option<[usize; 3]> {
-    let mut words = to_words(line);
+    let mut words = to_words_skip_empty(line);
     if words.next()? != "3" {
         return None;
     }

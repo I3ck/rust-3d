@@ -574,7 +574,7 @@ fn read_stl_vertex<P>(line: &str) -> Option<P>
 where
     P: IsBuildable3D,
 {
-    let mut words = to_words(line);
+    let mut words = to_words_skip_empty(line);
 
     // skip "vertex"
     words.next()?;
@@ -592,7 +592,7 @@ fn read_stl_normal<P>(line: &str) -> Option<P>
 where
     P: IsBuildable3D,
 {
-    let mut words = to_words(line);
+    let mut words = to_words_skip_empty(line);
 
     // skip "facet"
     words.next()?;
