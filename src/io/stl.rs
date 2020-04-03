@@ -182,10 +182,10 @@ where
     IPN: IsPushable<P>,
 {
     let mut i_line = 0;
-    let mut line_buffer = String::new();
+    let mut line_buffer = Vec::new();
 
     // skip first line
-    read.read_line(&mut line_buffer)?;
+    read.read_until(b'\n', &mut line_buffer)?;
     i_line += 1;
 
     loop {
@@ -305,10 +305,10 @@ where
     IPN: IsPushable<P>,
 {
     let mut i_line = 0;
-    let mut line_buffer = String::new();
+    let mut line_buffer = Vec::new();
 
     // skip first line
-    read.read_line(&mut line_buffer)?;
+    read.read_until(b'\n', &mut line_buffer)?;
     i_line += 1;
 
     let mut map = FnvHashMap::default();
@@ -437,10 +437,10 @@ where
     IPN: IsPushable<P>,
 {
     let mut i_line = 0;
-    let mut line_buffer = String::new();
+    let mut line_buffer = Vec::new();
 
     // skip first line
-    read.read_line(&mut line_buffer)?;
+    read.read_until(b'\n', &mut line_buffer)?;
     i_line += 1;
 
     loop {
@@ -507,61 +507,61 @@ where
 
 fn read_stl_facet<P, R>(
     read: &mut R,
-    line_buffer: &mut String,
+    line_buffer: &mut Vec<u8>,
     i_line: &mut usize,
 ) -> StlResult<[P; 4]>
 where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let mut line: &str;
+    let mut line: &[u8];
 
-    line = fetch_line(read, line_buffer)?;
+    line = trim_start(fetch_line2(read, line_buffer)?);
     *i_line += 1;
 
-    if line.contains("endsolid") {
+    if line.starts_with(b"endsolid") {
         return Err(StlError::LoadFileEndReached);
     }
 
-    if !line.contains("facet") {
+    if !line.starts_with(b"facet") {
         return Err(StlError::LineParse(*i_line));
     }
 
     let n = read_stl_normal(&line).ok_or(StlError::LineParse(*i_line))?;
 
-    line = fetch_line(read, line_buffer)?;
+    line = fetch_line2(read, line_buffer)?;
     *i_line += 1;
 
-    if !line.contains("outer loop") {
+    if !line.starts_with(b"outer loop") {
         return Err(StlError::LineParse(*i_line));
     }
 
-    line = fetch_line(read, line_buffer)?;
+    line = fetch_line2(read, line_buffer)?;
     *i_line += 1;
 
     let a = read_stl_vertex(&line).ok_or(StlError::LineParse(*i_line))?;
 
-    line = fetch_line(read, line_buffer)?;
+    line = fetch_line2(read, line_buffer)?;
     *i_line += 1;
 
     let b = read_stl_vertex(&line).ok_or(StlError::LineParse(*i_line))?;
 
-    line = fetch_line(read, line_buffer)?;
+    line = fetch_line2(read, line_buffer)?;
     *i_line += 1;
 
     let c = read_stl_vertex(&line).ok_or(StlError::LineParse(*i_line))?;
 
-    line = fetch_line(read, line_buffer)?;
+    line = fetch_line2(read, line_buffer)?;
     *i_line += 1;
 
-    if !line.contains("endloop") {
+    if !line.starts_with(b"endloop") {
         return Err(StlError::LineParse(*i_line));
     }
 
-    line = fetch_line(read, line_buffer)?;
+    line = fetch_line2(read, line_buffer)?;
     *i_line += 1;
 
-    if !line.contains("endfacet") {
+    if !line.starts_with(b"endfacet") {
         return Err(StlError::LineParse(*i_line));
     }
 
@@ -570,29 +570,29 @@ where
 
 //------------------------------------------------------------------------------
 
-fn read_stl_vertex<P>(line: &str) -> Option<P>
+fn read_stl_vertex<P>(line: &[u8]) -> Option<P>
 where
     P: IsBuildable3D,
 {
-    let mut words = to_words_skip_empty(line);
+    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
 
     // skip "vertex"
     words.next()?;
 
-    let x = f64::from_str(words.next()?).ok()?;
-    let y = f64::from_str(words.next()?).ok()?;
-    let z = f64::from_str(words.next()?).ok()?;
+    let x = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
+    let y = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
+    let z = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
 
     Some(P::new(x, y, z))
 }
 
 //------------------------------------------------------------------------------
 
-fn read_stl_normal<P>(line: &str) -> Option<P>
+fn read_stl_normal<P>(line: &[u8]) -> Option<P>
 where
     P: IsBuildable3D,
 {
-    let mut words = to_words_skip_empty(line);
+    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
 
     // skip "facet"
     words.next()?;
@@ -600,9 +600,9 @@ where
     // skip "normal"
     words.next()?;
 
-    let i = f64::from_str(words.next()?).ok()?;
-    let j = f64::from_str(words.next()?).ok()?;
-    let k = f64::from_str(words.next()?).ok()?;
+    let i = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
+    let j = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
+    let k = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
 
     Some(P::new(i, j, k))
 }

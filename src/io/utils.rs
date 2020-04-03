@@ -56,6 +56,21 @@ where
 
 //------------------------------------------------------------------------------
 
+/// Trims white space at the start of the input
+pub fn trim_start(text: &[u8]) -> &[u8] {
+    let mut to_drop = 0;
+    for c in text {
+        if !(*c == b' ' || *c == b'\t') {
+            break;
+        }
+        to_drop += 1;
+    }
+
+    &text[to_drop..]
+}
+
+//------------------------------------------------------------------------------
+
 /// Fetch a single line
 #[inline(always)]
 pub fn fetch_line<'a, R>(read: &mut R, line_buffer: &'a mut String) -> FetchLineResult<&'a str>
@@ -69,6 +84,20 @@ where
     }
 
     Ok(line_buffer.trim_end())
+}
+
+#[inline(always)]
+pub fn fetch_line2<'a, R>(read: &mut R, line_buffer: &'a mut Vec<u8>) -> FetchLineResult<&'a [u8]>
+where
+    R: BufRead,
+{
+    line_buffer.clear();
+    let n_read = read.read_until(b'\n', line_buffer)?;
+    if n_read == 0 {
+        return Err(FetchLineError);
+    }
+
+    Ok(&line_buffer[0..line_buffer.len() - 1])
 }
 
 //------------------------------------------------------------------------------
