@@ -41,7 +41,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let mut line_buffer = String::new();
+    let mut line_buffer = Vec::new();
 
     let mut i_line = 0;
 
@@ -53,7 +53,7 @@ where
 
     loop {
         line_buffer.clear();
-        let n_read = read.read_line(&mut line_buffer)?;
+        let n_read = read.read_until(b'\n', &mut line_buffer)?;
         if n_read == 0 {
             break;
         }
@@ -64,13 +64,14 @@ where
             continue;
         }
 
-        let (first, rest) = line.split_at(1);
+        let first = line[0];
+        let (_, rest) = line.split_at(1);
 
-        if first == "G" {
-            if rest.starts_with("1 ")
-                || rest.starts_with("0 ")
-                || rest.starts_with("2 ")
-                || rest.starts_with("3 ")
+        if first == b'G' {
+            if rest.starts_with(b"1 ")
+                || rest.starts_with(b"0 ")
+                || rest.starts_with(b"2 ")
+                || rest.starts_with(b"3 ")
             {
                 // Move according to absolute/relative
                 let mut any_changed = false;
@@ -109,11 +110,11 @@ where
                     }
                     ip.push(P::new(x, y, z));
                 }
-            } else if rest.starts_with("90 ") {
+            } else if rest.starts_with(b"90 ") {
                 ra = RelativeAbsolute::Absolute;
-            } else if rest.starts_with("91 ") {
+            } else if rest.starts_with(b"91 ") {
                 ra = RelativeAbsolute::Relative;
-            } else if rest.starts_with("92 ") {
+            } else if rest.starts_with(b"92 ") {
                 // Move according absolute
                 let mut any_changed = false;
                 //@todo more specific error
@@ -151,34 +152,35 @@ where
 
 //------------------------------------------------------------------------------
 
-fn command(line: &str) -> Option<[Option<f64>; 3]> {
+fn command(line: &[u8]) -> Option<[Option<f64>; 3]> {
     let mut n_found = 0;
     let mut x = None;
     let mut y = None;
     let mut z = None;
-    let words = to_words(line);
+    let words = line.split(|x| *x == b' ');
 
     for word in words {
         if n_found == 3 {
             break;
         }
-        
+
         if word.len() < 2 {
             continue;
         }
-        let (first, rest) = word.split_at(1);
+        let first = word[0];
+        let (_, rest) = word.split_at(1);
         match first {
-            ";" => break,
-            "X" => {
-                x = Some(f64::from_str(rest).ok()?);
+            b';' => break,
+            b'X' => {
+                x = Some(f64::from_str(std::str::from_utf8(rest).ok()?).ok()?);
                 n_found += 1
             }
-            "Y" => {
-                y = Some(f64::from_str(rest).ok()?);
+            b'Y' => {
+                y = Some(f64::from_str(std::str::from_utf8(rest).ok()?).ok()?);
                 n_found += 1
             }
-            "Z" => {
-                z = Some(f64::from_str(rest).ok()?);
+            b'Z' => {
+                z = Some(f64::from_str(std::str::from_utf8(rest).ok()?).ok()?);
                 n_found += 1
             }
             _ => (),
