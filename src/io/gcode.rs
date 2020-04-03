@@ -57,7 +57,7 @@ where
         if n_read == 0 {
             break;
         }
-        let line = line_buffer.trim_end();
+        let line = &line_buffer;
         i_line += 1;
 
         if line.len() < 2 {
