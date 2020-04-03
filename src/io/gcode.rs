@@ -67,11 +67,8 @@ where
         let first = line[0];
         let rest = &line[1..];
 
-        if first == b'G' {
-            if rest.len() >= 3
-                && rest[1] == b' '
-                && (rest[0] == b'1' || rest[0] == b'2' || rest[0] == b'3')
-            {
+        if first == b'G' && rest.len() >= 3 {
+            if rest[1] == b' ' && (rest[0] == b'1' || rest[0] == b'2' || rest[0] == b'3') {
                 // Move according to absolute/relative
                 let mut any_changed = false;
                 //@todo more specific errors
@@ -109,38 +106,44 @@ where
                     }
                     ip.push(P::new(x, y, z));
                 }
-            } else if rest.starts_with(b"90 ") {
-                ra = RelativeAbsolute::Absolute;
-            } else if rest.starts_with(b"91 ") {
-                ra = RelativeAbsolute::Relative;
-            } else if rest.starts_with(b"92 ") {
-                // Move according absolute
-                let mut any_changed = false;
-                //@todo more specific error
-                let [opt_x, opt_y, opt_z] =
-                    command(&rest[3..]).ok_or(GcodeError::LineParse(i_line))?;
+            } else if rest[0] == b'9' && rest[2] == b' ' {
+                // G9x
+                if rest[1] == b'0' {
+                    // G90
+                    ra = RelativeAbsolute::Absolute;
+                } else if rest[1] == b'1' {
+                    // G91
+                    ra = RelativeAbsolute::Relative;
+                } else if rest[1] == b'2' {
+                    // G92
+                    // Move according absolute
+                    let mut any_changed = false;
+                    //@todo more specific error
+                    let [opt_x, opt_y, opt_z] =
+                        command(&rest[3..]).ok_or(GcodeError::LineParse(i_line))?;
 
-                if let Some(new_x) = opt_x {
-                    any_changed = true;
-                    x = new_x
-                }
-
-                if let Some(new_y) = opt_y {
-                    any_changed = true;
-                    y = new_y
-                }
-
-                if let Some(new_z) = opt_z {
-                    any_changed = true;
-                    z = new_z
-                }
-
-                if any_changed {
-                    if !start_pushed {
-                        ip.push(P::new(0.0, 0.0, 0.0));
-                        start_pushed = true
+                    if let Some(new_x) = opt_x {
+                        any_changed = true;
+                        x = new_x
                     }
-                    ip.push(P::new(x, y, z));
+
+                    if let Some(new_y) = opt_y {
+                        any_changed = true;
+                        y = new_y
+                    }
+
+                    if let Some(new_z) = opt_z {
+                        any_changed = true;
+                        z = new_z
+                    }
+
+                    if any_changed {
+                        if !start_pushed {
+                            ip.push(P::new(0.0, 0.0, 0.0));
+                            start_pushed = true
+                        }
+                        ip.push(P::new(x, y, z));
+                    }
                 }
             }
         }
