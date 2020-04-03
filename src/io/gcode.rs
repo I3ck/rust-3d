@@ -60,20 +60,13 @@ where
         let line = &line_buffer;
         i_line += 1;
 
-        if line.len() < 2 {
-            continue;
-        }
-
-        let first = line[0];
-        let rest = &line[1..];
-
-        if first == b'G' && rest.len() >= 3 {
-            if rest[1] == b' ' && (rest[0] == b'1' || rest[0] == b'2' || rest[0] == b'3') {
+        if line.len() >= 4 && line[0] == b'G' {
+            if line[2] == b' ' && (line[1] == b'1' || line[1] == b'2' || line[1] == b'3') {
                 // Move according to absolute/relative
                 let mut any_changed = false;
                 //@todo more specific errors
                 let [opt_x, opt_y, opt_z] =
-                    command(&rest[2..]).ok_or(GcodeError::LineParse(i_line))?;
+                    command(&line[3..]).ok_or(GcodeError::LineParse(i_line))?;
 
                 if let Some(new_x) = opt_x {
                     any_changed = true;
@@ -106,21 +99,21 @@ where
                     }
                     ip.push(P::new(x, y, z));
                 }
-            } else if rest[0] == b'9' && rest[2] == b' ' {
+            } else if line[1] == b'9' && line[3] == b' ' {
                 // G9x
-                if rest[1] == b'0' {
+                if line[2] == b'0' {
                     // G90
                     ra = RelativeAbsolute::Absolute;
-                } else if rest[1] == b'1' {
+                } else if line[2] == b'1' {
                     // G91
                     ra = RelativeAbsolute::Relative;
-                } else if rest[1] == b'2' {
+                } else if line[2] == b'2' {
                     // G92
                     // Move according absolute
                     let mut any_changed = false;
                     //@todo more specific error
                     let [opt_x, opt_y, opt_z] =
-                        command(&rest[3..]).ok_or(GcodeError::LineParse(i_line))?;
+                        command(&line[4..]).ok_or(GcodeError::LineParse(i_line))?;
 
                     if let Some(new_x) = opt_x {
                         any_changed = true;
@@ -169,20 +162,19 @@ fn command(line: &[u8]) -> Option<[Option<f64>; 3]> {
         if word.len() < 2 {
             continue;
         }
-        let first = word[0];
-        let (_, rest) = word.split_at(1);
-        match first {
+
+        match word[0] {
             b';' => break,
             b'X' => {
-                x = Some(f64::from_str(std::str::from_utf8(rest).ok()?).ok()?);
+                x = Some(f64::from_str(std::str::from_utf8(&word[1..]).ok()?).ok()?);
                 n_found += 1
             }
             b'Y' => {
-                y = Some(f64::from_str(std::str::from_utf8(rest).ok()?).ok()?);
+                y = Some(f64::from_str(std::str::from_utf8(&word[1..]).ok()?).ok()?);
                 n_found += 1
             }
             b'Z' => {
-                z = Some(f64::from_str(std::str::from_utf8(rest).ok()?).ok()?);
+                z = Some(f64::from_str(std::str::from_utf8(&word[1..]).ok()?).ok()?);
                 n_found += 1
             }
             _ => (),
