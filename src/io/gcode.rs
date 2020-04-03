@@ -159,6 +159,10 @@ fn command(line: &str) -> Option<[Option<f64>; 3]> {
     let words = to_words(line);
 
     for word in words {
+        if n_found == 3 {
+            break;
+        }
+        
         if word.len() < 2 {
             continue;
         }
@@ -178,10 +182,6 @@ fn command(line: &str) -> Option<[Option<f64>; 3]> {
                 n_found += 1
             }
             _ => (),
-        }
-
-        if n_found == 3 {
-            break;
         }
     }
 
