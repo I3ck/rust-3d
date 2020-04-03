@@ -36,6 +36,11 @@ pub fn to_words_skip_empty(line: &str) -> SkipEmptyString<'_, std::str::Split<'_
     line.trim().split(" ").skip_empty_string()
 }
 
+/// Splits a string into its words
+pub fn to_words(line: &str) -> std::str::Split<'_, &str> {
+    line.trim().split(" ")
+}
+
 /// Returns all until delimiter
 pub fn until<'a>(line: &'a str, delimiter: &str) -> &'a str {
     line.split(delimiter).next().unwrap_or("")

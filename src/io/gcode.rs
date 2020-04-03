@@ -156,7 +156,7 @@ fn command(line: &str) -> Option<[Option<f64>; 3]> {
     let mut x = None;
     let mut y = None;
     let mut z = None;
-    let words = to_words_skip_empty(line);
+    let words = to_words(line);
 
     for word in words {
         if word.len() < 2 {
