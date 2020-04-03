@@ -65,13 +65,12 @@ where
         }
 
         let first = line[0];
-        let (_, rest) = line.split_at(1);
+        let rest = &line[1..];
 
         if first == b'G' {
-            if rest.starts_with(b"1 ")
-                || rest.starts_with(b"0 ")
-                || rest.starts_with(b"2 ")
-                || rest.starts_with(b"3 ")
+            if rest.len() >= 3
+                && rest[1] == b' '
+                && (rest[0] == b'1' || rest[0] == b'2' || rest[0] == b'3')
             {
                 // Move according to absolute/relative
                 let mut any_changed = false;
