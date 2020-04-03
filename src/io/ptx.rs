@@ -35,6 +35,8 @@ use super::utils::*;
 
 //------------------------------------------------------------------------------
 
+//@todo use nicer error chaining / handling
+
 /// Loads points from .ptx file into IsPushable<Is3D>
 pub fn load_ptx<IP, P, R>(read: &mut R, ip: &mut IP) -> PtxResult<()>
 where
@@ -43,58 +45,62 @@ where
     R: BufRead,
 {
     let mut i_line = 0;
-    let mut line_buffer = String::new();
+    let mut line_buffer = Vec::new();
 
-    let mut line: &str;
+    let mut line: &[u8];
 
     loop {
         let columns: usize;
         {
-            let first_line = fetch_line(read, &mut line_buffer);
+            let first_line = fetch_line2(read, &mut line_buffer);
             if first_line.is_err() {
                 break;
             }
             i_line += 1;
 
-            columns =
-                usize::from_str(first_line.unwrap()).map_err(|_| PtxError::Columns(i_line))?;
+            columns = usize::from_str(
+                std::str::from_utf8(first_line.unwrap()).map_err(|_| PtxError::Columns(i_line))?,
+            )
+            .map_err(|_| PtxError::Columns(i_line))?
             // safe, since first_line being err causing break
         }
 
-        line = fetch_line(read, &mut line_buffer)?;
+        line = fetch_line2(read, &mut line_buffer)?;
         i_line += 1;
 
-        let rows = usize::from_str(line).map_err(|_| PtxError::Rows(i_line))?;
+        let rows =
+            usize::from_str(std::str::from_utf8(line).map_err(|_| PtxError::Columns(i_line))?)
+                .map_err(|_| PtxError::Rows(i_line))?;
 
         // skip scanner position line
-        fetch_line(read, &mut line_buffer)?;
+        fetch_line2(read, &mut line_buffer)?;
         i_line += 1;
 
         // skip scanner x-axis line
-        fetch_line(read, &mut line_buffer)?;
+        fetch_line2(read, &mut line_buffer)?;
         i_line += 1;
 
         // skip scanner y-axis line
-        fetch_line(read, &mut line_buffer)?;
+        fetch_line2(read, &mut line_buffer)?;
         i_line += 1;
 
         // skip scanner z-axis line
-        fetch_line(read, &mut line_buffer)?;
+        fetch_line2(read, &mut line_buffer)?;
         i_line += 1;
 
-        line = fetch_line(read, &mut line_buffer)?;
+        line = fetch_line2(read, &mut line_buffer)?;
         i_line += 1;
         let [m11, m12, m13, m14] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
 
-        line = fetch_line(read, &mut line_buffer)?;
+        line = fetch_line2(read, &mut line_buffer)?;
         i_line += 1;
         let [m21, m22, m23, m24] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
 
-        line = fetch_line(read, &mut line_buffer)?;
+        line = fetch_line2(read, &mut line_buffer)?;
         i_line += 1;
         let [m31, m32, m33, m34] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
 
-        line = fetch_line(read, &mut line_buffer)?;
+        line = fetch_line2(read, &mut line_buffer)?;
         i_line += 1;
         let [m41, m42, m43, m44] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
 
@@ -114,17 +120,27 @@ where
         ip.reserve(n);
 
         for _ in 0..n {
-            line = fetch_line(read, &mut line_buffer)?;
+            line = fetch_line2(read, &mut line_buffer)?;
             i_line += 1;
 
-            let mut words = to_words_skip_empty(line);
+            //@todo also as helper?
+            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
 
-            let x = f64::from_str(words.next().ok_or(PtxError::Point(i_line))?)
-                .map_err(|_| PtxError::Point(i_line))?;
-            let y = f64::from_str(words.next().ok_or(PtxError::Point(i_line))?)
-                .map_err(|_| PtxError::Point(i_line))?;
-            let z = f64::from_str(words.next().ok_or(PtxError::Point(i_line))?)
-                .map_err(|_| PtxError::Point(i_line))?;
+            let x = f64::from_str(
+                std::str::from_utf8(words.next().ok_or(PtxError::Point(i_line))?)
+                    .map_err(|_| PtxError::Point(i_line))?,
+            )
+            .map_err(|_| PtxError::Point(i_line))?;
+            let y = f64::from_str(
+                std::str::from_utf8(words.next().ok_or(PtxError::Point(i_line))?)
+                    .map_err(|_| PtxError::Point(i_line))?,
+            )
+            .map_err(|_| PtxError::Point(i_line))?;
+            let z = f64::from_str(
+                std::str::from_utf8(words.next().ok_or(PtxError::Point(i_line))?)
+                    .map_err(|_| PtxError::Point(i_line))?,
+            )
+            .map_err(|_| PtxError::Point(i_line))?;
 
             let mut p = P::new(x, y, z);
 
@@ -141,13 +157,14 @@ where
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn read_matrix_row(line: &str) -> Option<[f64; 4]> {
-    let mut words = to_words_skip_empty(line);
+fn read_matrix_row(line: &[u8]) -> Option<[f64; 4]> {
+    //@todo also as helper?
+    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
 
-    let a = f64::from_str(words.next()?).ok()?;
-    let b = f64::from_str(words.next()?).ok()?;
-    let c = f64::from_str(words.next()?).ok()?;
-    let d = f64::from_str(words.next()?).ok()?;
+    let a = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
+    let b = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
+    let c = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
+    let d = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
 
     Some([a, b, c, d])
 }

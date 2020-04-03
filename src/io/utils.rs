@@ -73,20 +73,6 @@ pub fn trim_start(text: &[u8]) -> &[u8] {
 
 /// Fetch a single line
 #[inline(always)]
-pub fn fetch_line<'a, R>(read: &mut R, line_buffer: &'a mut String) -> FetchLineResult<&'a str>
-where
-    R: BufRead,
-{
-    line_buffer.clear();
-    let n_read = read.read_line(line_buffer)?;
-    if n_read == 0 {
-        return Err(FetchLineError);
-    }
-
-    Ok(line_buffer.trim_end())
-}
-
-#[inline(always)]
 pub fn fetch_line2<'a, R>(read: &mut R, line_buffer: &'a mut Vec<u8>) -> FetchLineResult<&'a [u8]>
 where
     R: BufRead,
@@ -97,7 +83,18 @@ where
         return Err(FetchLineError);
     }
 
-    Ok(&line_buffer[0..line_buffer.len() - 1])
+    // We must drop the '\n' we read_until for sure
+    // And might also have to drop additional whitespace
+    let mut ignore_end = 1;
+    for i in 1..line_buffer.len() - 1 {
+        if (line_buffer[line_buffer.len() - i - 1] as char).is_whitespace() {
+            ignore_end += 1;
+        } else {
+            break;
+        }
+    }
+
+    Ok(&line_buffer[0..line_buffer.len() - ignore_end])
 }
 
 //------------------------------------------------------------------------------
