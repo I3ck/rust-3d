@@ -159,12 +159,21 @@ fn command(line: &[u8]) -> Option<[Option<f64>; 3]> {
             break;
         }
 
-        if word.len() < 2 {
+        let n = word.len();
+
+        if n == 0 {
+            continue;
+        }
+
+        if word[0] == b';' {
+            break;
+        }
+
+        if n < 2 {
             continue;
         }
 
         match word[0] {
-            b';' => break,
             b'X' => {
                 x = Some(f64::from_str(std::str::from_utf8(&word[1..]).ok()?).ok()?);
                 n_found += 1
