@@ -41,9 +41,9 @@ pub fn collect_index_line(line: &[u8]) -> Option<[usize; 3]> {
         return None;
     }
 
-    let a = from_bytes(words.next()?)?;
-    let b = from_bytes(words.next()?)?;
-    let c = from_bytes(words.next()?)?;
+    let a = from_ascii(words.next()?)?;
+    let b = from_ascii(words.next()?)?;
+    let c = from_ascii(words.next()?)?;
 
     Some([a, b, c])
 }

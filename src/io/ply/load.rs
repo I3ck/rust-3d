@@ -128,7 +128,7 @@ where
                     let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
                     //@todo error handling can be simplified
                     opt_n_vertices = Some(
-                        from_bytes(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
+                        from_ascii(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
                             .ok_or(PlyError::LineParse(*i_line))?,
                     );
                     continue;
@@ -144,7 +144,7 @@ where
                     //@todo also as helper?
                     let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
                     opt_n_faces = Some(
-                        from_bytes(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
+                        from_ascii(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
                             .ok_or(PlyError::LineParse(*i_line))?,
                     );
                     continue;
@@ -369,17 +369,17 @@ where
 
             skip_n(&mut words, header.vertex_format.before.words);
 
-            let first = from_bytes(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
+            let first = from_ascii(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
                 .ok_or(PlyError::InvalidVertex(*i_line))?;
 
             skip_n(&mut words, header.vertex_format.between_first_snd.words);
 
-            let snd = from_bytes(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
+            let snd = from_ascii(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
                 .ok_or(PlyError::InvalidVertex(*i_line))?;
 
             skip_n(&mut words, header.vertex_format.between_snd_third.words);
 
-            let third = from_bytes(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
+            let third = from_ascii(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
                 .ok_or(PlyError::InvalidVertex(*i_line))?;
 
             // no need to skip 'after' since we're done with this line anyway

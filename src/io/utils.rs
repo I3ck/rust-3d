@@ -72,9 +72,9 @@ pub fn trim_start(text: &[u8]) -> &[u8] {
 
 //------------------------------------------------------------------------------
 
-/// Reads a FromStr from bytes
+/// Reads a FromStr from ASCII bytes
 #[inline(always)]
-pub fn from_bytes<T>(bytes: &[u8]) -> Option<T>
+pub fn from_ascii<T>(bytes: &[u8]) -> Option<T>
 where
     T: FromStr,
 {

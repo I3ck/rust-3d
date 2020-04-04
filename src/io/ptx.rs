@@ -54,14 +54,14 @@ where
             }
             i_line += 1;
 
-            columns = from_bytes(first_line.unwrap()).ok_or(PtxError::Columns(i_line))?;
+            columns = from_ascii(first_line.unwrap()).ok_or(PtxError::Columns(i_line))?;
             // safe, since first_line being err causing break
         }
 
         line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
 
-        let rows: usize = from_bytes(line).ok_or(PtxError::Rows(i_line))?;
+        let rows: usize = from_ascii(line).ok_or(PtxError::Rows(i_line))?;
 
         // skip scanner position line
         fetch_line(read, &mut line_buffer)?;
@@ -119,15 +119,15 @@ where
 
             let x = words
                 .next()
-                .and_then(|w| from_bytes(w))
+                .and_then(|w| from_ascii(w))
                 .ok_or(PtxError::Point(i_line))?;
             let y = words
                 .next()
-                .and_then(|w| from_bytes(w))
+                .and_then(|w| from_ascii(w))
                 .ok_or(PtxError::Point(i_line))?;
             let z = words
                 .next()
-                .and_then(|w| from_bytes(w))
+                .and_then(|w| from_ascii(w))
                 .ok_or(PtxError::Point(i_line))?;
 
             let mut p = P::new(x, y, z);
@@ -149,10 +149,10 @@ fn read_matrix_row(line: &[u8]) -> Option<[f64; 4]> {
     //@todo also as helper?
     let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
 
-    let a = from_bytes(words.next()?)?;
-    let b = from_bytes(words.next()?)?;
-    let c = from_bytes(words.next()?)?;
-    let d = from_bytes(words.next()?)?;
+    let a = from_ascii(words.next()?)?;
+    let b = from_ascii(words.next()?)?;
+    let c = from_ascii(words.next()?)?;
+    let d = from_ascii(words.next()?)?;
 
     Some([a, b, c, d])
 }

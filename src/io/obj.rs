@@ -62,17 +62,17 @@ where
 
             let x = words
                 .next()
-                .and_then(|w| from_bytes(w))
+                .and_then(|w| from_ascii(w))
                 .ok_or(ObjError::LineParse(i_line))?;
 
             let y = words
                 .next()
-                .and_then(|w| from_bytes(w))
+                .and_then(|w| from_ascii(w))
                 .ok_or(ObjError::LineParse(i_line))?;
 
             let z = words
                 .next()
-                .and_then(|w| from_bytes(w))
+                .and_then(|w| from_ascii(w))
                 .ok_or(ObjError::LineParse(i_line))?;
 
             mesh.add_vertex(P::new(x, y, z));
@@ -84,13 +84,13 @@ where
             words.next().ok_or(ObjError::LineParse(i_line))?;
 
             let mut tmp = words.next().ok_or(ObjError::LineParse(i_line))?;
-            let a: usize = from_bytes(until_bytes(tmp, b'/')).ok_or(ObjError::LineParse(i_line))?;
+            let a: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(ObjError::LineParse(i_line))?;
 
             tmp = words.next().ok_or(ObjError::LineParse(i_line))?;
-            let b: usize = from_bytes(until_bytes(tmp, b'/')).ok_or(ObjError::LineParse(i_line))?;
+            let b: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(ObjError::LineParse(i_line))?;
 
             tmp = words.next().ok_or(ObjError::LineParse(i_line))?;
-            let c: usize = from_bytes(until_bytes(tmp, b'/')).ok_or(ObjError::LineParse(i_line))?;
+            let c: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(ObjError::LineParse(i_line))?;
 
             // obj indexing starts at 1
             mesh.try_add_connection(VId { val: a - 1 }, VId { val: b - 1 }, VId { val: c - 1 })
@@ -127,17 +127,17 @@ where
 
             let x = words
                 .next()
-                .and_then(|w| from_bytes(w))
+                .and_then(|w| from_ascii(w))
                 .ok_or(ObjError::LineParse(i_line))?;
 
             let y = words
                 .next()
-                .and_then(|w| from_bytes(w))
+                .and_then(|w| from_ascii(w))
                 .ok_or(ObjError::LineParse(i_line))?;
 
             let z = words
                 .next()
-                .and_then(|w| from_bytes(w))
+                .and_then(|w| from_ascii(w))
                 .ok_or(ObjError::LineParse(i_line))?;
 
             ip.push(P::new(x, y, z));

@@ -577,9 +577,9 @@ where
     // skip "vertex"
     words.next()?;
 
-    let x = from_bytes(words.next()?)?;
-    let y = from_bytes(words.next()?)?;
-    let z = from_bytes(words.next()?)?;
+    let x = from_ascii(words.next()?)?;
+    let y = from_ascii(words.next()?)?;
+    let z = from_ascii(words.next()?)?;
 
     Some(P::new(x, y, z))
 }
@@ -598,9 +598,9 @@ where
     // skip "normal"
     words.next()?;
 
-    let i = from_bytes(words.next()?)?;
-    let j = from_bytes(words.next()?)?;
-    let k = from_bytes(words.next()?)?;
+    let i = from_ascii(words.next()?)?;
+    let j = from_ascii(words.next()?)?;
+    let k = from_ascii(words.next()?)?;
 
     Some(P::new(i, j, k))
 }

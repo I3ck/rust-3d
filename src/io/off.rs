@@ -67,11 +67,11 @@ where
             let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
             let n_vertices = words
                 .next()
-                .and_then(|word| from_bytes(word))
+                .and_then(|word| from_ascii(word))
                 .ok_or(OffError::LineParse(i_line))?;
             let n_faces = words
                 .next()
-                .and_then(|word| from_bytes(word))
+                .and_then(|word| from_ascii(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             mesh.reserve_vertices(n_vertices);
@@ -88,17 +88,17 @@ where
 
             let x = words
                 .next()
-                .and_then(|word| from_bytes(word))
+                .and_then(|word| from_ascii(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             let y = words
                 .next()
-                .and_then(|word| from_bytes(word))
+                .and_then(|word| from_ascii(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             let z = words
                 .next()
-                .and_then(|word| from_bytes(word))
+                .and_then(|word| from_ascii(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             mesh.add_vertex(P::new(x, y, z));
@@ -111,17 +111,17 @@ where
             if count_face == b"3" {
                 let a = words
                     .next()
-                    .and_then(|word| from_bytes(word))
+                    .and_then(|word| from_ascii(word))
                     .ok_or(OffError::LineParse(i_line))?;
 
                 let b = words
                     .next()
-                    .and_then(|word| from_bytes(word))
+                    .and_then(|word| from_ascii(word))
                     .ok_or(OffError::LineParse(i_line))?;
 
                 let c = words
                     .next()
-                    .and_then(|word| from_bytes(word))
+                    .and_then(|word| from_ascii(word))
                     .ok_or(OffError::LineParse(i_line))?;
 
                 mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
@@ -169,7 +169,7 @@ where
             n_vertices = Some(
                 words
                     .next()
-                    .and_then(|word| from_bytes(word))
+                    .and_then(|word| from_ascii(word))
                     .ok_or(OffError::LineParse(i_line))?,
             );
             ip.reserve(n_vertices.unwrap());
@@ -184,17 +184,17 @@ where
 
             let x = words
                 .next()
-                .and_then(|word| from_bytes(word))
+                .and_then(|word| from_ascii(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             let y = words
                 .next()
-                .and_then(|word| from_bytes(word))
+                .and_then(|word| from_ascii(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             let z = words
                 .next()
-                .and_then(|word| from_bytes(word))
+                .and_then(|word| from_ascii(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             ip.push(P::new(x, y, z));

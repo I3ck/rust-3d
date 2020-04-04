@@ -174,15 +174,15 @@ fn command(line: &[u8]) -> Option<[Option<f64>; 3]> {
 
         match word[0] {
             b'X' => {
-                x = Some(from_bytes(&word[1..])?);
+                x = Some(from_ascii(&word[1..])?);
                 n_found += 1
             }
             b'Y' => {
-                y = Some(from_bytes(&word[1..])?);
+                y = Some(from_ascii(&word[1..])?);
                 n_found += 1
             }
             b'Z' => {
-                z = Some(from_bytes(&word[1..])?);
+                z = Some(from_ascii(&word[1..])?);
                 n_found += 1
             }
             _ => (),
