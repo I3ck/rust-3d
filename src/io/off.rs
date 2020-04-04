@@ -24,12 +24,12 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use core::str::FromStr;
-
 use std::{
     fmt,
     io::{BufRead, Error as ioError},
 };
+
+use super::utils::*;
 
 //------------------------------------------------------------------------------
 
@@ -40,39 +40,38 @@ where
     P: IsBuildable3D + Clone,
     R: BufRead,
 {
-    let mut line_buffer = String::new();
+    let mut line_buffer = Vec::new();
     let mut i_line = 0;
 
     let mut off_seen = false;
     let mut counts = None;
 
     loop {
-        line_buffer.clear();
-        let n_read = read.read_line(&mut line_buffer)?;
-        if n_read == 0 {
-            break;
-        }
-        let line = line_buffer.trim_end();
+        let line = match fetch_line(read, &mut line_buffer) {
+            Ok(x) => x,
+            Err(_) => break,
+        };
         i_line += 1;
 
-        if !off_seen && line.starts_with("OFF") {
+        if !off_seen && line.starts_with(b"OFF") {
             off_seen = true;
             continue;
         }
 
-        if line.is_empty() || line.starts_with("#") {
+        if line.is_empty() || line.starts_with(b"#") {
             continue;
         }
 
         if counts.is_none() {
-            let mut words = to_words_skip_empty(&line);
+            //@todo also as helper?
+            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
             let n_vertices = words
                 .next()
-                .and_then(|word| usize::from_str(word).ok())
+                .and_then(|word| from_bytes(word))
                 .ok_or(OffError::LineParse(i_line))?;
             let n_faces = words
                 .next()
-                .and_then(|word| usize::from_str(word).ok())
+                .and_then(|word| from_bytes(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             mesh.reserve_vertices(n_vertices);
@@ -84,43 +83,45 @@ where
 
         // safe since checked above
         if mesh.num_vertices() < counts.unwrap()[0] {
-            let mut words = to_words_skip_empty(&line);
+            //@todo also as helper?
+            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
 
             let x = words
                 .next()
-                .and_then(|word| f64::from_str(word).ok())
+                .and_then(|word| from_bytes(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             let y = words
                 .next()
-                .and_then(|word| f64::from_str(word).ok())
+                .and_then(|word| from_bytes(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             let z = words
                 .next()
-                .and_then(|word| f64::from_str(word).ok())
+                .and_then(|word| from_bytes(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             mesh.add_vertex(P::new(x, y, z));
         } else {
-            let mut words = to_words_skip_empty(&line);
+            //@todo also as helper?
+            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
 
             let count_face = words.next().ok_or(OffError::LineParse(i_line))?;
 
-            if count_face == "3" {
+            if count_face == b"3" {
                 let a = words
                     .next()
-                    .and_then(|word| usize::from_str(word).ok())
+                    .and_then(|word| from_bytes(word))
                     .ok_or(OffError::LineParse(i_line))?;
 
                 let b = words
                     .next()
-                    .and_then(|word| usize::from_str(word).ok())
+                    .and_then(|word| from_bytes(word))
                     .ok_or(OffError::LineParse(i_line))?;
 
                 let c = words
                     .next()
-                    .and_then(|word| usize::from_str(word).ok())
+                    .and_then(|word| from_bytes(word))
                     .ok_or(OffError::LineParse(i_line))?;
 
                 mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
@@ -139,7 +140,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let mut line_buffer = String::new();
+    let mut line_buffer = Vec::new();
     let mut i_line = 0;
 
     let mut off_seen = false;
@@ -147,29 +148,28 @@ where
     let mut n_added = 0;
 
     loop {
-        line_buffer.clear();
-        let n_read = read.read_line(&mut line_buffer)?;
-        if n_read == 0 {
-            break;
-        }
-        let line = line_buffer.trim_end();
+        let line = match fetch_line(read, &mut line_buffer) {
+            Ok(x) => x,
+            Err(_) => break,
+        };
         i_line += 1;
 
-        if !off_seen && line.starts_with("OFF") {
+        if !off_seen && line.starts_with(b"OFF") {
             off_seen = true;
             continue;
         }
 
-        if line.is_empty() || line.starts_with("#") {
+        if line.is_empty() || line.starts_with(b"#") {
             continue;
         }
 
         if n_vertices.is_none() {
-            let mut words = to_words_skip_empty(&line);
+            //@todo also as helper?
+            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
             n_vertices = Some(
                 words
                     .next()
-                    .and_then(|word| usize::from_str(word).ok())
+                    .and_then(|word| from_bytes(word))
                     .ok_or(OffError::LineParse(i_line))?,
             );
             ip.reserve(n_vertices.unwrap());
@@ -179,21 +179,22 @@ where
 
         // safe since checked above
         if n_added < n_vertices.unwrap() {
-            let mut words = to_words_skip_empty(&line);
+            //@todo also as helper?
+            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
 
             let x = words
                 .next()
-                .and_then(|word| f64::from_str(word).ok())
+                .and_then(|word| from_bytes(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             let y = words
                 .next()
-                .and_then(|word| f64::from_str(word).ok())
+                .and_then(|word| from_bytes(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             let z = words
                 .next()
-                .and_then(|word| f64::from_str(word).ok())
+                .and_then(|word| from_bytes(word))
                 .ok_or(OffError::LineParse(i_line))?;
 
             ip.push(P::new(x, y, z));

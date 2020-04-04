@@ -100,7 +100,7 @@ where
     // We must drop the '\n' we read_until for sure
     // And might also have to drop additional whitespace
     let mut ignore_end = 1;
-    for i in 1..line_buffer.len() - 1 {
+    for i in 1..line_buffer.len() {
         if (line_buffer[line_buffer.len() - i - 1] as char).is_whitespace() {
             ignore_end += 1;
         } else {
