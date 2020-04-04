@@ -78,9 +78,11 @@ pub fn from_bytes<T>(bytes: &[u8]) -> Option<T>
 where
     T: FromStr,
 {
-    std::str::from_utf8(bytes)
-        .ok()
-        .and_then(|x| T::from_str(x).ok())
+    if bytes.is_ascii() {
+        unsafe { T::from_str(std::str::from_utf8_unchecked(bytes)).ok() }
+    } else {
+        None
+    }
 }
 
 //------------------------------------------------------------------------------
