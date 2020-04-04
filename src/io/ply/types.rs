@@ -56,20 +56,22 @@ impl Type {
     }
 }
 
-impl TryFrom<&str> for Type {
+impl TryFrom<&[u8]> for Type {
     type Error = PlyError;
 
-    fn try_from(x: &str) -> PlyResult<Self> {
+    fn try_from(x: &[u8]) -> PlyResult<Self> {
         match x {
-            "char" => Ok(Self::Char),
-            "uchar" => Ok(Self::UChar),
-            "short" => Ok(Self::Short),
-            "ushort" => Ok(Self::UShort),
-            "int" => Ok(Self::Int),
-            "uint" => Ok(Self::UInt),
-            "float" | "float32" => Ok(Self::Float),
-            "double" | "float64" => Ok(Self::Double),
-            _ => Err(PlyError::InvalidType(x.to_string())),
+            b"char" => Ok(Self::Char),
+            b"uchar" => Ok(Self::UChar),
+            b"short" => Ok(Self::Short),
+            b"ushort" => Ok(Self::UShort),
+            b"int" => Ok(Self::Int),
+            b"uint" => Ok(Self::UInt),
+            b"float" | b"float32" => Ok(Self::Float),
+            b"double" | b"float64" => Ok(Self::Double),
+            _ => Err(PlyError::InvalidType(
+                std::str::from_utf8(x).unwrap_or("").to_string(),
+            )),
         }
     }
 }

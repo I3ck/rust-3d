@@ -24,7 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use core::{convert::TryFrom, str::FromStr};
+use core::convert::TryFrom;
 
 use std::io::{BufRead, Read};
 
@@ -41,7 +41,7 @@ where
     P: IsBuildable3D + Clone,
     R: BufRead,
 {
-    let mut line_buffer = String::new();
+    let mut line_buffer = Vec::new();
     let mut i_line = 0;
 
     let header = load_header(read, &mut line_buffer, &mut i_line)?;
@@ -60,7 +60,7 @@ where
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-fn load_header<R>(read: &mut R, line_buffer: &mut String, i_line: &mut usize) -> PlyResult<Header>
+fn load_header<R>(read: &mut R, line_buffer: &mut Vec<u8>, i_line: &mut usize) -> PlyResult<Header>
 where
     R: BufRead,
 {
@@ -88,24 +88,22 @@ where
     let mut face_after = BytesWords::default();
 
     loop {
-        line_buffer.clear();
-        let n_read = read.read_line(line_buffer)?;
-        if n_read == 0 {
-            break;
-        }
-        let line = line_buffer.trim_end();
+        let line = match fetch_line(read, line_buffer) {
+            Ok(x) => x,
+            Err(_) => break,
+        };
         *i_line += 1;
 
-        if line.starts_with("comment") {
+        if line.starts_with(b"comment") {
             continue;
         }
 
-        if line.starts_with("obj_info") {
+        if line.starts_with(b"obj_info") {
             continue;
         }
 
         if !ply_found {
-            if line == "ply" {
+            if line == b"ply" {
                 ply_found = true;
                 continue;
             }
@@ -114,9 +112,9 @@ where
 
         if opt_format.is_none() {
             opt_format = Some(match line {
-                "format ascii 1.0" => Format::Ascii,
-                "format binary_little_endian 1.0" => Format::LittleEndian,
-                "format binary_big_endian 1.0" => Format::BigEndian,
+                b"format ascii 1.0" => Format::Ascii,
+                b"format binary_little_endian 1.0" => Format::LittleEndian,
+                b"format binary_big_endian 1.0" => Format::BigEndian,
                 _ => return Err(PlyError::LoadFormatNotFound),
             });
             continue;
@@ -124,12 +122,14 @@ where
 
         match opt_n_vertices {
             None => {
-                if line.starts_with("element vertex") {
+                if line.starts_with(b"element vertex") {
                     read_state = HeaderReadState::Vertex;
-                    let mut words = to_words_skip_empty(&line);
+                    //@todo also as helper?
+                    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+                    //@todo error handling can be simplified
                     opt_n_vertices = Some(
-                        usize::from_str(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
-                            .map_err(|_| PlyError::LineParse(*i_line))?,
+                        from_bytes(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
+                            .ok_or(PlyError::LineParse(*i_line))?,
                     );
                     continue;
                 }
@@ -139,12 +139,13 @@ where
 
         match opt_n_faces {
             None => {
-                if line.starts_with("element face") {
+                if line.starts_with(b"element face") {
                     read_state = HeaderReadState::Face;
-                    let mut words = to_words_skip_empty(&line);
+                    //@todo also as helper?
+                    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
                     opt_n_faces = Some(
-                        usize::from_str(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
-                            .map_err(|_| PlyError::LineParse(*i_line))?,
+                        from_bytes(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
+                            .ok_or(PlyError::LineParse(*i_line))?,
                     );
                     continue;
                 }
@@ -152,26 +153,27 @@ where
             Some(_) => {}
         }
 
-        if line.starts_with("property") {
+        if line.starts_with(b"property") {
             match read_state {
                 HeaderReadState::Vertex => {
-                    let mut words = to_words_skip_empty(line);
+                    //@todo also as helper?
+                    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
                     skip_n(&mut words, 1); // skip "property"
 
                     let t =
                         Type::try_from(words.next().ok_or(PlyError::InvalidProperty(*i_line))?)?;
                     let id = words.next().ok_or(PlyError::InvalidProperty(*i_line))?;
-                    if id == "x" {
+                    if id == b"x" {
                         opt_fst_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::X;
                         i_vertex_order += 1;
-                    } else if id == "y" {
+                    } else if id == b"y" {
                         opt_snd_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Y;
                         i_vertex_order += 1;
-                    } else if id == "z" {
+                    } else if id == b"z" {
                         opt_third_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Z;
@@ -193,10 +195,11 @@ where
                     }
                 }
                 HeaderReadState::Face => {
-                    if line.starts_with("property list") {
+                    if line.starts_with(b"property list") {
                         //@todo is this properly defined or are there other identifiers?
-                        if line.contains("vertex_indices") || line.contains("vertex_index") {
-                            let mut words = to_words_skip_empty(line);
+                        if contains(line, b"vertex_indices") || contains(line, b"vertex_index") {
+                            //@todo also as helper?
+                            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
                             skip_n(&mut words, 2); // skip "property" and "list"
 
                             let t_count = FaceType::try_from(Type::try_from(
@@ -210,7 +213,8 @@ where
                             opt_face_index_type = Some(t_index);
                         }
                     } else {
-                        let mut words = to_words_skip_empty(line);
+                        //@todo also as helper?
+                        let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
                         skip_n(&mut words, 1); // skip "property"
                         let t = Type::try_from(
                             words.next().ok_or(PlyError::InvalidProperty(*i_line))?,
@@ -230,7 +234,7 @@ where
             continue;
         }
 
-        if line == "end_header" && ply_found {
+        if line == b"end_header" && ply_found {
             if let (
                 Some(format),
                 Some(n_vertices),
@@ -344,7 +348,7 @@ fn load_ascii<EM, P, R>(
     read: &mut R,
     mesh: &mut EM,
     header: &Header,
-    line_buffer: &mut String,
+    line_buffer: &mut Vec<u8>,
     i_line: &mut usize,
 ) -> PlyResult<()>
 where
@@ -353,31 +357,30 @@ where
     R: BufRead,
 {
     loop {
-        line_buffer.clear();
-        let n_read = read.read_line(line_buffer)?;
-        if n_read == 0 {
-            break;
-        }
-        let line = line_buffer.trim_end();
+        let line = match fetch_line(read, line_buffer) {
+            Ok(x) => x,
+            Err(_) => break,
+        };
         *i_line += 1;
 
         if header.n_vertices > mesh.num_vertices() {
-            let mut words = line.split(" ").skip_empty_string();
+            //@todo also as helper?
+            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
 
             skip_n(&mut words, header.vertex_format.before.words);
 
-            let first = f64::from_str(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
-                .map_err(|_| PlyError::InvalidVertex(*i_line))?;
+            let first = from_bytes(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
+                .ok_or(PlyError::InvalidVertex(*i_line))?;
 
             skip_n(&mut words, header.vertex_format.between_first_snd.words);
 
-            let snd = f64::from_str(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
-                .map_err(|_| PlyError::InvalidVertex(*i_line))?;
+            let snd = from_bytes(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
+                .ok_or(PlyError::InvalidVertex(*i_line))?;
 
             skip_n(&mut words, header.vertex_format.between_snd_third.words);
 
-            let third = f64::from_str(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
-                .map_err(|_| PlyError::InvalidVertex(*i_line))?;
+            let third = from_bytes(words.next().ok_or(PlyError::InvalidVertex(*i_line))?)
+                .ok_or(PlyError::InvalidVertex(*i_line))?;
 
             // no need to skip 'after' since we're done with this line anyway
 

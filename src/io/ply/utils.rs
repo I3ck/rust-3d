@@ -24,24 +24,26 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use super::{super::byte_reader::*, types::*};
+use super::{
+    super::{byte_reader::*, utils::*},
+    types::*,
+};
 
 use std::io::Read;
-
-use core::str::FromStr;
 
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-pub fn collect_index_line(line: &str) -> Option<[usize; 3]> {
-    let mut words = to_words_skip_empty(line);
-    if words.next()? != "3" {
+pub fn collect_index_line(line: &[u8]) -> Option<[usize; 3]> {
+    //@todo also as helper?
+    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+    if words.next()? != b"3" {
         return None;
     }
 
-    let a = usize::from_str(words.next()?).ok()?;
-    let b = usize::from_str(words.next()?).ok()?;
-    let c = usize::from_str(words.next()?).ok()?;
+    let a = from_bytes(words.next()?)?;
+    let b = from_bytes(words.next()?)?;
+    let c = from_bytes(words.next()?)?;
 
     Some([a, b, c])
 }
