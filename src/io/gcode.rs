@@ -24,15 +24,14 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use core::str::FromStr;
 use std::{
     fmt,
     io::{BufRead, Error as ioError},
 };
 
-//------------------------------------------------------------------------------
+use super::utils::*;
 
-//@todo code duplication
+//------------------------------------------------------------------------------
 
 /// Loads a IsPushable<Is3D> as x y z coordinates from gcode
 pub fn load_gcode_points<IP, P, R>(read: &mut R, ip: &mut IP) -> GcodeResult<()>
@@ -175,15 +174,15 @@ fn command(line: &[u8]) -> Option<[Option<f64>; 3]> {
 
         match word[0] {
             b'X' => {
-                x = Some(f64::from_str(std::str::from_utf8(&word[1..]).ok()?).ok()?);
+                x = Some(from_bytes(&word[1..])?);
                 n_found += 1
             }
             b'Y' => {
-                y = Some(f64::from_str(std::str::from_utf8(&word[1..]).ok()?).ok()?);
+                y = Some(from_bytes(&word[1..])?);
                 n_found += 1
             }
             b'Z' => {
-                z = Some(f64::from_str(std::str::from_utf8(&word[1..]).ok()?).ok()?);
+                z = Some(from_bytes(&word[1..])?);
                 n_found += 1
             }
             _ => (),

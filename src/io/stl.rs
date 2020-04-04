@@ -35,8 +35,6 @@ use std::{
 
 use fnv::FnvHashMap;
 
-use core::str::FromStr;
-
 use super::{byte_reader::*, utils::*};
 
 //------------------------------------------------------------------------------
@@ -579,9 +577,9 @@ where
     // skip "vertex"
     words.next()?;
 
-    let x = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
-    let y = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
-    let z = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
+    let x = from_bytes(words.next()?)?;
+    let y = from_bytes(words.next()?)?;
+    let z = from_bytes(words.next()?)?;
 
     Some(P::new(x, y, z))
 }
@@ -600,9 +598,9 @@ where
     // skip "normal"
     words.next()?;
 
-    let i = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
-    let j = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
-    let k = f64::from_str(std::str::from_utf8(words.next()?).ok()?).ok()?;
+    let i = from_bytes(words.next()?)?;
+    let j = from_bytes(words.next()?)?;
+    let k = from_bytes(words.next()?)?;
 
     Some(P::new(i, j, k))
 }
