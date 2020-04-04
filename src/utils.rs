@@ -60,23 +60,11 @@ pub fn max_f64(a: f64, b: f64) -> f64 {
 }
 
 /// Checks whether haystack contains needle
-//@todo optimize
 pub fn contains<T>(haystack: &[T], needle: &[T]) -> bool
 where
     T: PartialEq,
 {
-    if needle.len() > haystack.len() {
-        return false;
-    }
-
-    for i in 0..haystack.len()
-    /* - needle.len()*/
-    {
-        if haystack[i..].starts_with(needle) {
-            return true;
-        }
-    }
-    false
+    haystack.windows(needle.len()).any(|x| x == needle)
 }
 
 /// Max of three f64 values
