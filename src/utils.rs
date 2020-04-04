@@ -46,6 +46,11 @@ pub fn until<'a>(line: &'a str, delimiter: &str) -> &'a str {
     line.split(delimiter).next().unwrap_or("")
 }
 
+/// Returns all until delimiter
+pub fn until_bytes<'a>(line: &'a [u8], delimiter: u8) -> &'a [u8] {
+    line.split(|x| *x == delimiter).next().unwrap_or(&[])
+}
+
 /// Max of two f64 values
 pub fn max_f64(a: f64, b: f64) -> f64 {
     if a > b {
