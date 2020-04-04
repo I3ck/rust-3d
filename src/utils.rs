@@ -130,9 +130,9 @@ where
 }
 
 /// Estimates the used delimiter within a string
-pub fn estimate_delimiter(minimum_count: usize, line: &str) -> Option<char> {
-    for candidate in [' ', ';', ',', '\t'].iter() {
-        if line.chars().filter(|c| *c == *candidate).count() >= minimum_count {
+pub fn estimate_delimiter(minimum_count: usize, line: &[u8]) -> Option<u8> {
+    for candidate in [b' ', b';', b',', b'\t'].iter() {
+        if line.iter().filter(|c| **c == *candidate).count() >= minimum_count {
             return Some(*candidate);
         }
     }

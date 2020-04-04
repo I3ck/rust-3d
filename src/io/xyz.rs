@@ -24,11 +24,12 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use core::str::FromStr;
 use std::{
     fmt,
     io::{BufRead, Error as ioError, Write},
 };
+
+use super::utils::*;
 
 //------------------------------------------------------------------------------
 
@@ -66,42 +67,38 @@ where
     R: BufRead,
 {
     let mut delim_determined = false;
-    let mut delim: String = "".to_string();
-    let mut line_buffer = String::new();
+    let mut delim = 0;
+    let mut line_buffer = Vec::new();
 
     let mut i_line = 0;
 
     loop {
-        line_buffer.clear();
-        let n_read = read.read_line(&mut line_buffer)?;
-        if n_read == 0 {
-            break;
-        }
-        let line = line_buffer.trim_end();
+        let line = match fetch_line(read, &mut line_buffer) {
+            Ok(x) => x,
+            Err(_) => break,
+        };
         i_line += 1;
 
         if !delim_determined {
-            delim = estimate_delimiter(2, &line)
-                .ok_or(XyzError::LineParse(i_line))?
-                .to_string();
+            delim = estimate_delimiter(2, &line).ok_or(XyzError::LineParse(i_line))?;
             delim_determined = true;
         }
 
-        let mut words = line.split(delim.as_str()).skip_empty_string();
+        let mut words = line.split(|x| *x == delim).skip_empty();
 
         let x = words
             .next()
-            .and_then(|word| f64::from_str(word).ok())
+            .and_then(|word| from_ascii(word))
             .ok_or(XyzError::LineParse(i_line))?;
 
         let y = words
             .next()
-            .and_then(|word| f64::from_str(word).ok())
+            .and_then(|word| from_ascii(word))
             .ok_or(XyzError::LineParse(i_line))?;
 
         let z = words
             .next()
-            .and_then(|word| f64::from_str(word).ok())
+            .and_then(|word| from_ascii(word))
             .ok_or(XyzError::LineParse(i_line))?;
 
         ip.push(P::new(x, y, z));
