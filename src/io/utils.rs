@@ -25,6 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use std::{
     fmt,
     io::{BufRead, Error as ioError, Read},
+    str::FromStr,
 };
 
 //------------------------------------------------------------------------------
@@ -67,6 +68,18 @@ pub fn trim_start(text: &[u8]) -> &[u8] {
     }
 
     &text[to_drop..]
+}
+
+//------------------------------------------------------------------------------
+
+/// Reads a FromStr from bytes
+pub fn from_bytes<T>(bytes: &[u8]) -> Option<T>
+where
+    T: FromStr,
+{
+    std::str::from_utf8(bytes)
+        .ok()
+        .and_then(|x| T::from_str(x).ok())
 }
 
 //------------------------------------------------------------------------------
