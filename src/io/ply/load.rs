@@ -87,11 +87,7 @@ where
     let mut face_before = BytesWords::default();
     let mut face_after = BytesWords::default();
 
-    loop {
-        let line = match fetch_line(read, line_buffer) {
-            Ok(x) => x,
-            Err(_) => break,
-        };
+    while let Ok(line) = fetch_line(read, line_buffer) {
         *i_line += 1;
 
         if line.starts_with(b"comment") {
@@ -356,11 +352,7 @@ where
     P: IsBuildable3D + Clone,
     R: BufRead,
 {
-    loop {
-        let line = match fetch_line(read, line_buffer) {
-            Ok(x) => x,
-            Err(_) => break,
-        };
+    while let Ok(line) = fetch_line(read, line_buffer) {
         *i_line += 1;
 
         if header.n_vertices > mesh.num_vertices() {

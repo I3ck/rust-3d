@@ -46,11 +46,7 @@ where
     let mut off_seen = false;
     let mut counts = None;
 
-    loop {
-        let line = match fetch_line(read, &mut line_buffer) {
-            Ok(x) => x,
-            Err(_) => break,
-        };
+    while let Ok(line) = fetch_line(read, &mut line_buffer) {
         i_line += 1;
 
         if !off_seen && line.starts_with(b"OFF") {
@@ -147,11 +143,7 @@ where
     let mut n_vertices = None;
     let mut n_added = 0;
 
-    loop {
-        let line = match fetch_line(read, &mut line_buffer) {
-            Ok(x) => x,
-            Err(_) => break,
-        };
+    while let Ok(line) = fetch_line(read, &mut line_buffer) {
         i_line += 1;
 
         if !off_seen && line.starts_with(b"OFF") {

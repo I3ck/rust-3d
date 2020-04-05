@@ -46,11 +46,7 @@ where
     let mut line_buffer = Vec::new();
     let mut i_line = 0;
 
-    loop {
-        let line = match fetch_line(read, &mut line_buffer) {
-            Ok(x) => x,
-            Err(_) => break,
-        };
+    while let Ok(line) = fetch_line(read, &mut line_buffer) {
         i_line += 1;
 
         if line.starts_with(b"v ") {
@@ -111,11 +107,7 @@ where
     let mut line_buffer = Vec::new();
     let mut i_line = 0;
 
-    loop {
-        let line = match fetch_line(read, &mut line_buffer) {
-            Ok(x) => x,
-            Err(_) => break,
-        };
+    while let Ok(line) = fetch_line(read, &mut line_buffer) {
         i_line += 1;
 
         if line.starts_with(b"v ") {
