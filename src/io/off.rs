@@ -118,7 +118,7 @@ where
                     .ok_or(OffError::LineParse(i_line))?;
 
                 mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
-                    .map_err(|_| OffError::InvalidMeshIndices(i_line))?;
+                    .or(Err(OffError::InvalidMeshIndices(i_line)))?;
             }
         }
     }

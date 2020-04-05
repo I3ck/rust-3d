@@ -327,7 +327,7 @@ where
             VId { val: b as usize },
             VId { val: c as usize },
         )
-        .map_err(|_| PlyError::InvalidMeshIndices(None))?;
+        .or(Err(PlyError::InvalidMeshIndices(None)))?;
     }
 
     Ok(())
@@ -383,7 +383,7 @@ where
         if header.n_faces > mesh.num_faces() {
             let [a, b, c] = collect_index_line(&line).ok_or(PlyError::FaceStructure)?;
             mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
-                .map_err(|_| PlyError::InvalidMeshIndices(Some(*i_line)))?;
+                .or(Err(PlyError::InvalidMeshIndices(Some(*i_line))))?;
             continue;
         }
     }

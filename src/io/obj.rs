@@ -88,7 +88,7 @@ where
 
             // obj indexing starts at 1
             mesh.try_add_connection(VId { val: a - 1 }, VId { val: b - 1 }, VId { val: c - 1 })
-                .map_err(|_| ObjError::InvalidMeshIndices(i_line))?;
+                .or(Err(ObjError::InvalidMeshIndices(i_line)))?;
         }
     }
 
