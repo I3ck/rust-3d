@@ -50,13 +50,7 @@ where
     let mut y = 0.0;
     let mut z = 0.0;
 
-    loop {
-        line_buffer.clear();
-        let n_read = read.read_until(b'\n', &mut line_buffer)?;
-        if n_read == 0 {
-            break;
-        }
-        let line = &line_buffer;
+    while let Ok(line) = fetch_line(read, &mut line_buffer) {
         i_line += 1;
 
         if line.len() >= 4 && line[0] == b'G' {
