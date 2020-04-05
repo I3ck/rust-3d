@@ -50,8 +50,7 @@ where
         i_line += 1;
 
         if line.starts_with(b"v ") {
-            //@todo also as helper?
-            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+            let mut words = to_words_skip_empty(line);
 
             // skip "v"
             words.next().ok_or(ObjError::LineParse(i_line))?;
@@ -73,8 +72,7 @@ where
 
             mesh.add_vertex(P::new(x, y, z));
         } else if line.starts_with(b"f ") {
-            //@todo also as helper?
-            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+            let mut words = to_words_skip_empty(line);
 
             // skip "f"
             words.next().ok_or(ObjError::LineParse(i_line))?;
@@ -111,8 +109,7 @@ where
         i_line += 1;
 
         if line.starts_with(b"v ") {
-            //@todo also as helper?
-            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+            let mut words = to_words_skip_empty(line);
 
             // skip "v"
             words.next().ok_or(ObjError::LineParse(i_line))?;

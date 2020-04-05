@@ -31,6 +31,11 @@ use crate::*;
 
 //------------------------------------------------------------------------------
 
+/// Splits an ASCII line into its words, skipping empty elements
+pub fn to_words_skip_empty(line: &[u8]) -> impl Iterator<Item = &[u8]> {
+    line.split(|x| *x == b' ' || *x == b'\t').skip_empty()
+}
+
 /// Returns all until delimiter
 pub fn until<'a>(line: &'a str, delimiter: &str) -> &'a str {
     line.split(delimiter).next().unwrap_or("")

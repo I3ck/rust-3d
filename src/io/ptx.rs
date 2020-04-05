@@ -114,8 +114,7 @@ where
             line = fetch_line(read, &mut line_buffer)?;
             i_line += 1;
 
-            //@todo also as helper?
-            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+            let mut words = to_words_skip_empty(line);
 
             let x = words
                 .next()
@@ -146,8 +145,7 @@ where
 
 #[inline(always)]
 fn read_matrix_row(line: &[u8]) -> Option<[f64; 4]> {
-    //@todo also as helper?
-    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+    let mut words = to_words_skip_empty(line);
 
     let a = from_ascii(words.next()?)?;
     let b = from_ascii(words.next()?)?;

@@ -35,8 +35,7 @@ use std::io::Read;
 
 #[inline(always)]
 pub fn collect_index_line(line: &[u8]) -> Option<[usize; 3]> {
-    //@todo also as helper?
-    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+    let mut words = to_words_skip_empty(line);
     if words.next()? != b"3" {
         return None;
     }

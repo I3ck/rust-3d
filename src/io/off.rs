@@ -59,8 +59,7 @@ where
         }
 
         if counts.is_none() {
-            //@todo also as helper?
-            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+            let mut words = to_words_skip_empty(line);
             let n_vertices = words
                 .next()
                 .and_then(|word| from_ascii(word))
@@ -79,8 +78,7 @@ where
 
         // safe since checked above
         if mesh.num_vertices() < counts.unwrap()[0] {
-            //@todo also as helper?
-            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+            let mut words = to_words_skip_empty(line);
 
             let x = words
                 .next()
@@ -99,8 +97,7 @@ where
 
             mesh.add_vertex(P::new(x, y, z));
         } else {
-            //@todo also as helper?
-            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+            let mut words = to_words_skip_empty(line);
 
             let count_face = words.next().ok_or(OffError::LineParse(i_line))?;
 
@@ -156,8 +153,7 @@ where
         }
 
         if n_vertices.is_none() {
-            //@todo also as helper?
-            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+            let mut words = to_words_skip_empty(line);
             n_vertices = Some(
                 words
                     .next()
@@ -171,8 +167,7 @@ where
 
         // safe since checked above
         if n_added < n_vertices.unwrap() {
-            //@todo also as helper?
-            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+            let mut words = to_words_skip_empty(line);
 
             let x = words
                 .next()

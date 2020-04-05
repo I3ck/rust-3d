@@ -120,8 +120,7 @@ where
             None => {
                 if line.starts_with(b"element vertex") {
                     read_state = HeaderReadState::Vertex;
-                    //@todo also as helper?
-                    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+                    let mut words = to_words_skip_empty(line);
                     //@todo error handling can be simplified
                     opt_n_vertices = Some(
                         from_ascii(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
@@ -137,8 +136,7 @@ where
             None => {
                 if line.starts_with(b"element face") {
                     read_state = HeaderReadState::Face;
-                    //@todo also as helper?
-                    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+                    let mut words = to_words_skip_empty(line);
                     opt_n_faces = Some(
                         from_ascii(words.nth(2).ok_or(PlyError::LineParse(*i_line))?)
                             .ok_or(PlyError::LineParse(*i_line))?,
@@ -152,8 +150,7 @@ where
         if line.starts_with(b"property") {
             match read_state {
                 HeaderReadState::Vertex => {
-                    //@todo also as helper?
-                    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+                    let mut words = to_words_skip_empty(line);
                     skip_n(&mut words, 1); // skip "property"
 
                     let t =
@@ -194,8 +191,7 @@ where
                     if line.starts_with(b"property list") {
                         //@todo is this properly defined or are there other identifiers?
                         if contains(line, b"vertex_indices") || contains(line, b"vertex_index") {
-                            //@todo also as helper?
-                            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+                            let mut words = to_words_skip_empty(line);
                             skip_n(&mut words, 2); // skip "property" and "list"
 
                             let t_count = FaceType::try_from(Type::try_from(
@@ -209,8 +205,7 @@ where
                             opt_face_index_type = Some(t_index);
                         }
                     } else {
-                        //@todo also as helper?
-                        let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+                        let mut words = to_words_skip_empty(line);
                         skip_n(&mut words, 1); // skip "property"
                         let t = Type::try_from(
                             words.next().ok_or(PlyError::InvalidProperty(*i_line))?,
@@ -356,8 +351,7 @@ where
         *i_line += 1;
 
         if header.n_vertices > mesh.num_vertices() {
-            //@todo also as helper?
-            let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+            let mut words = to_words_skip_empty(line);
 
             skip_n(&mut words, header.vertex_format.before.words);
 

@@ -572,7 +572,7 @@ fn read_stl_vertex<P>(line: &[u8]) -> Option<P>
 where
     P: IsBuildable3D,
 {
-    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+    let mut words = to_words_skip_empty(line);
 
     // skip "vertex"
     words.next()?;
@@ -590,7 +590,7 @@ fn read_stl_normal<P>(line: &[u8]) -> Option<P>
 where
     P: IsBuildable3D,
 {
-    let mut words = line.split(|x| *x == b' ' || *x == b'\t').skip_empty();
+    let mut words = to_words_skip_empty(line);
 
     // skip "facet"
     words.next()?;
