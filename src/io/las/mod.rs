@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Martin Buck
+Copyright 2020 Martin Buck
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"),
@@ -20,38 +20,10 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//! Containing IO functions / traits / types
+//! Module for IO operations of the las file format
 
-mod stl;
-pub use self::stl::*;
+mod load;
+mod types;
 
-mod ply;
-pub use self::ply::*;
-
-mod las;
-pub use self::las::*;
-
-mod xy;
-pub use self::xy::*;
-
-mod xyz;
-pub use self::xyz::*;
-
-mod obj;
-pub use self::obj::*;
-
-mod off;
-pub use self::off::*;
-
-mod psl;
-pub use self::psl::*;
-
-mod ptx;
-pub use self::ptx::*;
-
-mod gcode;
-pub use self::gcode::*;
-
-mod utils;
-
-mod byte_reader;
+pub use load::*;
+pub use types::*;

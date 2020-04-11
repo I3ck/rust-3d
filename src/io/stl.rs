@@ -117,7 +117,7 @@ where
 
 //------------------------------------------------------------------------------
 
-/// Loads points from .stl file as triplets into IsPushable<Is3D>
+/// Loads points from .stl file as triplets into IsPushable<IsBuildable3D>
 pub fn load_stl_triplets<IP, P, R, IPN>(
     read: &mut R,
     format: StlFormat,
