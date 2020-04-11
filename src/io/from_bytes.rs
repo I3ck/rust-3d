@@ -28,8 +28,45 @@ use std::convert::TryInto;
 
 //------------------------------------------------------------------------------
 
+#[macro_export]
+macro_rules! array_from_bytes_le {
+    ($t:ty , $n:expr , $bytes:expr) => {{
+        let size = std::mem::size_of::<$t>();
+        if $bytes.len() != size * $n {
+            return Err(FromBytesError::SizeMismatch)?;
+        }
+
+        let mut arr: [$t; $n] = [<$t>::default(); $n];
+        for i in 0..$n {
+            arr[i] = <$t>::from_le_slice(&$bytes[i * size..(i + 1) * size])?
+        }
+        let result: FromBytesResult<[$t; $n]> = Ok(arr);
+        result
+    }};
+}
+
+#[macro_export]
+macro_rules! array_from_bytes_be {
+    ($t:ty , $n:expr , $bytes:expr) => {{
+        let size = std::mem::size_of::<$t>();
+        if $bytes.len() != size * $n {
+            return Err(FromBytesError::SizeMismatch)?;
+        }
+
+        let mut arr: [$t; $n] = [<$t>::default(); $n];
+        for i in 0..$n {
+            arr[i] = <$t>::from_be_slice(&$bytes[i * size..(i + 1) * size])?
+        }
+        let result: FromBytesResult<[$t; $n]> = Ok(arr);
+        result
+    }};
+}
+
+//------------------------------------------------------------------------------
+
 #[inline(always)]
-pub fn many_from_bytes_le<FB>(bytes: &[u8], target: &mut [FB]) -> FromBytesResult<()>
+#[allow(unused)] //@todo actually use
+pub fn slice_from_bytes_le<FB>(bytes: &[u8], target: &mut [FB]) -> FromBytesResult<()>
 where
     FB: FromBytes,
 {
@@ -50,7 +87,7 @@ where
 
 #[inline(always)]
 #[allow(unused)] //@todo actually use
-pub fn many_from_bytes_be<FB>(bytes: &[u8], target: &mut [FB]) -> FromBytesResult<()>
+pub fn slice_from_bytes_be<FB>(bytes: &[u8], target: &mut [FB]) -> FromBytesResult<()>
 where
     FB: FromBytes,
 {

@@ -216,26 +216,10 @@ where
     read.read_exact(&mut buffer)?;
 
     Ok(StlTriangle {
-        n: {
-            let mut n = [0f32; 3];
-            many_from_bytes_le(&buffer[0..12], &mut n)?;
-            n
-        },
-        x: {
-            let mut x = [0f32; 3];
-            many_from_bytes_le(&buffer[12..24], &mut x)?;
-            x
-        },
-        y: {
-            let mut y = [0f32; 3];
-            many_from_bytes_le(&buffer[24..36], &mut y)?;
-            y
-        },
-        z: {
-            let mut z = [0f32; 3];
-            many_from_bytes_le(&buffer[36..48], &mut z)?;
-            z
-        },
+        n: array_from_bytes_le!(f32, 3, &buffer[0..12])?,
+        x: array_from_bytes_le!(f32, 3, &buffer[12..24])?,
+        y: array_from_bytes_le!(f32, 3, &buffer[24..36])?,
+        z: array_from_bytes_le!(f32, 3, &buffer[36..48])?,
     })
 }
 
