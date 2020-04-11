@@ -73,6 +73,7 @@ pub struct Header {
 //------------------------------------------------------------------------------
 
 /// Error type for .las file operation
+#[derive (Debug)]
 pub enum LasError {
     AccessFile,
     BinaryData,
