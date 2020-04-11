@@ -24,8 +24,11 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::io::Error as ioError;
 
+use super::super::from_bytes::FromBytesError;
+
 //------------------------------------------------------------------------------
 
+#[derive (Debug)]
 pub struct Header {
     //COUNT_BYTES_THIS COUNT_BYTES_TOTAL_HERE
     pub file_signature: [u8; 4],       //4 4 //@todo 'signed' char in spec
@@ -86,6 +89,12 @@ impl From<ioError> for LasError {
 
 impl From<std::array::TryFromSliceError> for LasError {
     fn from(_error: std::array::TryFromSliceError) -> Self {
+        LasError::BinaryData
+    }
+}
+
+impl From<FromBytesError> for LasError {
+    fn from(_error: FromBytesError) -> Self {
         LasError::BinaryData
     }
 }
