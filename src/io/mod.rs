@@ -55,3 +55,4 @@ pub use self::gcode::*;
 mod utils;
 
 mod byte_reader;
+mod from_bytes;

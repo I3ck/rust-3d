@@ -27,14 +27,13 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 
 use std::{
-    convert::TryInto,
     fmt,
     io::{BufRead, Error as ioError, Read, Write},
 };
 
 use fnv::FnvHashMap;
 
-use super::{byte_reader::*, utils::*};
+use super::{byte_reader::*, from_bytes::*, utils::*};
 
 //------------------------------------------------------------------------------
 
@@ -201,21 +200,10 @@ where
 }
 
 struct StlTriangle {
-    pub nx: f32, //4
-    pub ny: f32, //8
-    pub nz: f32, //12
-
-    pub ax: f32, //16
-    pub ay: f32, //20
-    pub az: f32, //24
-
-    pub bx: f32, //28
-    pub by: f32, //32
-    pub bz: f32, //36
-
-    pub cx: f32, //40
-    pub cy: f32, //44
-    pub cz: f32, //48
+    pub n: [f32; 3],
+    pub x: [f32; 3],
+    pub y: [f32; 3],
+    pub z: [f32; 3],
 }
 
 #[inline(always)]
@@ -228,21 +216,26 @@ where
     read.read_exact(&mut buffer)?;
 
     Ok(StlTriangle {
-        nx: f32::from_le_bytes(buffer[0..4].try_into()?),
-        ny: f32::from_le_bytes(buffer[4..8].try_into()?),
-        nz: f32::from_le_bytes(buffer[8..12].try_into()?),
-
-        ax: f32::from_le_bytes(buffer[12..16].try_into()?),
-        ay: f32::from_le_bytes(buffer[16..20].try_into()?),
-        az: f32::from_le_bytes(buffer[20..24].try_into()?),
-
-        bx: f32::from_le_bytes(buffer[24..28].try_into()?),
-        by: f32::from_le_bytes(buffer[28..32].try_into()?),
-        bz: f32::from_le_bytes(buffer[32..36].try_into()?),
-
-        cx: f32::from_le_bytes(buffer[36..40].try_into()?),
-        cy: f32::from_le_bytes(buffer[40..44].try_into()?),
-        cz: f32::from_le_bytes(buffer[44..48].try_into()?),
+        n: {
+            let mut n = [0f32; 3];
+            many_from_bytes_le(&buffer[0..12], &mut n)?;
+            n
+        },
+        x: {
+            let mut x = [0f32; 3];
+            many_from_bytes_le(&buffer[12..24], &mut x)?;
+            x
+        },
+        y: {
+            let mut y = [0f32; 3];
+            many_from_bytes_le(&buffer[24..36], &mut y)?;
+            y
+        },
+        z: {
+            let mut z = [0f32; 3];
+            many_from_bytes_le(&buffer[36..48], &mut z)?;
+            z
+        },
     })
 }
 
@@ -275,13 +268,12 @@ where
     for _ in 0..n_triangles {
         let t = read_stl_triangle(read)?;
 
-        let n = P::new(t.nx as f64, t.ny as f64, t.nz as f64);
+        let n = P::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
+        let x = P::new(t.x[0] as f64, t.x[1] as f64, t.x[2] as f64);
+        let y = P::new(t.y[0] as f64, t.y[1] as f64, t.y[2] as f64);
+        let z = P::new(t.z[0] as f64, t.z[1] as f64, t.z[2] as f64);
 
-        let a = P::new(t.ax as f64, t.ay as f64, t.az as f64);
-        let b = P::new(t.bx as f64, t.by as f64, t.bz as f64);
-        let c = P::new(t.cx as f64, t.cy as f64, t.cz as f64);
-
-        mesh.add_face(a, b, c);
+        mesh.add_face(x, y, z);
         face_normals.push(n)
     }
 
@@ -383,33 +375,32 @@ where
     for _ in 0..n_triangles {
         let t = read_stl_triangle(read)?;
 
-        let n = P::new(t.nx as f64, t.ny as f64, t.nz as f64);
+        let n = P::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
+        let x = P::new(t.x[0] as f64, t.x[1] as f64, t.x[2] as f64);
+        let y = P::new(t.y[0] as f64, t.y[1] as f64, t.y[2] as f64);
+        let z = P::new(t.z[0] as f64, t.z[1] as f64, t.z[2] as f64);
 
-        let a = P::new(t.ax as f64, t.ay as f64, t.az as f64);
-        let b = P::new(t.bx as f64, t.by as f64, t.bz as f64);
-        let c = P::new(t.cx as f64, t.cy as f64, t.cz as f64);
-
-        let id_a = *map.entry(a.clone()).or_insert_with(|| {
+        let id_x = *map.entry(x.clone()).or_insert_with(|| {
             let value = mesh.num_vertices();
-            mesh.add_vertex(a);
+            mesh.add_vertex(x);
             value
         });
 
-        let id_b = *map.entry(b.clone()).or_insert_with(|| {
+        let id_y = *map.entry(y.clone()).or_insert_with(|| {
             let value = mesh.num_vertices();
-            mesh.add_vertex(b);
+            mesh.add_vertex(y);
             value
         });
 
-        let id_c = *map.entry(c.clone()).or_insert_with(|| {
+        let id_z = *map.entry(z.clone()).or_insert_with(|| {
             let value = mesh.num_vertices();
-            mesh.add_vertex(c);
+            mesh.add_vertex(z);
             value
         });
 
         // Ignore this issues since this only fails if a triangle uses a vertex multiple times
         // Simply do not add this triangle
-        match mesh.try_add_connection(VId { val: id_a }, VId { val: id_b }, VId { val: id_c }) {
+        match mesh.try_add_connection(VId { val: id_x }, VId { val: id_y }, VId { val: id_z }) {
             Ok(_) => {
                 face_normals.push(n);
             }
@@ -484,15 +475,14 @@ where
     for _ in 0..n_triangles {
         let t = read_stl_triangle(read)?;
 
-        let n = P::new(t.nx as f64, t.ny as f64, t.nz as f64);
+        let n = P::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
+        let x = P::new(t.x[0] as f64, t.x[1] as f64, t.x[2] as f64);
+        let y = P::new(t.y[0] as f64, t.y[1] as f64, t.y[2] as f64);
+        let z = P::new(t.z[0] as f64, t.z[1] as f64, t.z[2] as f64);
 
-        let a = P::new(t.ax as f64, t.ay as f64, t.az as f64);
-        let b = P::new(t.bx as f64, t.by as f64, t.bz as f64);
-        let c = P::new(t.cx as f64, t.cy as f64, t.cz as f64);
-
-        ip.push(a);
-        ip.push(b);
-        ip.push(c);
+        ip.push(x);
+        ip.push(y);
+        ip.push(z);
 
         face_normals.push(n)
     }
@@ -661,6 +651,11 @@ impl From<ioError> for StlError {
 
 impl From<std::array::TryFromSliceError> for StlError {
     fn from(_error: std::array::TryFromSliceError) -> Self {
+        StlError::BinaryData
+    }
+}
+impl From<FromBytesError> for StlError {
+    fn from(_error: FromBytesError) -> Self {
         StlError::BinaryData
     }
 }
