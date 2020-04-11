@@ -658,6 +658,7 @@ impl From<ioError> for StlError {
         StlError::AccessFile
     }
 }
+
 impl From<std::array::TryFromSliceError> for StlError {
     fn from(_error: std::array::TryFromSliceError) -> Self {
         StlError::BinaryData
