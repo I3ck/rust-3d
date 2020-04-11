@@ -20,13 +20,13 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//@todo better docs / name
-//@todo ensure sizes correct? Otherwise document that correctness is required
 //@todo little/big endian via enum?
 
 //! Module containing the FromBytes trait
 
 use std::convert::TryInto;
+
+//------------------------------------------------------------------------------
 
 #[inline(always)]
 pub fn many_from_bytes_le<FB>(bytes: &[u8], target: &mut [FB]) -> FromBytesResult<()>
@@ -45,6 +45,8 @@ where
 
     Ok(())
 }
+
+//------------------------------------------------------------------------------
 
 #[inline(always)]
 #[allow(unused)] //@todo actually use
@@ -65,23 +67,15 @@ where
     Ok(())
 }
 
-pub enum FromBytesError {
-    BinaryData,
-    SizeMismatch,
-}
+//------------------------------------------------------------------------------
 
-pub type FromBytesResult<T> = std::result::Result<T, FromBytesError>;
-
-impl From<std::array::TryFromSliceError> for FromBytesError {
-    fn from(_error: std::array::TryFromSliceError) -> Self {
-        FromBytesError::BinaryData
-    }
-}
-
+/// Trait for the conversion from byte slices (size is checked at run time)
 pub trait FromBytes: Sized {
     fn from_le_slice(bytes: &[u8]) -> FromBytesResult<Self>;
     fn from_be_slice(bytes: &[u8]) -> FromBytesResult<Self>;
 }
+
+//------------------------------------------------------------------------------
 
 impl FromBytes for i8 {
     #[inline(always)]
@@ -192,3 +186,22 @@ impl FromBytes for f64 {
         Ok(f64::from_be_bytes(bytes.try_into()?))
     }
 }
+
+//------------------------------------------------------------------------------
+
+/// Error type for the FromBytes conversion
+pub enum FromBytesError {
+    BinaryData,
+    SizeMismatch,
+}
+
+/// Result type for the FromBytes conversion
+pub type FromBytesResult<T> = std::result::Result<T, FromBytesError>;
+
+impl From<std::array::TryFromSliceError> for FromBytesError {
+    fn from(_error: std::array::TryFromSliceError) -> Self {
+        FromBytesError::BinaryData
+    }
+}
+
+//------------------------------------------------------------------------------
