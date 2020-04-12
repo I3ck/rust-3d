@@ -34,13 +34,13 @@ use super::super::from_bytes::*;
 //@todo move all these and rename
 
 //@todo already in std? //@todo could use From, too
-trait FromRead: Sized {
-    fn from_read<R>(read: &mut R) -> LasResult<Self>
+pub trait FromRead {
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read;
 }
 
-trait FormatGeneric: FromRead + Sized {
+pub trait FormatGeneric: FromRead + Default {
     //@todo this is currently not scaled etc.
     fn point_data(&self) -> &PointData;
 }
@@ -156,6 +156,7 @@ pub struct ExtendedVariableLengthHeader {
 
 //------------------------------------------------------------------------------
 
+#[derive(Debug, Default)]
 pub struct PointData {
     pub x: i32, //4 4
     pub y: i32, //4 8
@@ -173,6 +174,7 @@ impl PointData {
     }
 }
 
+#[derive(Debug, Default)]
 pub struct ColorData {
     pub red: u16,   //2 2
     pub green: u16, //2 4
@@ -189,6 +191,7 @@ impl ColorData {
     }
 }
 
+#[derive(Debug, Default)]
 pub struct WaveData {
     pub wave_descriptor_index: u8,      //1 1
     pub offset_waveform_data: u64,      //8 9
@@ -215,17 +218,17 @@ impl WaveData {
 
 #[derive(Debug)]
 pub enum Format {
-    F0,
-    F1,
-    F2,
-    F3,
-    F4,
-    F5,
-    F6,
-    F7,
-    F8,
-    F9,
-    F10,
+    F0(Format0),
+    F1(Format1),
+    F2(Format2),
+    F3(Format3),
+    F4(Format4),
+    F5(Format5),
+    F6(Format6),
+    F7(Format7),
+    F8(Format8),
+    F9(Format9),
+    F10(Format10),
 }
 
 impl TryFrom<u8> for Format {
@@ -233,17 +236,17 @@ impl TryFrom<u8> for Format {
 
     fn try_from(x: u8) -> LasResult<Self> {
         match x {
-            0 => Ok(Self::F0),
-            1 => Ok(Self::F1),
-            2 => Ok(Self::F2),
-            3 => Ok(Self::F3),
-            4 => Ok(Self::F4),
-            5 => Ok(Self::F5),
-            6 => Ok(Self::F6),
-            7 => Ok(Self::F7),
-            8 => Ok(Self::F8),
-            9 => Ok(Self::F9),
-            10 => Ok(Self::F10),
+            0 => Ok(Self::F0(Format0::default())),
+            1 => Ok(Self::F1(Format1::default())),
+            2 => Ok(Self::F2(Format2::default())),
+            3 => Ok(Self::F3(Format3::default())),
+            4 => Ok(Self::F4(Format4::default())),
+            5 => Ok(Self::F5(Format5::default())),
+            6 => Ok(Self::F6(Format6::default())),
+            7 => Ok(Self::F7(Format7::default())),
+            8 => Ok(Self::F8(Format8::default())),
+            9 => Ok(Self::F9(Format9::default())),
+            10 => Ok(Self::F10(Format10::default())),
             _ => Err(LasError::UnknownFormat),
         }
     }
@@ -251,6 +254,7 @@ impl TryFrom<u8> for Format {
 
 //------------------------------------------------------------------------------
 
+#[derive(Debug, Default)]
 pub struct Format0 {
     pub point_data: PointData, //12 12
     pub intensity: u16,        //2 14
@@ -262,22 +266,22 @@ pub struct Format0 {
 }
 
 impl FromRead for Format0 {
-    fn from_read<R>(read: &mut R) -> LasResult<Self>
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
     {
         let mut buffer = [0u8; 20]; //@todo use mem::sizeof?
         read.read_exact(&mut buffer)?;
 
-        Ok(Self {
-            point_data: PointData::from_bytes(buffer[0..12].try_into()?)?,
-            intensity: u16::from_le_bytes(buffer[12..14].try_into()?),
-            bitdata: u8::from_le_bytes(buffer[14..15].try_into()?),
-            classification: u8::from_le_bytes(buffer[15..16].try_into()?),
-            scan_angle_rank: u8::from_le_bytes(buffer[16..17].try_into()?),
-            user_data: u8::from_le_bytes(buffer[17..18].try_into()?),
-            point_source_id: u16::from_le_bytes(buffer[18..20].try_into()?),
-        })
+        self.point_data = PointData::from_bytes(buffer[1..12].try_into()?)?;
+        self.intensity = u16::from_le_bytes(buffer[12..14].try_into()?);
+        self.bitdata = u8::from_le_bytes(buffer[14..15].try_into()?);
+        self.classification = u8::from_le_bytes(buffer[15..16].try_into()?);
+        self.scan_angle_rank = u8::from_le_bytes(buffer[16..17].try_into()?);
+        self.user_data = u8::from_le_bytes(buffer[17..18].try_into()?);
+        self.point_source_id = u16::from_le_bytes(buffer[18..20].try_into()?);
+
+        Ok(())
     }
 }
 
@@ -289,25 +293,25 @@ impl FormatGeneric for Format0 {
 
 //------------------------------------------------------------------------------
 
+#[derive(Debug, Default)]
 pub struct Format1 {
     pub format_0: Format0, //20 20
     pub gps_time: f64,     //8 28
 }
 
 impl FromRead for Format1 {
-    fn from_read<R>(read: &mut R) -> LasResult<Self>
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
     {
-        let format_0 = Format0::from_read(read)?;
+        self.format_0.from_read(read)?;
 
         let mut buffer = [0u8; 28 - 20];
         read.read_exact(&mut buffer)?;
 
-        Ok(Self {
-            format_0,
-            gps_time: f64::from_le_bytes(buffer),
-        })
+        self.gps_time = f64::from_le_bytes(buffer);
+
+        Ok(())
     }
 }
 
@@ -319,25 +323,25 @@ impl FormatGeneric for Format1 {
 
 //------------------------------------------------------------------------------
 
+#[derive(Debug, Default)]
 pub struct Format2 {
     pub format_0: Format0,     //20 20
     pub color_data: ColorData, //6 26
 }
 
 impl FromRead for Format2 {
-    fn from_read<R>(read: &mut R) -> LasResult<Self>
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
     {
-        let format_0 = Format0::from_read(read)?;
+        self.format_0.from_read(read)?;
 
         let mut buffer = [0u8; 26 - 20];
         read.read_exact(&mut buffer)?;
 
-        Ok(Self {
-            format_0,
-            color_data: ColorData::from_bytes(&buffer)?,
-        })
+        self.color_data = ColorData::from_bytes(&buffer)?;
+
+        Ok(())
     }
 }
 
@@ -349,25 +353,25 @@ impl FormatGeneric for Format2 {
 
 //------------------------------------------------------------------------------
 
+#[derive(Debug, Default)]
 pub struct Format3 {
     pub format_1: Format1,     //28 28
     pub color_data: ColorData, //6 34
 }
 
 impl FromRead for Format3 {
-    fn from_read<R>(read: &mut R) -> LasResult<Self>
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
     {
-        let format_1 = Format1::from_read(read)?;
+        self.format_1.from_read(read)?;
 
         let mut buffer = [0u8; 34 - 28];
         read.read_exact(&mut buffer)?;
 
-        Ok(Self {
-            format_1,
-            color_data: ColorData::from_bytes(&buffer)?,
-        })
+        self.color_data = ColorData::from_bytes(&buffer)?;
+
+        Ok(())
     }
 }
 
@@ -379,25 +383,25 @@ impl FormatGeneric for Format3 {
 
 //------------------------------------------------------------------------------
 
+#[derive(Debug, Default)]
 pub struct Format4 {
     pub format_1: Format1,   //28 28
     pub wave_data: WaveData, //29 57
 }
 
 impl FromRead for Format4 {
-    fn from_read<R>(read: &mut R) -> LasResult<Self>
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
     {
-        let format_1 = Format1::from_read(read)?;
+        self.format_1.from_read(read)?;
 
         let mut buffer = [0u8; 57 - 28];
         read.read_exact(&mut buffer)?;
 
-        Ok(Self {
-            format_1,
-            wave_data: WaveData::from_bytes(&buffer)?,
-        })
+        self.wave_data = WaveData::from_bytes(&buffer)?;
+
+        Ok(())
     }
 }
 
@@ -409,25 +413,25 @@ impl FormatGeneric for Format4 {
 
 //------------------------------------------------------------------------------
 
+#[derive(Debug, Default)]
 pub struct Format5 {
     pub format_3: Format3,   //34 34
     pub wave_data: WaveData, //29 63
 }
 
 impl FromRead for Format5 {
-    fn from_read<R>(read: &mut R) -> LasResult<Self>
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
     {
-        let format_3 = Format3::from_read(read)?;
+        self.format_3.from_read(read)?;
 
         let mut buffer = [0u8; 63 - 34];
         read.read_exact(&mut buffer)?;
 
-        Ok(Self {
-            format_3,
-            wave_data: WaveData::from_bytes(&buffer)?,
-        })
+        self.wave_data = WaveData::from_bytes(&buffer)?;
+
+        Ok(())
     }
 }
 
@@ -439,6 +443,7 @@ impl FormatGeneric for Format5 {
 
 //------------------------------------------------------------------------------
 
+#[derive(Debug, Default)]
 pub struct Format6 {
     pub point_data: PointData, //12 12
     pub intensity: u16,        //2 14
@@ -451,23 +456,23 @@ pub struct Format6 {
 }
 
 impl FromRead for Format6 {
-    fn from_read<R>(read: &mut R) -> LasResult<Self>
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
     {
         let mut buffer = [0u8; 30]; //@todo use mem::sizeof?
         read.read_exact(&mut buffer)?;
 
-        Ok(Self {
-            point_data: PointData::from_bytes(buffer[0..12].try_into()?)?,
-            intensity: u16::from_le_bytes(buffer[12..14].try_into()?),
-            bitdata: u16::from_le_bytes(buffer[14..16].try_into()?),
-            classification: u8::from_le_bytes(buffer[16..17].try_into()?),
-            user_data: u8::from_le_bytes(buffer[17..18].try_into()?),
-            scan_angle: i16::from_le_bytes(buffer[18..20].try_into()?),
-            point_source_id: u16::from_le_bytes(buffer[20..22].try_into()?),
-            gps_time: f64::from_le_bytes(buffer[22..30].try_into()?),
-        })
+        self.point_data = PointData::from_bytes(buffer[0..12].try_into()?)?;
+        self.intensity = u16::from_le_bytes(buffer[12..14].try_into()?);
+        self.bitdata = u16::from_le_bytes(buffer[14..16].try_into()?);
+        self.classification = u8::from_le_bytes(buffer[16..17].try_into()?);
+        self.user_data = u8::from_le_bytes(buffer[17..18].try_into()?);
+        self.scan_angle = i16::from_le_bytes(buffer[18..20].try_into()?);
+        self.point_source_id = u16::from_le_bytes(buffer[20..22].try_into()?);
+        self.gps_time = f64::from_le_bytes(buffer[22..30].try_into()?);
+
+        Ok(())
     }
 }
 
@@ -479,25 +484,25 @@ impl FormatGeneric for Format6 {
 
 //------------------------------------------------------------------------------
 
+#[derive(Debug, Default)]
 pub struct Format7 {
     pub format_6: Format6,     //30 30
     pub color_data: ColorData, //6 36
 }
 
 impl FromRead for Format7 {
-    fn from_read<R>(read: &mut R) -> LasResult<Self>
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
     {
-        let format_6 = Format6::from_read(read)?;
+        self.format_6.from_read(read)?;
 
         let mut buffer = [0u8; 36 - 30];
         read.read_exact(&mut buffer)?;
 
-        Ok(Self {
-            format_6,
-            color_data: ColorData::from_bytes(&buffer)?,
-        })
+        self.color_data = ColorData::from_bytes(&buffer)?;
+
+        Ok(())
     }
 }
 
@@ -509,25 +514,25 @@ impl FormatGeneric for Format7 {
 
 //------------------------------------------------------------------------------
 
+#[derive(Debug, Default)]
 pub struct Format8 {
     pub format_7: Format7, //36 36
     pub nir: u16,          //2 38
 }
 
 impl FromRead for Format8 {
-    fn from_read<R>(read: &mut R) -> LasResult<Self>
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
     {
-        let format_7 = Format7::from_read(read)?;
+        self.format_7.from_read(read)?;
 
         let mut buffer = [0u8; 38 - 36];
         read.read_exact(&mut buffer)?;
 
-        Ok(Self {
-            format_7,
-            nir: u16::from_le_bytes(buffer),
-        })
+        self.nir = u16::from_le_bytes(buffer);
+
+        Ok(())
     }
 }
 
@@ -539,25 +544,25 @@ impl FormatGeneric for Format8 {
 
 //------------------------------------------------------------------------------
 
+#[derive(Debug, Default)]
 pub struct Format9 {
     pub format_6: Format6,   //30 30
     pub wave_data: WaveData, //29 59
 }
 
 impl FromRead for Format9 {
-    fn from_read<R>(read: &mut R) -> LasResult<Self>
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
     {
-        let format_6 = Format6::from_read(read)?;
+        self.format_6.from_read(read)?;
 
         let mut buffer = [0u8; 59 - 30];
         read.read_exact(&mut buffer)?;
 
-        Ok(Self {
-            format_6,
-            wave_data: WaveData::from_bytes(&buffer)?,
-        })
+        self.wave_data = WaveData::from_bytes(&buffer)?;
+
+        Ok(())
     }
 }
 
@@ -569,6 +574,7 @@ impl FormatGeneric for Format9 {
 
 //------------------------------------------------------------------------------
 
+#[derive(Debug, Default)]
 pub struct Format10 {
     pub format_6: Format6,     //30 30
     pub color_data: ColorData, //6 36
@@ -577,21 +583,20 @@ pub struct Format10 {
 }
 
 impl FromRead for Format10 {
-    fn from_read<R>(read: &mut R) -> LasResult<Self>
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
     {
-        let format_6 = Format6::from_read(read)?;
+        self.format_6.from_read(read)?;
 
         let mut buffer = [0u8; 67 - 30];
         read.read_exact(&mut buffer)?;
 
-        Ok(Self {
-            format_6,
-            color_data: ColorData::from_bytes(&buffer[0..6].try_into()?)?,
-            nir: u16::from_le_bytes(buffer[6..8].try_into()?),
-            wave_data: WaveData::from_bytes(&buffer[8..37].try_into()?)?,
-        })
+        self.color_data = ColorData::from_bytes(&buffer[0..6].try_into()?)?;
+        self.nir = u16::from_le_bytes(buffer[6..8].try_into()?);
+        self.wave_data = WaveData::from_bytes(&buffer[8..37].try_into()?)?;
+
+        Ok(())
     }
 }
 

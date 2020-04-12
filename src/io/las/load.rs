@@ -28,7 +28,7 @@ use super::types::*;
 
 use std::{
     convert::{TryFrom, TryInto},
-    io::{BufRead, Read, Seek},
+    io::{BufRead, Read, Seek, SeekFrom},
 };
 
 use super::super::from_bytes::*;
@@ -50,6 +50,8 @@ where
     let header = RelevantHeader::try_from(header_raw)?;
 
     println!("{:?}", header);
+
+    read.seek(SeekFrom::Start(header.offset_point_data as u64))?;
 
     Ok(())
 }
