@@ -22,11 +22,67 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for types for the las file format
 
-use std::io::Error as ioError;
+use std::{convert::TryFrom, io::Error as ioError};
 
 use super::super::from_bytes::FromBytesError;
 
 //------------------------------------------------------------------------------
+
+//@todo better name (everything here)
+#[derive(Debug)]
+pub struct RelevantHeader {
+    pub offset_point_data: u32,
+    pub point_record_format: Format,
+    pub point_record_length: u16,
+    pub n_point_records: u64,
+    pub n_points_return: [u64; 15],
+}
+
+impl TryFrom<Header> for RelevantHeader {
+    type Error = LasError;
+
+    fn try_from(x: Header) -> LasResult<RelevantHeader> {
+        // These are conversions according to the legacy mode
+        let n_point_records = if x.legacy_n_point_records == 0 {
+            x.n_point_records
+        } else {
+            x.legacy_n_point_records as u64
+        };
+
+        let n_points_return = if x.legacy_n_point_return == [0u32; 5] {
+            x.n_points_return
+        } else {
+            let y = &x.legacy_n_point_return;
+            [
+                y[0] as u64,
+                y[1] as u64,
+                y[2] as u64,
+                y[3] as u64,
+                y[4] as u64,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+            ]
+        };
+
+        let point_record_format = Format::try_from(x.point_record_format)?;
+
+        Ok(RelevantHeader {
+            point_record_format,
+            offset_point_data: x.offset_point_data,
+            point_record_length: x.point_record_length,
+            n_point_records,
+            n_points_return,
+        })
+    }
+}
 
 #[derive(Debug)]
 // This header reflects the 1.4 spec
@@ -101,6 +157,42 @@ pub struct WaveData {
     pub dx: f32,                        //4 21
     pub dy: f32,                        //4 25
     pub dz: f32,                        //4 29
+}
+
+#[derive(Debug)]
+pub enum Format {
+    F0,
+    F1,
+    F2,
+    F3,
+    F4,
+    F5,
+    F6,
+    F7,
+    F8,
+    F9,
+    F10,
+}
+
+impl TryFrom<u8> for Format {
+    type Error = LasError;
+
+    fn try_from(x: u8) -> LasResult<Self> {
+        match x {
+            0 => Ok(Self::F0),
+            1 => Ok(Self::F1),
+            2 => Ok(Self::F2),
+            3 => Ok(Self::F3),
+            4 => Ok(Self::F4),
+            5 => Ok(Self::F5),
+            6 => Ok(Self::F6),
+            7 => Ok(Self::F7),
+            8 => Ok(Self::F8),
+            9 => Ok(Self::F9),
+            10 => Ok(Self::F10),
+            _ => Err(LasError::UnknownFormat),
+        }
+    }
 }
 
 pub struct Format0 {
@@ -178,6 +270,7 @@ pub struct Format10 {
 pub enum LasError {
     AccessFile,
     BinaryData,
+    UnknownFormat,
 }
 
 /// Result type for .las file operation

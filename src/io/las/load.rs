@@ -27,7 +27,7 @@ use crate::*;
 use super::types::*;
 
 use std::{
-    convert::TryInto,
+    convert::{TryFrom, TryInto},
     io::{BufRead, Read, Seek},
 };
 
@@ -43,7 +43,11 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-    let header = load_header(read)?;
+    let header_raw = load_header(read)?;
+
+    println!("{:?}", header_raw);
+
+    let header = RelevantHeader::try_from(header_raw)?;
 
     println!("{:?}", header);
 
