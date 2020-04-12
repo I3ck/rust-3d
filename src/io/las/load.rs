@@ -54,6 +54,7 @@ where
     Ok(())
 }
 
+//@todo rather also implement FromBytes instead
 fn load_header<R>(read: &mut R) -> LasResult<Header>
 where
     R: Read,

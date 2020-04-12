@@ -22,9 +22,28 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for types for the las file format
 
-use std::{convert::TryFrom, io::Error as ioError};
+use std::{
+    convert::{TryFrom, TryInto},
+    io::{Error as ioError, Read},
+};
 
-use super::super::from_bytes::FromBytesError;
+use super::super::from_bytes::*;
+
+//------------------------------------------------------------------------------
+
+//@todo move all these and rename
+
+//@todo already in std? //@todo could use From, too
+trait FromRead: Sized {
+    fn from_read<R>(read: &mut R) -> LasResult<Self>
+    where
+        R: Read;
+}
+
+trait FormatGeneric: FromRead + Sized {
+    //@todo this is currently not scaled etc.
+    fn point_data(&self) -> &PointData;
+}
 
 //------------------------------------------------------------------------------
 
@@ -143,10 +162,31 @@ pub struct PointData {
     pub z: i32, //4 12
 }
 
+impl PointData {
+    //@todo this can likely never fail, consider unwrapping AND in other places
+    pub fn from_bytes(buffer: &[u8; 12]) -> LasResult<Self> {
+        Ok(Self {
+            x: i32::from_le_bytes(buffer[0..4].try_into()?),
+            y: i32::from_le_bytes(buffer[4..8].try_into()?),
+            z: i32::from_le_bytes(buffer[8..12].try_into()?),
+        })
+    }
+}
+
 pub struct ColorData {
     pub red: u16,   //2 2
     pub green: u16, //2 4
     pub blue: u16,  //2 6
+}
+
+impl ColorData {
+    pub fn from_bytes(buffer: &[u8; 6]) -> LasResult<Self> {
+        Ok(Self {
+            red: u16::from_le_bytes(buffer[0..2].try_into()?),
+            green: u16::from_le_bytes(buffer[2..4].try_into()?),
+            blue: u16::from_le_bytes(buffer[4..6].try_into()?),
+        })
+    }
 }
 
 pub struct WaveData {
@@ -157,6 +197,20 @@ pub struct WaveData {
     pub dx: f32,                        //4 21
     pub dy: f32,                        //4 25
     pub dz: f32,                        //4 29
+}
+
+impl WaveData {
+    pub fn from_bytes(buffer: &[u8; 29]) -> LasResult<Self> {
+        Ok(Self {
+            wave_descriptor_index: u8::from_le_bytes(buffer[0..1].try_into()?),
+            offset_waveform_data: u64::from_le_bytes(buffer[1..9].try_into()?),
+            waveform_packet_size: u32::from_le_bytes(buffer[9..13].try_into()?),
+            return_point_waveform_loc: f32::from_le_bytes(buffer[13..17].try_into()?),
+            dx: f32::from_le_bytes(buffer[17..21].try_into()?),
+            dy: f32::from_le_bytes(buffer[21..25].try_into()?),
+            dz: f32::from_le_bytes(buffer[25..29].try_into()?),
+        })
+    }
 }
 
 #[derive(Debug)]
@@ -195,6 +249,8 @@ impl TryFrom<u8> for Format {
     }
 }
 
+//------------------------------------------------------------------------------
+
 pub struct Format0 {
     pub point_data: PointData, //12 12
     pub intensity: u16,        //2 14
@@ -204,6 +260,35 @@ pub struct Format0 {
     pub user_data: u8, // 1 18
     pub point_source_id: u16, //2 20
 }
+
+impl FromRead for Format0 {
+    fn from_read<R>(read: &mut R) -> LasResult<Self>
+    where
+        R: Read,
+    {
+        let mut buffer = [0u8; 20]; //@todo use mem::sizeof?
+        read.read_exact(&mut buffer)?;
+
+        Ok(Self {
+            point_data: PointData::from_bytes(buffer[0..12].try_into()?)?,
+            intensity: u16::from_le_bytes(buffer[12..14].try_into()?),
+            bitdata: u8::from_le_bytes(buffer[14..15].try_into()?),
+            classification: u8::from_le_bytes(buffer[15..16].try_into()?),
+            scan_angle_rank: u8::from_le_bytes(buffer[16..17].try_into()?),
+            user_data: u8::from_le_bytes(buffer[17..18].try_into()?),
+            point_source_id: u16::from_le_bytes(buffer[18..20].try_into()?),
+        })
+
+    }
+}
+
+impl FormatGeneric for Format0 {
+    fn point_data(&self) -> &PointData {
+        &self.point_data
+    }
+}
+
+//------------------------------------------------------------------------------
 
 pub struct Format1 {
     pub format_0: Format0, //20 20
