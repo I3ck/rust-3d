@@ -156,7 +156,7 @@ pub struct ExtendedVariableLengthHeader {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PointData {
     pub x: i32, //4 4
     pub y: i32, //4 8
@@ -174,7 +174,7 @@ impl PointData {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ColorData {
     pub red: u16,   //2 2
     pub green: u16, //2 4
@@ -191,7 +191,7 @@ impl ColorData {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WaveData {
     pub wave_descriptor_index: u8,      //1 1
     pub offset_waveform_data: u64,      //8 9
@@ -216,7 +216,7 @@ impl WaveData {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Format {
     F0(Format0),
     F1(Format1),
@@ -293,7 +293,7 @@ impl TryFrom<u8> for Format {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Format0 {
     pub point_data: PointData, //12 12
     pub intensity: u16,        //2 14
@@ -332,7 +332,7 @@ impl FormatGeneric for Format0 {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Format1 {
     pub format_0: Format0, //20 20
     pub gps_time: f64,     //8 28
@@ -362,7 +362,7 @@ impl FormatGeneric for Format1 {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Format2 {
     pub format_0: Format0,     //20 20
     pub color_data: ColorData, //6 26
@@ -392,7 +392,7 @@ impl FormatGeneric for Format2 {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Format3 {
     pub format_1: Format1,     //28 28
     pub color_data: ColorData, //6 34
@@ -422,7 +422,7 @@ impl FormatGeneric for Format3 {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Format4 {
     pub format_1: Format1,   //28 28
     pub wave_data: WaveData, //29 57
@@ -452,7 +452,7 @@ impl FormatGeneric for Format4 {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Format5 {
     pub format_3: Format3,   //34 34
     pub wave_data: WaveData, //29 63
@@ -482,7 +482,7 @@ impl FormatGeneric for Format5 {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Format6 {
     pub point_data: PointData, //12 12
     pub intensity: u16,        //2 14
@@ -523,7 +523,7 @@ impl FormatGeneric for Format6 {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Format7 {
     pub format_6: Format6,     //30 30
     pub color_data: ColorData, //6 36
@@ -553,7 +553,7 @@ impl FormatGeneric for Format7 {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Format8 {
     pub format_7: Format7, //36 36
     pub nir: u16,          //2 38
@@ -583,7 +583,7 @@ impl FormatGeneric for Format8 {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Format9 {
     pub format_6: Format6,   //30 30
     pub wave_data: WaveData, //29 59
@@ -613,7 +613,7 @@ impl FormatGeneric for Format9 {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Format10 {
     pub format_6: Format6,     //30 30
     pub color_data: ColorData, //6 36

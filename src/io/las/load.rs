@@ -36,7 +36,7 @@ use super::super::from_bytes::*;
 //------------------------------------------------------------------------------
 
 /// Loads points from .las file into IsPushable<IsBuildable3D>
-pub fn load_las<IP, P, R>(read: &mut R, _ip: &mut IP) -> LasResult<()>
+pub fn load_las<IP, P, R>(read: &mut R, ip: &mut IP) -> LasResult<()>
 //@todo result
 where
     IP: IsPushable<P>,
@@ -47,13 +47,22 @@ where
 
     println!("{:?}", header_raw);
 
-    let mut header = RelevantHeader::try_from(header_raw)?;
+    let header = RelevantHeader::try_from(header_raw)?;
 
     println!("{:?}", header);
 
-    read.seek(SeekFrom::Start(header.offset_point_data as u64))?;
+    let start = header.offset_point_data as u64;
+    let mut format = header.point_record_format.clone();
 
-    header.point_record_format.from_read(read)?;
+    for i in 0..header.n_point_records {
+        read.seek(SeekFrom::Start(start + i*(header.point_record_length as u64)))?;
+        format.from_read(read)?;
+        let pd = format.point_data();
+
+
+        //@todo here scale/offset etc. is missing!
+        ip.push(P::new(pd.x as f64, pd.y as f64, pd.z as f64))
+    }
 
     println!("{:?}", header);
 
