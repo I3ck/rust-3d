@@ -31,7 +31,7 @@ use std::{
     io::{BufRead, Read, Seek, SeekFrom},
 };
 
-use super::super::from_bytes::*;
+use super::super::{utils::*, from_bytes::*};
 
 //------------------------------------------------------------------------------
 
@@ -53,16 +53,21 @@ where
 
     let start = header.offset_point_data as u64;
     let mut format = header.point_record_format.clone();
+    let to_skip = header.point_record_length as usize - format.byte_consumption();
 
-    for i in 0..header.n_point_records {
-        read.seek(SeekFrom::Start(start + i*(header.point_record_length as u64)))?;
+    read.seek(SeekFrom::Start(start))?;
+
+    for _ in 0..header.n_point_records {
         format.from_read(read)?;
-        let pd = format.point_data();
+        if to_skip > 0 { skip_bytes(read, to_skip)? }
 
+        let pd = format.point_data();
 
         //@todo here scale/offset etc. is missing!
         ip.push(P::new(pd.x as f64, pd.y as f64, pd.z as f64))
     }
+
+    //@todo must also use the extended point data
 
     println!("{:?}", header);
 

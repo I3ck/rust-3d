@@ -35,6 +35,7 @@ use super::super::from_bytes::*;
 
 //@todo already in std? //@todo could use From, too
 pub trait FromRead {
+    fn byte_consumption(&self) -> usize;
     fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read;
@@ -232,6 +233,21 @@ pub enum Format {
 }
 
 impl FromRead for Format {
+    fn byte_consumption(&self) -> usize {
+        match self {
+            Self::F0(x) => x.byte_consumption(),
+            Self::F1(x) => x.byte_consumption(),
+            Self::F2(x) => x.byte_consumption(),
+            Self::F3(x) => x.byte_consumption(),
+            Self::F4(x) => x.byte_consumption(),
+            Self::F5(x) => x.byte_consumption(),
+            Self::F6(x) => x.byte_consumption(),
+            Self::F7(x) => x.byte_consumption(),
+            Self::F8(x) => x.byte_consumption(),
+            Self::F9(x) => x.byte_consumption(),
+            Self::F10(x) => x.byte_consumption(),
+        }
+    }
     fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
@@ -305,6 +321,10 @@ pub struct Format0 {
 }
 
 impl FromRead for Format0 {
+    fn byte_consumption(&self) -> usize {
+        20
+    }
+
     fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
@@ -339,6 +359,10 @@ pub struct Format1 {
 }
 
 impl FromRead for Format1 {
+    fn byte_consumption(&self) -> usize {
+        28
+    }
+
     fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
@@ -369,6 +393,10 @@ pub struct Format2 {
 }
 
 impl FromRead for Format2 {
+    fn byte_consumption(&self) -> usize {
+        26
+    }
+
     fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
@@ -399,6 +427,10 @@ pub struct Format3 {
 }
 
 impl FromRead for Format3 {
+    fn byte_consumption(&self) -> usize {
+        34
+    }
+
     fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
@@ -429,6 +461,10 @@ pub struct Format4 {
 }
 
 impl FromRead for Format4 {
+    fn byte_consumption(&self) -> usize {
+        57
+    }
+
     fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
@@ -459,6 +495,10 @@ pub struct Format5 {
 }
 
 impl FromRead for Format5 {
+    fn byte_consumption(&self) -> usize {
+        63
+    }
+
     fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
@@ -495,6 +535,10 @@ pub struct Format6 {
 }
 
 impl FromRead for Format6 {
+    fn byte_consumption(&self) -> usize {
+        30
+    }
+
     fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
@@ -530,6 +574,10 @@ pub struct Format7 {
 }
 
 impl FromRead for Format7 {
+    fn byte_consumption(&self) -> usize {
+        36
+    }
+
     fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
@@ -560,6 +608,10 @@ pub struct Format8 {
 }
 
 impl FromRead for Format8 {
+    fn byte_consumption(&self) -> usize {
+        38
+    }
+
     fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
@@ -590,6 +642,10 @@ pub struct Format9 {
 }
 
 impl FromRead for Format9 {
+    fn byte_consumption(&self) -> usize {
+        59
+    }
+
     fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
@@ -622,6 +678,10 @@ pub struct Format10 {
 }
 
 impl FromRead for Format10 {
+    fn byte_consumption(&self) -> usize {
+        67
+    }
+
     fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
     where
         R: Read,
