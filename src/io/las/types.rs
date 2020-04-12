@@ -40,7 +40,7 @@ pub trait FromRead {
         R: Read;
 }
 
-pub trait FormatGeneric: FromRead + Default {
+pub trait FormatGeneric: FromRead {
     //@todo this is currently not scaled etc.
     fn point_data(&self) -> &PointData;
 }
@@ -229,6 +229,45 @@ pub enum Format {
     F8(Format8),
     F9(Format9),
     F10(Format10),
+}
+
+impl FromRead for Format {
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
+    where
+        R: Read,
+    {
+        match self {
+            Self::F0(x) => x.from_read(read),
+            Self::F1(x) => x.from_read(read),
+            Self::F2(x) => x.from_read(read),
+            Self::F3(x) => x.from_read(read),
+            Self::F4(x) => x.from_read(read),
+            Self::F5(x) => x.from_read(read),
+            Self::F6(x) => x.from_read(read),
+            Self::F7(x) => x.from_read(read),
+            Self::F8(x) => x.from_read(read),
+            Self::F9(x) => x.from_read(read),
+            Self::F10(x) => x.from_read(read),
+        }
+    }
+}
+
+impl FormatGeneric for Format {
+    fn point_data(&self) -> &PointData {
+        match self {
+            Self::F0(x) => x.point_data(),
+            Self::F1(x) => x.point_data(),
+            Self::F2(x) => x.point_data(),
+            Self::F3(x) => x.point_data(),
+            Self::F4(x) => x.point_data(),
+            Self::F5(x) => x.point_data(),
+            Self::F6(x) => x.point_data(),
+            Self::F7(x) => x.point_data(),
+            Self::F8(x) => x.point_data(),
+            Self::F9(x) => x.point_data(),
+            Self::F10(x) => x.point_data(),
+        }
+    }
 }
 
 impl TryFrom<u8> for Format {
