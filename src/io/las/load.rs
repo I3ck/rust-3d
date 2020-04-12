@@ -47,11 +47,15 @@ where
 
     println!("{:?}", header_raw);
 
-    let header = RelevantHeader::try_from(header_raw)?;
+    let mut header = RelevantHeader::try_from(header_raw)?;
 
     println!("{:?}", header);
 
     read.seek(SeekFrom::Start(header.offset_point_data as u64))?;
+
+    header.point_record_format.from_read(read)?;
+
+    println!("{:?}", header);
 
     Ok(())
 }

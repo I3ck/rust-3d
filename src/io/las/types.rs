@@ -165,7 +165,7 @@ pub struct PointData {
 
 impl PointData {
     //@todo this can likely never fail, consider unwrapping AND in other places
-    pub fn from_bytes(buffer: &[u8; 12]) -> LasResult<Self> {
+    pub fn from_bytes(buffer: [u8; 12]) -> LasResult<Self> {
         Ok(Self {
             x: i32::from_le_bytes(buffer[0..4].try_into()?),
             y: i32::from_le_bytes(buffer[4..8].try_into()?),
@@ -182,7 +182,7 @@ pub struct ColorData {
 }
 
 impl ColorData {
-    pub fn from_bytes(buffer: &[u8; 6]) -> LasResult<Self> {
+    pub fn from_bytes(buffer: [u8; 6]) -> LasResult<Self> {
         Ok(Self {
             red: u16::from_le_bytes(buffer[0..2].try_into()?),
             green: u16::from_le_bytes(buffer[2..4].try_into()?),
@@ -203,7 +203,7 @@ pub struct WaveData {
 }
 
 impl WaveData {
-    pub fn from_bytes(buffer: &[u8; 29]) -> LasResult<Self> {
+    pub fn from_bytes(buffer: [u8; 29]) -> LasResult<Self> {
         Ok(Self {
             wave_descriptor_index: u8::from_le_bytes(buffer[0..1].try_into()?),
             offset_waveform_data: u64::from_le_bytes(buffer[1..9].try_into()?),
@@ -312,7 +312,7 @@ impl FromRead for Format0 {
         let mut buffer = [0u8; 20]; //@todo use mem::sizeof?
         read.read_exact(&mut buffer)?;
 
-        self.point_data = PointData::from_bytes(buffer[1..12].try_into()?)?;
+        self.point_data = PointData::from_bytes(buffer[0..12].try_into()?)?;
         self.intensity = u16::from_le_bytes(buffer[12..14].try_into()?);
         self.bitdata = u8::from_le_bytes(buffer[14..15].try_into()?);
         self.classification = u8::from_le_bytes(buffer[15..16].try_into()?);
@@ -378,7 +378,7 @@ impl FromRead for Format2 {
         let mut buffer = [0u8; 26 - 20];
         read.read_exact(&mut buffer)?;
 
-        self.color_data = ColorData::from_bytes(&buffer)?;
+        self.color_data = ColorData::from_bytes(buffer)?;
 
         Ok(())
     }
@@ -408,7 +408,7 @@ impl FromRead for Format3 {
         let mut buffer = [0u8; 34 - 28];
         read.read_exact(&mut buffer)?;
 
-        self.color_data = ColorData::from_bytes(&buffer)?;
+        self.color_data = ColorData::from_bytes(buffer)?;
 
         Ok(())
     }
@@ -438,7 +438,7 @@ impl FromRead for Format4 {
         let mut buffer = [0u8; 57 - 28];
         read.read_exact(&mut buffer)?;
 
-        self.wave_data = WaveData::from_bytes(&buffer)?;
+        self.wave_data = WaveData::from_bytes(buffer)?;
 
         Ok(())
     }
@@ -468,7 +468,7 @@ impl FromRead for Format5 {
         let mut buffer = [0u8; 63 - 34];
         read.read_exact(&mut buffer)?;
 
-        self.wave_data = WaveData::from_bytes(&buffer)?;
+        self.wave_data = WaveData::from_bytes(buffer)?;
 
         Ok(())
     }
@@ -539,7 +539,7 @@ impl FromRead for Format7 {
         let mut buffer = [0u8; 36 - 30];
         read.read_exact(&mut buffer)?;
 
-        self.color_data = ColorData::from_bytes(&buffer)?;
+        self.color_data = ColorData::from_bytes(buffer)?;
 
         Ok(())
     }
@@ -599,7 +599,7 @@ impl FromRead for Format9 {
         let mut buffer = [0u8; 59 - 30];
         read.read_exact(&mut buffer)?;
 
-        self.wave_data = WaveData::from_bytes(&buffer)?;
+        self.wave_data = WaveData::from_bytes(buffer)?;
 
         Ok(())
     }
@@ -631,9 +631,9 @@ impl FromRead for Format10 {
         let mut buffer = [0u8; 67 - 30];
         read.read_exact(&mut buffer)?;
 
-        self.color_data = ColorData::from_bytes(&buffer[0..6].try_into()?)?;
+        self.color_data = ColorData::from_bytes(buffer[0..6].try_into()?)?;
         self.nir = u16::from_le_bytes(buffer[6..8].try_into()?);
-        self.wave_data = WaveData::from_bytes(&buffer[8..37].try_into()?)?;
+        self.wave_data = WaveData::from_bytes(buffer[8..37].try_into()?)?;
 
         Ok(())
     }
