@@ -29,6 +29,7 @@ use super::super::from_bytes::FromBytesError;
 //------------------------------------------------------------------------------
 
 #[derive(Debug)]
+// This header reflects the 1.4 spec
 pub struct Header {
     //COUNT_BYTES_THIS COUNT_BYTES_TOTAL_HERE
     pub file_signature: [u8; 4],       //4 4 //@todo 'signed' char in spec
@@ -68,6 +69,14 @@ pub struct Header {
     pub n_extended_variable_length: u32, //4 247
     pub n_point_records: u64,          //8 255
     pub n_points_return: [u64; 15],    //120 375
+}
+
+pub struct ExtendedVariableLengthHeader {
+    pub reserved: u16,                   //2 2
+    pub user_id: [u8; 16],               //16 18 //@todo 'signed' char in spec
+    pub record_id: u16,                  //2 20
+    pub record_length_after_header: u64, //8 28
+    pub description: [u8; 32],           //32 60 //@todo 'signed' char in spec
 }
 
 //------------------------------------------------------------------------------
