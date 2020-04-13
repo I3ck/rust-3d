@@ -159,14 +159,6 @@ pub struct Header {
     pub n_points_return: [u64; 15],    //120 375
 }
 
-pub struct ExtendedVariableLengthHeader {
-    pub reserved: u16,                   //2 2
-    pub user_id: [u8; 16],               //16 18 //@todo 'signed' char in spec
-    pub record_id: u16,                  //2 20
-    pub record_length_after_header: u64, //8 28
-    pub description: [u8; 32],           //32 60 //@todo 'signed' char in spec
-}
-
 //------------------------------------------------------------------------------
 
 #[derive(Debug, Default, Clone)]

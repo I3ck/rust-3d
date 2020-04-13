@@ -76,8 +76,6 @@ where
         ip.push(P::new(x, y, z))
     }
 
-    //@todo must also use the extended point data
-
     println!("{:?}", header);
 
     Ok(())
