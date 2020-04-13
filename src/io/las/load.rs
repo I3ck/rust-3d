@@ -20,7 +20,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//! Module for load functions of the las file format
+//! Module for load functions of the .las file format
 
 use crate::*;
 
@@ -54,7 +54,7 @@ where
     for _ in 0..header.n_point_records {
         read.read_exact(&mut buffer)?;
 
-        let pd = PointData::from_bytes(buffer[0..12].try_into()?)?;
+        let pd = PointData::from_bytes(buffer[0..12].try_into()?);
 
         let x = header.offset_x + (pd.x as f64 * header.scale_factor_x);
         let y = header.offset_y + (pd.y as f64 * header.scale_factor_y);

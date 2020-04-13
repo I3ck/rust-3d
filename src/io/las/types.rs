@@ -157,13 +157,13 @@ pub struct PointData {
 }
 
 impl PointData {
-    //@todo this can likely never fail, consider unwrapping AND in other places
-    pub fn from_bytes(buffer: [u8; 12]) -> LasResult<Self> {
-        Ok(Self {
-            x: i32::from_le_bytes(buffer[0..4].try_into()?),
-            y: i32::from_le_bytes(buffer[4..8].try_into()?),
-            z: i32::from_le_bytes(buffer[8..12].try_into()?),
-        })
+    pub fn from_bytes(buffer: [u8; 12]) -> Self {
+        // safe unwraps since buffer size is enforced at compile time
+        Self {
+            x: i32::from_le_bytes(buffer[0..4].try_into().unwrap()),
+            y: i32::from_le_bytes(buffer[4..8].try_into().unwrap()),
+            z: i32::from_le_bytes(buffer[8..12].try_into().unwrap()),
+        }
     }
 }
 
