@@ -60,7 +60,7 @@ impl TryFrom<HeaderRaw> for Header {
         };
 
         if x.point_record_format > 10 {
-            return Err(LasError::UnknownFormat);
+            return Err(LasError::UnknownPointFormat);
         }
 
         Ok(Header {
@@ -149,7 +149,7 @@ impl PointData {
 pub enum LasError {
     AccessFile,
     BinaryData,
-    UnknownFormat,
+    UnknownPointFormat,
     UnsupportedVersion,
 }
 
