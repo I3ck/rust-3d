@@ -31,7 +31,7 @@ use std::{
     io::{BufRead, Read, Seek, SeekFrom},
 };
 
-use super::super::{utils::*, from_bytes::*};
+use super::super::from_bytes::*;
 
 //------------------------------------------------------------------------------
 
@@ -61,9 +61,14 @@ where
 
     read.seek(SeekFrom::Start(start))?;
 
+    //@todo this solution is faster than calling skip_bytes multiple times (consider using elsewhere)
+    let mut byte_sink = vec![0u8; to_skip];
+
     for _ in 0..header.n_point_records {
         format.from_read(read)?;
-        if to_skip > 0 { skip_bytes(read, to_skip)? }
+        if to_skip > 0 {
+            read.read_exact(&mut byte_sink)?
+        }
 
         let pd = format.point_data();
 
