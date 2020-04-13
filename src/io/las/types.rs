@@ -31,9 +31,8 @@ use super::super::from_bytes::*;
 
 //------------------------------------------------------------------------------
 
-//@todo better name (everything here)
 #[derive(Debug)]
-pub struct RelevantHeader {
+pub struct Header {
     pub offset_point_data: u32,
     pub point_record_length: u16,
     pub n_point_records: u64,
@@ -46,10 +45,10 @@ pub struct RelevantHeader {
     pub offset_z: f64,
 }
 
-impl TryFrom<HeaderRaw> for RelevantHeader {
+impl TryFrom<HeaderRaw> for Header {
     type Error = LasError;
 
-    fn try_from(x: HeaderRaw) -> LasResult<RelevantHeader> {
+    fn try_from(x: HeaderRaw) -> LasResult<Header> {
         // These are conversions according to the legacy mode
         let n_point_records = if x.legacy_n_point_records == 0 {
             x.n_point_records
@@ -84,7 +83,7 @@ impl TryFrom<HeaderRaw> for RelevantHeader {
             return Err(LasError::UnknownFormat);
         }
 
-        Ok(RelevantHeader {
+        Ok(Header {
             offset_point_data: x.offset_point_data,
             point_record_length: x.point_record_length,
             n_point_records,
@@ -98,6 +97,8 @@ impl TryFrom<HeaderRaw> for RelevantHeader {
         })
     }
 }
+
+//------------------------------------------------------------------------------
 
 #[derive(Debug)]
 // This header reflects the 1.4 spec
