@@ -31,9 +31,11 @@ use std::{
     io::{BufRead, Read, Seek, SeekFrom},
 };
 
-use super::super::{utils::*, from_bytes::*};
+use super::super::{from_bytes::*};
 
 //------------------------------------------------------------------------------
+
+//@todo consider ignoring all data but the point information, avoiding many parse/conversion operations
 
 /// Loads points from .las file into IsPushable<IsBuildable3D>
 pub fn load_las<IP, P, R>(read: &mut R, ip: &mut IP) -> LasResult<()>
@@ -43,6 +45,8 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
+
+    //@todo reserve
     let header_raw = load_header(read)?;
 
     println!("{:?}", header_raw);
@@ -59,7 +63,7 @@ where
 
     for _ in 0..header.n_point_records {
         format.from_read(read)?;
-        if to_skip > 0 { skip_bytes(read, to_skip)? }
+        if to_skip > 0 { read.seek(SeekFrom::Current(to_skip as i64))?; }
 
         let pd = format.point_data();
 
