@@ -56,6 +56,12 @@ pub struct RelevantHeader {
     pub point_record_length: u16,
     pub n_point_records: u64,
     pub n_points_return: [u64; 15],
+    pub scale_factor_x: f64,
+    pub scale_factor_y: f64,
+    pub scale_factor_z: f64,
+    pub offset_x: f64,
+    pub offset_y: f64,
+    pub offset_z: f64,
 }
 
 impl TryFrom<Header> for RelevantHeader {
@@ -100,6 +106,12 @@ impl TryFrom<Header> for RelevantHeader {
             point_record_length: x.point_record_length,
             n_point_records,
             n_points_return,
+            scale_factor_x: x.scale_factor_x,
+            scale_factor_y: x.scale_factor_y,
+            scale_factor_z: x.scale_factor_z,
+            offset_x: x.offset_x,
+            offset_y: x.offset_y,
+            offset_z: x.offset_z,
         })
     }
 }
