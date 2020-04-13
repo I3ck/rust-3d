@@ -223,6 +223,7 @@ impl WaveData {
 
 #[derive(Debug, Clone)]
 pub enum Format {
+    FSimple(FormatSimple),
     F0(Format0),
     F1(Format1),
     F2(Format2),
@@ -239,6 +240,7 @@ pub enum Format {
 impl FromRead for Format {
     fn byte_consumption(&self) -> usize {
         match self {
+            Self::FSimple(x) => x.byte_consumption(),
             Self::F0(x) => x.byte_consumption(),
             Self::F1(x) => x.byte_consumption(),
             Self::F2(x) => x.byte_consumption(),
@@ -257,6 +259,7 @@ impl FromRead for Format {
         R: Read,
     {
         match self {
+            Self::FSimple(x) => x.from_read(read),
             Self::F0(x) => x.from_read(read),
             Self::F1(x) => x.from_read(read),
             Self::F2(x) => x.from_read(read),
@@ -275,6 +278,7 @@ impl FromRead for Format {
 impl FormatGeneric for Format {
     fn point_data(&self) -> &PointData {
         match self {
+            Self::FSimple(x) => x.point_data(),
             Self::F0(x) => x.point_data(),
             Self::F1(x) => x.point_data(),
             Self::F2(x) => x.point_data(),
@@ -295,6 +299,10 @@ impl TryFrom<u8> for Format {
 
     fn try_from(x: u8) -> LasResult<Self> {
         match x {
+            0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 => {
+                Ok(Self::FSimple(FormatSimple::default()))
+            }
+            /*
             0 => Ok(Self::F0(Format0::default())),
             1 => Ok(Self::F1(Format1::default())),
             2 => Ok(Self::F2(Format2::default())),
@@ -306,8 +314,40 @@ impl TryFrom<u8> for Format {
             8 => Ok(Self::F8(Format8::default())),
             9 => Ok(Self::F9(Format9::default())),
             10 => Ok(Self::F10(Format10::default())),
+            */
             _ => Err(LasError::UnknownFormat),
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Default)]
+pub struct FormatSimple {
+    pub point_data: PointData, //12 12
+}
+
+impl FromRead for FormatSimple {
+    fn byte_consumption(&self) -> usize {
+        12
+    }
+
+    fn from_read<R>(&mut self, read: &mut R) -> LasResult<()>
+    where
+        R: Read,
+    {
+        let mut buffer = [0u8; 12]; //@todo use mem::sizeof?
+        read.read_exact(&mut buffer)?;
+
+        self.point_data = PointData::from_bytes(buffer)?;
+
+        Ok(())
+    }
+}
+
+impl FormatGeneric for FormatSimple {
+    fn point_data(&self) -> &PointData {
+        &self.point_data
     }
 }
 
