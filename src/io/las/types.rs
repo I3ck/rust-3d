@@ -20,7 +20,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//! Module for types for the las file format
+//! Module for types for the .las file format
 
 use std::{
     convert::{TryFrom, TryInto},
@@ -49,6 +49,10 @@ impl TryFrom<HeaderRaw> for Header {
     type Error = LasError;
 
     fn try_from(x: HeaderRaw) -> LasResult<Header> {
+        if x.version_major > 1 || x.version_minor > 4 {
+            return Err(LasError::UnsupportedVersion);
+        }
+
         // These are conversions according to the legacy mode
         let n_point_records = if x.legacy_n_point_records == 0 {
             x.n_point_records
@@ -171,6 +175,7 @@ pub enum LasError {
     AccessFile,
     BinaryData,
     UnknownFormat,
+    UnsupportedVersion,
 }
 
 /// Result type for .las file operation
