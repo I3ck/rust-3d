@@ -79,17 +79,14 @@ where
 }
 
 //@todo rather also implement FromBytes instead
-fn load_header<R>(read: &mut R) -> LasResult<Header>
+fn load_header<R>(read: &mut R) -> LasResult<HeaderRaw>
 where
     R: Read,
 {
-    //@todo result
     let mut buffer = [0u8; 375];
     read.read_exact(&mut buffer)?;
 
-    //@todo le or be?
-
-    Ok(Header {
+    Ok(HeaderRaw {
         file_signature: array_from_bytes_le!(u8, 4, &buffer[0..4])?,
         file_source_id: u16::from_le_bytes(buffer[4..6].try_into()?), //2 6
         global_encoding: u16::from_le_bytes(buffer[6..8].try_into()?), //2 8

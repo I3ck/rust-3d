@@ -46,10 +46,10 @@ pub struct RelevantHeader {
     pub offset_z: f64,
 }
 
-impl TryFrom<Header> for RelevantHeader {
+impl TryFrom<HeaderRaw> for RelevantHeader {
     type Error = LasError;
 
-    fn try_from(x: Header) -> LasResult<RelevantHeader> {
+    fn try_from(x: HeaderRaw) -> LasResult<RelevantHeader> {
         // These are conversions according to the legacy mode
         let n_point_records = if x.legacy_n_point_records == 0 {
             x.n_point_records
@@ -101,7 +101,7 @@ impl TryFrom<Header> for RelevantHeader {
 
 #[derive(Debug)]
 // This header reflects the 1.4 spec
-pub struct Header {
+pub struct HeaderRaw {
     //COUNT_BYTES_THIS COUNT_BYTES_TOTAL_HERE
     pub file_signature: [u8; 4],       //4 4 //@todo 'signed' char in spec
     pub file_source_id: u16,           //2 6
