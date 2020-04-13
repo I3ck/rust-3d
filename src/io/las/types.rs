@@ -36,7 +36,6 @@ pub struct Header {
     pub offset_point_data: u32,
     pub point_record_length: u16,
     pub n_point_records: u64,
-    pub n_points_return: [u64; 15],
     pub scale_factor_x: f64,
     pub scale_factor_y: f64,
     pub scale_factor_z: f64,
@@ -60,29 +59,6 @@ impl TryFrom<HeaderRaw> for Header {
             x.legacy_n_point_records as u64
         };
 
-        let n_points_return = if x.legacy_n_point_return == [0u32; 5] {
-            x.n_points_return
-        } else {
-            let y = &x.legacy_n_point_return;
-            [
-                y[0] as u64,
-                y[1] as u64,
-                y[2] as u64,
-                y[3] as u64,
-                y[4] as u64,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ]
-        };
-
         if x.point_record_format > 10 {
             return Err(LasError::UnknownFormat);
         }
@@ -91,7 +67,6 @@ impl TryFrom<HeaderRaw> for Header {
             offset_point_data: x.offset_point_data,
             point_record_length: x.point_record_length,
             n_point_records,
-            n_points_return,
             scale_factor_x: x.scale_factor_x,
             scale_factor_y: x.scale_factor_y,
             scale_factor_z: x.scale_factor_z,
