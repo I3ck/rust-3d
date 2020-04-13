@@ -54,23 +54,17 @@ where
     println!("{:?}", header);
 
     let start = header.offset_point_data as u64;
-    let mut format = header.point_record_format.clone();
-    let to_skip = header.point_record_length as usize - format.byte_consumption();
 
     ip.reserve(header.n_point_records as usize);
 
     read.seek(SeekFrom::Start(start))?;
 
-    //@todo this solution is faster than calling skip_bytes multiple times (consider using elsewhere)
-    let mut byte_sink = vec![0u8; to_skip];
+    let mut buffer = vec![0u8; header.point_record_length as usize];
 
     for _ in 0..header.n_point_records {
-        format.from_read(read)?;
-        if to_skip > 0 {
-            read.read_exact(&mut byte_sink)?
-        }
+        read.read_exact(&mut buffer)?;
 
-        let pd = format.point_data();
+        let pd = PointData::from_bytes(buffer[0..12].try_into()?)?;
 
         let x = header.offset_x + (pd.x as f64 * header.scale_factor_x);
         let y = header.offset_y + (pd.y as f64 * header.scale_factor_y);

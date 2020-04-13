@@ -52,7 +52,6 @@ pub trait FormatGeneric: FromRead {
 #[derive(Debug)]
 pub struct RelevantHeader {
     pub offset_point_data: u32,
-    pub point_record_format: Format,
     pub point_record_length: u16,
     pub n_point_records: u64,
     pub n_points_return: [u64; 15],
@@ -98,10 +97,11 @@ impl TryFrom<Header> for RelevantHeader {
             ]
         };
 
-        let point_record_format = Format::try_from(x.point_record_format)?;
+        if x.point_record_format > 10 {
+            return Err(LasError::UnknownFormat);
+        }
 
         Ok(RelevantHeader {
-            point_record_format,
             offset_point_data: x.offset_point_data,
             point_record_length: x.point_record_length,
             n_point_records,
