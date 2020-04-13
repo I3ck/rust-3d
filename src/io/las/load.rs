@@ -45,8 +45,6 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-
-    //@todo reserve
     let header_raw = load_header(read)?;
 
     println!("{:?}", header_raw);
@@ -58,6 +56,8 @@ where
     let start = header.offset_point_data as u64;
     let mut format = header.point_record_format.clone();
     let to_skip = header.point_record_length as usize - format.byte_consumption();
+
+    ip.reserve(header.n_point_records as usize);
 
     read.seek(SeekFrom::Start(start))?;
 
