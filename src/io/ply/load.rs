@@ -35,7 +35,7 @@ use super::{types::*, utils::*};
 //------------------------------------------------------------------------------
 
 /// Loads an IsMesh3D from the .ply file format
-pub fn load_ply<EM, P, R>(read: &mut R, mesh: &mut EM) -> PlyResult<()>
+pub fn load_ply_mesh<EM, P, R>(read: &mut R, mesh: &mut EM) -> PlyResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
