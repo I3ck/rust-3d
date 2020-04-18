@@ -60,7 +60,7 @@ where
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-fn load_header<R>(read: &mut R, line_buffer: &mut Vec<u8>, i_line: &mut usize) -> PlyResult<Header>
+fn load_header<R>(read: &mut R, line_buffer: &mut Vec<u8>, i_line: &mut usize) -> PlyResult<FullHeader>
 where
     R: BufRead,
 {
@@ -248,7 +248,7 @@ where
                 opt_face_count_type,
                 opt_face_index_type,
             ) {
-                return Ok(Header {
+                return Ok(FullHeader {
                     format,
                     vertex: VertexData {
                         count: n_vertices,
@@ -284,7 +284,7 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_binary<BR, EM, P, R>(read: &mut R, mesh: &mut EM, header: &Header) -> PlyResult<()>
+fn load_binary<BR, EM, P, R>(read: &mut R, mesh: &mut EM, header: &FullHeader) -> PlyResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -345,7 +345,7 @@ where
 fn load_ascii<EM, P, R>(
     read: &mut R,
     mesh: &mut EM,
-    header: &Header,
+    header: &FullHeader,
     line_buffer: &mut Vec<u8>,
     i_line: &mut usize,
 ) -> PlyResult<()>

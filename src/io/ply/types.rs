@@ -228,7 +228,7 @@ pub struct FaceData {
 //------------------------------------------------------------------------------
 
 #[derive(Debug)]
-pub struct Header {
+pub struct FullHeader {
     pub format: Format,
     pub vertex: VertexData,
     pub face: FaceData,
