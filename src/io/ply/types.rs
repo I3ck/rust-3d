@@ -246,6 +246,24 @@ pub struct PartialHeader {
     pub vertex: VertexData,
 }
 
+impl Into<PartialHeader> for FullHeader {
+    fn into(self) -> PartialHeader {
+        PartialHeader {
+            format: self.format,
+            vertex: self.vertex,
+        }
+    }
+}
+
+impl Into<PartialHeader> for Header {
+    fn into(self) -> PartialHeader {
+        match self {
+            Self::Full(x) => x.into(),
+            Self::Partial(x) => x,
+        }
+    }
+}
+
 //------------------------------------------------------------------------------
 
 /// Error type for .ply file operations

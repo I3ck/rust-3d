@@ -49,12 +49,34 @@ where
         mesh.reserve_faces(header.face.count);
 
         match header.format {
-            Format::Ascii => load_ascii(read, mesh, &header, &mut line_buffer, &mut i_line),
-            Format::LittleEndian => load_binary::<LittleReader, _, _, _>(read, mesh, &header),
-            Format::BigEndian => load_binary::<BigReader, _, _, _>(read, mesh, &header),
+            Format::Ascii => load_mesh_ascii(read, mesh, &header, &mut line_buffer, &mut i_line),
+            Format::LittleEndian => load_mesh_binary::<LittleReader, _, _, _>(read, mesh, &header),
+            Format::BigEndian => load_mesh_binary::<BigReader, _, _, _>(read, mesh, &header),
         }
     } else {
         Err(PlyError::LoadHeaderInvalid)
+    }
+}
+
+//------------------------------------------------------------------------------
+
+/// Loads the points from the .ply file into IsPushable<Is3D>
+pub fn load_ply_points<IP, P, R>(read: &mut R, ip: &mut IP) -> PlyResult<()>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D + Clone,
+    R: BufRead,
+{
+    let mut line_buffer = Vec::new();
+    let mut i_line = 0;
+
+    let header: PartialHeader = load_header(read, &mut line_buffer, &mut i_line)?.into();
+    ip.reserve(header.vertex.count);
+
+    match header.format {
+        Format::Ascii => load_points_ascii(read, ip, &header, &mut line_buffer, &mut i_line),
+        Format::LittleEndian => load_points_binary::<LittleReader, _, _, _>(read, ip, &header),
+        Format::BigEndian => load_points_binary::<BigReader, _, _, _>(read, ip, &header),
     }
 }
 
@@ -285,7 +307,111 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_binary<BR, EM, P, R>(read: &mut R, mesh: &mut EM, header: &FullHeader) -> PlyResult<()>
+fn load_points_binary<BR, IP, P, R>(
+    read: &mut R,
+    ip: &mut IP,
+    header: &PartialHeader,
+) -> PlyResult<()>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D + Clone,
+    R: Read,
+    BR: IsByteReader,
+{
+    for _ in 0..header.vertex.count {
+        skip_bytes(read, header.vertex.format.before.bytes)?;
+
+        let first = read_vertex_type::<BR, _>(read, header.vertex.format.first)?;
+
+        skip_bytes(read, header.vertex.format.between_first_snd.bytes)?;
+
+        let snd = read_vertex_type::<BR, _>(read, header.vertex.format.snd)?;
+
+        skip_bytes(read, header.vertex.format.between_snd_third.bytes)?;
+
+        let third = read_vertex_type::<BR, _>(read, header.vertex.format.third)?;
+
+        skip_bytes(read, header.vertex.format.after.bytes)?;
+
+        ip.push(point_with_order(
+            first,
+            snd,
+            third,
+            header.vertex.format.order,
+        ));
+    }
+
+    Ok(())
+}
+
+//------------------------------------------------------------------------------
+
+fn load_points_ascii<IP, P, R>(
+    read: &mut R,
+    ip: &mut IP,
+    header: &PartialHeader,
+    line_buffer: &mut Vec<u8>,
+    i_line: &mut usize,
+) -> PlyResult<()>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D + Clone,
+    R: BufRead,
+{
+    let mut n_pushed = 0;
+
+    while let Ok(line) = fetch_line(read, line_buffer) {
+        *i_line += 1;
+
+        if header.vertex.count > n_pushed {
+            let mut words = to_words_skip_empty(line);
+
+            skip_n(&mut words, header.vertex.format.before.words);
+
+            let first = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(PlyError::InvalidVertex(*i_line))?;
+
+            skip_n(&mut words, header.vertex.format.between_first_snd.words);
+
+            let snd = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(PlyError::InvalidVertex(*i_line))?;
+
+            skip_n(&mut words, header.vertex.format.between_snd_third.words);
+
+            let third = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(PlyError::InvalidVertex(*i_line))?;
+
+            // no need to skip 'after' since we're done with this line anyway
+
+            ip.push(point_with_order(
+                first,
+                snd,
+                third,
+                header.vertex.format.order,
+            ));
+
+            n_pushed += 1;
+
+            continue;
+        }
+    }
+
+    if header.vertex.count != n_pushed {
+        return Err(PlyError::LoadVertexCountIncorrect);
+    }
+
+    Ok(())
+}
+
+//------------------------------------------------------------------------------
+
+fn load_mesh_binary<BR, EM, P, R>(read: &mut R, mesh: &mut EM, header: &FullHeader) -> PlyResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -343,7 +469,7 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_ascii<EM, P, R>(
+fn load_mesh_ascii<EM, P, R>(
     read: &mut R,
     mesh: &mut EM,
     header: &FullHeader,
