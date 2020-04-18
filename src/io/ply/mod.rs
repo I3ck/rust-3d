@@ -29,4 +29,4 @@ mod utils;
 
 pub use load::*;
 pub use save::*;
-pub use types::PlyError;
+pub use types::{MeshOrPoints, PlyError};
