@@ -46,8 +46,8 @@ where
 
     let header = load_header(read, &mut line_buffer, &mut i_line)?;
 
-    mesh.reserve_vertices(header.n_vertices);
-    mesh.reserve_faces(header.n_faces);
+    mesh.reserve_vertices(header.vertex.count);
+    mesh.reserve_faces(header.face.count);
 
     match header.format {
         Format::Ascii => load_ascii(read, mesh, &header, &mut line_buffer, &mut i_line),
@@ -250,23 +250,27 @@ where
             ) {
                 return Ok(Header {
                     format,
-                    n_vertices,
-                    n_faces,
-                    vertex_format: VertexFormat {
-                        order: VertexOrder::try_from(vertex_order)?,
-                        first: x_type,
-                        snd: y_type,
-                        third: z_type,
-                        before: vertex_before,
-                        between_first_snd: vertex_between_first_snd,
-                        between_snd_third: vertex_between_snd_third,
-                        after,
+                    vertex: VertexData {
+                        count: n_vertices,
+                        format: VertexFormat {
+                            order: VertexOrder::try_from(vertex_order)?,
+                            first: x_type,
+                            snd: y_type,
+                            third: z_type,
+                            before: vertex_before,
+                            between_first_snd: vertex_between_first_snd,
+                            between_snd_third: vertex_between_snd_third,
+                            after,
+                        },
                     },
-                    face_format: FaceFormat {
-                        before: face_before,
-                        after: face_after,
-                        count: face_count_type,
-                        index: face_index_type,
+                    face: FaceData {
+                        count: n_faces,
+                        format: FaceFormat {
+                            before: face_before,
+                            after: face_after,
+                            count: face_count_type,
+                            index: face_index_type,
+                        },
                     },
                 });
             }
@@ -287,43 +291,43 @@ where
     R: Read,
     BR: IsByteReader,
 {
-    for _ in 0..header.n_vertices {
-        skip_bytes(read, header.vertex_format.before.bytes)?;
+    for _ in 0..header.vertex.count {
+        skip_bytes(read, header.vertex.format.before.bytes)?;
 
-        let first = read_vertex_type::<BR, _>(read, header.vertex_format.first)?;
+        let first = read_vertex_type::<BR, _>(read, header.vertex.format.first)?;
 
-        skip_bytes(read, header.vertex_format.between_first_snd.bytes)?;
+        skip_bytes(read, header.vertex.format.between_first_snd.bytes)?;
 
-        let snd = read_vertex_type::<BR, _>(read, header.vertex_format.snd)?;
+        let snd = read_vertex_type::<BR, _>(read, header.vertex.format.snd)?;
 
-        skip_bytes(read, header.vertex_format.between_snd_third.bytes)?;
+        skip_bytes(read, header.vertex.format.between_snd_third.bytes)?;
 
-        let third = read_vertex_type::<BR, _>(read, header.vertex_format.third)?;
+        let third = read_vertex_type::<BR, _>(read, header.vertex.format.third)?;
 
-        skip_bytes(read, header.vertex_format.after.bytes)?;
+        skip_bytes(read, header.vertex.format.after.bytes)?;
 
         mesh.add_vertex(point_with_order(
             first,
             snd,
             third,
-            header.vertex_format.order,
+            header.vertex.format.order,
         ));
     }
 
-    for _ in 0..header.n_faces {
-        skip_bytes(read, header.face_format.before.bytes)?;
+    for _ in 0..header.face.count {
+        skip_bytes(read, header.face.format.before.bytes)?;
 
-        let element_count = read_face_type::<BR, _>(read, header.face_format.count)?;
+        let element_count = read_face_type::<BR, _>(read, header.face.format.count)?;
 
         if element_count != 3 {
             return Err(PlyError::FaceStructure);
         }
 
-        let a = read_face_type::<BR, _>(read, header.face_format.index)?;
-        let b = read_face_type::<BR, _>(read, header.face_format.index)?;
-        let c = read_face_type::<BR, _>(read, header.face_format.index)?;
+        let a = read_face_type::<BR, _>(read, header.face.format.index)?;
+        let b = read_face_type::<BR, _>(read, header.face.format.index)?;
+        let c = read_face_type::<BR, _>(read, header.face.format.index)?;
 
-        skip_bytes(read, header.face_format.after.bytes)?;
+        skip_bytes(read, header.face.format.after.bytes)?;
 
         mesh.try_add_connection(
             VId { val: a as usize },
@@ -353,24 +357,24 @@ where
     while let Ok(line) = fetch_line(read, line_buffer) {
         *i_line += 1;
 
-        if header.n_vertices > mesh.num_vertices() {
+        if header.vertex.count > mesh.num_vertices() {
             let mut words = to_words_skip_empty(line);
 
-            skip_n(&mut words, header.vertex_format.before.words);
+            skip_n(&mut words, header.vertex.format.before.words);
 
             let first = words
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(PlyError::InvalidVertex(*i_line))?;
 
-            skip_n(&mut words, header.vertex_format.between_first_snd.words);
+            skip_n(&mut words, header.vertex.format.between_first_snd.words);
 
             let snd = words
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(PlyError::InvalidVertex(*i_line))?;
 
-            skip_n(&mut words, header.vertex_format.between_snd_third.words);
+            skip_n(&mut words, header.vertex.format.between_snd_third.words);
 
             let third = words
                 .next()
@@ -383,13 +387,13 @@ where
                 first,
                 snd,
                 third,
-                header.vertex_format.order,
+                header.vertex.format.order,
             ));
 
             continue;
         }
 
-        if header.n_faces > mesh.num_faces() {
+        if header.face.count > mesh.num_faces() {
             let [a, b, c] = collect_index_line(&line).ok_or(PlyError::FaceStructure)?;
             mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
                 .or(Err(PlyError::InvalidMeshIndices(Some(*i_line))))?;
@@ -397,7 +401,7 @@ where
         }
     }
 
-    if header.n_vertices != mesh.num_vertices() {
+    if header.vertex.count != mesh.num_vertices() {
         return Err(PlyError::LoadVertexCountIncorrect);
     }
 

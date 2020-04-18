@@ -214,12 +214,24 @@ pub enum HeaderReadState {
 //------------------------------------------------------------------------------
 
 #[derive(Debug)]
+pub struct VertexData {
+    pub count: usize,
+    pub format: VertexFormat,
+}
+
+#[derive(Debug)]
+pub struct FaceData {
+    pub count: usize,
+    pub format: FaceFormat,
+}
+
+//------------------------------------------------------------------------------
+
+#[derive(Debug)]
 pub struct Header {
     pub format: Format,
-    pub n_vertices: usize,
-    pub n_faces: usize,
-    pub vertex_format: VertexFormat,
-    pub face_format: FaceFormat,
+    pub vertex: VertexData,
+    pub face: FaceData,
 }
 
 //------------------------------------------------------------------------------
