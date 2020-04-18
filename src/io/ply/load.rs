@@ -44,15 +44,17 @@ where
     let mut line_buffer = Vec::new();
     let mut i_line = 0;
 
-    let header = load_header(read, &mut line_buffer, &mut i_line)?;
+    if let Header::Full(header) = load_header(read, &mut line_buffer, &mut i_line)? {
+        mesh.reserve_vertices(header.vertex.count);
+        mesh.reserve_faces(header.face.count);
 
-    mesh.reserve_vertices(header.vertex.count);
-    mesh.reserve_faces(header.face.count);
-
-    match header.format {
-        Format::Ascii => load_ascii(read, mesh, &header, &mut line_buffer, &mut i_line),
-        Format::LittleEndian => load_binary::<LittleReader, _, _, _>(read, mesh, &header),
-        Format::BigEndian => load_binary::<BigReader, _, _, _>(read, mesh, &header),
+        match header.format {
+            Format::Ascii => load_ascii(read, mesh, &header, &mut line_buffer, &mut i_line),
+            Format::LittleEndian => load_binary::<LittleReader, _, _, _>(read, mesh, &header),
+            Format::BigEndian => load_binary::<BigReader, _, _, _>(read, mesh, &header),
+        }
+    } else {
+        Err(PlyError::LoadHeaderInvalid)
     }
 }
 
@@ -60,7 +62,7 @@ where
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-fn load_header<R>(read: &mut R, line_buffer: &mut Vec<u8>, i_line: &mut usize) -> PlyResult<FullHeader>
+fn load_header<R>(read: &mut R, line_buffer: &mut Vec<u8>, i_line: &mut usize) -> PlyResult<Header>
 where
     R: BufRead,
 {
@@ -229,50 +231,49 @@ where
         }
 
         if line == b"end_header" && ply_found {
-            if let (
-                Some(format),
-                Some(n_vertices),
-                Some(n_faces),
-                Some(x_type),
-                Some(y_type),
-                Some(z_type),
-                Some(face_count_type),
-                Some(face_index_type),
-            ) = (
+            if let (Some(format), Some(n_vertices), Some(x_type), Some(y_type), Some(z_type)) = (
                 opt_format,
                 opt_n_vertices,
-                opt_n_faces,
                 opt_fst_type,
                 opt_snd_type,
                 opt_third_type,
-                opt_face_count_type,
-                opt_face_index_type,
             ) {
-                return Ok(FullHeader {
-                    format,
-                    vertex: VertexData {
-                        count: n_vertices,
-                        format: VertexFormat {
-                            order: VertexOrder::try_from(vertex_order)?,
-                            first: x_type,
-                            snd: y_type,
-                            third: z_type,
-                            before: vertex_before,
-                            between_first_snd: vertex_between_first_snd,
-                            between_snd_third: vertex_between_snd_third,
-                            after,
-                        },
+                let vertex_data = VertexData {
+                    count: n_vertices,
+                    format: VertexFormat {
+                        order: VertexOrder::try_from(vertex_order)?,
+                        first: x_type,
+                        snd: y_type,
+                        third: z_type,
+                        before: vertex_before,
+                        between_first_snd: vertex_between_first_snd,
+                        between_snd_third: vertex_between_snd_third,
+                        after,
                     },
-                    face: FaceData {
-                        count: n_faces,
-                        format: FaceFormat {
-                            before: face_before,
-                            after: face_after,
-                            count: face_count_type,
-                            index: face_index_type,
+                };
+
+                if let (Some(n_faces), Some(face_count_type), Some(face_index_type)) =
+                    (opt_n_faces, opt_face_count_type, opt_face_index_type)
+                {
+                    return Ok(Header::Full(FullHeader {
+                        format,
+                        vertex: vertex_data,
+                        face: FaceData {
+                            count: n_faces,
+                            format: FaceFormat {
+                                before: face_before,
+                                after: face_after,
+                                count: face_count_type,
+                                index: face_index_type,
+                            },
                         },
-                    },
-                });
+                    }));
+                } else {
+                    return Ok(Header::Partial(PartialHeader {
+                        format,
+                        vertex: vertex_data,
+                    }));
+                }
             }
         }
 

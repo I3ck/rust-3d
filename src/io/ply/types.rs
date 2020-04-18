@@ -228,10 +228,22 @@ pub struct FaceData {
 //------------------------------------------------------------------------------
 
 #[derive(Debug)]
+pub enum Header {
+    Full(FullHeader),
+    Partial(PartialHeader),
+}
+
+#[derive(Debug)]
 pub struct FullHeader {
     pub format: Format,
     pub vertex: VertexData,
     pub face: FaceData,
+}
+
+#[derive(Debug)]
+pub struct PartialHeader {
+    pub format: Format,
+    pub vertex: VertexData,
 }
 
 //------------------------------------------------------------------------------
