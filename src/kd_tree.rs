@@ -140,11 +140,11 @@ where
 {
     pub fn size(&self) -> usize {
         let mut result: usize = 0;
-        if let Some(ref n) = (&self).left {
+        if let Some(ref n) = self.left {
             result += n.size();
         }
         result += 1;
-        if let Some(ref n) = (&self).right {
+        if let Some(ref n) = self.right {
             result += n.size();
         }
         result
@@ -160,11 +160,11 @@ where
     P: Is3D + Clone,
 {
     pub fn to_pointcloud_3d(&self, pc: &mut PointCloud3D<P>) {
-        if let Some(ref n) = (&self).left {
+        if let Some(ref n) = self.left {
             n.to_pointcloud_3d(pc);
         }
         pc.push(self.val.clone());
-        if let Some(ref n) = (&self).right {
+        if let Some(ref n) = self.right {
             n.to_pointcloud_3d(pc);
         }
     }
@@ -176,7 +176,7 @@ where
                 left: None,
                 right: None,
                 val: pc[0].clone(),
-                dimension: dimension,
+                dimension,
             };
         }
 
@@ -237,12 +237,12 @@ where
         match comp {
             Ok(res) => match res {
                 Ordering::Less => {
-                    if let Some(ref node) = (&self).left {
+                    if let Some(ref node) = self.left {
                         node.knearest(search, n, pc);
                     }
                 }
                 _ => {
-                    if let Some(ref node) = (&self).right {
+                    if let Some(ref node) = self.right {
                         node.knearest(search, n, pc);
                     }
                 }
@@ -265,14 +265,14 @@ where
         match comp {
             Ok(res) => match res {
                 Ordering::Less => {
-                    if let Some(ref node) = (&self).right {
+                    if let Some(ref node) = self.right {
                         if pc.len() < n || border_right >= current_val {
                             node.knearest(search, n, pc);
                         }
                     }
                 }
                 _ => {
-                    if let Some(ref node) = (&self).left {
+                    if let Some(ref node) = self.left {
                         if pc.len() < n || border_left <= current_val {
                             node.knearest(search, n, pc);
                         }
@@ -299,12 +299,12 @@ where
         match comp {
             Ok(res) => match res {
                 Ordering::Less => {
-                    if let Some(ref node) = (&self).left {
+                    if let Some(ref node) = self.left {
                         node.in_sphere(sphere, pc);
                     }
                 }
                 _ => {
-                    if let Some(ref node) = (&self).right {
+                    if let Some(ref node) = self.right {
                         node.in_sphere(sphere, pc);
                     }
                 }
@@ -324,14 +324,14 @@ where
         match comp {
             Ok(res) => match res {
                 Ordering::Less => {
-                    if let Some(ref node) = (&self).right {
+                    if let Some(ref node) = self.right {
                         if border_right >= current_val {
                             node.in_sphere(sphere, pc);
                         }
                     }
                 }
                 _ => {
-                    if let Some(ref node) = (&self).left {
+                    if let Some(ref node) = self.left {
                         if border_left <= current_val {
                             node.in_sphere(sphere, pc);
                         }
@@ -364,12 +364,12 @@ where
             match comp {
                 Ok(res) => match res {
                     Ordering::Less => {
-                        if let Some(ref node) = (&self).left {
+                        if let Some(ref node) = self.left {
                             node.in_box(box_3d, pc);
                         }
                     }
                     _ => {
-                        if let Some(ref node) = (&self).right {
+                        if let Some(ref node) = self.right {
                             node.in_box(box_3d, pc);
                         }
                     }
@@ -389,14 +389,14 @@ where
             match comp {
                 Ok(res) => match res {
                     Ordering::Less => {
-                        if let Some(ref node) = (&self).right {
+                        if let Some(ref node) = self.right {
                             if border_right >= current_val {
                                 node.in_box(box_3d, pc);
                             }
                         }
                     }
                     _ => {
-                        if let Some(ref node) = (&self).left {
+                        if let Some(ref node) = self.left {
                             if border_left <= current_val {
                                 node.in_box(box_3d, pc);
                             }

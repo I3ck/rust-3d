@@ -67,7 +67,8 @@ where
         pc.data.push(p1);
         pc.data.push(p2);
     }
-    return pc;
+
+    pc
 }
 
 //------------------------------------------------------------------------------
@@ -98,5 +99,5 @@ where
 
     let y = ((a2 - b2) * x + a1 * b2 - a2 * b1) / (a1 - b1);
 
-    return ((x - p.x()).powi(2) + (y - p.y()).powi(2)).sqrt();
+    ((x - p.x()).powi(2) + (y - p.y()).powi(2)).sqrt()
 }

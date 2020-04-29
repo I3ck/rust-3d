@@ -52,6 +52,6 @@ where
 {
     fn is_allowed(&self, pn: &(P, N)) -> bool {
         let expected = self.field.direction_at(&pn.0);
-        return expected.rad_to(&pn.1) <= self.eps;
+        expected.rad_to(&pn.1) <= self.eps
     }
 }

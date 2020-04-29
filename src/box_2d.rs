@@ -122,7 +122,7 @@ impl IsBuildable2D for Box2D {
     #[inline(always)]
     fn new(x: f64, y: f64) -> Self {
         Box2D {
-            center: Point2D { x: x, y: y },
+            center: Point2D { x, y },
             size_x: Positive::one(),
             size_y: Positive::one(),
         }

@@ -272,7 +272,7 @@ impl IsBuildableND for Point2D {
 impl IsBuildable2D for Point2D {
     #[inline(always)]
     fn new(x: f64, y: f64) -> Self {
-        Point2D { x: x, y: y }
+        Point2D { x, y }
     }
 
     #[inline(always)]

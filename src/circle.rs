@@ -94,7 +94,7 @@ impl IsBuildable2D for Circle {
     #[inline(always)]
     fn new(x: f64, y: f64) -> Self {
         Circle {
-            center: Point2D { x: x, y: y },
+            center: Point2D { x, y },
             radius: Positive::one(),
         }
     }

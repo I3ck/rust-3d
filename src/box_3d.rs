@@ -134,7 +134,7 @@ impl IsBuildable3D for Box3D {
     #[inline(always)]
     fn new(x: f64, y: f64, z: f64) -> Self {
         Box3D {
-            center: Point3D { x: x, y: y, z: z },
+            center: Point3D { x, y, z },
             size_x: Positive::one(),
             size_y: Positive::one(),
             size_z: Positive::one(),

@@ -241,14 +241,14 @@ where
         let nnn = Self::build_subnode(pcnnn, &bbnnn);
 
         let result: Internal<P> = Internal {
-            ppp: ppp,
-            ppn: ppn,
-            pnp: pnp,
-            pnn: pnn,
-            npp: npp,
-            npn: npn,
-            nnp: nnp,
-            nnn: nnn,
+            ppp,
+            ppn,
+            pnp,
+            pnn,
+            npp,
+            npn,
+            nnp,
+            nnn,
         };
 
         Ok(OcNode::Node(result))

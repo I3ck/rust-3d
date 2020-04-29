@@ -94,7 +94,7 @@ where
         let mut result = HalfEdge {
             tails,
             twins,
-            vertices_start_edges: vertices_start_edges,
+            vertices_start_edges,
         };
 
         // For each edge, get tail of next

@@ -294,7 +294,7 @@ impl IsBuildableND for Point3D {
 impl IsBuildable3D for Point3D {
     #[inline(always)]
     fn new(x: f64, y: f64, z: f64) -> Self {
-        Point3D { x: x, y: y, z: z }
+        Point3D { x, y, z }
     }
 
     #[inline(always)]

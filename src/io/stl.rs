@@ -189,7 +189,6 @@ where
             Ok([a, b, c, n]) => {
                 mesh.add_face(a, b, c);
                 face_normals.push(n);
-                ()
             }
             Err(StlError::LoadFileEndReached) => break,
             Err(x) => return Err(x),
@@ -422,7 +421,6 @@ where
                 ip.push(b);
                 ip.push(c);
                 face_normals.push(n);
-                ()
             }
             Err(StlError::LoadFileEndReached) => break,
             Err(x) => return Err(x),
