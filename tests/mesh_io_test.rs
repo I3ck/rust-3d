@@ -29,7 +29,7 @@ use std::{fs::File, io::BufReader};
 #[test]
 fn mesh_io_test() {
     let mut m = Mesh3D::<Point3D, PointCloud3D<Point3D>, Vec<usize>>::default();
-    load_ply(
+    load_ply_mesh(
         &mut BufReader::new(File::open("tests/data/torus_only_vertex_data.ply").unwrap()),
         &mut m,
     )
@@ -44,7 +44,7 @@ fn mesh_io_test() {
     .unwrap();
 
     let mut m = Mesh3D::<Point3D, PointCloud3D<Point3D>, Vec<usize>>::default();
-    load_ply(
+    load_ply_mesh(
         &mut BufReader::new(File::open("tests/tmp/torus_only_vertex_data.ply").unwrap()),
         &mut m,
     )
