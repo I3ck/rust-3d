@@ -498,7 +498,7 @@ where
 
     let n = read_stl_normal(&line).ok_or(StlError::LineParse(*i_line))?;
 
-    line = fetch_line(read, line_buffer)?;
+    line = trim_start(fetch_line(read, line_buffer)?);
     *i_line += 1;
 
     if !line.starts_with(b"outer loop") {
@@ -520,14 +520,14 @@ where
 
     let c = read_stl_vertex(&line).ok_or(StlError::LineParse(*i_line))?;
 
-    line = fetch_line(read, line_buffer)?;
+    line = trim_start(fetch_line(read, line_buffer)?);
     *i_line += 1;
 
     if !line.starts_with(b"endloop") {
         return Err(StlError::LineParse(*i_line));
     }
 
-    line = fetch_line(read, line_buffer)?;
+    line = trim_start(fetch_line(read, line_buffer)?);
     *i_line += 1;
 
     if !line.starts_with(b"endfacet") {
