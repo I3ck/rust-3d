@@ -63,11 +63,15 @@ where
             let n_vertices = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse(i_line))?;
+                .ok_or_else(|| {
+                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                })?;
             let n_faces = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse(i_line))?;
+                .ok_or_else(|| {
+                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                })?;
 
             mesh.reserve_vertices(n_vertices);
             mesh.reserve_faces(n_faces);
@@ -83,39 +87,53 @@ where
             let x = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse(i_line))?;
+                .ok_or_else(|| {
+                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                })?;
 
             let y = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse(i_line))?;
+                .ok_or_else(|| {
+                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                })?;
 
             let z = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse(i_line))?;
+                .ok_or_else(|| {
+                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                })?;
 
             mesh.add_vertex(P::new(x, y, z));
         } else {
             let mut words = to_words_skip_empty(line);
 
-            let count_face = words.next().ok_or(OffError::LineParse(i_line))?;
+            let count_face = words.next().ok_or_else(|| {
+                OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
             if count_face == b"3" {
                 let a = words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or(OffError::LineParse(i_line))?;
+                    .ok_or_else(|| {
+                        OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                    })?;
 
                 let b = words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or(OffError::LineParse(i_line))?;
+                    .ok_or_else(|| {
+                        OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                    })?;
 
                 let c = words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or(OffError::LineParse(i_line))?;
+                    .ok_or_else(|| {
+                        OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                    })?;
 
                 mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
                     .or(Err(OffError::InvalidMeshIndices(i_line)))?;
@@ -158,7 +176,9 @@ where
                 words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or(OffError::LineParse(i_line))?,
+                    .ok_or_else(|| {
+                        OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                    })?,
             );
             ip.reserve(n_vertices.unwrap());
 
@@ -172,17 +192,23 @@ where
             let x = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse(i_line))?;
+                .ok_or_else(|| {
+                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                })?;
 
             let y = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse(i_line))?;
+                .ok_or_else(|| {
+                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                })?;
 
             let z = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse(i_line))?;
+                .ok_or_else(|| {
+                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                })?;
 
             ip.push(P::new(x, y, z));
             n_added += 1;
@@ -200,7 +226,7 @@ where
 pub enum OffError {
     AccessFile,
     InvalidMeshIndices(usize),
-    LineParse(usize),
+    LineParse(usize, String),
 }
 
 /// Result type for .off file operations
@@ -210,7 +236,7 @@ impl fmt::Debug for OffError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::AccessFile => write!(f, "Unable to access file"),
-            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
             Self::InvalidMeshIndices(x) => {
                 write!(f, "File contains invalid mesh indices on line {}", x)
             }

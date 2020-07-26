@@ -1,3 +1,5 @@
+lots of code duplication within the io (error handling)
+
 consider full abstraction over floating point type (huge change)
 
 consider From / Into implementations for Mesh etc. so buffers can be reused

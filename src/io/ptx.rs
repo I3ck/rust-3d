@@ -54,14 +54,20 @@ where
             }
             i_line += 1;
 
-            columns = from_ascii(first_line.unwrap()).ok_or(PtxError::Columns(i_line))?;
+            columns = from_ascii(first_line.as_ref().unwrap()).ok_or_else(|| {
+                PtxError::Columns(
+                    i_line,
+                    String::from_utf8_lossy(first_line.unwrap()).to_string(),
+                )
+            })?;
             // safe, since first_line being err causing break
         }
 
         line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
 
-        let rows: usize = from_ascii(line).ok_or(PtxError::Rows(i_line))?;
+        let rows: usize = from_ascii(line)
+            .ok_or_else(|| PtxError::Rows(i_line, String::from_utf8_lossy(line).to_string()))?;
 
         // skip scanner position line
         fetch_line(read, &mut line_buffer)?;
@@ -81,19 +87,23 @@ where
 
         line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
-        let [m11, m12, m13, m14] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
+        let [m11, m12, m13, m14] = read_matrix_row(line)
+            .ok_or_else(|| PtxError::Matrix(i_line, String::from_utf8_lossy(line).to_string()))?;
 
         line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
-        let [m21, m22, m23, m24] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
+        let [m21, m22, m23, m24] = read_matrix_row(line)
+            .ok_or_else(|| PtxError::Matrix(i_line, String::from_utf8_lossy(line).to_string()))?;
 
         line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
-        let [m31, m32, m33, m34] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
+        let [m31, m32, m33, m34] = read_matrix_row(line)
+            .ok_or_else(|| PtxError::Matrix(i_line, String::from_utf8_lossy(line).to_string()))?;
 
         line = fetch_line(read, &mut line_buffer)?;
         i_line += 1;
-        let [m41, m42, m43, m44] = read_matrix_row(line).ok_or(PtxError::Matrix(i_line))?;
+        let [m41, m42, m43, m44] = read_matrix_row(line)
+            .ok_or_else(|| PtxError::Matrix(i_line, String::from_utf8_lossy(line).to_string()))?;
 
         let m = Matrix4 {
             data: [
@@ -116,18 +126,15 @@ where
 
             let mut words = to_words_skip_empty(line);
 
-            let x = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PtxError::Point(i_line))?;
-            let y = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PtxError::Point(i_line))?;
-            let z = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PtxError::Point(i_line))?;
+            let x = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                PtxError::Point(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
+            let y = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                PtxError::Point(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
+            let z = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                PtxError::Point(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
             let mut p = P::new(x, y, z);
 
@@ -161,11 +168,10 @@ fn read_matrix_row(line: &[u8]) -> Option<[f64; 4]> {
 pub enum PtxError {
     LoadFileEndReached,
     AccessFile,
-    LineParse(usize),
-    Columns(usize),
-    Rows(usize),
-    Matrix(usize),
-    Point(usize),
+    Columns(usize, String),
+    Rows(usize, String),
+    Matrix(usize, String),
+    Point(usize, String),
 }
 
 /// Result type for .ptx file operations
@@ -176,11 +182,14 @@ impl fmt::Debug for PtxError {
         match self {
             Self::LoadFileEndReached => write!(f, "Unexpected reach of .ptx file end"),
             Self::AccessFile => write!(f, "Unable to access file"),
-            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
-            Self::Columns(x) => write!(f, "Columns could not be parsed on line {}", x),
-            Self::Rows(x) => write!(f, "Rows could not be parsed on line {}", x),
-            Self::Matrix(x) => write!(f, "Transformation matrix could not be parsed on line {}", x),
-            Self::Point(x) => write!(f, "Point could not be parsed on line {}", x),
+            Self::Columns(i, s) => write!(f, "Columns could not be parsed on line {}: '{}'", i, s),
+            Self::Rows(i, s) => write!(f, "Rows could not be parsed on line {}: '{}'", i, s),
+            Self::Matrix(i, s) => write!(
+                f,
+                "Transformation matrix could not be parsed on line {}: '{}'",
+                i, s
+            ),
+            Self::Point(i, s) => write!(f, "Point could not be parsed on line {}: '{}'", i, s),
         }
     }
 }

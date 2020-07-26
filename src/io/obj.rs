@@ -53,38 +53,51 @@ where
             let mut words = to_words_skip_empty(line);
 
             // skip "v"
-            words.next().ok_or(ObjError::LineParse(i_line))?;
+            words.next().ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
-            let x = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::LineParse(i_line))?;
+            let x = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
-            let y = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::LineParse(i_line))?;
+            let y = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
-            let z = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::LineParse(i_line))?;
+            let z = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
             mesh.add_vertex(P::new(x, y, z));
         } else if line.starts_with(b"f ") {
             let mut words = to_words_skip_empty(line);
 
             // skip "f"
-            words.next().ok_or(ObjError::LineParse(i_line))?;
+            words.next().ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
-            let mut tmp = words.next().ok_or(ObjError::LineParse(i_line))?;
-            let a: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(ObjError::LineParse(i_line))?;
+            let mut tmp = words.next().ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
+            let a: usize = from_ascii(until_bytes(tmp, b'/')).ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
-            tmp = words.next().ok_or(ObjError::LineParse(i_line))?;
-            let b: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(ObjError::LineParse(i_line))?;
+            tmp = words.next().ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
+            let b: usize = from_ascii(until_bytes(tmp, b'/')).ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
-            tmp = words.next().ok_or(ObjError::LineParse(i_line))?;
-            let c: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(ObjError::LineParse(i_line))?;
+            tmp = words.next().ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
+            let c: usize = from_ascii(until_bytes(tmp, b'/')).ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
             // obj indexing starts at 1
             mesh.try_add_connection(VId { val: a - 1 }, VId { val: b - 1 }, VId { val: c - 1 })
@@ -112,22 +125,21 @@ where
             let mut words = to_words_skip_empty(line);
 
             // skip "v"
-            words.next().ok_or(ObjError::LineParse(i_line))?;
+            words.next().ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
-            let x = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::LineParse(i_line))?;
+            let x = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
-            let y = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::LineParse(i_line))?;
+            let y = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
-            let z = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::LineParse(i_line))?;
+            let z = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
             ip.push(P::new(x, y, z));
         }
@@ -142,7 +154,7 @@ where
 pub enum ObjError {
     AccessFile,
     InvalidMeshIndices(usize),
-    LineParse(usize),
+    LineParse(usize, String),
 }
 
 /// Result type for .obj file operations
@@ -152,7 +164,7 @@ impl fmt::Debug for ObjError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::AccessFile => write!(f, "Unable to access file"),
-            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
             Self::InvalidMeshIndices(x) => {
                 write!(f, "File contains invalid mesh indices on line {}", x)
             }

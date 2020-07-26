@@ -57,12 +57,9 @@ where
             None => {
                 //@todo code duplication
                 let mut words = to_words_skip_empty(line);
-                n_vertices = Some(
-                    words
-                        .next()
-                        .and_then(|word| from_ascii(word))
-                        .ok_or(PtsError::LineParse(i_line))?,
-                );
+                n_vertices = Some(words.next().and_then(|word| from_ascii(word)).ok_or_else(
+                    || PtsError::LineParse(i_line, String::from_utf8_lossy(line).to_string()),
+                )?);
                 ip.reserve(n_vertices.unwrap());
             }
             Some(n) => {
@@ -72,17 +69,23 @@ where
                     let x = words
                         .next()
                         .and_then(|word| from_ascii(word))
-                        .ok_or(PtsError::LineParse(i_line))?;
+                        .ok_or_else(|| {
+                            PtsError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                        })?;
 
                     let y = words
                         .next()
                         .and_then(|word| from_ascii(word))
-                        .ok_or(PtsError::LineParse(i_line))?;
+                        .ok_or_else(|| {
+                            PtsError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                        })?;
 
                     let z = words
                         .next()
                         .and_then(|word| from_ascii(word))
-                        .ok_or(PtsError::LineParse(i_line))?;
+                        .ok_or_else(|| {
+                            PtsError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                        })?;
 
                     ip.push(P::new(x, y, z));
                     n_added += 1;
@@ -91,12 +94,9 @@ where
                     //@todo code duplication
                     n_added = 0;
                     let mut words = to_words_skip_empty(line);
-                    n_vertices = Some(
-                        words
-                            .next()
-                            .and_then(|word| from_ascii(word))
-                            .ok_or(PtsError::LineParse(i_line))?,
-                    );
+                    n_vertices = Some(words.next().and_then(|word| from_ascii(word)).ok_or_else(
+                        || PtsError::LineParse(i_line, String::from_utf8_lossy(line).to_string()),
+                    )?);
                     ip.reserve(n_vertices.unwrap());
                 }
             }
@@ -111,7 +111,7 @@ where
 /// Error type for .pts file operations
 pub enum PtsError {
     AccessFile,
-    LineParse(usize),
+    LineParse(usize, String),
 }
 
 /// Result type for .pts file operations
@@ -121,7 +121,7 @@ impl fmt::Debug for PtsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::AccessFile => write!(f, "Unable to access file"),
-            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
         }
     }
 }

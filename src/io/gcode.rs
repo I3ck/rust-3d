@@ -58,8 +58,9 @@ where
                 // Move according to absolute/relative
                 let mut any_changed = false;
                 //@todo more specific errors
-                let [opt_x, opt_y, opt_z] =
-                    command(&line[3..]).ok_or(GcodeError::LineParse(i_line))?;
+                let [opt_x, opt_y, opt_z] = command(&line[3..]).ok_or_else(|| {
+                    GcodeError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                })?;
 
                 if let Some(new_x) = opt_x {
                     any_changed = true;
@@ -105,8 +106,9 @@ where
                     // Move according absolute
                     let mut any_changed = false;
                     //@todo more specific error
-                    let [opt_x, opt_y, opt_z] =
-                        command(&line[4..]).ok_or(GcodeError::LineParse(i_line))?;
+                    let [opt_x, opt_y, opt_z] = command(&line[4..]).ok_or_else(|| {
+                        GcodeError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+                    })?;
 
                     if let Some(new_x) = opt_x {
                         any_changed = true;
@@ -194,7 +196,7 @@ enum RelativeAbsolute {
 /// Error type for .gcode file operations
 pub enum GcodeError {
     AccessFile,
-    LineParse(usize),
+    LineParse(usize, String),
 }
 
 /// Result type for .gcode file operations
@@ -203,7 +205,7 @@ pub type GcodeResult<T> = std::result::Result<T, GcodeError>;
 impl fmt::Debug for GcodeError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
             Self::AccessFile => write!(f, "Unable to access file"),
         }
     }
