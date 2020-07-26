@@ -76,7 +76,9 @@ where
         i_line += 1;
 
         if !delim_determined {
-            delim = estimate_delimiter(2, &line).ok_or(XyzError::LineParse(i_line))?;
+            delim = estimate_delimiter(2, &line).ok_or_else(|| {
+                XyzError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
             delim_determined = true;
         }
 
@@ -85,17 +87,23 @@ where
         let x = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::LineParse(i_line))?;
+            .ok_or_else(|| {
+                XyzError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
         let y = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::LineParse(i_line))?;
+            .ok_or_else(|| {
+                XyzError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
         let z = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::LineParse(i_line))?;
+            .ok_or_else(|| {
+                XyzError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
         ip.push(P::new(x, y, z));
     }
@@ -109,7 +117,7 @@ where
 pub enum XyzError {
     EstimateDelimiter,
     AccessFile,
-    LineParse(usize),
+    LineParse(usize, String),
 }
 
 /// Result type for .xyz file operations
@@ -118,7 +126,7 @@ pub type XyzResult<T> = std::result::Result<T, XyzError>;
 impl fmt::Debug for XyzError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
         }

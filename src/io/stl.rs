@@ -493,45 +493,61 @@ where
     }
 
     if !line.starts_with(b"facet") {
-        return Err(StlError::LineParse(*i_line));
+        return Err(StlError::LineParse(
+            *i_line,
+            String::from_utf8_lossy(line).to_string(),
+        ));
     }
 
-    let n = read_stl_normal(&line).ok_or(StlError::LineParse(*i_line))?;
+    let n = read_stl_normal(&line)
+        .ok_or_else(|| StlError::LineParse(*i_line, String::from_utf8_lossy(line).to_string()))?;
 
     line = trim_start(fetch_line(read, line_buffer)?);
     *i_line += 1;
 
     if !line.starts_with(b"outer loop") {
-        return Err(StlError::LineParse(*i_line));
+        return Err(StlError::LineParse(
+            *i_line,
+            String::from_utf8_lossy(line).to_string(),
+        ));
     }
 
     line = fetch_line(read, line_buffer)?;
     *i_line += 1;
 
-    let a = read_stl_vertex(&line).ok_or(StlError::LineParse(*i_line))?;
+    let a = read_stl_vertex(&line)
+        .ok_or_else(|| StlError::LineParse(*i_line, String::from_utf8_lossy(line).to_string()))?;
 
     line = fetch_line(read, line_buffer)?;
     *i_line += 1;
 
-    let b = read_stl_vertex(&line).ok_or(StlError::LineParse(*i_line))?;
+    let b = read_stl_vertex(&line)
+        .ok_or_else(|| StlError::LineParse(*i_line, String::from_utf8_lossy(line).to_string()))?;
 
     line = fetch_line(read, line_buffer)?;
     *i_line += 1;
 
-    let c = read_stl_vertex(&line).ok_or(StlError::LineParse(*i_line))?;
+    let c = read_stl_vertex(&line)
+        .ok_or_else(|| StlError::LineParse(*i_line, String::from_utf8_lossy(line).to_string()))?;
 
     line = trim_start(fetch_line(read, line_buffer)?);
     *i_line += 1;
 
     if !line.starts_with(b"endloop") {
-        return Err(StlError::LineParse(*i_line));
+        return Err(StlError::LineParse(
+            *i_line,
+            String::from_utf8_lossy(line).to_string(),
+        ));
     }
 
     line = trim_start(fetch_line(read, line_buffer)?);
     *i_line += 1;
 
     if !line.starts_with(b"endfacet") {
-        return Err(StlError::LineParse(*i_line));
+        return Err(StlError::LineParse(
+            *i_line,
+            String::from_utf8_lossy(line).to_string(),
+        ));
     }
 
     Ok([a, b, c, n])
@@ -608,7 +624,7 @@ pub enum StlError {
     LoadFileEndReached,
     AccessFile,
     BinaryData,
-    LineParse(usize),
+    LineParse(usize, String),
 }
 
 /// Result type for .stl file operations
@@ -620,7 +636,7 @@ impl fmt::Debug for StlError {
             Self::LoadFileEndReached => write!(f, "Unexpected reach of .stl file end"),
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::BinaryData => write!(f, "Binary data seems to be invalid"),
-            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
         }
     }
 }
