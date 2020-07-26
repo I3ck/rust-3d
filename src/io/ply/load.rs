@@ -195,12 +195,10 @@ where
                 if line.starts_with(b"element vertex") {
                     read_state = HeaderReadState::Vertex;
                     let mut words = to_words_skip_empty(line);
-                    opt_n_vertices = Some(
-                        words
-                            .nth(2)
-                            .and_then(|w| from_ascii(w))
-                            .ok_or(PlyError::LineParse(*i_line))?,
-                    );
+                    opt_n_vertices =
+                        Some(words.nth(2).and_then(|w| from_ascii(w)).ok_or_else(|| {
+                            PlyError::LineParse(*i_line, String::from_utf8_lossy(line).to_string())
+                        })?);
                     continue;
                 }
             }
@@ -212,12 +210,10 @@ where
                 if line.starts_with(b"element face") {
                     read_state = HeaderReadState::Face;
                     let mut words = to_words_skip_empty(line);
-                    opt_n_faces = Some(
-                        words
-                            .nth(2)
-                            .and_then(|w| from_ascii(w))
-                            .ok_or(PlyError::LineParse(*i_line))?,
-                    );
+                    opt_n_faces =
+                        Some(words.nth(2).and_then(|w| from_ascii(w)).ok_or_else(|| {
+                            PlyError::LineParse(*i_line, String::from_utf8_lossy(line).to_string())
+                        })?);
                     continue;
                 }
             }
@@ -230,9 +226,18 @@ where
                     let mut words = to_words_skip_empty(line);
                     skip_n(&mut words, 1); // skip "property"
 
-                    let t =
-                        Type::try_from(words.next().ok_or(PlyError::InvalidProperty(*i_line))?)?;
-                    let id = words.next().ok_or(PlyError::InvalidProperty(*i_line))?;
+                    let t = Type::try_from(words.next().ok_or_else(|| {
+                        PlyError::InvalidProperty(
+                            *i_line,
+                            String::from_utf8_lossy(line).to_string(),
+                        )
+                    })?)?;
+                    let id = words.next().ok_or_else(|| {
+                        PlyError::InvalidProperty(
+                            *i_line,
+                            String::from_utf8_lossy(line).to_string(),
+                        )
+                    })?;
                     if id == b"x" {
                         opt_fst_type = Some(VertexType::try_from(t)?);
                         n_types_found += 1;
@@ -272,10 +277,20 @@ where
                             skip_n(&mut words, 2); // skip "property" and "list"
 
                             let t_count = FaceType::try_from(Type::try_from(
-                                words.next().ok_or(PlyError::InvalidProperty(*i_line))?,
+                                words.next().ok_or_else(|| {
+                                    PlyError::InvalidProperty(
+                                        *i_line,
+                                        String::from_utf8_lossy(line).to_string(),
+                                    )
+                                })?,
                             )?)?;
                             let t_index = FaceType::try_from(Type::try_from(
-                                words.next().ok_or(PlyError::InvalidProperty(*i_line))?,
+                                words.next().ok_or_else(|| {
+                                    PlyError::InvalidProperty(
+                                        *i_line,
+                                        String::from_utf8_lossy(line).to_string(),
+                                    )
+                                })?,
                             )?)?;
 
                             opt_face_count_type = Some(t_count);
@@ -284,9 +299,12 @@ where
                     } else {
                         let mut words = to_words_skip_empty(line);
                         skip_n(&mut words, 1); // skip "property"
-                        let t = Type::try_from(
-                            words.next().ok_or(PlyError::InvalidProperty(*i_line))?,
-                        )?;
+                        let t = Type::try_from(words.next().ok_or_else(|| {
+                            PlyError::InvalidProperty(
+                                *i_line,
+                                String::from_utf8_lossy(line).to_string(),
+                            )
+                        })?)?;
                         if opt_face_count_type.is_some() {
                             face_after.bytes += t.size_bytes();
                             face_after.words += 1;
@@ -296,7 +314,12 @@ where
                         }
                     }
                 }
-                _ => return Err(PlyError::PropertyLineLocation(*i_line)),
+                _ => {
+                    return Err(PlyError::PropertyLineLocation(
+                        *i_line,
+                        String::from_utf8_lossy(line).to_string(),
+                    ))
+                }
             }
 
             continue;
@@ -418,24 +441,21 @@ where
 
             skip_n(&mut words, header.vertex.format.before.words);
 
-            let first = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PlyError::InvalidVertex(*i_line))?;
+            let first = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                PlyError::InvalidVertex(*i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
             skip_n(&mut words, header.vertex.format.between_first_snd.words);
 
-            let snd = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PlyError::InvalidVertex(*i_line))?;
+            let snd = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                PlyError::InvalidVertex(*i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
             skip_n(&mut words, header.vertex.format.between_snd_third.words);
 
-            let third = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PlyError::InvalidVertex(*i_line))?;
+            let third = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                PlyError::InvalidVertex(*i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
             // no need to skip 'after' since we're done with this line anyway
 
@@ -539,24 +559,21 @@ where
 
             skip_n(&mut words, header.vertex.format.before.words);
 
-            let first = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PlyError::InvalidVertex(*i_line))?;
+            let first = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                PlyError::InvalidVertex(*i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
             skip_n(&mut words, header.vertex.format.between_first_snd.words);
 
-            let snd = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PlyError::InvalidVertex(*i_line))?;
+            let snd = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                PlyError::InvalidVertex(*i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
             skip_n(&mut words, header.vertex.format.between_snd_third.words);
 
-            let third = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PlyError::InvalidVertex(*i_line))?;
+            let third = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
+                PlyError::InvalidVertex(*i_line, String::from_utf8_lossy(line).to_string())
+            })?;
 
             // no need to skip 'after' since we're done with this line anyway
 

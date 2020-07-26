@@ -291,10 +291,10 @@ pub enum PlyError {
     InvalidVertexType, //@todo would be better to name the issue
     InvalidFaceType,   //@todo would be better to name the issue
     InvalidMeshIndices(Option<usize>),
-    LineParse(usize),
-    InvalidProperty(usize),
-    InvalidVertex(usize),
-    PropertyLineLocation(usize),
+    LineParse(usize, String),
+    InvalidProperty(usize, String),
+    InvalidVertex(usize, String),
+    PropertyLineLocation(usize, String),
     FaceStructure,
     InvalidVertexDimensionDefinition,
 }
@@ -323,21 +323,23 @@ impl fmt::Debug for PlyError {
             Self::InvalidType(x) => write!(f, "Invalid type in header '{}'", x),
             Self::InvalidVertexType => write!(f, "Invalid vertex type in header"),
             Self::InvalidFaceType => write!(f, "Invalid face type in header"),
-            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::InvalidMeshIndices(opt_x) => match opt_x {
                 Some(x) => write!(f, "File contains invalid mesh indices on line {}", x),
                 None => write!(f, "File contains invalid mesh indices"),
             },
-            Self::InvalidProperty(x) => write!(f, "Invalid property on line {}", x),
-            Self::InvalidVertex(x) => write!(f, "Invalid vertex definition on line {}", x),
+            Self::InvalidProperty(i, s) => write!(f, "Invalid property on line {}: '{}'", i, s),
+            Self::InvalidVertex(i, s) => {
+                write!(f, "Invalid vertex definition on line {}: '{}'", i, s)
+            }
             Self::InvalidVertexDimensionDefinition => {
                 write!(f, "Invalid order / definition of vertex dimension order")
             }
-            Self::PropertyLineLocation(x) => write!(
+            Self::PropertyLineLocation(i, s) => write!(
                 f,
-                "Found property line at unexpected location on line {}",
-                x
+                "Found property line at unexpected location on line {}: '{}'",
+                i, s
             ),
             Self::FaceStructure => write!(
                 f,
