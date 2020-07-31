@@ -37,6 +37,12 @@ use super::{byte_reader::*, from_bytes::*, utils::*};
 
 //------------------------------------------------------------------------------
 
+//@todo can be resolved in a better way once https://github.com/rust-lang/rust/issues/48043 is on stable
+//@todo work around in case the binary data is invalid
+const MAX_TRIANGLES_BINARY: u32 = 1_000_000_000;
+
+//------------------------------------------------------------------------------
+
 /// Saves an IsMesh3D in the ASCII .stl file format
 pub fn save_stl_ascii<M, P, W>(write: &mut W, mesh: &M) -> StlResult<()>
 where
@@ -242,6 +248,9 @@ where
     }
 
     let n_triangles = LittleReader::read_u32(read)?;
+    if n_triangles > MAX_TRIANGLES_BINARY {
+        return Err(StlError::InvalidFaceCount);
+    }
 
     mesh.reserve_vertices(3 * n_triangles as usize);
     mesh.reserve_faces(n_triangles as usize);
@@ -347,6 +356,9 @@ where
     }
 
     let n_triangles = LittleReader::read_u32(read)?;
+    if n_triangles > MAX_TRIANGLES_BINARY {
+        return Err(StlError::InvalidFaceCount);
+    }
 
     mesh.reserve_vertices((0.5 * n_triangles as f64) as usize);
     mesh.reserve_faces(n_triangles as usize);
@@ -450,6 +462,9 @@ where
     }
 
     let n_triangles = LittleReader::read_u32(read)?;
+    if n_triangles > MAX_TRIANGLES_BINARY {
+        return Err(StlError::InvalidFaceCount);
+    }
 
     ip.reserve(3 * n_triangles as usize);
     face_normals.reserve(n_triangles as usize);
@@ -624,6 +639,7 @@ pub enum StlError {
     LoadFileEndReached,
     AccessFile,
     BinaryData,
+    InvalidFaceCount,
     LineParse(usize, String),
 }
 
@@ -636,6 +652,7 @@ impl fmt::Debug for StlError {
             Self::LoadFileEndReached => write!(f, "Unexpected reach of .stl file end"),
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::BinaryData => write!(f, "Binary data seems to be invalid"),
+            Self::InvalidFaceCount => write!(f, "Containing an invalid face count"),
             Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
         }
     }
