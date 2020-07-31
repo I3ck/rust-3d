@@ -514,8 +514,7 @@ where
         ));
     }
 
-    let n = read_stl_normal(&line)
-        .ok_or_else(|| StlError::LineParse(*i_line, String::from_utf8_lossy(line).to_string()))?;
+    let n = read_stl_normal(&line).unwrap_or(P::new(0.0, 0.0, 1.0));
 
     line = trim_start(fetch_line(read, line_buffer)?);
     *i_line += 1;
