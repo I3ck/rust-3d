@@ -61,12 +61,12 @@ impl TryFrom<&[u8]> for Type {
 
     fn try_from(x: &[u8]) -> PlyResult<Self> {
         match x {
-            b"char" => Ok(Self::Char),
-            b"uchar" => Ok(Self::UChar),
-            b"short" => Ok(Self::Short),
-            b"ushort" => Ok(Self::UShort),
-            b"int" => Ok(Self::Int),
-            b"uint" => Ok(Self::UInt),
+            b"char" | b"int8" => Ok(Self::Char),
+            b"uchar" | b"uint8" => Ok(Self::UChar),
+            b"short" | b"int16" => Ok(Self::Short),
+            b"ushort" | b"uint16" => Ok(Self::UShort),
+            b"int" | b"int32" => Ok(Self::Int),
+            b"uint" | b"uint32" => Ok(Self::UInt),
             b"float" | b"float32" => Ok(Self::Float),
             b"double" | b"float64" => Ok(Self::Double),
             _ => Err(PlyError::InvalidType(
