@@ -28,7 +28,7 @@ use core::convert::TryFrom;
 
 use std::io::{BufRead, Read};
 
-use super::super::{byte_reader::*, utils::*};
+use super::super::{byte_reader::*, types::*, utils::*};
 
 use super::{types::*, utils::*};
 
@@ -39,7 +39,7 @@ pub fn load_ply_either<EM, IP, P, R>(
     read: &mut R,
     mesh: &mut EM,
     ip: &mut IP,
-) -> PlyResult<MeshOrPoints>
+) -> PlyIOResult<MeshOrPoints>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     IP: IsPushable<P>,
@@ -59,9 +59,11 @@ where
                     load_mesh_ascii(read, mesh, &header, &mut line_buffer, &mut i_line)
                 }
                 Format::LittleEndian => {
-                    load_mesh_binary::<LittleReader, _, _, _>(read, mesh, &header)
+                    load_mesh_binary::<LittleReader, _, _, _>(read, mesh, &header).simple()
                 }
-                Format::BigEndian => load_mesh_binary::<BigReader, _, _, _>(read, mesh, &header),
+                Format::BigEndian => {
+                    load_mesh_binary::<BigReader, _, _, _>(read, mesh, &header).simple()
+                }
             }?;
 
             Ok(MeshOrPoints::Mesh)
@@ -74,9 +76,11 @@ where
                     load_points_ascii(read, ip, &header, &mut line_buffer, &mut i_line)
                 }
                 Format::LittleEndian => {
-                    load_points_binary::<LittleReader, _, _, _>(read, ip, &header)
+                    load_points_binary::<LittleReader, _, _, _>(read, ip, &header).simple()
                 }
-                Format::BigEndian => load_points_binary::<BigReader, _, _, _>(read, ip, &header),
+                Format::BigEndian => {
+                    load_points_binary::<BigReader, _, _, _>(read, ip, &header).simple()
+                }
             }?;
 
             Ok(MeshOrPoints::Points)
@@ -85,7 +89,7 @@ where
 }
 
 /// Loads an IsMesh3D from the .ply file format
-pub fn load_ply_mesh<EM, P, R>(read: &mut R, mesh: &mut EM) -> PlyResult<()>
+pub fn load_ply_mesh<EM, P, R>(read: &mut R, mesh: &mut EM) -> PlyIOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -100,18 +104,22 @@ where
 
         match header.format {
             Format::Ascii => load_mesh_ascii(read, mesh, &header, &mut line_buffer, &mut i_line),
-            Format::LittleEndian => load_mesh_binary::<LittleReader, _, _, _>(read, mesh, &header),
-            Format::BigEndian => load_mesh_binary::<BigReader, _, _, _>(read, mesh, &header),
+            Format::LittleEndian => {
+                load_mesh_binary::<LittleReader, _, _, _>(read, mesh, &header).simple()
+            }
+            Format::BigEndian => {
+                load_mesh_binary::<BigReader, _, _, _>(read, mesh, &header).simple()
+            }
         }
     } else {
-        Err(PlyError::LoadHeaderInvalid)
+        Err(PlyError::LoadHeaderInvalid).simple()
     }
 }
 
 //------------------------------------------------------------------------------
 
 /// Loads the points from the .ply file into IsPushable<Is3D>
-pub fn load_ply_points<IP, P, R>(read: &mut R, ip: &mut IP) -> PlyResult<()>
+pub fn load_ply_points<IP, P, R>(read: &mut R, ip: &mut IP) -> PlyIOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D + Clone,
@@ -125,8 +133,10 @@ where
 
     match header.format {
         Format::Ascii => load_points_ascii(read, ip, &header, &mut line_buffer, &mut i_line),
-        Format::LittleEndian => load_points_binary::<LittleReader, _, _, _>(read, ip, &header),
-        Format::BigEndian => load_points_binary::<BigReader, _, _, _>(read, ip, &header),
+        Format::LittleEndian => {
+            load_points_binary::<LittleReader, _, _, _>(read, ip, &header).simple()
+        }
+        Format::BigEndian => load_points_binary::<BigReader, _, _, _>(read, ip, &header).simple(),
     }
 }
 
@@ -134,7 +144,11 @@ where
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-fn load_header<R>(read: &mut R, line_buffer: &mut Vec<u8>, i_line: &mut usize) -> PlyResult<Header>
+fn load_header<R>(
+    read: &mut R,
+    line_buffer: &mut Vec<u8>,
+    i_line: &mut usize,
+) -> PlyIOResult<Header>
 where
     R: BufRead,
 {
@@ -177,7 +191,7 @@ where
                 ply_found = true;
                 continue;
             }
-            return Err(PlyError::LoadStartNotFound);
+            return Err(PlyError::LoadStartNotFound).bline(*i_line, line);
         }
 
         if opt_format.is_none() {
@@ -185,7 +199,7 @@ where
                 b"format ascii 1.0" => Format::Ascii,
                 b"format binary_little_endian 1.0" => Format::LittleEndian,
                 b"format binary_big_endian 1.0" => Format::BigEndian,
-                _ => return Err(PlyError::LoadFormatNotFound),
+                _ => return Err(PlyError::LoadFormatNotFound).bline(*i_line, line),
             });
             continue;
         }
@@ -195,10 +209,13 @@ where
                 if line.starts_with(b"element vertex") {
                     read_state = HeaderReadState::Vertex;
                     let mut words = to_words_skip_empty(line);
-                    opt_n_vertices =
-                        Some(words.nth(2).and_then(|w| from_ascii(w)).ok_or_else(|| {
-                            PlyError::LineParse(*i_line, String::from_utf8_lossy(line).to_string())
-                        })?);
+                    opt_n_vertices = Some(
+                        words
+                            .nth(2)
+                            .and_then(|w| from_ascii(w))
+                            .ok_or(PlyError::VertexElement)
+                            .bline(*i_line, line)?,
+                    );
                     continue;
                 }
             }
@@ -210,10 +227,13 @@ where
                 if line.starts_with(b"element face") {
                     read_state = HeaderReadState::Face;
                     let mut words = to_words_skip_empty(line);
-                    opt_n_faces =
-                        Some(words.nth(2).and_then(|w| from_ascii(w)).ok_or_else(|| {
-                            PlyError::LineParse(*i_line, String::from_utf8_lossy(line).to_string())
-                        })?);
+                    opt_n_faces = Some(
+                        words
+                            .nth(2)
+                            .and_then(|w| from_ascii(w))
+                            .ok_or(PlyError::FaceElement)
+                            .bline(*i_line, line)?,
+                    );
                     continue;
                 }
             }
@@ -226,30 +246,27 @@ where
                     let mut words = to_words_skip_empty(line);
                     skip_n(&mut words, 1); // skip "property"
 
-                    let t = Type::try_from(words.next().ok_or_else(|| {
-                        PlyError::InvalidProperty(
-                            *i_line,
-                            String::from_utf8_lossy(line).to_string(),
-                        )
-                    })?)?;
-                    let id = words.next().ok_or_else(|| {
-                        PlyError::InvalidProperty(
-                            *i_line,
-                            String::from_utf8_lossy(line).to_string(),
-                        )
-                    })?;
+                    let t = words
+                        .next()
+                        .ok_or(PlyError::InvalidProperty)
+                        .and_then(|w| Type::try_from(w))
+                        .bline(*i_line, line)?;
+                    let id = words
+                        .next()
+                        .ok_or(PlyError::InvalidProperty)
+                        .bline(*i_line, line)?;
                     if id == b"x" {
-                        opt_fst_type = Some(VertexType::try_from(t)?);
+                        opt_fst_type = Some(VertexType::try_from(t).bline(*i_line, line)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::X;
                         i_vertex_order += 1;
                     } else if id == b"y" {
-                        opt_snd_type = Some(VertexType::try_from(t)?);
+                        opt_snd_type = Some(VertexType::try_from(t).bline(*i_line, line)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Y;
                         i_vertex_order += 1;
                     } else if id == b"z" {
-                        opt_third_type = Some(VertexType::try_from(t)?);
+                        opt_third_type = Some(VertexType::try_from(t).bline(*i_line, line)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Z;
                         i_vertex_order += 1;
@@ -274,22 +291,18 @@ where
                             let mut words = to_words_skip_empty(line);
                             skip_n(&mut words, 2); // skip "property" and "list"
 
-                            let t_count = FaceType::try_from(Type::try_from(
-                                words.next().ok_or_else(|| {
-                                    PlyError::InvalidProperty(
-                                        *i_line,
-                                        String::from_utf8_lossy(line).to_string(),
-                                    )
-                                })?,
-                            )?)?;
-                            let t_index = FaceType::try_from(Type::try_from(
-                                words.next().ok_or_else(|| {
-                                    PlyError::InvalidProperty(
-                                        *i_line,
-                                        String::from_utf8_lossy(line).to_string(),
-                                    )
-                                })?,
-                            )?)?;
+                            let t_count = words
+                                .next()
+                                .ok_or(PlyError::InvalidProperty)
+                                .and_then(|x| Type::try_from(x))
+                                .and_then(|x| FaceType::try_from(x))
+                                .bline(*i_line, line)?;
+                            let t_index = words
+                                .next()
+                                .ok_or(PlyError::InvalidProperty)
+                                .and_then(|x| Type::try_from(x))
+                                .and_then(|x| FaceType::try_from(x))
+                                .bline(*i_line, line)?;
 
                             opt_face_count_type = Some(t_count);
                             opt_face_index_type = Some(t_index);
@@ -297,12 +310,11 @@ where
                     } else {
                         let mut words = to_words_skip_empty(line);
                         skip_n(&mut words, 1); // skip "property"
-                        let t = Type::try_from(words.next().ok_or_else(|| {
-                            PlyError::InvalidProperty(
-                                *i_line,
-                                String::from_utf8_lossy(line).to_string(),
-                            )
-                        })?)?;
+                        let t = words
+                            .next()
+                            .ok_or(PlyError::InvalidProperty)
+                            .and_then(|x| Type::try_from(x))
+                            .bline(*i_line, line)?;
                         if opt_face_count_type.is_some() {
                             face_after.bytes += t.size_bytes();
                             face_after.words += 1;
@@ -313,10 +325,7 @@ where
                     }
                 }
                 _ => {
-                    return Err(PlyError::PropertyLineLocation(
-                        *i_line,
-                        String::from_utf8_lossy(line).to_string(),
-                    ))
+                    return Err(PlyError::PropertyLineLocation).bline(*i_line, line);
                 }
             }
 
@@ -334,7 +343,7 @@ where
                 let vertex_data = VertexData {
                     count: n_vertices,
                     format: VertexFormat {
-                        order: VertexOrder::try_from(vertex_order)?,
+                        order: VertexOrder::try_from(vertex_order).bline(*i_line, line)?,
                         first: x_type,
                         snd: y_type,
                         third: z_type,
@@ -370,10 +379,10 @@ where
             }
         }
 
-        return Err(PlyError::LoadHeaderInvalid);
+        return Err(PlyError::LoadHeaderInvalid).bline(*i_line, line);
     }
 
-    Err(PlyError::LoadHeaderInvalid)
+    Err(PlyError::LoadHeaderInvalid).simple()
 }
 
 //------------------------------------------------------------------------------
@@ -423,7 +432,7 @@ fn load_points_ascii<IP, P, R>(
     header: &PartialHeader,
     line_buffer: &mut Vec<u8>,
     i_line: &mut usize,
-) -> PlyResult<()>
+) -> PlyIOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D + Clone,
@@ -439,21 +448,27 @@ where
 
             skip_n(&mut words, header.vertex.format.before.words);
 
-            let first = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                PlyError::InvalidVertex(*i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let first = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(PlyError::InvalidVertex)
+                .bline(*i_line, line)?;
 
             skip_n(&mut words, header.vertex.format.between_first_snd.words);
 
-            let snd = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                PlyError::InvalidVertex(*i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let snd = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(PlyError::InvalidVertex)
+                .bline(*i_line, line)?;
 
             skip_n(&mut words, header.vertex.format.between_snd_third.words);
 
-            let third = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                PlyError::InvalidVertex(*i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let third = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(PlyError::InvalidVertex)
+                .bline(*i_line, line)?;
 
             // no need to skip 'after' since we're done with this line anyway
 
@@ -471,7 +486,7 @@ where
     }
 
     if header.vertex.count != n_pushed {
-        return Err(PlyError::LoadVertexCountIncorrect);
+        return Err(PlyError::LoadVertexCountIncorrect).simple();
     }
 
     Ok(())
@@ -529,7 +544,7 @@ where
             VId { val: b as usize },
             VId { val: c as usize },
         )
-        .or(Err(PlyError::InvalidMeshIndices(None)))?;
+        .or(Err(PlyError::InvalidMeshIndices))?;
     }
 
     Ok(())
@@ -543,7 +558,7 @@ fn load_mesh_ascii<EM, P, R>(
     header: &FullHeader,
     line_buffer: &mut Vec<u8>,
     i_line: &mut usize,
-) -> PlyResult<()>
+) -> PlyIOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -557,21 +572,27 @@ where
 
             skip_n(&mut words, header.vertex.format.before.words);
 
-            let first = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                PlyError::InvalidVertex(*i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let first = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(PlyError::InvalidVertex)
+                .bline(*i_line, line)?;
 
             skip_n(&mut words, header.vertex.format.between_first_snd.words);
 
-            let snd = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                PlyError::InvalidVertex(*i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let snd = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(PlyError::InvalidVertex)
+                .bline(*i_line, line)?;
 
             skip_n(&mut words, header.vertex.format.between_snd_third.words);
 
-            let third = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                PlyError::InvalidVertex(*i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let third = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(PlyError::InvalidVertex)
+                .bline(*i_line, line)?;
 
             // no need to skip 'after' since we're done with this line anyway
 
@@ -586,15 +607,18 @@ where
         }
 
         if header.face.count > mesh.num_faces() {
-            let [a, b, c] = collect_index_line(&line).ok_or(PlyError::FaceStructure)?;
+            let [a, b, c] = collect_index_line(&line)
+                .ok_or(PlyError::FaceStructure)
+                .bline(*i_line, line)?;
             mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
-                .or(Err(PlyError::InvalidMeshIndices(Some(*i_line))))?;
+                .or(Err(PlyError::InvalidMeshIndices))
+                .bline(*i_line, line)?;
             continue;
         }
     }
 
     if header.vertex.count != mesh.num_vertices() {
-        return Err(PlyError::LoadVertexCountIncorrect);
+        return Err(PlyError::LoadVertexCountIncorrect).simple();
     }
 
     Ok(())

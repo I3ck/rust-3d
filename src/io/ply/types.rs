@@ -26,6 +26,8 @@ use core::convert::TryFrom;
 
 use std::{fmt, io::Error as ioError};
 
+use crate::io::IOResult;
+
 //------------------------------------------------------------------------------
 
 #[derive(Copy, Clone)]
@@ -277,28 +279,29 @@ impl Into<PartialHeader> for Header {
 pub enum PlyError {
     LoadStartNotFound,
     LoadFormatNotFound,
-    LoadWrongPropertyCount,
     LoadVertexIndexDefinitionNotFound,
     LoadHeaderInvalid,
-    LoadVertexCountNotFound,
-    LoadFaceCountNotFound,
     LoadVertexCountIncorrect,
     AccessFile,
     ColorArrayIncorrectLength,
-    //@todo these all could name the affected line
+    VertexElement,
+    FaceElement,
     InvalidType(String),
     InvalidVertexType, //@todo would be better to name the issue
     InvalidFaceType,   //@todo would be better to name the issue
-    InvalidMeshIndices(Option<usize>),
-    LineParse(usize, String),
-    InvalidProperty(usize, String),
-    InvalidVertex(usize, String),
-    PropertyLineLocation(usize, String),
+    InvalidMeshIndices,
+    InvalidProperty,
+    InvalidVertex,
+    PropertyLineLocation,
     FaceStructure,
     InvalidVertexDimensionDefinition,
 }
 
 /// Result type for .ply file operations
+pub type PlyIOResult<T> = IOResult<T, PlyError>;
+
+/// Internal Result type for .ply file operations
+/// //@todo rename since e.g. used for save operations
 pub type PlyResult<T> = std::result::Result<T, PlyError>;
 
 impl fmt::Debug for PlyError {
@@ -306,40 +309,27 @@ impl fmt::Debug for PlyError {
         match self {
             Self::LoadStartNotFound => write!(f, "Start of .ply header not found"),
             Self::LoadFormatNotFound => write!(f, "Format of .ply missing or not supported"),
-            Self::LoadWrongPropertyCount => {
-                write!(f, "Property count of .ply missing or not supported")
-            }
             Self::LoadVertexIndexDefinitionNotFound => {
                 write!(f, "Index definition in .ply not found")
             }
             Self::LoadHeaderInvalid => write!(f, "Header of .ply seems to be invalid"),
-            Self::LoadVertexCountNotFound => write!(f, "Vertex count of .ply not found"),
-            Self::LoadFaceCountNotFound => write!(f, "Face count of .ply not found"),
             Self::LoadVertexCountIncorrect => write!(f, "Vertex count of .ply not found"),
             Self::ColorArrayIncorrectLength => {
                 write!(f, "The provided color array has an incorrect length")
             }
+            Self::VertexElement => write!(f, "Invalid vertex element"),
+            Self::FaceElement => write!(f, "Invalid face element"),
             Self::InvalidType(x) => write!(f, "Invalid type in header '{}'", x),
             Self::InvalidVertexType => write!(f, "Invalid vertex type in header"),
             Self::InvalidFaceType => write!(f, "Invalid face type in header"),
-            Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
             Self::AccessFile => write!(f, "Unable to access file"),
-            Self::InvalidMeshIndices(opt_x) => match opt_x {
-                Some(x) => write!(f, "File contains invalid mesh indices on line {}", x),
-                None => write!(f, "File contains invalid mesh indices"),
-            },
-            Self::InvalidProperty(i, s) => write!(f, "Invalid property on line {}: '{}'", i, s),
-            Self::InvalidVertex(i, s) => {
-                write!(f, "Invalid vertex definition on line {}: '{}'", i, s)
-            }
+            Self::InvalidMeshIndices => write!(f, "File contains invalid mesh indices"),
+            Self::InvalidProperty => write!(f, "Invalid property"),
+            Self::InvalidVertex => write!(f, "Invalid vertex definition"),
             Self::InvalidVertexDimensionDefinition => {
                 write!(f, "Invalid order / definition of vertex dimension order")
             }
-            Self::PropertyLineLocation(i, s) => write!(
-                f,
-                "Found property line at unexpected location on line {}: '{}'",
-                i, s
-            ),
+            Self::PropertyLineLocation => write!(f, "Found property line at unexpected location",),
             Self::FaceStructure => write!(
                 f,
                 "Invalid face structure, only supporting 3 vertices per face"
