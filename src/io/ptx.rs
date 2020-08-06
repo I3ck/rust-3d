@@ -29,7 +29,7 @@ use std::{
     io::{BufRead, Error as ioError},
 };
 
-use super::utils::*;
+use super::{types::*, utils::*};
 
 //------------------------------------------------------------------------------
 
@@ -54,56 +54,56 @@ where
             }
             i_line += 1;
 
-            columns = from_ascii(first_line.as_ref().unwrap()).ok_or_else(|| {
-                PtxError::Columns(
-                    i_line,
-                    String::from_utf8_lossy(first_line.unwrap()).to_string(),
-                )
-            })?;
+            columns = from_ascii(first_line.as_ref().unwrap())
+                .ok_or(PtxError::Columns)
+                .index(i_line)?;
             // safe, since first_line being err causing break
         }
 
-        line = fetch_line(read, &mut line_buffer)?;
+        line = fetch_line(read, &mut line_buffer).index(i_line)?;
         i_line += 1;
 
-        let rows: usize = from_ascii(line)
-            .ok_or_else(|| PtxError::Rows(i_line, String::from_utf8_lossy(line).to_string()))?;
+        let rows: usize = from_ascii(line).ok_or(PtxError::Rows).bline(i_line, line)?;
 
         // skip scanner position line
-        fetch_line(read, &mut line_buffer)?;
+        fetch_line(read, &mut line_buffer).index(i_line)?;
         i_line += 1;
 
         // skip scanner x-axis line
-        fetch_line(read, &mut line_buffer)?;
+        fetch_line(read, &mut line_buffer).index(i_line)?;
         i_line += 1;
 
         // skip scanner y-axis line
-        fetch_line(read, &mut line_buffer)?;
+        fetch_line(read, &mut line_buffer).index(i_line)?;
         i_line += 1;
 
         // skip scanner z-axis line
-        fetch_line(read, &mut line_buffer)?;
+        fetch_line(read, &mut line_buffer).index(i_line)?;
         i_line += 1;
 
-        line = fetch_line(read, &mut line_buffer)?;
+        line = fetch_line(read, &mut line_buffer).index(i_line)?;
         i_line += 1;
         let [m11, m12, m13, m14] = read_matrix_row(line)
-            .ok_or_else(|| PtxError::Matrix(i_line, String::from_utf8_lossy(line).to_string()))?;
+            .ok_or(PtxError::Matrix)
+            .bline(i_line, line)?;
 
-        line = fetch_line(read, &mut line_buffer)?;
+        line = fetch_line(read, &mut line_buffer).index(i_line)?;
         i_line += 1;
         let [m21, m22, m23, m24] = read_matrix_row(line)
-            .ok_or_else(|| PtxError::Matrix(i_line, String::from_utf8_lossy(line).to_string()))?;
+            .ok_or(PtxError::Matrix)
+            .bline(i_line, line)?;
 
-        line = fetch_line(read, &mut line_buffer)?;
+        line = fetch_line(read, &mut line_buffer).index(i_line)?;
         i_line += 1;
         let [m31, m32, m33, m34] = read_matrix_row(line)
-            .ok_or_else(|| PtxError::Matrix(i_line, String::from_utf8_lossy(line).to_string()))?;
+            .ok_or(PtxError::Matrix)
+            .bline(i_line, line)?;
 
-        line = fetch_line(read, &mut line_buffer)?;
+        line = fetch_line(read, &mut line_buffer).index(i_line)?;
         i_line += 1;
         let [m41, m42, m43, m44] = read_matrix_row(line)
-            .ok_or_else(|| PtxError::Matrix(i_line, String::from_utf8_lossy(line).to_string()))?;
+            .ok_or(PtxError::Matrix)
+            .bline(i_line, line)?;
 
         let m = Matrix4 {
             data: [
@@ -121,20 +121,26 @@ where
         ip.reserve(n);
 
         for _ in 0..n {
-            line = fetch_line(read, &mut line_buffer)?;
+            line = fetch_line(read, &mut line_buffer).index(i_line)?;
             i_line += 1;
 
             let mut words = to_words_skip_empty(line);
 
-            let x = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                PtxError::Point(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
-            let y = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                PtxError::Point(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
-            let z = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                PtxError::Point(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let x = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(PtxError::Point)
+                .bline(i_line, line)?;
+            let y = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(PtxError::Point)
+                .bline(i_line, line)?;
+            let z = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(PtxError::Point)
+                .bline(i_line, line)?;
 
             let mut p = P::new(x, y, z);
 
@@ -168,28 +174,24 @@ fn read_matrix_row(line: &[u8]) -> Option<[f64; 4]> {
 pub enum PtxError {
     LoadFileEndReached,
     AccessFile,
-    Columns(usize, String),
-    Rows(usize, String),
-    Matrix(usize, String),
-    Point(usize, String),
+    Columns,
+    Rows,
+    Matrix,
+    Point,
 }
 
 /// Result type for .ptx file operations
-pub type PtxResult<T> = std::result::Result<T, PtxError>;
+pub type PtxResult<T> = IOResult<T, PtxError>;
 
 impl fmt::Debug for PtxError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::LoadFileEndReached => write!(f, "Unexpected reach of .ptx file end"),
             Self::AccessFile => write!(f, "Unable to access file"),
-            Self::Columns(i, s) => write!(f, "Columns could not be parsed on line {}: '{}'", i, s),
-            Self::Rows(i, s) => write!(f, "Rows could not be parsed on line {}: '{}'", i, s),
-            Self::Matrix(i, s) => write!(
-                f,
-                "Transformation matrix could not be parsed on line {}: '{}'",
-                i, s
-            ),
-            Self::Point(i, s) => write!(f, "Point could not be parsed on line {}: '{}'", i, s),
+            Self::Columns => write!(f, "Columns could not be parsed"),
+            Self::Rows => write!(f, "Rows could not be parsed"),
+            Self::Matrix => write!(f, "Transformation matrix could not be parsed"),
+            Self::Point => write!(f, "Point could not be parsed"),
         }
     }
 }
@@ -203,5 +205,19 @@ impl From<ioError> for PtxError {
 impl From<FetchLineError> for PtxError {
     fn from(_error: FetchLineError) -> Self {
         PtxError::LoadFileEndReached
+    }
+}
+
+impl From<WithLineInfo<FetchLineError>> for WithLineInfo<PtxError> {
+    fn from(other: WithLineInfo<FetchLineError>) -> Self {
+        match other {
+            WithLineInfo::<FetchLineError>::None(x) => WithLineInfo::None(PtxError::from(x)),
+            WithLineInfo::<FetchLineError>::Index(i, x) => {
+                WithLineInfo::Index(i, PtxError::from(x))
+            }
+            WithLineInfo::<FetchLineError>::Line(i, l, x) => {
+                WithLineInfo::Line(i, l, PtxError::from(x))
+            }
+        }
     }
 }
