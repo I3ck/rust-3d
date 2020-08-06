@@ -65,7 +65,7 @@ macro_rules! array_from_bytes_be {
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-#[allow(unused)] //@todo actually use
+#[allow(unused)]
 pub fn slice_from_bytes_le<FB>(bytes: &[u8], target: &mut [FB]) -> FromBytesResult<()>
 where
     FB: FromBytes,
@@ -86,7 +86,7 @@ where
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-#[allow(unused)] //@todo actually use
+#[allow(unused)]
 pub fn slice_from_bytes_be<FB>(bytes: &[u8], target: &mut [FB]) -> FromBytesResult<()>
 where
     FB: FromBytes,

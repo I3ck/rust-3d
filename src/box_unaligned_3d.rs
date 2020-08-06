@@ -39,7 +39,6 @@ pub struct BoxUnaligned3D {
 //------------------------------------------------------------------------------
 
 impl BoxUnaligned3D {
-    //@todo constructor from the 6 min/max values and one for corners
     pub fn new_from_bb(bb: &BoundingBox3D) -> Self {
         let center = Point3D::new_from(&bb.center_bb());
         let y_dir = Norm3D::norm_y();
@@ -53,7 +52,6 @@ impl BoxUnaligned3D {
             size,
         }
     }
-    //@todo consider adding alternative constructors
     pub fn new_from_z_rotation<P>(center: &P, size: [Positive; 3], rotation: f64) -> Self
     where
         P: Is3D,
@@ -82,8 +80,7 @@ impl BoxUnaligned3D {
         Point3D::new_from(&self.z_dir) * d
     }
     pub fn x_dir(&self) -> Norm3D {
-        Norm3D::new(cross(&self.z_dir, &Point3D::new_from(&self.y_dir))).unwrap()
-        //@todo
+        Norm3D::new(cross(&self.z_dir, &Point3D::new_from(&self.y_dir))).unwrap_or(Norm3D::norm_z())
     }
 }
 

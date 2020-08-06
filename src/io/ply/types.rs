@@ -78,7 +78,6 @@ impl TryFrom<&[u8]> for Type {
 
 //------------------------------------------------------------------------------
 
-//@todo define globally?
 pub enum MeshOrPoints {
     Mesh,
     Points,
