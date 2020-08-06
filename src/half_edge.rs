@@ -253,7 +253,6 @@ where
     }
 }
 
-//@todo consider two separate implementations
 impl<IC> Into<(IC, Vec<Option<EId>>)> for HalfEdge<IC>
 where
     IC: IsIndexContainer,
