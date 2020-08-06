@@ -29,7 +29,7 @@ use std::{
     io::{BufRead, Error as ioError},
 };
 
-use super::utils::*;
+use super::{types::*, utils::*};
 
 //------------------------------------------------------------------------------
 
@@ -63,15 +63,13 @@ where
             let n_vertices = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or_else(|| {
-                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                })?;
+                .ok_or(OffError::LineParse)
+                .bline(i_line, line)?;
             let n_faces = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or_else(|| {
-                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                })?;
+                .ok_or(OffError::LineParse)
+                .bline(i_line, line)?;
 
             mesh.reserve_vertices(n_vertices);
             mesh.reserve_faces(n_faces);
@@ -87,56 +85,51 @@ where
             let x = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or_else(|| {
-                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                })?;
+                .ok_or(OffError::LineParse)
+                .bline(i_line, line)?;
 
             let y = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or_else(|| {
-                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                })?;
+                .ok_or(OffError::LineParse)
+                .bline(i_line, line)?;
 
             let z = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or_else(|| {
-                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                })?;
+                .ok_or(OffError::LineParse)
+                .bline(i_line, line)?;
 
             mesh.add_vertex(P::new(x, y, z));
         } else {
             let mut words = to_words_skip_empty(line);
 
-            let count_face = words.next().ok_or_else(|| {
-                OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let count_face = words
+                .next()
+                .ok_or(OffError::LineParse)
+                .bline(i_line, line)?;
 
             if count_face == b"3" {
                 let a = words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or_else(|| {
-                        OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                    })?;
+                    .ok_or(OffError::LineParse)
+                    .bline(i_line, line)?;
 
                 let b = words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or_else(|| {
-                        OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                    })?;
+                    .ok_or(OffError::LineParse)
+                    .bline(i_line, line)?;
 
                 let c = words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or_else(|| {
-                        OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                    })?;
+                    .ok_or(OffError::LineParse)
+                    .bline(i_line, line)?;
 
                 mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
-                    .or(Err(OffError::InvalidMeshIndices(i_line)))?;
+                    .or(Err(OffError::InvalidMeshIndices).bline(i_line, line))?;
             }
         }
     }
@@ -176,9 +169,8 @@ where
                 words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or_else(|| {
-                        OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                    })?,
+                    .ok_or(OffError::LineParse)
+                    .bline(i_line, line)?,
             );
             ip.reserve(n_vertices.unwrap());
 
@@ -192,23 +184,20 @@ where
             let x = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or_else(|| {
-                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                })?;
+                .ok_or(OffError::LineParse)
+                .bline(i_line, line)?;
 
             let y = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or_else(|| {
-                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                })?;
+                .ok_or(OffError::LineParse)
+                .bline(i_line, line)?;
 
             let z = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or_else(|| {
-                    OffError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                })?;
+                .ok_or(OffError::LineParse)
+                .bline(i_line, line)?;
 
             ip.push(P::new(x, y, z));
             n_added += 1;
@@ -225,21 +214,19 @@ where
 /// Error type for .off file operations
 pub enum OffError {
     AccessFile,
-    InvalidMeshIndices(usize),
-    LineParse(usize, String),
+    InvalidMeshIndices,
+    LineParse,
 }
 
 /// Result type for .off file operations
-pub type OffResult<T> = std::result::Result<T, OffError>;
+pub type OffResult<T> = IOResult<T, OffError>;
 
 impl fmt::Debug for OffError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::AccessFile => write!(f, "Unable to access file"),
-            Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
-            Self::InvalidMeshIndices(x) => {
-                write!(f, "File contains invalid mesh indices on line {}", x)
-            }
+            Self::LineParse => write!(f, "Unable to parse line"),
+            Self::InvalidMeshIndices => write!(f, "File contains invalid mesh indices"),
         }
     }
 }

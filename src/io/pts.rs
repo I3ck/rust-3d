@@ -29,7 +29,7 @@ use std::{
     io::{BufRead, Error as ioError},
 };
 
-use super::utils::*;
+use super::{types::*, utils::*};
 
 //------------------------------------------------------------------------------
 
@@ -57,9 +57,13 @@ where
             None => {
                 //@todo code duplication
                 let mut words = to_words_skip_empty(line);
-                n_vertices = Some(words.next().and_then(|word| from_ascii(word)).ok_or_else(
-                    || PtsError::LineParse(i_line, String::from_utf8_lossy(line).to_string()),
-                )?);
+                n_vertices = Some(
+                    words
+                        .next()
+                        .and_then(|word| from_ascii(word))
+                        .ok_or(PtsError::LineParse)
+                        .bline(i_line, line)?,
+                );
                 ip.reserve(n_vertices.unwrap());
             }
             Some(n) => {
@@ -69,23 +73,20 @@ where
                     let x = words
                         .next()
                         .and_then(|word| from_ascii(word))
-                        .ok_or_else(|| {
-                            PtsError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                        })?;
+                        .ok_or(PtsError::LineParse)
+                        .bline(i_line, line)?;
 
                     let y = words
                         .next()
                         .and_then(|word| from_ascii(word))
-                        .ok_or_else(|| {
-                            PtsError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                        })?;
+                        .ok_or(PtsError::LineParse)
+                        .bline(i_line, line)?;
 
                     let z = words
                         .next()
                         .and_then(|word| from_ascii(word))
-                        .ok_or_else(|| {
-                            PtsError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-                        })?;
+                        .ok_or(PtsError::LineParse)
+                        .bline(i_line, line)?;
 
                     ip.push(P::new(x, y, z));
                     n_added += 1;
@@ -94,9 +95,13 @@ where
                     //@todo code duplication
                     n_added = 0;
                     let mut words = to_words_skip_empty(line);
-                    n_vertices = Some(words.next().and_then(|word| from_ascii(word)).ok_or_else(
-                        || PtsError::LineParse(i_line, String::from_utf8_lossy(line).to_string()),
-                    )?);
+                    n_vertices = Some(
+                        words
+                            .next()
+                            .and_then(|word| from_ascii(word))
+                            .ok_or(PtsError::LineParse)
+                            .bline(i_line, line)?,
+                    );
                     ip.reserve(n_vertices.unwrap());
                 }
             }
@@ -111,17 +116,17 @@ where
 /// Error type for .pts file operations
 pub enum PtsError {
     AccessFile,
-    LineParse(usize, String),
+    LineParse,
 }
 
 /// Result type for .pts file operations
-pub type PtsResult<T> = std::result::Result<T, PtsError>;
+pub type PtsResult<T> = IOResult<T, PtsError>;
 
 impl fmt::Debug for PtsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::AccessFile => write!(f, "Unable to access file"),
-            Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
+            Self::LineParse => write!(f, "Unable to parse line"),
         }
     }
 }

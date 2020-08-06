@@ -29,7 +29,7 @@ use std::{
     io::{BufRead, Error as ioError},
 };
 
-use super::utils::*;
+use super::{types::*, utils::*};
 
 //------------------------------------------------------------------------------
 
@@ -53,55 +53,67 @@ where
             let mut words = to_words_skip_empty(line);
 
             // skip "v"
-            words.next().ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            words
+                .next()
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
 
-            let x = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let x = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
 
-            let y = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let y = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
 
-            let z = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let z = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
 
             mesh.add_vertex(P::new(x, y, z));
         } else if line.starts_with(b"f ") {
             let mut words = to_words_skip_empty(line);
 
             // skip "f"
-            words.next().ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            words
+                .next()
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
 
-            let mut tmp = words.next().ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
-            let a: usize = from_ascii(until_bytes(tmp, b'/')).ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let mut tmp = words
+                .next()
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
+            let a: usize = from_ascii(until_bytes(tmp, b'/'))
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
 
-            tmp = words.next().ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
-            let b: usize = from_ascii(until_bytes(tmp, b'/')).ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            tmp = words
+                .next()
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
+            let b: usize = from_ascii(until_bytes(tmp, b'/'))
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
 
-            tmp = words.next().ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
-            let c: usize = from_ascii(until_bytes(tmp, b'/')).ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            tmp = words
+                .next()
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
+            let c: usize = from_ascii(until_bytes(tmp, b'/'))
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
 
             // obj indexing starts at 1
             mesh.try_add_connection(VId { val: a - 1 }, VId { val: b - 1 }, VId { val: c - 1 })
-                .or(Err(ObjError::InvalidMeshIndices(i_line)))?;
+                .or(Err(ObjError::InvalidMeshIndices))
+                .bline(i_line, line)?;
         }
     }
 
@@ -125,21 +137,28 @@ where
             let mut words = to_words_skip_empty(line);
 
             // skip "v"
-            words.next().ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            words
+                .next()
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
 
-            let x = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let x = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
 
-            let y = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let y = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
 
-            let z = words.next().and_then(|w| from_ascii(w)).ok_or_else(|| {
-                ObjError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            let z = words
+                .next()
+                .and_then(|w| from_ascii(w))
+                .ok_or(ObjError::LineParse)
+                .bline(i_line, line)?;
 
             ip.push(P::new(x, y, z));
         }
@@ -153,21 +172,19 @@ where
 /// Error type for .obj file operations
 pub enum ObjError {
     AccessFile,
-    InvalidMeshIndices(usize),
-    LineParse(usize, String),
+    InvalidMeshIndices,
+    LineParse,
 }
 
 /// Result type for .obj file operations
-pub type ObjResult<T> = std::result::Result<T, ObjError>;
+pub type ObjResult<T> = IOResult<T, ObjError>;
 
 impl fmt::Debug for ObjError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::AccessFile => write!(f, "Unable to access file"),
-            Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
-            Self::InvalidMeshIndices(x) => {
-                write!(f, "File contains invalid mesh indices on line {}", x)
-            }
+            Self::LineParse => write!(f, "Unable to parse line"),
+            Self::InvalidMeshIndices => write!(f, "File contains invalid mesh indices"),
         }
     }
 }
