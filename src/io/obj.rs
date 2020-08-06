@@ -53,27 +53,24 @@ where
             let mut words = to_words_skip_empty(line);
 
             // skip "v"
-            words
-                .next()
-                .ok_or(ObjError::LineParse)
-                .bline(i_line, line)?;
+            words.next().ok_or(ObjError::Vertex).bline(i_line, line)?;
 
             let x = words
                 .next()
                 .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::LineParse)
+                .ok_or(ObjError::Vertex)
                 .bline(i_line, line)?;
 
             let y = words
                 .next()
                 .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::LineParse)
+                .ok_or(ObjError::Vertex)
                 .bline(i_line, line)?;
 
             let z = words
                 .next()
                 .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::LineParse)
+                .ok_or(ObjError::Vertex)
                 .bline(i_line, line)?;
 
             mesh.add_vertex(P::new(x, y, z));
@@ -81,33 +78,21 @@ where
             let mut words = to_words_skip_empty(line);
 
             // skip "f"
-            words
-                .next()
-                .ok_or(ObjError::LineParse)
-                .bline(i_line, line)?;
+            words.next().ok_or(ObjError::Face).bline(i_line, line)?;
 
-            let mut tmp = words
-                .next()
-                .ok_or(ObjError::LineParse)
-                .bline(i_line, line)?;
+            let mut tmp = words.next().ok_or(ObjError::Face).bline(i_line, line)?;
             let a: usize = from_ascii(until_bytes(tmp, b'/'))
-                .ok_or(ObjError::LineParse)
+                .ok_or(ObjError::Face)
                 .bline(i_line, line)?;
 
-            tmp = words
-                .next()
-                .ok_or(ObjError::LineParse)
-                .bline(i_line, line)?;
+            tmp = words.next().ok_or(ObjError::Face).bline(i_line, line)?;
             let b: usize = from_ascii(until_bytes(tmp, b'/'))
-                .ok_or(ObjError::LineParse)
+                .ok_or(ObjError::Face)
                 .bline(i_line, line)?;
 
-            tmp = words
-                .next()
-                .ok_or(ObjError::LineParse)
-                .bline(i_line, line)?;
+            tmp = words.next().ok_or(ObjError::Face).bline(i_line, line)?;
             let c: usize = from_ascii(until_bytes(tmp, b'/'))
-                .ok_or(ObjError::LineParse)
+                .ok_or(ObjError::Face)
                 .bline(i_line, line)?;
 
             // obj indexing starts at 1
@@ -137,27 +122,24 @@ where
             let mut words = to_words_skip_empty(line);
 
             // skip "v"
-            words
-                .next()
-                .ok_or(ObjError::LineParse)
-                .bline(i_line, line)?;
+            words.next().ok_or(ObjError::Vertex).bline(i_line, line)?;
 
             let x = words
                 .next()
                 .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::LineParse)
+                .ok_or(ObjError::Vertex)
                 .bline(i_line, line)?;
 
             let y = words
                 .next()
                 .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::LineParse)
+                .ok_or(ObjError::Vertex)
                 .bline(i_line, line)?;
 
             let z = words
                 .next()
                 .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::LineParse)
+                .ok_or(ObjError::Vertex)
                 .bline(i_line, line)?;
 
             ip.push(P::new(x, y, z));
@@ -173,7 +155,8 @@ where
 pub enum ObjError {
     AccessFile,
     InvalidMeshIndices,
-    LineParse,
+    Face,
+    Vertex,
 }
 
 /// Result type for .obj file operations
@@ -183,7 +166,8 @@ impl fmt::Debug for ObjError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::AccessFile => write!(f, "Unable to access file"),
-            Self::LineParse => write!(f, "Unable to parse line"),
+            Self::Face => write!(f, "Unable to parse face"),
+            Self::Vertex => write!(f, "Unable to parse vertex"),
             Self::InvalidMeshIndices => write!(f, "File contains invalid mesh indices"),
         }
     }

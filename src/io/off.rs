@@ -63,12 +63,12 @@ where
             let n_vertices = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse)
+                .ok_or(OffError::VertexCount)
                 .bline(i_line, line)?;
             let n_faces = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse)
+                .ok_or(OffError::FaceCount)
                 .bline(i_line, line)?;
 
             mesh.reserve_vertices(n_vertices);
@@ -85,19 +85,19 @@ where
             let x = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse)
+                .ok_or(OffError::Vertex)
                 .bline(i_line, line)?;
 
             let y = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse)
+                .ok_or(OffError::Vertex)
                 .bline(i_line, line)?;
 
             let z = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse)
+                .ok_or(OffError::Vertex)
                 .bline(i_line, line)?;
 
             mesh.add_vertex(P::new(x, y, z));
@@ -106,26 +106,26 @@ where
 
             let count_face = words
                 .next()
-                .ok_or(OffError::LineParse)
+                .ok_or(OffError::FaceVertexCount)
                 .bline(i_line, line)?;
 
             if count_face == b"3" {
                 let a = words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or(OffError::LineParse)
+                    .ok_or(OffError::Face)
                     .bline(i_line, line)?;
 
                 let b = words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or(OffError::LineParse)
+                    .ok_or(OffError::Face)
                     .bline(i_line, line)?;
 
                 let c = words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or(OffError::LineParse)
+                    .ok_or(OffError::Face)
                     .bline(i_line, line)?;
 
                 mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
@@ -169,7 +169,7 @@ where
                 words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or(OffError::LineParse)
+                    .ok_or(OffError::VertexCount)
                     .bline(i_line, line)?,
             );
             ip.reserve(n_vertices.unwrap());
@@ -184,19 +184,19 @@ where
             let x = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse)
+                .ok_or(OffError::Vertex)
                 .bline(i_line, line)?;
 
             let y = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse)
+                .ok_or(OffError::Vertex)
                 .bline(i_line, line)?;
 
             let z = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::LineParse)
+                .ok_or(OffError::Vertex)
                 .bline(i_line, line)?;
 
             ip.push(P::new(x, y, z));
@@ -215,7 +215,11 @@ where
 pub enum OffError {
     AccessFile,
     InvalidMeshIndices,
-    LineParse,
+    VertexCount,
+    FaceCount,
+    Vertex,
+    Face,
+    FaceVertexCount,
 }
 
 /// Result type for .off file operations
@@ -225,7 +229,11 @@ impl fmt::Debug for OffError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::AccessFile => write!(f, "Unable to access file"),
-            Self::LineParse => write!(f, "Unable to parse line"),
+            Self::VertexCount => write!(f, "Unable to parse vertex count"),
+            Self::FaceCount => write!(f, "Unable to parse face count"),
+            Self::Vertex => write!(f, "Unable to parse vertex"),
+            Self::Face => write!(f, "Unable to parse face"),
+            Self::FaceVertexCount => write!(f, "Unable to parse vertex count of face"),
             Self::InvalidMeshIndices => write!(f, "File contains invalid mesh indices"),
         }
     }

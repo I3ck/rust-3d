@@ -77,7 +77,7 @@ where
 
         if !delim_determined {
             delim = estimate_delimiter(2, &line)
-                .ok_or(XyzError::LineParse)
+                .ok_or(XyzError::EstimateDelimiter)
                 .bline(i_line, line)?;
             delim_determined = true;
         }
@@ -87,19 +87,19 @@ where
         let x = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::LineParse)
+            .ok_or(XyzError::Vertex)
             .bline(i_line, line)?;
 
         let y = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::LineParse)
+            .ok_or(XyzError::Vertex)
             .bline(i_line, line)?;
 
         let z = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::LineParse)
+            .ok_or(XyzError::Vertex)
             .bline(i_line, line)?;
 
         ip.push(P::new(x, y, z));
@@ -114,7 +114,7 @@ where
 pub enum XyzError {
     EstimateDelimiter,
     AccessFile,
-    LineParse,
+    Vertex,
 }
 
 /// Result type for .xyz file operations
@@ -126,7 +126,7 @@ pub type XyzIOResult<T> = IOResult<T, XyzError>;
 impl fmt::Debug for XyzError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::LineParse => write!(f, "Unable to parse line"),
+            Self::Vertex => write!(f, "Unable to parse vertex"),
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
         }

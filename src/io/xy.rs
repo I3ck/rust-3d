@@ -67,7 +67,7 @@ where
 
         if !delim_determined {
             delim = estimate_delimiter(1, line)
-                .ok_or(XyError::LineParse)
+                .ok_or(XyError::EstimateDelimiter)
                 .bline(i_line, line)?;
 
             delim_determined = true;
@@ -78,13 +78,13 @@ where
         let x = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyError::LineParse)
+            .ok_or(XyError::Vertex)
             .bline(i_line, line)?;
 
         let y = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyError::LineParse)
+            .ok_or(XyError::Vertex)
             .bline(i_line, line)?;
 
         ip.push(P::new(x, y));
@@ -99,7 +99,7 @@ where
 pub enum XyError {
     EstimateDelimiter,
     AccessFile,
-    LineParse,
+    Vertex,
 }
 
 /// Result type for .xy file operations
@@ -111,7 +111,7 @@ pub type XyIOResult<T> = IOResult<T, XyError>;
 impl fmt::Debug for XyError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::LineParse => write!(f, "Unable to parse line"),
+            Self::Vertex => write!(f, "Unable to parse vertex"),
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
         }

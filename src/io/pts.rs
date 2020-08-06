@@ -61,7 +61,7 @@ where
                     words
                         .next()
                         .and_then(|word| from_ascii(word))
-                        .ok_or(PtsError::LineParse)
+                        .ok_or(PtsError::VertexCount)
                         .bline(i_line, line)?,
                 );
                 ip.reserve(n_vertices.unwrap());
@@ -73,19 +73,19 @@ where
                     let x = words
                         .next()
                         .and_then(|word| from_ascii(word))
-                        .ok_or(PtsError::LineParse)
+                        .ok_or(PtsError::Vertex)
                         .bline(i_line, line)?;
 
                     let y = words
                         .next()
                         .and_then(|word| from_ascii(word))
-                        .ok_or(PtsError::LineParse)
+                        .ok_or(PtsError::Vertex)
                         .bline(i_line, line)?;
 
                     let z = words
                         .next()
                         .and_then(|word| from_ascii(word))
-                        .ok_or(PtsError::LineParse)
+                        .ok_or(PtsError::Vertex)
                         .bline(i_line, line)?;
 
                     ip.push(P::new(x, y, z));
@@ -99,7 +99,7 @@ where
                         words
                             .next()
                             .and_then(|word| from_ascii(word))
-                            .ok_or(PtsError::LineParse)
+                            .ok_or(PtsError::VertexCount)
                             .bline(i_line, line)?,
                     );
                     ip.reserve(n_vertices.unwrap());
@@ -116,7 +116,8 @@ where
 /// Error type for .pts file operations
 pub enum PtsError {
     AccessFile,
-    LineParse,
+    VertexCount,
+    Vertex,
 }
 
 /// Result type for .pts file operations
@@ -126,7 +127,8 @@ impl fmt::Debug for PtsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::AccessFile => write!(f, "Unable to access file"),
-            Self::LineParse => write!(f, "Unable to parse line"),
+            Self::VertexCount => write!(f, "Unable to parse vertex count"),
+            Self::Vertex => write!(f, "Unable to parse vertex"),
         }
     }
 }
