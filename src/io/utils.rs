@@ -36,7 +36,6 @@ pub fn skip_bytes<R>(read: &mut R, n_bytes: usize) -> std::io::Result<()>
 where
     R: Read,
 {
-    //@todo consider using bytesink instead where this is called with a large n_bytes
     let mut buffer = [0u8; 1];
     for _ in 0..n_bytes {
         let _ = read.read_exact(&mut buffer)?;

@@ -105,7 +105,7 @@ where
 {
     let n = mesh.num_vertices();
     let nf = mesh.num_faces();
-    let mut ns = vec![P::default(); n]; //@todo Vec3D type?
+    let mut ns = vec![P::default(); n];
 
     for i in 0..nf {
         let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe

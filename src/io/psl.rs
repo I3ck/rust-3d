@@ -42,7 +42,6 @@ where
 {
     // header
     {
-        //@todo ensure buffer reads "PSLF"?
         let mut buffer = [0u8; 4];
         read.read_exact(&mut buffer)?;
     }
