@@ -5,8 +5,6 @@ consider full abstraction over floating point type (huge change)
 consider From / Into implementations for Mesh etc. so buffers can be reused
   Mesh From Vec<Pos> Vec<usize>,  PC From Vec<Pos> ... (done for case where data is used, but not solely to reuse buffer)
 
-boundingbox currently requires a positive size in all dimensions, might be possible to weaken this requirement
-
 octree for voxel image
 
 kdtree for 2d or generic
@@ -34,16 +32,10 @@ similar to distances, add intersections
 searchable mesh currently only defined for tri mesh. consider making this generic / rename it
 same for HalfEdge (likely that the specific version can be optimized better)
 
-add more combinator filters to the random accessible filters
-
-trait for type with one or many normals (normal() or normal(id))
-
 make the tests folder of the exact same structure and file names as src,
 this way it becomes very easy to ensure everything is tested
 
 many tests are missing
-
-filters should be directed (this could be dropped and a TransFormed wrapper applied [which inverse transformes incoming points first])
 
 drop the distances files, once the DistanceTo traits are implemented
 
@@ -52,13 +44,6 @@ also consider writing wrapper types which e.g. take a PC and parse the tree inte
 this way, the tree and pc can never get async
 
 should be possible to generalize the OutlierFilter to nd
-
-outlier removal (filter which holds a kdtree of the reference structure, calc median / medium distance to k-nearest
-neighbours remove which are further than x, furthest x percent further than x times
-median / average dist...   could take either kdtree or iterator or random access
-and be destructible to kdtree)
-
-segmentation detection
 
 octree is missing many query methods
 (also implement quad tree once these are implemented)
