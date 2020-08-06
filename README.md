@@ -14,16 +14,8 @@ If you were using the prelude via `rust_3d::prelude::*;` you should now be able 
 If you were using explicit paths such as `rust_3d::filters::combinators::FilterAll` you should now use `rust_3d::FilterAll`.  
 Note that `io` and `impls` are still part of the module path.  
 This should make future usage easier, but might be painful for existing users.  
-Sorry `:(`
 
 
-Notes
------
-`rust-3d` is still in really early stages, there might come breaking changes with each update.  
-The test coverage is far from perfect, so you might find some bugs (please report them).  
-Compiling with `stable`.
- 
- 
 Tour
 ----
 Here's a little overview of some of `rust-3d`'s features. 
@@ -67,7 +59,7 @@ Any `IO` method is defined on traits, so if you implement these, you'll get read
 
 Documentation
 -------------
-The documentation is quite good already, come and [take a look](https://docs.rs/rust-3d/).
+You can find the documentation [here](https://docs.rs/rust-3d/).
 
 
 Examples
