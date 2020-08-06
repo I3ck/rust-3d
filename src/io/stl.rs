@@ -33,7 +33,7 @@ use std::{
 
 use fnv::FnvHashMap;
 
-use super::{byte_reader::*, from_bytes::*, utils::*};
+use super::{byte_reader::*, from_bytes::*, types::*, utils::*};
 
 //------------------------------------------------------------------------------
 
@@ -84,17 +84,17 @@ pub fn load_stl_mesh_duped<EM, P, R, IPN>(
     format: StlFormat,
     mesh: &mut EM,
     face_normals: &mut IPN,
-) -> StlResult<()>
+) -> StlIOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: BufRead,
     IPN: IsPushable<P>,
 {
-    if is_ascii(read, format)? {
+    if is_ascii(read, format).simple()? {
         load_stl_mesh_duped_ascii(read, mesh, face_normals)
     } else {
-        load_stl_mesh_duped_binary(read, mesh, face_normals)
+        load_stl_mesh_duped_binary(read, mesh, face_normals).simple()
     }
 }
 
@@ -106,17 +106,17 @@ pub fn load_stl_mesh_unique<EM, P, R, IPN>(
     format: StlFormat,
     mesh: &mut EM,
     face_normals: &mut IPN,
-) -> StlResult<()>
+) -> StlIOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: BufRead,
     IPN: IsPushable<P>,
 {
-    if is_ascii(read, format)? {
+    if is_ascii(read, format).simple()? {
         load_stl_mesh_unique_ascii(read, mesh, face_normals)
     } else {
-        load_stl_mesh_unique_binary(read, mesh, face_normals)
+        load_stl_mesh_unique_binary(read, mesh, face_normals).simple()
     }
 }
 
@@ -128,17 +128,17 @@ pub fn load_stl_triplets<IP, P, R, IPN>(
     format: StlFormat,
     ip: &mut IP,
     face_normals: &mut IPN,
-) -> StlResult<()>
+) -> StlIOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
     IPN: IsPushable<P>,
 {
-    if is_ascii(read, format)? {
+    if is_ascii(read, format).simple()? {
         load_stl_triplets_ascii(read, ip, face_normals)
     } else {
-        load_stl_triplets_binary(read, ip, face_normals)
+        load_stl_triplets_binary(read, ip, face_normals).simple()
     }
 }
 
@@ -176,7 +176,7 @@ fn load_stl_mesh_duped_ascii<EM, P, R, IPN>(
     read: &mut R,
     mesh: &mut EM,
     face_normals: &mut IPN,
-) -> StlResult<()>
+) -> StlIOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -187,7 +187,7 @@ where
     let mut line_buffer = Vec::new();
 
     // skip first line
-    read.read_until(b'\n', &mut line_buffer)?;
+    read.read_until(b'\n', &mut line_buffer).index(i_line)?;
     i_line += 1;
 
     loop {
@@ -196,7 +196,9 @@ where
                 mesh.add_face(a, b, c);
                 face_normals.push(n);
             }
-            Err(StlError::LoadFileEndReached) => break,
+            Err(WithLineInfo::None(StlError::LoadFileEndReached))
+            | Err(WithLineInfo::Index(_, StlError::LoadFileEndReached))
+            | Err(WithLineInfo::Line(_, _, StlError::LoadFileEndReached)) => break,
             Err(x) => return Err(x),
         }
     }
@@ -278,7 +280,7 @@ fn load_stl_mesh_unique_ascii<EM, P, R, IPN>(
     read: &mut R,
     mesh: &mut EM,
     face_normals: &mut IPN,
-) -> StlResult<()>
+) -> StlIOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -289,7 +291,7 @@ where
     let mut line_buffer = Vec::new();
 
     // skip first line
-    read.read_until(b'\n', &mut line_buffer)?;
+    read.read_until(b'\n', &mut line_buffer).index(i_line)?;
     i_line += 1;
 
     let mut map = FnvHashMap::default();
@@ -328,7 +330,9 @@ where
                     Err(_) => (),
                 }
             }
-            Err(StlError::LoadFileEndReached) => break,
+            Err(WithLineInfo::None(StlError::LoadFileEndReached))
+            | Err(WithLineInfo::Index(_, StlError::LoadFileEndReached))
+            | Err(WithLineInfo::Line(_, _, StlError::LoadFileEndReached)) => break,
             Err(x) => return Err(x),
         }
     }
@@ -412,7 +416,7 @@ fn load_stl_triplets_ascii<IP, P, R, IPN>(
     read: &mut R,
     ip: &mut IP,
     face_normals: &mut IPN,
-) -> StlResult<()>
+) -> StlIOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -423,7 +427,7 @@ where
     let mut line_buffer = Vec::new();
 
     // skip first line
-    read.read_until(b'\n', &mut line_buffer)?;
+    read.read_until(b'\n', &mut line_buffer).index(i_line)?;
     i_line += 1;
 
     loop {
@@ -434,7 +438,9 @@ where
                 ip.push(c);
                 face_normals.push(n);
             }
-            Err(StlError::LoadFileEndReached) => break,
+            Err(WithLineInfo::None(StlError::LoadFileEndReached))
+            | Err(WithLineInfo::Index(_, StlError::LoadFileEndReached))
+            | Err(WithLineInfo::Line(_, _, StlError::LoadFileEndReached)) => break,
             Err(x) => return Err(x),
         }
     }
@@ -493,75 +499,66 @@ fn read_stl_facet<P, R>(
     read: &mut R,
     line_buffer: &mut Vec<u8>,
     i_line: &mut usize,
-) -> StlResult<[P; 4]>
+) -> StlIOResult<[P; 4]>
 where
     P: IsBuildable3D,
     R: BufRead,
 {
     let mut line: &[u8];
 
-    line = trim_start(fetch_line(read, line_buffer)?);
+    line = trim_start(fetch_line(read, line_buffer).index(*i_line)?);
     *i_line += 1;
 
     if line.starts_with(b"endsolid") {
-        return Err(StlError::LoadFileEndReached);
+        return Err(StlError::LoadFileEndReached).bline(*i_line, line);
     }
 
     if !line.starts_with(b"facet") {
-        return Err(StlError::LineParse(
-            *i_line,
-            String::from_utf8_lossy(line).to_string(),
-        ));
+        return Err(StlError::LineParse).bline(*i_line, line);
     }
 
     let n = read_stl_normal(&line).unwrap_or(P::new(0.0, 0.0, 1.0));
 
-    line = trim_start(fetch_line(read, line_buffer)?);
+    line = trim_start(fetch_line(read, line_buffer).index(*i_line)?);
     *i_line += 1;
 
     if !line.starts_with(b"outer loop") {
-        return Err(StlError::LineParse(
-            *i_line,
-            String::from_utf8_lossy(line).to_string(),
-        ));
+        return Err(StlError::LineParse).bline(*i_line, line);
     }
 
-    line = fetch_line(read, line_buffer)?;
+    line = fetch_line(read, line_buffer).index(*i_line)?;
     *i_line += 1;
 
     let a = read_stl_vertex(&line)
-        .ok_or_else(|| StlError::LineParse(*i_line, String::from_utf8_lossy(line).to_string()))?;
+        .ok_or(StlError::LineParse)
+        .bline(*i_line, line)?;
 
-    line = fetch_line(read, line_buffer)?;
+    line = fetch_line(read, line_buffer).index(*i_line)?;
     *i_line += 1;
 
     let b = read_stl_vertex(&line)
-        .ok_or_else(|| StlError::LineParse(*i_line, String::from_utf8_lossy(line).to_string()))?;
+        .ok_or(StlError::LineParse)
+        .bline(*i_line, line)?;
 
-    line = fetch_line(read, line_buffer)?;
+    line = fetch_line(read, line_buffer).index(*i_line)?;
     *i_line += 1;
 
     let c = read_stl_vertex(&line)
-        .ok_or_else(|| StlError::LineParse(*i_line, String::from_utf8_lossy(line).to_string()))?;
+        .ok_or(StlError::LineParse)
+        .bline(*i_line, line)?;
 
-    line = trim_start(fetch_line(read, line_buffer)?);
+    line = trim_start(fetch_line(read, line_buffer).index(*i_line)?);
     *i_line += 1;
 
     if !line.starts_with(b"endloop") {
-        return Err(StlError::LineParse(
-            *i_line,
-            String::from_utf8_lossy(line).to_string(),
-        ));
+        return Err(StlError::LineParse).bline(*i_line, line);
     }
 
-    line = trim_start(fetch_line(read, line_buffer)?);
+    line = trim_start(fetch_line(read, line_buffer).index(*i_line)?);
     *i_line += 1;
 
     if !line.starts_with(b"endfacet") {
-        return Err(StlError::LineParse(
-            *i_line,
-            String::from_utf8_lossy(line).to_string(),
-        ));
+        return Err(StlError::LineParse).bline(*i_line, line);
     }
 
     Ok([a, b, c, n])
@@ -639,11 +636,14 @@ pub enum StlError {
     AccessFile,
     BinaryData,
     InvalidFaceCount,
-    LineParse(usize, String),
+    LineParse,
 }
 
 /// Result type for .stl file operations
 pub type StlResult<T> = std::result::Result<T, StlError>;
+
+/// Result type for .stl file operations
+pub type StlIOResult<T> = IOResult<T, StlError>;
 
 impl fmt::Debug for StlError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -652,7 +652,7 @@ impl fmt::Debug for StlError {
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::BinaryData => write!(f, "Binary data seems to be invalid"),
             Self::InvalidFaceCount => write!(f, "Containing an invalid face count"),
-            Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
+            Self::LineParse => write!(f, "Unable to parse line"),
         }
     }
 }
@@ -660,6 +660,30 @@ impl fmt::Debug for StlError {
 impl From<ioError> for StlError {
     fn from(_error: ioError) -> Self {
         StlError::AccessFile
+    }
+}
+
+impl From<WithLineInfo<ioError>> for WithLineInfo<StlError> {
+    fn from(other: WithLineInfo<ioError>) -> Self {
+        match other {
+            WithLineInfo::<ioError>::None(x) => WithLineInfo::None(StlError::from(x)),
+            WithLineInfo::<ioError>::Index(i, x) => WithLineInfo::Index(i, StlError::from(x)),
+            WithLineInfo::<ioError>::Line(i, l, x) => WithLineInfo::Line(i, l, StlError::from(x)),
+        }
+    }
+}
+
+impl From<WithLineInfo<FetchLineError>> for WithLineInfo<StlError> {
+    fn from(other: WithLineInfo<FetchLineError>) -> Self {
+        match other {
+            WithLineInfo::<FetchLineError>::None(x) => WithLineInfo::None(StlError::from(x)),
+            WithLineInfo::<FetchLineError>::Index(i, x) => {
+                WithLineInfo::Index(i, StlError::from(x))
+            }
+            WithLineInfo::<FetchLineError>::Line(i, l, x) => {
+                WithLineInfo::Line(i, l, StlError::from(x))
+            }
+        }
     }
 }
 
