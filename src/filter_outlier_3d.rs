@@ -30,7 +30,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use std::sync::Mutex;
+use std::cell::RefCell;
 
 use std::marker::PhantomData;
 
@@ -50,7 +50,7 @@ where
     search_distance: Positive,
     min_neighbours: usize,
     searchable: S,
-    cache: Mutex<Vec<P>>,
+    cache: RefCell<Vec<P>>,
     phantom_search: PhantomData<P>,
 }
 
@@ -65,7 +65,7 @@ where
             search_distance,
             min_neighbours,
             searchable,
-            cache: Mutex::new(Vec::new()),
+            cache: RefCell::default(),
             phantom_search: PhantomData,
         })
     }
@@ -78,7 +78,7 @@ where
     S: IsSphereSearchable<P>,
 {
     fn is_allowed(&self, p: &PSearch) -> bool {
-        let mut pts = self.cache.lock().unwrap(); //@todo any way to properly handle failure here?
+        let mut pts = self.cache.borrow_mut();
         pts.clear();
         self.searchable.in_sphere(
             &Sphere {
