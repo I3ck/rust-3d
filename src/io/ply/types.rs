@@ -300,8 +300,7 @@ pub enum PlyError {
 /// Result type for .ply file operations
 pub type PlyIOResult<T> = IOResult<T, PlyError>;
 
-/// Internal Result type for .ply file operations
-/// //@todo rename since e.g. used for save operations
+/// Result type for .ply file operations
 pub type PlyResult<T> = std::result::Result<T, PlyError>;
 
 impl fmt::Debug for PlyError {
