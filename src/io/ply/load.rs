@@ -253,20 +253,18 @@ where
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Z;
                         i_vertex_order += 1;
+                    } else if n_types_found == 0 {
+                        vertex_before.bytes += t.size_bytes();
+                        vertex_before.words += 1;
+                    } else if n_types_found == 1 {
+                        vertex_between_first_snd.bytes += t.size_bytes();
+                        vertex_between_first_snd.words += 1;
+                    } else if n_types_found == 2 {
+                        vertex_between_snd_third.bytes += t.size_bytes();
+                        vertex_between_snd_third.words += 1;
                     } else {
-                        if n_types_found == 0 {
-                            vertex_before.bytes += t.size_bytes();
-                            vertex_before.words += 1;
-                        } else if n_types_found == 1 {
-                            vertex_between_first_snd.bytes += t.size_bytes();
-                            vertex_between_first_snd.words += 1;
-                        } else if n_types_found == 2 {
-                            vertex_between_snd_third.bytes += t.size_bytes();
-                            vertex_between_snd_third.words += 1;
-                        } else {
-                            after.bytes += t.size_bytes();
-                            after.words += 1;
-                        }
+                        after.bytes += t.size_bytes();
+                        after.words += 1;
                     }
                 }
                 HeaderReadState::Face => {
