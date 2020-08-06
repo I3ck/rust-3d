@@ -29,7 +29,7 @@ use std::{
     io::{BufRead, Error as ioError, Write},
 };
 
-use super::utils::*;
+use super::{types::*, utils::*};
 
 //------------------------------------------------------------------------------
 
@@ -60,7 +60,7 @@ where
 }
 
 /// Loads a IsPushable<Is3D> as x y z coordinates. E.g. used to load the .xyz file format or .csv file
-pub fn load_xyz<IP, P, R>(read: &mut R, ip: &mut IP) -> XyzResult<()>
+pub fn load_xyz<IP, P, R>(read: &mut R, ip: &mut IP) -> XyzIOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -76,9 +76,9 @@ where
         i_line += 1;
 
         if !delim_determined {
-            delim = estimate_delimiter(2, &line).ok_or_else(|| {
-                XyzError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            delim = estimate_delimiter(2, &line)
+                .ok_or(XyzError::LineParse)
+                .bline(i_line, line)?;
             delim_determined = true;
         }
 
@@ -87,23 +87,20 @@ where
         let x = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or_else(|| {
-                XyzError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            .ok_or(XyzError::LineParse)
+            .bline(i_line, line)?;
 
         let y = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or_else(|| {
-                XyzError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            .ok_or(XyzError::LineParse)
+            .bline(i_line, line)?;
 
         let z = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or_else(|| {
-                XyzError::LineParse(i_line, String::from_utf8_lossy(line).to_string())
-            })?;
+            .ok_or(XyzError::LineParse)
+            .bline(i_line, line)?;
 
         ip.push(P::new(x, y, z));
     }
@@ -117,16 +114,19 @@ where
 pub enum XyzError {
     EstimateDelimiter,
     AccessFile,
-    LineParse(usize, String),
+    LineParse,
 }
 
 /// Result type for .xyz file operations
 pub type XyzResult<T> = std::result::Result<T, XyzError>;
 
+/// Result type for .xyz file operations
+pub type XyzIOResult<T> = IOResult<T, XyzError>;
+
 impl fmt::Debug for XyzError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::LineParse(i, s) => write!(f, "Unable to parse line {}: '{}'", i, s),
+            Self::LineParse => write!(f, "Unable to parse line"),
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
         }

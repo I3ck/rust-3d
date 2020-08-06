@@ -37,6 +37,7 @@ pub trait LineInfoResult<T, E>: Sized {
 //------------------------------------------------------------------------------
 
 /// Wrapper type with additional line information
+#[derive(Debug)]
 pub enum WithLineInfo<T> {
     None(T),
     Index(usize, T),
