@@ -55,7 +55,6 @@ where
 
         match n_vertices {
             None => {
-                //@todo code duplication
                 let mut words = to_words_skip_empty(line);
                 n_vertices = Some(
                     words
@@ -92,7 +91,6 @@ where
                     n_added += 1;
                 } else {
                     // New block
-                    //@todo code duplication
                     n_added = 0;
                     let mut words = to_words_skip_empty(line);
                     n_vertices = Some(

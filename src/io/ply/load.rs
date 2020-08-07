@@ -286,7 +286,6 @@ where
                 }
                 HeaderReadState::Face => {
                     if line.starts_with(b"property list") {
-                        //@todo is this properly defined or are there other identifiers?
                         if contains(line, b"vertex_indices") || contains(line, b"vertex_index") {
                             let mut words = to_words_skip_empty(line);
                             skip_n(&mut words, 2); // skip "property" and "list"

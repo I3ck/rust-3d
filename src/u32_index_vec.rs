@@ -33,9 +33,7 @@ pub struct U32IndexVec {
 }
 
 impl IsIndexContainer for U32IndexVec {
-    fn ensure_supported(&mut self, _x: usize) {
-        //@todo nothing we can do here?!
-    }
+    fn ensure_supported(&mut self, _x: usize) {}
 
     fn get(&self, i: usize) -> usize {
         self.data[i] as usize

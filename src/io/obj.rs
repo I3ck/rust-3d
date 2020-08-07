@@ -33,9 +33,6 @@ use super::{types::*, utils::*};
 
 //------------------------------------------------------------------------------
 
-//@todo offer both point cloud and mesh loading? (applies to .ply as well?)
-//@todo many valid files won't be read correctly currently
-
 /// Loads an IsMesh3D from the .obj file format
 pub fn load_obj_mesh<EM, P, R>(read: &mut R, mesh: &mut EM) -> ObjResult<()>
 where

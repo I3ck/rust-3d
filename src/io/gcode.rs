@@ -57,7 +57,6 @@ where
             if line[2] == b' ' && (line[1] == b'1' || line[1] == b'2' || line[1] == b'3') {
                 // Move according to absolute/relative
                 let mut any_changed = false;
-                //@todo more specific errors
                 let [opt_x, opt_y, opt_z] = command(&line[3..])
                     .ok_or(GcodeError::Command)
                     .bline(i_line, line)?;
@@ -105,7 +104,6 @@ where
                     // G92
                     // Move according absolute
                     let mut any_changed = false;
-                    //@todo more specific error
                     let [opt_x, opt_y, opt_z] = command(&line[4..])
                         .ok_or(GcodeError::Command)
                         .bline(i_line, line)?;

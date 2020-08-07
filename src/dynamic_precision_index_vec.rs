@@ -35,7 +35,6 @@ pub struct DynamicPrecisionIndexVec {
 }
 
 //@todo implement as much of the Vec interface as possible
-//@todo have constructors such as with_capacity that additionally initialize with the fitting mode
 impl DynamicPrecisionIndexVec {
     /// Creates a new DynamicPrecisionIndexVec with u8 precision
     pub fn new() -> Self {
@@ -249,7 +248,6 @@ impl IsIndexContainer for DynamicPrecisionIndexVec {
 }
 
 impl From<&Vec<usize>> for DynamicPrecisionIndexVec {
-    //@todo also implement for u8 u16 u32
     fn from(vec: &Vec<usize>) -> Self {
         let mut result = Self::new();
         if let Some(max) = vec.iter().max() {

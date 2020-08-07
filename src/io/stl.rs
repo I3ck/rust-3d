@@ -22,8 +22,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for IO operations of the stl file format
 
-//@todo _mesh / _triplet code duplication
-
 use crate::*;
 
 use std::{
