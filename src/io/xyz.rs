@@ -133,6 +133,12 @@ impl fmt::Debug for XyzError {
     }
 }
 
+impl fmt::Display for XyzError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl From<ioError> for XyzError {
     fn from(_error: ioError) -> Self {
         XyzError::AccessFile

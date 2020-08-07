@@ -343,6 +343,12 @@ impl fmt::Debug for PlyError {
     }
 }
 
+impl fmt::Display for PlyError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl From<ioError> for PlyError {
     fn from(_error: ioError) -> Self {
         PlyError::AccessFile

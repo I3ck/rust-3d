@@ -170,6 +170,12 @@ impl fmt::Debug for ObjError {
     }
 }
 
+impl fmt::Display for ObjError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl From<ioError> for ObjError {
     fn from(_error: ioError) -> Self {
         ObjError::AccessFile

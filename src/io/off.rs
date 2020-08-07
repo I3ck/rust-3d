@@ -239,6 +239,12 @@ impl fmt::Debug for OffError {
     }
 }
 
+impl fmt::Display for OffError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl From<ioError> for OffError {
     fn from(_error: ioError) -> Self {
         OffError::AccessFile

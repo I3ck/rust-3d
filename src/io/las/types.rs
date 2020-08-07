@@ -24,6 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::{
     convert::{TryFrom, TryInto},
+    fmt,
     io::Error as ioError,
 };
 
@@ -145,12 +146,28 @@ impl PointData {
 //------------------------------------------------------------------------------
 
 /// Error type for .las file operation
-#[derive(Debug)]
 pub enum LasError {
     AccessFile,
     BinaryData,
     UnknownPointFormat,
     UnsupportedVersion,
+}
+
+impl fmt::Debug for LasError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::AccessFile => write!(f, "Unable to access file"),
+            Self::BinaryData => write!(f, "Unable to parse binary data"),
+            Self::UnknownPointFormat => write!(f, "Unknown point format"),
+            Self::UnsupportedVersion => write!(f, "Unsupported version"),
+        }
+    }
+}
+
+impl fmt::Display for LasError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 /// Result type for .las file operation

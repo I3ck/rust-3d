@@ -663,6 +663,12 @@ impl fmt::Debug for StlError {
     }
 }
 
+impl fmt::Display for StlError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl From<ioError> for StlError {
     fn from(_error: ioError) -> Self {
         StlError::AccessFile

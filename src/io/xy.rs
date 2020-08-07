@@ -118,6 +118,12 @@ impl fmt::Debug for XyError {
     }
 }
 
+impl fmt::Display for XyError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl From<ioError> for XyError {
     fn from(_error: ioError) -> Self {
         XyError::AccessFile

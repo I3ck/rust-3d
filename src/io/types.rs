@@ -22,7 +22,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for types used for IO actions
 
-use std::result::Result;
+use std::{
+    fmt::{Display, Formatter},
+    result::Result,
+};
 
 //------------------------------------------------------------------------------
 
@@ -41,6 +44,21 @@ pub enum WithLineInfo<T> {
     None(T),
     Index(usize, T),
     Line(usize, String, T),
+}
+
+//------------------------------------------------------------------------------
+
+impl<T> Display for WithLineInfo<T>
+where
+    T: Display,
+{
+    fn fmt(&self, f: &mut Formatter) -> std::result::Result<(), std::fmt::Error> {
+        match self {
+            Self::None(x) => write!(f, "{}", x),
+            Self::Index(i, x) => write!(f, "Line #{}: '{}'", i, x),
+            Self::Line(i, l, x) => write!(f, "Line #{}: '{}' '{}'", i, x, l),
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

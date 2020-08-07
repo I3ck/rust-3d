@@ -131,6 +131,12 @@ impl fmt::Debug for PtsError {
     }
 }
 
+impl fmt::Display for PtsError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl From<ioError> for PtsError {
     fn from(_error: ioError) -> Self {
         PtsError::AccessFile

@@ -196,6 +196,12 @@ impl fmt::Debug for PtxError {
     }
 }
 
+impl fmt::Display for PtxError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl From<ioError> for PtxError {
     fn from(_error: ioError) -> Self {
         PtxError::AccessFile

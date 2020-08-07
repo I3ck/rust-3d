@@ -209,6 +209,12 @@ impl fmt::Debug for GcodeError {
     }
 }
 
+impl fmt::Display for GcodeError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl From<ioError> for GcodeError {
     fn from(_error: ioError) -> Self {
         GcodeError::AccessFile

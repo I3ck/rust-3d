@@ -120,6 +120,12 @@ impl fmt::Debug for PslError {
     }
 }
 
+impl fmt::Display for PslError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl From<ioError> for PslError {
     fn from(_error: ioError) -> Self {
         PslError::AccessFile
