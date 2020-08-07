@@ -59,7 +59,7 @@ where
                 let mut any_changed = false;
                 let [opt_x, opt_y, opt_z] = command(&line[3..])
                     .ok_or(GcodeError::Command)
-                    .bline(i_line, line)?;
+                    .line(i_line, line)?;
 
                 if let Some(new_x) = opt_x {
                     any_changed = true;
@@ -106,7 +106,7 @@ where
                     let mut any_changed = false;
                     let [opt_x, opt_y, opt_z] = command(&line[4..])
                         .ok_or(GcodeError::Command)
-                        .bline(i_line, line)?;
+                        .line(i_line, line)?;
 
                     if let Some(new_x) = opt_x {
                         any_changed = true;

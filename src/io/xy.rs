@@ -68,7 +68,7 @@ where
         if !delim_determined {
             delim = estimate_delimiter(1, line)
                 .ok_or(XyError::EstimateDelimiter)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             delim_determined = true;
         }
@@ -79,13 +79,13 @@ where
             .next()
             .and_then(|word| from_ascii(word))
             .ok_or(XyError::Vertex)
-            .bline(i_line, line)?;
+            .line(i_line, line)?;
 
         let y = words
             .next()
             .and_then(|word| from_ascii(word))
             .ok_or(XyError::Vertex)
-            .bline(i_line, line)?;
+            .line(i_line, line)?;
 
         ip.push(P::new(x, y));
     }

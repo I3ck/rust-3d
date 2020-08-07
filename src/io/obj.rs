@@ -50,52 +50,52 @@ where
             let mut words = to_words_skip_empty(line);
 
             // skip "v"
-            words.next().ok_or(ObjError::Vertex).bline(i_line, line)?;
+            words.next().ok_or(ObjError::Vertex).line(i_line, line)?;
 
             let x = words
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(ObjError::Vertex)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             let y = words
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(ObjError::Vertex)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             let z = words
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(ObjError::Vertex)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             mesh.add_vertex(P::new(x, y, z));
         } else if line.starts_with(b"f ") {
             let mut words = to_words_skip_empty(line);
 
             // skip "f"
-            words.next().ok_or(ObjError::Face).bline(i_line, line)?;
+            words.next().ok_or(ObjError::Face).line(i_line, line)?;
 
-            let mut tmp = words.next().ok_or(ObjError::Face).bline(i_line, line)?;
+            let mut tmp = words.next().ok_or(ObjError::Face).line(i_line, line)?;
             let a: usize = from_ascii(until_bytes(tmp, b'/'))
                 .ok_or(ObjError::Face)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
-            tmp = words.next().ok_or(ObjError::Face).bline(i_line, line)?;
+            tmp = words.next().ok_or(ObjError::Face).line(i_line, line)?;
             let b: usize = from_ascii(until_bytes(tmp, b'/'))
                 .ok_or(ObjError::Face)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
-            tmp = words.next().ok_or(ObjError::Face).bline(i_line, line)?;
+            tmp = words.next().ok_or(ObjError::Face).line(i_line, line)?;
             let c: usize = from_ascii(until_bytes(tmp, b'/'))
                 .ok_or(ObjError::Face)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             // obj indexing starts at 1
             mesh.try_add_connection(VId { val: a - 1 }, VId { val: b - 1 }, VId { val: c - 1 })
                 .or(Err(ObjError::InvalidMeshIndices))
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
         }
     }
 
@@ -119,25 +119,25 @@ where
             let mut words = to_words_skip_empty(line);
 
             // skip "v"
-            words.next().ok_or(ObjError::Vertex).bline(i_line, line)?;
+            words.next().ok_or(ObjError::Vertex).line(i_line, line)?;
 
             let x = words
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(ObjError::Vertex)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             let y = words
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(ObjError::Vertex)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             let z = words
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(ObjError::Vertex)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             ip.push(P::new(x, y, z));
         }

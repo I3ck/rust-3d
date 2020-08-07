@@ -64,12 +64,12 @@ where
                 .next()
                 .and_then(|word| from_ascii(word))
                 .ok_or(OffError::VertexCount)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
             let n_faces = words
                 .next()
                 .and_then(|word| from_ascii(word))
                 .ok_or(OffError::FaceCount)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             mesh.reserve_vertices(n_vertices);
             mesh.reserve_faces(n_faces);
@@ -86,19 +86,19 @@ where
                 .next()
                 .and_then(|word| from_ascii(word))
                 .ok_or(OffError::Vertex)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             let y = words
                 .next()
                 .and_then(|word| from_ascii(word))
                 .ok_or(OffError::Vertex)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             let z = words
                 .next()
                 .and_then(|word| from_ascii(word))
                 .ok_or(OffError::Vertex)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             mesh.add_vertex(P::new(x, y, z));
         } else {
@@ -107,29 +107,29 @@ where
             let count_face = words
                 .next()
                 .ok_or(OffError::FaceVertexCount)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             if count_face == b"3" {
                 let a = words
                     .next()
                     .and_then(|word| from_ascii(word))
                     .ok_or(OffError::Face)
-                    .bline(i_line, line)?;
+                    .line(i_line, line)?;
 
                 let b = words
                     .next()
                     .and_then(|word| from_ascii(word))
                     .ok_or(OffError::Face)
-                    .bline(i_line, line)?;
+                    .line(i_line, line)?;
 
                 let c = words
                     .next()
                     .and_then(|word| from_ascii(word))
                     .ok_or(OffError::Face)
-                    .bline(i_line, line)?;
+                    .line(i_line, line)?;
 
                 mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
-                    .or(Err(OffError::InvalidMeshIndices).bline(i_line, line))?;
+                    .or(Err(OffError::InvalidMeshIndices).line(i_line, line))?;
             }
         }
     }
@@ -170,7 +170,7 @@ where
                     .next()
                     .and_then(|word| from_ascii(word))
                     .ok_or(OffError::VertexCount)
-                    .bline(i_line, line)?,
+                    .line(i_line, line)?,
             );
             ip.reserve(n_vertices.unwrap());
 
@@ -185,19 +185,19 @@ where
                 .next()
                 .and_then(|word| from_ascii(word))
                 .ok_or(OffError::Vertex)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             let y = words
                 .next()
                 .and_then(|word| from_ascii(word))
                 .ok_or(OffError::Vertex)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             let z = words
                 .next()
                 .and_then(|word| from_ascii(word))
                 .ok_or(OffError::Vertex)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             ip.push(P::new(x, y, z));
             n_added += 1;

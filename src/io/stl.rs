@@ -508,11 +508,11 @@ where
     *i_line += 1;
 
     if line.starts_with(b"endsolid") {
-        return Err(StlError::LoadFileEndReached).bline(*i_line, line);
+        return Err(StlError::LoadFileEndReached).line(*i_line, line);
     }
 
     if !line.starts_with(b"facet") {
-        return Err(StlError::Facet).bline(*i_line, line);
+        return Err(StlError::Facet).line(*i_line, line);
     }
 
     let n = read_stl_normal(&line).unwrap_or(P::new(0.0, 0.0, 1.0));
@@ -521,7 +521,7 @@ where
     *i_line += 1;
 
     if !line.starts_with(b"outer loop") {
-        return Err(StlError::Loop).bline(*i_line, line);
+        return Err(StlError::Loop).line(*i_line, line);
     }
 
     line = fetch_line(read, line_buffer).index(*i_line)?;
@@ -529,34 +529,34 @@ where
 
     let a = read_stl_vertex(&line)
         .ok_or(StlError::Vertex)
-        .bline(*i_line, line)?;
+        .line(*i_line, line)?;
 
     line = fetch_line(read, line_buffer).index(*i_line)?;
     *i_line += 1;
 
     let b = read_stl_vertex(&line)
         .ok_or(StlError::Vertex)
-        .bline(*i_line, line)?;
+        .line(*i_line, line)?;
 
     line = fetch_line(read, line_buffer).index(*i_line)?;
     *i_line += 1;
 
     let c = read_stl_vertex(&line)
         .ok_or(StlError::Vertex)
-        .bline(*i_line, line)?;
+        .line(*i_line, line)?;
 
     line = trim_start(fetch_line(read, line_buffer).index(*i_line)?);
     *i_line += 1;
 
     if !line.starts_with(b"endloop") {
-        return Err(StlError::EndLoop).bline(*i_line, line);
+        return Err(StlError::EndLoop).line(*i_line, line);
     }
 
     line = trim_start(fetch_line(read, line_buffer).index(*i_line)?);
     *i_line += 1;
 
     if !line.starts_with(b"endfacet") {
-        return Err(StlError::EndFacet).bline(*i_line, line);
+        return Err(StlError::EndFacet).line(*i_line, line);
     }
 
     Ok([a, b, c, n])

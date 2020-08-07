@@ -30,8 +30,7 @@ use std::result::Result;
 pub trait LineInfoResult<T, E>: Sized {
     fn simple(self) -> Result<T, WithLineInfo<E>>;
     fn index(self, i: usize) -> Result<T, WithLineInfo<E>>;
-    fn line(self, i: usize, line: &str) -> Result<T, WithLineInfo<E>>;
-    fn bline(self, i: usize, line: &[u8]) -> Result<T, WithLineInfo<E>>;
+    fn line(self, i: usize, line: &[u8]) -> Result<T, WithLineInfo<E>>;
 }
 
 //------------------------------------------------------------------------------
@@ -56,10 +55,7 @@ impl<T, E> LineInfoResult<T, E> for Result<T, E> {
     fn index(self, i: usize) -> Result<T, WithLineInfo<E>> {
         self.map_err(|e| WithLineInfo::Index(i, e))
     }
-    fn line(self, i: usize, line: &str) -> Result<T, WithLineInfo<E>> {
-        self.map_err(|e| WithLineInfo::Line(i, line.to_string(), e))
-    }
-    fn bline(self, i: usize, line: &[u8]) -> Result<T, WithLineInfo<E>> {
+    fn line(self, i: usize, line: &[u8]) -> Result<T, WithLineInfo<E>> {
         self.map_err(|e| WithLineInfo::Line(i, String::from_utf8_lossy(line).to_string(), e))
     }
 }

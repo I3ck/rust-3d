@@ -191,7 +191,7 @@ where
                 ply_found = true;
                 continue;
             }
-            return Err(PlyError::LoadStartNotFound).bline(*i_line, line);
+            return Err(PlyError::LoadStartNotFound).line(*i_line, line);
         }
 
         if opt_format.is_none() {
@@ -199,7 +199,7 @@ where
                 b"format ascii 1.0" => Format::Ascii,
                 b"format binary_little_endian 1.0" => Format::LittleEndian,
                 b"format binary_big_endian 1.0" => Format::BigEndian,
-                _ => return Err(PlyError::LoadFormatNotFound).bline(*i_line, line),
+                _ => return Err(PlyError::LoadFormatNotFound).line(*i_line, line),
             });
             continue;
         }
@@ -214,7 +214,7 @@ where
                             .nth(2)
                             .and_then(|w| from_ascii(w))
                             .ok_or(PlyError::VertexElement)
-                            .bline(*i_line, line)?,
+                            .line(*i_line, line)?,
                     );
                     continue;
                 }
@@ -232,7 +232,7 @@ where
                             .nth(2)
                             .and_then(|w| from_ascii(w))
                             .ok_or(PlyError::FaceElement)
-                            .bline(*i_line, line)?,
+                            .line(*i_line, line)?,
                     );
                     continue;
                 }
@@ -250,23 +250,23 @@ where
                         .next()
                         .ok_or(PlyError::InvalidProperty)
                         .and_then(|w| Type::try_from(w))
-                        .bline(*i_line, line)?;
+                        .line(*i_line, line)?;
                     let id = words
                         .next()
                         .ok_or(PlyError::InvalidProperty)
-                        .bline(*i_line, line)?;
+                        .line(*i_line, line)?;
                     if id == b"x" {
-                        opt_fst_type = Some(VertexType::try_from(t).bline(*i_line, line)?);
+                        opt_fst_type = Some(VertexType::try_from(t).line(*i_line, line)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::X;
                         i_vertex_order += 1;
                     } else if id == b"y" {
-                        opt_snd_type = Some(VertexType::try_from(t).bline(*i_line, line)?);
+                        opt_snd_type = Some(VertexType::try_from(t).line(*i_line, line)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Y;
                         i_vertex_order += 1;
                     } else if id == b"z" {
-                        opt_third_type = Some(VertexType::try_from(t).bline(*i_line, line)?);
+                        opt_third_type = Some(VertexType::try_from(t).line(*i_line, line)?);
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Z;
                         i_vertex_order += 1;
@@ -295,13 +295,13 @@ where
                                 .ok_or(PlyError::InvalidProperty)
                                 .and_then(|x| Type::try_from(x))
                                 .and_then(|x| FaceType::try_from(x))
-                                .bline(*i_line, line)?;
+                                .line(*i_line, line)?;
                             let t_index = words
                                 .next()
                                 .ok_or(PlyError::InvalidProperty)
                                 .and_then(|x| Type::try_from(x))
                                 .and_then(|x| FaceType::try_from(x))
-                                .bline(*i_line, line)?;
+                                .line(*i_line, line)?;
 
                             opt_face_count_type = Some(t_count);
                             opt_face_index_type = Some(t_index);
@@ -313,7 +313,7 @@ where
                             .next()
                             .ok_or(PlyError::InvalidProperty)
                             .and_then(|x| Type::try_from(x))
-                            .bline(*i_line, line)?;
+                            .line(*i_line, line)?;
                         if opt_face_count_type.is_some() {
                             face_after.bytes += t.size_bytes();
                             face_after.words += 1;
@@ -324,7 +324,7 @@ where
                     }
                 }
                 _ => {
-                    return Err(PlyError::PropertyLineLocation).bline(*i_line, line);
+                    return Err(PlyError::PropertyLineLocation).line(*i_line, line);
                 }
             }
 
@@ -342,7 +342,7 @@ where
                 let vertex_data = VertexData {
                     count: n_vertices,
                     format: VertexFormat {
-                        order: VertexOrder::try_from(vertex_order).bline(*i_line, line)?,
+                        order: VertexOrder::try_from(vertex_order).line(*i_line, line)?,
                         first: x_type,
                         snd: y_type,
                         third: z_type,
@@ -378,7 +378,7 @@ where
             }
         }
 
-        return Err(PlyError::LoadHeaderInvalid).bline(*i_line, line);
+        return Err(PlyError::LoadHeaderInvalid).line(*i_line, line);
     }
 
     Err(PlyError::LoadHeaderInvalid).simple()
@@ -451,7 +451,7 @@ where
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(PlyError::InvalidVertex)
-                .bline(*i_line, line)?;
+                .line(*i_line, line)?;
 
             skip_n(&mut words, header.vertex.format.between_first_snd.words);
 
@@ -459,7 +459,7 @@ where
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(PlyError::InvalidVertex)
-                .bline(*i_line, line)?;
+                .line(*i_line, line)?;
 
             skip_n(&mut words, header.vertex.format.between_snd_third.words);
 
@@ -467,7 +467,7 @@ where
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(PlyError::InvalidVertex)
-                .bline(*i_line, line)?;
+                .line(*i_line, line)?;
 
             // no need to skip 'after' since we're done with this line anyway
 
@@ -575,7 +575,7 @@ where
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(PlyError::InvalidVertex)
-                .bline(*i_line, line)?;
+                .line(*i_line, line)?;
 
             skip_n(&mut words, header.vertex.format.between_first_snd.words);
 
@@ -583,7 +583,7 @@ where
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(PlyError::InvalidVertex)
-                .bline(*i_line, line)?;
+                .line(*i_line, line)?;
 
             skip_n(&mut words, header.vertex.format.between_snd_third.words);
 
@@ -591,7 +591,7 @@ where
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(PlyError::InvalidVertex)
-                .bline(*i_line, line)?;
+                .line(*i_line, line)?;
 
             // no need to skip 'after' since we're done with this line anyway
 
@@ -608,10 +608,10 @@ where
         if header.face.count > mesh.num_faces() {
             let [a, b, c] = collect_index_line(&line)
                 .ok_or(PlyError::FaceStructure)
-                .bline(*i_line, line)?;
+                .line(*i_line, line)?;
             mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
                 .or(Err(PlyError::InvalidMeshIndices))
-                .bline(*i_line, line)?;
+                .line(*i_line, line)?;
             continue;
         }
     }

@@ -63,7 +63,7 @@ where
         line = fetch_line(read, &mut line_buffer).index(i_line)?;
         i_line += 1;
 
-        let rows: usize = from_ascii(line).ok_or(PtxError::Rows).bline(i_line, line)?;
+        let rows: usize = from_ascii(line).ok_or(PtxError::Rows).line(i_line, line)?;
 
         // skip scanner position line
         fetch_line(read, &mut line_buffer).index(i_line)?;
@@ -85,25 +85,25 @@ where
         i_line += 1;
         let [m11, m12, m13, m14] = read_matrix_row(line)
             .ok_or(PtxError::Matrix)
-            .bline(i_line, line)?;
+            .line(i_line, line)?;
 
         line = fetch_line(read, &mut line_buffer).index(i_line)?;
         i_line += 1;
         let [m21, m22, m23, m24] = read_matrix_row(line)
             .ok_or(PtxError::Matrix)
-            .bline(i_line, line)?;
+            .line(i_line, line)?;
 
         line = fetch_line(read, &mut line_buffer).index(i_line)?;
         i_line += 1;
         let [m31, m32, m33, m34] = read_matrix_row(line)
             .ok_or(PtxError::Matrix)
-            .bline(i_line, line)?;
+            .line(i_line, line)?;
 
         line = fetch_line(read, &mut line_buffer).index(i_line)?;
         i_line += 1;
         let [m41, m42, m43, m44] = read_matrix_row(line)
             .ok_or(PtxError::Matrix)
-            .bline(i_line, line)?;
+            .line(i_line, line)?;
 
         let m = Matrix4 {
             data: [
@@ -130,17 +130,17 @@ where
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(PtxError::Point)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
             let y = words
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(PtxError::Point)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
             let z = words
                 .next()
                 .and_then(|w| from_ascii(w))
                 .ok_or(PtxError::Point)
-                .bline(i_line, line)?;
+                .line(i_line, line)?;
 
             let mut p = P::new(x, y, z);
 

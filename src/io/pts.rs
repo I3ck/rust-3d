@@ -61,7 +61,7 @@ where
                         .next()
                         .and_then(|word| from_ascii(word))
                         .ok_or(PtsError::VertexCount)
-                        .bline(i_line, line)?,
+                        .line(i_line, line)?,
                 );
                 ip.reserve(n_vertices.unwrap());
             }
@@ -73,19 +73,19 @@ where
                         .next()
                         .and_then(|word| from_ascii(word))
                         .ok_or(PtsError::Vertex)
-                        .bline(i_line, line)?;
+                        .line(i_line, line)?;
 
                     let y = words
                         .next()
                         .and_then(|word| from_ascii(word))
                         .ok_or(PtsError::Vertex)
-                        .bline(i_line, line)?;
+                        .line(i_line, line)?;
 
                     let z = words
                         .next()
                         .and_then(|word| from_ascii(word))
                         .ok_or(PtsError::Vertex)
-                        .bline(i_line, line)?;
+                        .line(i_line, line)?;
 
                     ip.push(P::new(x, y, z));
                     n_added += 1;
@@ -98,7 +98,7 @@ where
                             .next()
                             .and_then(|word| from_ascii(word))
                             .ok_or(PtsError::VertexCount)
-                            .bline(i_line, line)?,
+                            .line(i_line, line)?,
                     );
                     ip.reserve(n_vertices.unwrap());
                 }
