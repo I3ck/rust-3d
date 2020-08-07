@@ -30,7 +30,7 @@ use crate::io::IOResult;
 
 //------------------------------------------------------------------------------
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum Type {
     Char,
     UChar,
@@ -55,6 +55,12 @@ impl Type {
             Self::Float => 4,
             Self::Double => 8,
         }
+    }
+}
+
+impl fmt::Display for Type {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
     }
 }
 
@@ -145,7 +151,7 @@ impl TryFrom<Type> for VertexType {
         match x {
             Type::Float => Ok(Self::Float),
             Type::Double => Ok(Self::Double),
-            _ => Err(PlyError::InvalidVertexType),
+            t => Err(PlyError::InvalidVertexType(t)),
         }
     }
 }
@@ -173,7 +179,7 @@ impl TryFrom<Type> for FaceType {
             Type::UShort => Ok(Self::UShort),
             Type::Int => Ok(Self::Int),
             Type::UInt => Ok(Self::UInt),
-            _ => Err(PlyError::InvalidFaceType),
+            t => Err(PlyError::InvalidFaceType(t)),
         }
     }
 }
@@ -287,8 +293,8 @@ pub enum PlyError {
     VertexElement,
     FaceElement,
     InvalidType(String),
-    InvalidVertexType, //@todo would be better to name the issue
-    InvalidFaceType,   //@todo would be better to name the issue
+    InvalidVertexType(Type),
+    InvalidFaceType(Type),
     InvalidMeshIndices,
     InvalidProperty,
     InvalidVertex,
@@ -319,8 +325,8 @@ impl fmt::Debug for PlyError {
             Self::VertexElement => write!(f, "Invalid vertex element"),
             Self::FaceElement => write!(f, "Invalid face element"),
             Self::InvalidType(x) => write!(f, "Invalid type in header '{}'", x),
-            Self::InvalidVertexType => write!(f, "Invalid vertex type in header"),
-            Self::InvalidFaceType => write!(f, "Invalid face type in header"),
+            Self::InvalidVertexType(x) => write!(f, "Invalid vertex type in header {}", x),
+            Self::InvalidFaceType(x) => write!(f, "Invalid face type in header {}", x),
             Self::AccessFile => write!(f, "Unable to access file"),
             Self::InvalidMeshIndices => write!(f, "File contains invalid mesh indices"),
             Self::InvalidProperty => write!(f, "Invalid property"),
