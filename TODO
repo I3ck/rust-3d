@@ -1,3 +1,11 @@
+implement IsDataContainer for Vec
+
+return Option for functions with only one error reason (e.g. IncorrectVertexID)
+
+consider using Vec::get instead of checking index 'by hand'
+
+get_d should have error case (could panic currently)
+
 consider full abstraction over floating point type (huge change)
 
 consider From / Into implementations for Mesh etc. so buffers can be reused
