@@ -30,6 +30,6 @@ use crate::*;
 pub trait IsViewBuildable: Sized {
     /// Should apply the view and only keep items indexed within the view. Should return an error if any index is out of bounds
     fn apply_view(&mut self, view: &View) -> Result<()>;
-    /// Should create a new object consisting only of items indexed within the view. Should return an error if any index is out of bounds
-    fn from_view(&self, view: &View) -> Result<Self>;
+    /// Should create a new object consisting only of items indexed within the view. Should return None if any index is out of bounds
+    fn from_view(&self, view: &View) -> Option<Self>;
 }

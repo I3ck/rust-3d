@@ -266,10 +266,10 @@ where
         Ok(())
     }
 
-    fn from_view(&self, view: &View) -> Result<Self> {
+    fn from_view(&self, view: &View) -> Option<Self> {
         let mut cloned = self.clone();
-        cloned.apply_view(view)?;
-        Ok(cloned)
+        cloned.apply_view(view).ok()?;
+        Some(cloned)
     }
 }
 
