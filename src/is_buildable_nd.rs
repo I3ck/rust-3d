@@ -36,10 +36,10 @@ pub trait IsBuildableND: Sized + IsND {
         P: IsBuildableND;
 
     /// Returns a new object with 0 for all coordinates
-    //@todo shouldn't return Result, never fails
     #[inline(always)]
-    fn zero_nd() -> Result<Self> {
-        Self::new_nd(&vec![0.0; Self::n_dimensions()])
+    fn zero_nd() -> Self {
+        // Safe if the implementation is correct
+        Self::new_nd(&vec![0.0; Self::n_dimensions()]).unwrap()
     }
     /// Returns the center between this and other
     fn center_nd<P>(&self, other: &P, buffer: &mut Vec<f64>) -> Result<Self>
