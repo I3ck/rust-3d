@@ -60,14 +60,14 @@ where
     S: IsSphereSearchable<P>,
 {
     /// Creates a new FilterOutlier3D from a search distance and the min number of neighbours to be found in this distance
-    pub fn new(searchable: S, search_distance: Positive, min_neighbours: usize) -> Result<Self> {
-        Ok(FilterOutlier3D {
+    pub fn new(searchable: S, search_distance: Positive, min_neighbours: usize) -> Self {
+        FilterOutlier3D {
             search_distance,
             min_neighbours,
             searchable,
             cache: RefCell::default(),
             phantom_search: PhantomData,
-        })
+        }
     }
 }
 
