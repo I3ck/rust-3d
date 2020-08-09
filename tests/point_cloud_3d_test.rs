@@ -38,17 +38,17 @@ fn test_point_cloud_3d() {
     assert!(pc.data[0].y() == 0.2);
     assert!(pc.data[0].z() == 0.3);
 
-    assert!(pc.bounding_box_maybe().is_err());
+    assert!(pc.bounding_box_maybe().is_none());
 
     let p = Point3D::new(0.2, 0.3, 0.4);
     pc.push(p);
     assert!(pc.len() == 2);
 
-    assert!(pc.bounding_box_maybe().is_ok());
+    assert!(pc.bounding_box_maybe().is_some());
 
     match pc.bounding_box_maybe() {
-        Err(_) => assert!(false),
-        Ok(bb) => {
+        None => assert!(false),
+        Some(bb) => {
             assert!(bb.min_p().x() == 0.1);
             assert!(bb.min_p().y() == 0.2);
             assert!(bb.min_p().z() == 0.3);
