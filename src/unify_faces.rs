@@ -148,7 +148,9 @@ where
     M: IsMesh<P, Face3> + Default,
     P: Is3D,
 {
-    let f = mesh.face_vertex_ids(fid)?;
+    let f = mesh
+        .face_vertex_ids(fid)
+        .ok_or(ErrorKind::IncorrectFaceID)?;
     neighbours.extend(v_to_f[f.a.val].iter());
     neighbours.extend(v_to_f[f.b.val].iter());
     neighbours.extend(v_to_f[f.c.val].iter());

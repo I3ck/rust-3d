@@ -85,15 +85,15 @@ where
         self.mesh.num_vertices()
     }
 
-    fn face_vertex_ids(&self, faceid: FId) -> Result<Face3> {
+    fn face_vertex_ids(&self, faceid: FId) -> Option<Face3> {
         self.mesh.face_vertex_ids(faceid)
     }
 
-    fn face_vertices(&self, faceid: FId) -> Result<[T; 3]> {
+    fn face_vertices(&self, faceid: FId) -> Option<[T; 3]> {
         self.mesh.face_vertices(faceid)
     }
 
-    fn vertex(&self, vertexid: VId) -> Result<T> {
+    fn vertex(&self, vertexid: VId) -> Option<T> {
         self.mesh.vertex(vertexid)
     }
 }

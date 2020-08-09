@@ -55,16 +55,16 @@ where
         self.pc.len_d()
     }
 
-    fn face_vertex_ids(&self, faceid: FId) -> Result<Face3> {
+    fn face_vertex_ids(&self, faceid: FId) -> Option<Face3> {
         let id1 = 3 * faceid.val + 0;
         let id2 = 3 * faceid.val + 1;
         let id3 = 3 * faceid.val + 2;
 
         if id3 >= self.topology.len() {
-            return Err(ErrorKind::IncorrectFaceID);
+            return None;
         }
 
-        Ok(Face3::new(
+        Some(Face3::new(
             VId {
                 val: self.topology.get(id1),
             },
@@ -77,22 +77,17 @@ where
         ))
     }
 
-    fn face_vertices(&self, faceid: FId) -> Result<[P; 3]> {
+    fn face_vertices(&self, faceid: FId) -> Option<[P; 3]> {
         let face = self.face_vertex_ids(faceid)?;
-        if let (Ok(v1), Ok(v2), Ok(v3)) = (
-            self.vertex(face.a),
-            self.vertex(face.b),
-            self.vertex(face.c),
-        ) {
-            return Ok([v1, v2, v3]);
-        }
-        Err(ErrorKind::IncorrectVertexID)
+
+        let v1 = self.vertex(face.a)?;
+        let v2 = self.vertex(face.b)?;
+        let v3 = self.vertex(face.c)?;
+        Some([v1, v2, v3])
     }
 
-    fn vertex(&self, vertexid: VId) -> Result<P> {
-        self.pc
-            .get_d(vertexid.val)
-            .ok_or(ErrorKind::IncorrectVertexID)
+    fn vertex(&self, vertexid: VId) -> Option<P> {
+        self.pc.get_d(vertexid.val)
     }
 }
 

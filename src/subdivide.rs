@@ -50,13 +50,16 @@ where
     let mut center_buffer = Vec::new();
 
     for i in 0..n_vertices {
-        mo.add_vertex(mi.vertex(VId { val: i })?);
+        // safe since iterating n_vertices
+        mo.add_vertex(mi.vertex(VId { val: i }).unwrap());
     }
 
     for i in 0..n_faces {
-        let f = mi.face_vertex_ids(FId { val: i })?;
-        let (vi1, vi2, vi3) = (f.vid(0)?, f.vid(1)?, f.vid(2)?);
-        let [v1, v2, v3] = mi.face_vertices(FId { val: i })?;
+        // safe since iterating n_faces
+        let f = mi.face_vertex_ids(FId { val: i }).unwrap();
+        let (vi1, vi2, vi3) = (f.a, f.b, f.c);
+        // safe since iterating n_faces
+        let [v1, v2, v3] = mi.face_vertices(FId { val: i }).unwrap();
 
         let ia = *added_edges
             .entry((min(vi1, vi2), max(vi1, vi2)))

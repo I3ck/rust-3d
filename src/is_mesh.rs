@@ -36,9 +36,9 @@ where
     /// Should return the number of vertices within the mesh
     fn num_vertices(&self) -> usize;
     /// Should return the ids of vertices of the given face
-    fn face_vertex_ids(&self, faceid: FId) -> Result<TU>;
+    fn face_vertex_ids(&self, faceid: FId) -> Option<TU>;
     /// Should return the vertices of the given face
-    fn face_vertices(&self, faceid: FId) -> Result<[V; 3]>;
+    fn face_vertices(&self, faceid: FId) -> Option<[V; 3]>;
     /// Should return the vertex with the given id
-    fn vertex(&self, vertexid: VId) -> Result<V>;
+    fn vertex(&self, vertexid: VId) -> Option<V>;
 }

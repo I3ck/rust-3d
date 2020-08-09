@@ -110,7 +110,9 @@ pub trait IsSearchableMesh<V, TU>: IsMesh<V, Face3> {
         result: &mut Vec<FId>,
     ) -> Result<()> {
         cache.clear();
-        let vids = self.face_vertex_ids(faceid)?;
+        let vids = self
+            .face_vertex_ids(faceid)
+            .ok_or(ErrorKind::IncorrectFaceID)?;
 
         {
             let mut add_vertex_faces = |vertexid| self.faces_of_vertex(vertexid, cache, result);

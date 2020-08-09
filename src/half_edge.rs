@@ -60,8 +60,8 @@ where
 
         for i in 0..n_faces {
             match mesh.face_vertex_ids(FId { val: i }) {
-                Err(_) => {}
-                Ok(face) => {
+                None => {}
+                Some(face) => {
                     tails.push(face.a.val);
                     tails.push(face.b.val);
                     tails.push(face.c.val);
