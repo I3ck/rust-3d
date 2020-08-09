@@ -48,12 +48,12 @@ impl IsTopologyUnit for Face3 {
         3
     }
 
-    fn vid(&self, index: usize) -> Result<VId> {
+    fn vid(&self, index: usize) -> Option<VId> {
         match index {
-            0 => Ok(self.a),
-            1 => Ok(self.b),
-            2 => Ok(self.c),
-            _ => Err(ErrorKind::IncorrectUnitID),
+            0 => Some(self.a),
+            1 => Some(self.b),
+            2 => Some(self.c),
+            _ => None,
         }
     }
 }
