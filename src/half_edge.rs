@@ -105,12 +105,14 @@ where
         for i in 0..result.tails.len() {
             cache.clear();
             let _ = result.next(EId { val: i }).and_then(&mut |next_id: EId| {
-                result.edges_originating(
-                    VId {
-                        val: result.tails.get(next_id.val),
-                    },
-                    &mut cache,
-                )
+                result
+                    .edges_originating(
+                        VId {
+                            val: result.tails.get(next_id.val),
+                        },
+                        &mut cache,
+                    )
+                    .ok()
             });
             for originating_id in cache.iter() {
                 let _ = result.next(*originating_id).map(|candidate_id| {
@@ -122,38 +124,38 @@ where
         }
         result
     }
-    /// Returns the ID of the vertex the edge originates from (error if id out of bounds)
-    pub fn tail(&self, id: EId) -> Result<VId> {
-        self.ensure_edge_id(id)?;
-        Ok(VId {
+    /// Returns the ID of the vertex the edge originates from (None if id out of bounds)
+    pub fn tail(&self, id: EId) -> Option<VId> {
+        self.ensure_edge_id(id).ok()?;
+        Some(VId {
             val: self.tails.get(id.val),
         })
     }
-    /// Returns the ID of the face the edge belongs to (error if id out of bounds)
-    pub fn face(&self, id: EId) -> Result<FId> {
-        self.ensure_edge_id(id)?;
-        Ok(FId { val: id.val / 3 })
+    /// Returns the ID of the face the edge belongs to (None if id out of bounds)
+    pub fn face(&self, id: EId) -> Option<FId> {
+        self.ensure_edge_id(id).ok()?;
+        Some(FId { val: id.val / 3 })
     }
-    /// Returns the ID of the twin edge (None if there isn't any) (error if id out of bounds)
-    pub fn twin(&self, id: EId) -> Result<Option<EId>> {
-        self.ensure_edge_id(id)?;
-        Ok(self.twins[id.val])
+    /// Returns the ID of the twin edge (None if there isn't any / id out of bounds)
+    pub fn twin(&self, id: EId) -> Option<EId> {
+        self.ensure_edge_id(id).ok()?;
+        self.twins.get(id.val).cloned().flatten()
     }
-    /// Returns the ID of the edge after this edge (error if id out of bounds)
-    pub fn next(&self, id: EId) -> Result<EId> {
-        self.ensure_edge_id(id)?;
+    /// Returns the ID of the edge after this edge (None if id out of bounds)
+    pub fn next(&self, id: EId) -> Option<EId> {
+        self.ensure_edge_id(id).ok()?;
         if Self::last_in_face(id) {
-            return Ok(EId { val: id.val - 2 });
+            return Some(EId { val: id.val - 2 });
         }
-        Ok(EId { val: id.val + 1 })
+        Some(EId { val: id.val + 1 })
     }
-    /// Returns the ID of the edge before this edge (error if id out of bounds)
-    pub fn prev(&self, id: EId) -> Result<EId> {
-        self.ensure_edge_id(id)?;
+    /// Returns the ID of the edge before this edge (None if id out of bounds)
+    pub fn prev(&self, id: EId) -> Option<EId> {
+        self.ensure_edge_id(id).ok()?;
         if Self::first_in_face(id) {
-            return Ok(EId { val: id.val + 2 });
+            return Some(EId { val: id.val + 2 });
         }
-        Ok(EId { val: id.val - 1 })
+        Some(EId { val: id.val - 1 })
     }
     /// Appends all edges originating (pointing away) from the given vertex (error if id out of bounds)
     pub fn edges_originating(&self, id: VId, result: &mut Vec<EId>) -> Result<()> {
@@ -171,9 +173,8 @@ where
         cache.clear();
         self.edges_originating(id, cache)?;
         for edge in cache {
-            match self.prev(*edge) {
-                Err(_) => {}
-                Ok(id) => result.push(id),
+            if let Some(id) = self.prev(*edge) {
+                result.push(id)
             }
         }
         Ok(())
@@ -185,9 +186,8 @@ where
         self.edges_originating(id, cache)?;
         for edge in cache {
             result.push(*edge);
-            match self.prev(*edge) {
-                Err(_) => {}
-                Ok(id) => result.push(id),
+            if let Some(id) = self.prev(*edge) {
+                result.push(id)
             }
         }
         Ok(())
@@ -198,9 +198,8 @@ where
         cache.clear();
         self.edges_originating(id, cache)?;
         for edge in cache {
-            match self.face(*edge) {
-                Err(_) => {}
-                Ok(id) => result.push(id),
+            if let Some(id) = self.face(*edge) {
+                result.push(id)
             }
         }
         Ok(())

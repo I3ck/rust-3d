@@ -126,9 +126,9 @@ where
         self.mesh.num_faces() * 3
     }
 
-    fn edges_of_face(&self, faceid: FId) -> Result<(EId, EId, EId)> {
-        self.ensure_face_id(faceid)?;
-        Ok((
+    fn edges_of_face(&self, faceid: FId) -> Option<(EId, EId, EId)> {
+        self.ensure_face_id(faceid).ok()?;
+        Some((
             EId {
                 val: faceid.val * 3 + 0,
             },
@@ -163,27 +163,27 @@ where
         self.he.edges_all(vertexid, cache, result)
     }
 
-    fn edge_tail(&self, edgeid: EId) -> Result<VId> {
+    fn edge_tail(&self, edgeid: EId) -> Option<VId> {
         self.he.tail(edgeid)
     }
 
-    fn edge_head(&self, edgeid: EId) -> Result<VId> {
+    fn edge_head(&self, edgeid: EId) -> Option<VId> {
         self.he.next(edgeid).and_then(|next| self.he.tail(next))
     }
 
-    fn edge_next(&self, edgeid: EId) -> Result<EId> {
+    fn edge_next(&self, edgeid: EId) -> Option<EId> {
         self.he.next(edgeid)
     }
 
-    fn edge_prev(&self, edgeid: EId) -> Result<EId> {
+    fn edge_prev(&self, edgeid: EId) -> Option<EId> {
         self.he.prev(edgeid)
     }
 
-    fn edge_twin(&self, edgeid: EId) -> Result<Option<EId>> {
+    fn edge_twin(&self, edgeid: EId) -> Option<EId> {
         self.he.twin(edgeid)
     }
 
-    fn edge_face(&self, edgeid: EId) -> Result<FId> {
+    fn edge_face(&self, edgeid: EId) -> Option<FId> {
         self.he.face(edgeid)
     }
 }

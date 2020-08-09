@@ -29,7 +29,7 @@ No `.unwrap()` where it's not 100% safe.
 There's strong types for everything that might get mixed up easily.  
 This way e.g. ids of faces can't be mistaken for ids of vertices.
 ```rust
-fn edges_of_face(&self, faceid: FId) -> Result<(EId, EId, EId)>;
+fn edges_of_face(&self, faceid: FId) -> Option<(EId, EId, EId)>;
 ```
 There's also smart types which restrict the values they can hold.  
 This way distances can never be `< 0.0`, sizes can be enfored to be `> 0.0` etc.
