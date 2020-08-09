@@ -31,11 +31,11 @@ pub trait IsPolygon<V> {
     /// Should return the number of segments within the polygon
     fn num_segments(&self) -> usize;
     /// Should return the ids of vertices of the given segment
-    fn segment_vertex_ids(&self, segmentid: SId) -> Result<(VId, VId)>;
+    fn segment_vertex_ids(&self, segmentid: SId) -> Option<(VId, VId)>;
     /// Should return the vertices of the given segment
-    fn segment_vertices(&self, segmentid: SId) -> Result<(V, V)>;
+    fn segment_vertices(&self, segmentid: SId) -> Option<(V, V)>;
     /// Should return the vertex with the given id
-    fn vertex(&self, vertexid: VId) -> Result<V>;
+    fn vertex(&self, vertexid: VId) -> Option<V>;
 
     /// Returns the number of vertices within the polygon
     fn num_vertices(&self) -> usize {

@@ -32,26 +32,26 @@ use crate::*;
 /// Polygon3D, a polygon within 3D space
 pub struct Polygon3D<P>
 where
-    P: Is3D,
+    P: IsBuildable3D,
 {
     pc: PointCloud3D<P>,
 }
 
 impl<P> IsPolygon<P> for Polygon3D<P>
 where
-    P: Is3D + Clone,
+    P: IsBuildable3D + Clone,
 {
     fn num_segments(&self) -> usize {
         self.pc.len()
     }
 
-    fn segment_vertex_ids(&self, segmentid: SId) -> Result<(VId, VId)> {
+    fn segment_vertex_ids(&self, segmentid: SId) -> Option<(VId, VId)> {
         if segmentid.val >= self.pc.len() {
-            Err(ErrorKind::IncorrectSegmentID)
+            None
         } else if segmentid.val == self.pc.len() - 1 {
-            Ok((VId { val: segmentid.val }, VId { val: 0 }))
+            Some((VId { val: segmentid.val }, VId { val: 0 }))
         } else {
-            Ok((
+            Some((
                 VId { val: segmentid.val },
                 VId {
                     val: segmentid.val + 1,
@@ -60,23 +60,19 @@ where
         }
     }
 
-    fn segment_vertices(&self, segmentid: SId) -> Result<(P, P)> {
+    fn segment_vertices(&self, segmentid: SId) -> Option<(P, P)> {
         let (vid1, vid2) = self.segment_vertex_ids(segmentid)?;
-        Ok((self.pc[vid1.val].clone(), self.pc[vid2.val].clone()))
+        Some((self.pc[vid1.val].clone(), self.pc[vid2.val].clone()))
     }
 
-    fn vertex(&self, vertexid: VId) -> Result<P> {
-        if vertexid.val >= self.pc.len() {
-            Err(ErrorKind::IncorrectVertexID)
-        } else {
-            Ok(self.pc[vertexid.val].clone())
-        }
+    fn vertex(&self, vertexid: VId) -> Option<P> {
+        self.pc.get_d(vertexid.val).clone()
     }
 }
 
 impl<P> IsEditablePolygon<P> for Polygon3D<P>
 where
-    P: Is3D + Clone,
+    P: IsBuildable3D + Clone,
 {
     fn add_vertex(&mut self, vertex: P) -> VId {
         self.pc.data.push(vertex);
@@ -97,7 +93,7 @@ where
 
 impl<P> IsMovable3D for Polygon3D<P>
 where
-    P: Is3D + IsMovable3D,
+    P: IsBuildable3D + IsMovable3D,
 {
     fn move_by(&mut self, x: f64, y: f64, z: f64) {
         self.pc.move_by(x, y, z)
@@ -106,7 +102,7 @@ where
 
 impl<P> HasBoundingBox3DMaybe for Polygon3D<P>
 where
-    P: Is3D,
+    P: IsBuildable3D,
 {
     fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
         self.pc.bounding_box_maybe()
@@ -115,7 +111,7 @@ where
 
 impl<P> HasCenterOfGravity3D for Polygon3D<P>
 where
-    P: Is3D,
+    P: IsBuildable3D,
 {
     fn center_of_gravity(&self) -> Result<Point3D> {
         self.pc.center_of_gravity()
@@ -124,7 +120,7 @@ where
 
 impl<P> HasLength for Polygon3D<P>
 where
-    P: Is3D,
+    P: IsBuildable3D,
 {
     fn length(&self) -> f64 {
         let mut length = self.pc.length();
@@ -139,7 +135,7 @@ where
 
 impl<P> IsScalable for Polygon3D<P>
 where
-    P: IsEditable3D,
+    P: IsEditable3D + IsBuildable3D,
 {
     fn scale(&mut self, factor: Positive) {
         self.pc.scale(factor)
@@ -148,7 +144,7 @@ where
 
 impl<P> IsMatrix4Transformable for Polygon3D<P>
 where
-    P: Is3D + IsMatrix4Transformable + Clone,
+    P: IsBuildable3D + IsMatrix4Transformable + Clone,
 {
     fn transformed(&self, m: &Matrix4) -> Self {
         let mut new = self.clone();
@@ -164,7 +160,7 @@ where
 impl<P> Default for Polygon3D<P>
 where
     //https://github.com/rust-lang/rust/issues/26925
-    P: Is3D,
+    P: IsBuildable3D,
 {
     fn default() -> Self {
         let pc = PointCloud3D::default();
@@ -174,7 +170,7 @@ where
 
 impl<P> fmt::Display for Polygon3D<P>
 where
-    P: Is3D + fmt::Display,
+    P: IsBuildable3D + fmt::Display,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.pc.fmt(f)
@@ -183,7 +179,7 @@ where
 
 impl<P> From<PointCloud3D<P>> for Polygon3D<P>
 where
-    P: Is3D,
+    P: IsBuildable3D,
 {
     fn from(pc: PointCloud3D<P>) -> Self {
         Polygon3D { pc }
