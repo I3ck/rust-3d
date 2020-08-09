@@ -40,11 +40,11 @@ pub struct Positive {
 
 impl Positive {
     /// Creates a new Positive if input > 0, fails otherwise
-    pub fn new(val: f64) -> Result<Positive> {
+    pub fn new(val: f64) -> Option<Positive> {
         if val > 0.0 {
-            return Ok(Positive { val });
+            return Some(Positive { val });
         }
-        Err(ErrorKind::NumberInWrongRange)
+        None
     }
     /// Creates a new Positive with value 1
     pub fn one() -> Positive {

@@ -40,11 +40,11 @@ pub struct NonNegative {
 
 impl NonNegative {
     /// Creates a new NonNegative if input >= 0, fails otherwise
-    pub fn new(val: f64) -> Result<NonNegative> {
+    pub fn new(val: f64) -> Option<NonNegative> {
         if val >= 0.0 {
-            return Ok(NonNegative { val });
+            return Some(NonNegative { val });
         }
-        Err(ErrorKind::NumberInWrongRange)
+        None
     }
     /// Creates a new NonNegative with value 0
     pub fn zero() -> NonNegative {
