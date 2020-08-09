@@ -213,11 +213,11 @@ impl<P> HasCenterOfGravity2D for PointCloud2D<P>
 where
     P: Is2D,
 {
-    fn center_of_gravity(&self) -> Result<Point2D> {
+    fn center_of_gravity(&self) -> Option<Point2D> {
         let size = self.len();
 
         if size < 1 {
-            return Err(ErrorKind::TooFewPoints);
+            return None;
         }
 
         let sizef = size as f64;
@@ -230,7 +230,7 @@ where
             sumy += p.y();
         }
 
-        Ok(Point2D {
+        Some(Point2D {
             x: sumx / sizef,
             y: sumy / sizef,
         })

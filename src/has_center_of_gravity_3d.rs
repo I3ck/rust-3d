@@ -29,5 +29,5 @@ use crate::*;
 /// HasCenterOfGravity3D is a trait for types which might have a center of gravity
 pub trait HasCenterOfGravity3D {
     /// Should return the center of gravity
-    fn center_of_gravity(&self) -> Result<Point3D>;
+    fn center_of_gravity(&self) -> Option<Point3D>;
 }

@@ -29,5 +29,5 @@ use crate::*;
 /// HasCenterOfGravity2D is a trait for types which might have a center of gravity
 pub trait HasCenterOfGravity2D {
     /// Should return the center of gravity
-    fn center_of_gravity(&self) -> Result<Point2D>;
+    fn center_of_gravity(&self) -> Option<Point2D>;
 }

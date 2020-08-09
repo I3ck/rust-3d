@@ -113,7 +113,7 @@ impl<P> HasCenterOfGravity3D for Polygon3D<P>
 where
     P: IsBuildable3D,
 {
-    fn center_of_gravity(&self) -> Result<Point3D> {
+    fn center_of_gravity(&self) -> Option<Point3D> {
         self.pc.center_of_gravity()
     }
 }

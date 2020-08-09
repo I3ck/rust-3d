@@ -203,7 +203,7 @@ where
     M: IsMesh<T, Face3> + HasCenterOfGravity3D,
     IC: IsIndexContainer,
 {
-    fn center_of_gravity(&self) -> Result<Point3D> {
+    fn center_of_gravity(&self) -> Option<Point3D> {
         self.mesh.center_of_gravity()
     }
 }

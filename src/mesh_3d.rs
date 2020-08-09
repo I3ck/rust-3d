@@ -176,7 +176,7 @@ where
     ID: IsDataContainer<P> + HasCenterOfGravity3D,
     IC: IsIndexContainer,
 {
-    fn center_of_gravity(&self) -> Result<Point3D> {
+    fn center_of_gravity(&self) -> Option<Point3D> {
         self.pc.center_of_gravity()
     }
 }

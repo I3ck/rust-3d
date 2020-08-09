@@ -62,8 +62,8 @@ impl HasBoundingBox2DMaybe for LineSegment2D {
 }
 
 impl HasCenterOfGravity2D for LineSegment2D {
-    fn center_of_gravity(&self) -> Result<Point2D> {
-        Ok(center_2d(&self.start, &self.end))
+    fn center_of_gravity(&self) -> Option<Point2D> {
+        Some(center_2d(&self.start, &self.end))
     }
 }
 

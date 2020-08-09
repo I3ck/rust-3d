@@ -62,8 +62,8 @@ impl HasBoundingBox3DMaybe for LineSegment3D {
 }
 
 impl HasCenterOfGravity3D for LineSegment3D {
-    fn center_of_gravity(&self) -> Result<Point3D> {
-        Ok(center_3d(&self.start, &self.end))
+    fn center_of_gravity(&self) -> Option<Point3D> {
+        Some(center_3d(&self.start, &self.end))
     }
 }
 

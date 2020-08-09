@@ -213,11 +213,11 @@ impl<P> HasCenterOfGravity3D for PointCloud3D<P>
 where
     P: Is3D,
 {
-    fn center_of_gravity(&self) -> Result<Point3D> {
+    fn center_of_gravity(&self) -> Option<Point3D> {
         let size = self.len();
 
         if size < 1 {
-            return Err(ErrorKind::TooFewPoints);
+            return None;
         }
 
         let sizef = size as f64;
@@ -232,7 +232,7 @@ where
             sumz += p.z();
         }
 
-        Ok(Point3D {
+        Some(Point3D {
             x: sumx / sizef,
             y: sumy / sizef,
             z: sumz / sizef,
