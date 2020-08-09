@@ -22,8 +22,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsVoxelImage trait used for any type of voxel image
 
-use crate::*;
-
 //------------------------------------------------------------------------------
 
 /// IsVoxelImage is a trait used for any type of voxel image
@@ -35,5 +33,5 @@ pub trait IsVoxelImage<T> {
     /// Should return the number of voxels in z-direction
     fn size_z(&self) -> usize;
     /// Should return the voxel at a given x y z coordinate
-    fn voxel(&self, x: usize, y: usize, z: usize) -> Result<T>;
+    fn voxel(&self, x: usize, y: usize, z: usize) -> Option<T>;
 }
