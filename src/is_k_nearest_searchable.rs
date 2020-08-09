@@ -23,15 +23,13 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! IsKNearestSearchable trait used for search structures which can be queried for nearest neighbours.
 //! You should only implement this, if your solution is rather efficient
 
-use crate::*;
-
 //------------------------------------------------------------------------------
 
 /// IsKNearestSearchable trait used for search structures which can be queried for nearest neighbours.
 /// You should only implement this, if your solution is rather efficient
 pub trait IsKNearestSearchable<Search, Find> {
     /// Should return the nearest neighbour to search, if there is any
-    fn nearest(&self, search: &Search) -> Result<Find>;
+    fn nearest(&self, search: &Search) -> Option<Find>;
     /// Should return the k nearest neighbours to search
     fn knearest(&self, search: &Search, n: usize, result: &mut Vec<Find>);
 }

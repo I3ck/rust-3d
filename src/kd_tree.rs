@@ -98,17 +98,11 @@ where
         }
     }
 
-    fn nearest(&self, search: &PSearch) -> Result<PFind> {
+    fn nearest(&self, search: &PSearch) -> Option<PFind> {
         //@todo implemented on its own, since the code can be faster without vecs
         let mut result = Vec::new();
         self.knearest(search, 1, &mut result);
-        match result.len() {
-            0 => Err(ErrorKind::TooFewPoints),
-            _ => {
-                let p = result[0].clone();
-                Ok(p)
-            }
-        }
+        result.get(0).cloned()
     }
 }
 
