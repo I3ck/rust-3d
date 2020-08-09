@@ -104,7 +104,7 @@ impl<P> HasBoundingBox2DMaybe for Polygon2D<P>
 where
     P: IsBuildable2D,
 {
-    fn bounding_box_maybe(&self) -> Result<BoundingBox2D> {
+    fn bounding_box_maybe(&self) -> Option<BoundingBox2D> {
         self.pc.bounding_box_maybe()
     }
 }

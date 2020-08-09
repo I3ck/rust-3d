@@ -54,7 +54,9 @@ where
     }
 
     fn build(&mut self, pc: PointCloud3D<P>) -> Result<()> {
-        self.bb = pc.bounding_box_maybe()?;
+        self.bb = pc
+            .bounding_box_maybe()
+            .ok_or(ErrorKind::BoundingBoxMissing)?;
         let mut unique_data = Vec::new();
         let mut set = HashSet::new();
         for p in pc.data {

@@ -170,8 +170,8 @@ impl HasBoundingBox2D for Box2D {
 }
 
 impl HasBoundingBox2DMaybe for Box2D {
-    fn bounding_box_maybe(&self) -> Result<BoundingBox2D> {
-        Ok(self.bounding_box())
+    fn bounding_box_maybe(&self) -> Option<BoundingBox2D> {
+        Some(self.bounding_box())
     }
 }
 

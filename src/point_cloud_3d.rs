@@ -204,8 +204,8 @@ impl<P> HasBoundingBox3DMaybe for PointCloud3D<P>
 where
     P: Is3D,
 {
-    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
-        BoundingBox3D::from_iterator(&self.data)
+    fn bounding_box_maybe(&self) -> Option<BoundingBox3D> {
+        BoundingBox3D::from_iterator(&self.data).ok()
     }
 }
 
@@ -339,7 +339,7 @@ where
     P: IsEditable3D,
 {
     fn scale(&mut self, factor: Positive) {
-        if let Ok(bb) = self.bounding_box_maybe() {
+        if let Some(bb) = self.bounding_box_maybe() {
             let c = bb.center_bb();
             for p in &mut self.data {
                 p.increase_distance_to_by(&c, factor);

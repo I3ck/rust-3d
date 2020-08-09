@@ -126,12 +126,12 @@ impl<P> HasBoundingBox3DMaybe for PointCloud3Df32<P>
 where
     P: IsBuildable3D,
 {
-    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
+    fn bounding_box_maybe(&self) -> Option<BoundingBox3D> {
         let d = &self.data;
         let n_p = d.len() / 3;
 
         if n_p <= 2 {
-            return Err(ErrorKind::TooFewPoints);
+            return None;
         }
 
         let mut minx = d[0];
@@ -175,6 +175,7 @@ where
                 z: maxz as f64,
             },
         )
+        .ok()
     }
 }
 

@@ -50,7 +50,9 @@ where
     where
         P: Is3D,
     {
-        let bb = pc.bounding_box_maybe()?;
+        let bb = pc
+            .bounding_box_maybe()
+            .ok_or(ErrorKind::BoundingBoxMissing)?;
 
         let rangex = (bb.max_p().x - bb.min_p().x).abs();
         let rangey = (bb.max_p().y - bb.min_p().y).abs();

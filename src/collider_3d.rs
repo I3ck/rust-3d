@@ -70,8 +70,8 @@ impl HasBoundingBox3D for Collider3D {
 }
 
 impl HasBoundingBox3DMaybe for Collider3D {
-    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
-        Ok(self.bounding_box())
+    fn bounding_box_maybe(&self) -> Option<BoundingBox3D> {
+        Some(self.bounding_box())
     }
 }
 

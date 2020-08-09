@@ -213,7 +213,7 @@ pub fn center<T>(x: &mut T)
 where
     T: HasBoundingBox3DMaybe + IsMovable3D,
 {
-    if let Ok(bb) = x.bounding_box_maybe() {
+    if let Some(bb) = x.bounding_box_maybe() {
         let center = bb.center_bb();
         x.move_by(-center.x(), -center.y(), -center.z());
     }
@@ -224,7 +224,7 @@ pub fn set_size<T>(x: &mut T, size: [Positive; 3])
 where
     T: HasBoundingBox3DMaybe + IsMatrix4Transformable,
 {
-    if let Ok(bb) = x.bounding_box_maybe() {
+    if let Some(bb) = x.bounding_box_maybe() {
         let m = Matrix4::scale(
             size[0].get() / bb.size_x().get(),
             size[1].get() / bb.size_y().get(),
@@ -308,7 +308,7 @@ pub fn for_each_intersecting<'c, I, HB>(
     HB: HasBoundingBox3DMaybe,
 {
     for hb in hbs {
-        if let Ok(bb) = hb.bounding_box_maybe() {
+        if let Some(bb) = hb.bounding_box_maybe() {
             if let Some(i) = intersection(&ray.line, &bb) {
                 f(&i, hb)
             }
@@ -325,7 +325,7 @@ where
     let mut result: Option<(Point3D, &'c mut HB)> = None;
 
     for hb in hbs {
-        if let Ok(bb) = hb.bounding_box_maybe() {
+        if let Some(bb) = hb.bounding_box_maybe() {
             if let Some(i) = intersection(&ray.line, &bb) {
                 if let Some(r) = &result {
                     if sqr_dist_3d(&ray.line.anchor, &i) < sqr_dist_3d(&ray.line.anchor, &r.0) {
@@ -350,7 +350,7 @@ where
     let mut result: Option<(Point3D, &'c HB)> = None;
 
     for hb in hbs {
-        if let Ok(bb) = hb.bounding_box_maybe() {
+        if let Some(bb) = hb.bounding_box_maybe() {
             if let Some(i) = intersection(&ray.line, &bb) {
                 if let Some(r) = &result {
                     if sqr_dist_3d(&ray.line.anchor, &i) < sqr_dist_3d(&ray.line.anchor, &r.0) {
@@ -375,7 +375,7 @@ where
     let mut result: Option<(Point3D, usize)> = None;
 
     for (i, hb) in hbs.enumerate() {
-        if let Ok(bb) = hb.bounding_box_maybe() {
+        if let Some(bb) = hb.bounding_box_maybe() {
             if let Some(inter) = intersection(&ray.line, &bb) {
                 if let Some(r) = &result {
                     if sqr_dist_3d(&ray.line.anchor, &inter) < sqr_dist_3d(&ray.line.anchor, &r.0) {

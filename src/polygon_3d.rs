@@ -104,7 +104,7 @@ impl<P> HasBoundingBox3DMaybe for Polygon3D<P>
 where
     P: IsBuildable3D,
 {
-    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
+    fn bounding_box_maybe(&self) -> Option<BoundingBox3D> {
         self.pc.bounding_box_maybe()
     }
 }

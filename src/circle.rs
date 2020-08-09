@@ -141,8 +141,8 @@ impl HasBoundingBox2D for Circle {
 }
 
 impl HasBoundingBox2DMaybe for Circle {
-    fn bounding_box_maybe(&self) -> Result<BoundingBox2D> {
-        Ok(self.bounding_box())
+    fn bounding_box_maybe(&self) -> Option<BoundingBox2D> {
+        Some(self.bounding_box())
     }
 }
 

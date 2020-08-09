@@ -117,7 +117,7 @@ impl HasBoundingBox2D for FilterCircle {
 }
 
 impl HasBoundingBox2DMaybe for FilterCircle {
-    fn bounding_box_maybe(&self) -> Result<BoundingBox2D> {
+    fn bounding_box_maybe(&self) -> Option<BoundingBox2D> {
         self.circle.bounding_box_maybe()
     }
 }

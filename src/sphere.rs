@@ -153,8 +153,8 @@ impl HasBoundingBox3D for Sphere {
 }
 
 impl HasBoundingBox3DMaybe for Sphere {
-    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
-        Ok(self.bounding_box())
+    fn bounding_box_maybe(&self) -> Option<BoundingBox3D> {
+        Some(self.bounding_box())
     }
 }
 

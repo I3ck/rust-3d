@@ -128,7 +128,7 @@ impl HasBoundingBox3D for FilterBox3D {
 }
 
 impl HasBoundingBox3DMaybe for FilterBox3D {
-    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
+    fn bounding_box_maybe(&self) -> Option<BoundingBox3D> {
         self.box_3d.bounding_box_maybe()
     }
 }

@@ -35,7 +35,7 @@ pub trait HasBoundingBox2D: HasBoundingBox2DMaybe {
 /// HasBoundingBox2DMaybe is a trait for types which might have a bounding box
 pub trait HasBoundingBox2DMaybe {
     /// Should return the bounding box if it can be calculated
-    fn bounding_box_maybe(&self) -> Result<BoundingBox2D>;
+    fn bounding_box_maybe(&self) -> Option<BoundingBox2D>;
 }
 
 //------------------------------------------------------------------------------
@@ -52,9 +52,9 @@ impl<T> HasBoundingBox2DConverted<T>
 where
     T: HasBoundingBox2DMaybe,
 {
-    pub fn new(data: T) -> Result<Self> {
+    pub fn new(data: T) -> Option<Self> {
         data.bounding_box_maybe()?; // ensure present
-        Ok(Self { data })
+        Some(Self { data })
     }
 
     pub fn get(&self) -> &T {
@@ -66,7 +66,7 @@ impl<T> HasBoundingBox2DMaybe for HasBoundingBox2DConverted<T>
 where
     T: HasBoundingBox2DMaybe,
 {
-    fn bounding_box_maybe(&self) -> Result<BoundingBox2D> {
+    fn bounding_box_maybe(&self) -> Option<BoundingBox2D> {
         self.data.bounding_box_maybe()
     }
 }

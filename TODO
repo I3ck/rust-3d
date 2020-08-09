@@ -1,5 +1,8 @@
 implement IsDataContainer for Vec
 
+BoundingBox for Meshes (and similar) not fully correct since using entire point cloud for checks
+(It's possible many points aren't used)
+
 return Option for functions with only one error reason (e.g. IncorrectVertexID)
 
 consider using Vec::get instead of checking index 'by hand'

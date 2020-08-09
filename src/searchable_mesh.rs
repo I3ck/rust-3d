@@ -193,7 +193,7 @@ where
     M: IsMesh<T, Face3> + HasBoundingBox3DMaybe,
     IC: IsIndexContainer,
 {
-    fn bounding_box_maybe(&self) -> Result<BoundingBox3D> {
+    fn bounding_box_maybe(&self) -> Option<BoundingBox3D> {
         self.mesh.bounding_box_maybe()
     }
 }

@@ -38,7 +38,9 @@ where
         + HasBoundingBox3DMaybe,
     P: IsBuildable3D + Eq + Hash + Clone,
 {
-    let bb = mesh.bounding_box_maybe()?;
+    let bb = mesh
+        .bounding_box_maybe()
+        .ok_or(ErrorKind::BoundingBoxMissing)?;
     let [sx, sy, sz] = bb.sizes();
     let min = P::new_from(&bb.min_p());
     let (nx, ny, nz) = (
