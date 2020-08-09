@@ -54,7 +54,10 @@ pub trait IsBuildableND: Sized + IsND {
 
         buffer.clear();
         for i in 0..n {
-            buffer.push(0.5 * (self.position_nd(i)? + other.position_nd(i)?));
+            buffer.push(
+                0.5 * (self.position_nd(i).ok_or(ErrorKind::IncorrectDimension)?
+                    + other.position_nd(i).ok_or(ErrorKind::IncorrectDimension)?),
+            );
         }
 
         Self::new_nd(&buffer)

@@ -88,7 +88,7 @@ impl IsND for Box3D {
         Point3D::n_dimensions()
     }
 
-    fn position_nd(&self, dimension: usize) -> Result<f64> {
+    fn position_nd(&self, dimension: usize) -> Option<f64> {
         self.center.position_nd(dimension)
     }
 }

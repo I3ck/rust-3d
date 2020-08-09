@@ -55,7 +55,7 @@ impl IsND for Circle {
         Point2D::n_dimensions()
     }
 
-    fn position_nd(&self, dimension: usize) -> Result<f64> {
+    fn position_nd(&self, dimension: usize) -> Option<f64> {
         self.center.position_nd(dimension)
     }
 }

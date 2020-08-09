@@ -22,8 +22,6 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! IsND trait used for types which are positioned within the n-dimensional space
 
-use crate::*;
-
 //------------------------------------------------------------------------------
 
 /// IsND is a trait used for types which are positioned within the n-dimensional space
@@ -33,5 +31,5 @@ pub trait IsND {
     where
         Self: Sized;
     /// Should return the value of a given dimensions. E.g. for 2D position with x = 4.3, y = 1.8 the result for dimension = 1 should be 1.8
-    fn position_nd(&self, dimension: usize) -> Result<f64>;
+    fn position_nd(&self, dimension: usize) -> Option<f64>;
 }

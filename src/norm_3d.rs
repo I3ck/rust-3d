@@ -113,12 +113,12 @@ impl IsND for Norm3D {
         3
     }
 
-    fn position_nd(&self, dimension: usize) -> Result<f64> {
+    fn position_nd(&self, dimension: usize) -> Option<f64> {
         match dimension {
-            0 => Ok(self.x),
-            1 => Ok(self.y),
-            2 => Ok(self.z),
-            _ => Err(ErrorKind::IncorrectDimension),
+            0 => Some(self.x),
+            1 => Some(self.y),
+            2 => Some(self.z),
+            _ => None,
         }
     }
 }

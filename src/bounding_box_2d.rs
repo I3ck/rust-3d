@@ -260,7 +260,7 @@ impl IsND for BoundingBox2D {
         2
     }
 
-    fn position_nd(&self, dimension: usize) -> Result<f64> {
+    fn position_nd(&self, dimension: usize) -> Option<f64> {
         self.center_bb().position_nd(dimension)
     }
 }

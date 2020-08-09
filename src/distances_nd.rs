@@ -47,7 +47,7 @@ where
 
     let mut result: f64 = 0.0;
     for i in 0..P::n_dimensions() {
-        if let (Ok(val1), Ok(val2)) = (p1.position_nd(i), p2.position_nd(i)) {
+        if let (Some(val1), Some(val2)) = (p1.position_nd(i), p2.position_nd(i)) {
             result += (val1 - val2).powi(2);
         } else {
             return Err(ErrorKind::IncorrectDimension);
