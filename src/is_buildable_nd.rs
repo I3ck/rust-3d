@@ -36,6 +36,7 @@ pub trait IsBuildableND: Sized + IsND {
         P: IsBuildableND;
 
     /// Returns a new object with 0 for all coordinates
+    //@todo shouldn't return Result, never fails
     #[inline(always)]
     fn zero_nd() -> Result<Self> {
         Self::new_nd(&vec![0.0; Self::n_dimensions()])

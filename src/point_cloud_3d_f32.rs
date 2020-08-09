@@ -94,12 +94,12 @@ where
         self.data.push(p.z() as f32);
     }
 
-    fn get_d(&self, index: usize) -> P {
-        P::new(
-            self.data[3 * index + 0] as f64,
-            self.data[3 * index + 1] as f64,
-            self.data[3 * index + 2] as f64,
-        )
+    fn get_d(&self, index: usize) -> Option<P> {
+        Some(P::new(
+            *self.data.get(3 * index + 0)? as f64,
+            *self.data.get(3 * index + 1)? as f64,
+            *self.data.get(3 * index + 2)? as f64,
+        ))
     }
 
     fn set_d(&mut self, index: usize, p: P) {

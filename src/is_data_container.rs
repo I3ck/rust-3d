@@ -31,7 +31,7 @@ pub trait IsDataContainer<T> {
     /// Should push a T to the end of the container
     fn push_d(&mut self, x: T);
     /// Should return the element at index
-    fn get_d(&self, index: usize) -> T;
+    fn get_d(&self, index: usize) -> Option<T>;
     /// Should set the element at index
     fn set_d(&mut self, index: usize, x: T);
 }

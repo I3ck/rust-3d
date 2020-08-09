@@ -90,10 +90,9 @@ where
     }
 
     fn vertex(&self, vertexid: VId) -> Result<P> {
-        if vertexid.val >= self.pc.len_d() {
-            return Err(ErrorKind::IncorrectVertexID);
-        }
-        Ok(self.pc.get_d(vertexid.val))
+        self.pc
+            .get_d(vertexid.val)
+            .ok_or(ErrorKind::IncorrectVertexID)
     }
 }
 

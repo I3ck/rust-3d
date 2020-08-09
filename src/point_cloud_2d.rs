@@ -126,8 +126,8 @@ where
         self.push(p)
     }
 
-    fn get_d(&self, index: usize) -> P {
-        self.data[index].clone()
+    fn get_d(&self, index: usize) -> Option<P> {
+        self.data.get(index).cloned()
     }
 
     fn set_d(&mut self, index: usize, p: P) {
