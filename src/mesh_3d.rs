@@ -110,14 +110,12 @@ where
     }
 
     fn try_add_connection(&mut self, vid1: VId, vid2: VId, vid3: VId) -> Result<FId> {
-        if vid1.val >= self.pc.len_d()
-            || vid2.val >= self.pc.len_d()
-            || vid3.val >= self.pc.len_d()
-            || vid1 == vid2
-            || vid1 == vid3
-            || vid2 == vid3
+        if vid1.val >= self.pc.len_d() || vid2.val >= self.pc.len_d() || vid3.val >= self.pc.len_d()
         {
             return Err(ErrorKind::IncorrectVertexID);
+        }
+        if vid1 == vid2 || vid1 == vid3 || vid2 == vid3 {
+            return Err(ErrorKind::FaceIDsNotUnique);
         }
         self.topology.push(vid1.val);
         self.topology.push(vid2.val);
