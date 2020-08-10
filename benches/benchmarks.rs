@@ -38,7 +38,7 @@ where
     let mut sum_x = 0.0;
 
     for i in 0..n {
-        if let Ok(v) = mesh.vertex(VId { val: i }) {
+        if let Some(v) = mesh.vertex(VId { val: i }) {
             sum_x += v.x();
         }
     }
