@@ -52,6 +52,27 @@ impl<T> IsPushable<T> for Vec<T> {
     }
 }
 
+impl<T> IsDataContainer<T> for Vec<T>
+where
+    T: Clone,
+{
+    fn reserve_d(&mut self, n: usize) {
+        self.reserve(n)
+    }
+    fn len_d(&self) -> usize {
+        self.len()
+    }
+    fn push_d(&mut self, x: T) {
+        self.push(x)
+    }
+    fn get_d(&self, index: usize) -> Option<T> {
+        self.get(index).cloned()
+    }
+    fn set_d(&mut self, index: usize, x: T) {
+        self[index] = x
+    }
+}
+
 impl<T> IsViewBuildable for Vec<T>
 where
     T: Clone,
