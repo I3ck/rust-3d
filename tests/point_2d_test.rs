@@ -35,12 +35,12 @@ fn point_2d_test() {
 
     assert!(p1.x() == 0.0);
     assert!(p1.y() == 0.0);
-    assert!(p1.abs().get() == 0.0);
+    assert!(*p1.abs() == 0.0);
 
     let mut p2 = Point2D::new(1.0, 0.0);
     assert!(p2.x() == 1.0);
     assert!(p2.y() == 0.0);
-    assert!(p2.abs().get() == 1.0);
+    assert!(*p2.abs() == 1.0);
 
     assert!(p1.rad_to(&p2).0 == 0.0);
     assert!(p2.rad_to(&p1).0 == consts::PI);
@@ -68,9 +68,9 @@ fn point_2d_test() {
     match p3_norm {
         Err(_) => {}
         Ok(n) => {
-            assert!((1.0 - n.abs().get()).abs() < eps);
-            assert!(n.x() == p3.x() / p3.abs().get());
-            assert!(n.y() == p3.y() / p3.abs().get());
+            assert!((1.0 - *n.abs()).abs() < eps);
+            assert!(n.x() == p3.x() / *p3.abs());
+            assert!(n.y() == p3.y() / *p3.abs());
         }
     }
 

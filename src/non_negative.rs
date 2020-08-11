@@ -54,10 +54,6 @@ impl NonNegative {
     pub fn one() -> NonNegative {
         NonNegative { val: 1.0 }
     }
-    /// Returns the wrapped value
-    pub fn get(&self) -> f64 {
-        self.val
-    }
     /// Returns the square root
     pub fn sqrt(&self) -> NonNegative {
         NonNegative {
@@ -182,6 +178,13 @@ impl DivAssign<Positive> for NonNegative {
 impl Into<f64> for NonNegative {
     fn into(self) -> f64 {
         self.val
+    }
+}
+
+impl std::ops::Deref for NonNegative {
+    type Target = f64;
+    fn deref(&self) -> &Self::Target {
+        &self.val
     }
 }
 

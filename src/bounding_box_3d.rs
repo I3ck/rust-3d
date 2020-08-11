@@ -286,7 +286,7 @@ impl BoundingBox3D {
     where
         P: Is3D,
     {
-        let sqr_dist = self.sqr_distance(other).get();
+        let sqr_dist = *self.sqr_distance(other);
         NonNegative::new(sqr_dist.sqrt()).unwrap()
     }
     /// Returns the square distance to another Is3D

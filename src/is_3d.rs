@@ -68,12 +68,10 @@ pub trait Is3D: IsND {
     }
     /// Calculates the angle to the other Is3D in radians
     fn rad_to(&self, other: &dyn Is3D) -> Result<Rad> {
-        if self.abs().get() == 0.0 || other.abs().get() == 0.0 {
+        if *self.abs() == 0.0 || *other.abs() == 0.0 {
             return Err(ErrorKind::CantCalculateAngleIfZeroLength);
         }
-        Ok(Rad(
-            (self.dot(other) / (self.abs() * other.abs()).get()).acos()
-        ))
+        Ok(Rad((self.dot(other) / *(self.abs() * other.abs())).acos()))
     }
     /// Transforms the position in a "x y z" string. E.g. "3.72 5.99 1.01"
     fn to_str(&self) -> String {

@@ -133,7 +133,7 @@ impl IsNormalized2D for Norm2D {
     where
         P: Is2D,
     {
-        let l = p.abs().get();
+        let l = *p.abs();
         if l == 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
         }

@@ -84,7 +84,7 @@ impl Add<NonNegative> for Positive {
 
     fn add(self, other: NonNegative) -> Positive {
         Positive {
-            val: self.val + other.get(),
+            val: self.val + *other,
         }
     }
 }
@@ -97,7 +97,7 @@ impl AddAssign for Positive {
 
 impl AddAssign<NonNegative> for Positive {
     fn add_assign(&mut self, other: NonNegative) {
-        self.val += other.get();
+        self.val += *other;
     }
 }
 
@@ -137,7 +137,7 @@ impl Div<NonNegative> for Positive {
     type Output = NonNegative;
 
     fn div(self, other: NonNegative) -> NonNegative {
-        NonNegative::new(self.val / other.get()).unwrap() // safe
+        NonNegative::new(self.val / *other).unwrap() // safe
     }
 }
 

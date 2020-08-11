@@ -221,7 +221,7 @@ impl BoundingBox2D {
     where
         P: Is2D,
     {
-        let sqr_dist = self.sqr_distance(other).get();
+        let sqr_dist = *self.sqr_distance(other);
         NonNegative::new(sqr_dist.sqrt()).unwrap()
     }
     /// Returns the square distance to another Is2D

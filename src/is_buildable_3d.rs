@@ -66,14 +66,10 @@ pub trait IsBuildable3D: Sized + Is3D + Eq + PartialEq + Ord + PartialOrd + Hash
     /// Returns this with normalized values
     fn normalized(&self) -> Result<Self> {
         let l = self.abs();
-        if l.get() == 0.0 {
+        if *l == 0.0 {
             return Err(ErrorKind::NormalizeVecWithoutLength);
         }
-        Ok(Self::new(
-            self.x() / l.get(),
-            self.y() / l.get(),
-            self.z() / l.get(),
-        ))
+        Ok(Self::new(self.x() / *l, self.y() / *l, self.z() / *l))
     }
     /// Returns a new object with 0/0/0 as coordinates
     #[inline(always)]
