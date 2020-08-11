@@ -86,7 +86,7 @@ pub trait IsEditable2D: Is2D + IsEditableND {
     where
         P: Is2D,
     {
-        let rad = r.val;
+        let rad = r.0;
         let newx =
             center.x() + rad.cos() * (self.x() - center.x()) - rad.sin() * (self.y() - center.y());
         let newy =

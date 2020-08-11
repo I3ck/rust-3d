@@ -56,7 +56,7 @@ where
 {
     let mut pc = PointCloud2D::with_capacity(n_points);
     let d = diameter.get();
-    let p_dist = (end.val - start.val).abs() / (n_points - 1) as f64;
+    let p_dist = (end.0 - start.0).abs() / (n_points - 1) as f64;
 
     for i in 0..n_points {
         let current = (i as f64) * p_dist;
@@ -81,10 +81,10 @@ where
 {
     let mut pc = PointCloud2D::with_capacity(n_points);
     let d = diameter.get();
-    let p_dist = (end.val - start.val).abs() / (n_points - 1) as f64;
+    let p_dist = (end.0 - start.0).abs() / (n_points - 1) as f64;
 
     for i in 0..n_points {
-        let radians = start.val + (i as f64) * p_dist;
+        let radians = start.0 + (i as f64) * p_dist;
         pc.push(P::new(
             center.x() + d / 2.0 * radians.cos(),
             center.y() + d / 2.0 * radians.sin(),

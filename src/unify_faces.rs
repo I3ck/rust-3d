@@ -65,9 +65,9 @@ where
 
         while let Some(this) = frontier.pop() {
             neighbour_buffer.clear();
-            collect_neighbour_faces(mesh, &v_to_f, FId { val: this }, &mut neighbour_buffer)?;
+            collect_neighbour_faces(mesh, &v_to_f, FId(this), &mut neighbour_buffer)?;
 
-            let [v1, v2, v3] = mesh.face_vertices(FId { val: this }).unwrap(); // safe since index is safe
+            let [v1, v2, v3] = mesh.face_vertices(FId(this)).unwrap(); // safe since index is safe
             let n_this = normal_of_face(&v1, &v2, &v3);
 
             for neighbour in neighbour_buffer.iter() {
@@ -75,7 +75,7 @@ where
                     continue;
                 }
 
-                let [v1n, v2n, v3n] = mesh.face_vertices(FId { val: neighbour }).unwrap(); // safe since index is safe
+                let [v1n, v2n, v3n] = mesh.face_vertices(FId(neighbour)).unwrap(); // safe since index is safe
                 let n_neighbour = normal_of_face(&v1n, &v2n, &v3n);
 
                 let are_different = n_this.dot(&n_neighbour) < 0.0;
@@ -98,11 +98,11 @@ where
     result.reserve_vertices(n_v_total);
     result.reserve_faces(n_f_total);
     for i in 0..n_v_total {
-        result.add_vertex(mesh.vertex(VId { val: i }).unwrap()); // safe since index safe
+        result.add_vertex(mesh.vertex(VId(i)).unwrap()); // safe since index safe
     }
 
     for i in 0..n_f_total {
-        let f = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since index safe
+        let f = mesh.face_vertex_ids(FId(i)).unwrap(); // safe since index safe
         if must_flip[i] {
             //println!("add normal");
             result.try_add_connection(f.a, f.c, f.b).unwrap(); // safe assuming original mesh was valid
@@ -127,10 +127,10 @@ where
     let mut v_to_f = vec![FnvHashSet::default(); nv];
 
     for i in 0..nf {
-        let f = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe
-        v_to_f[f.a.val].insert(i);
-        v_to_f[f.b.val].insert(i);
-        v_to_f[f.c.val].insert(i);
+        let f = mesh.face_vertex_ids(FId(i)).unwrap(); // safe
+        v_to_f[f.a.0].insert(i);
+        v_to_f[f.b.0].insert(i);
+        v_to_f[f.c.0].insert(i);
     }
 
     v_to_f
@@ -151,11 +151,11 @@ where
     let f = mesh
         .face_vertex_ids(fid)
         .ok_or(ErrorKind::IncorrectFaceID)?;
-    neighbours.extend(v_to_f[f.a.val].iter());
-    neighbours.extend(v_to_f[f.b.val].iter());
-    neighbours.extend(v_to_f[f.c.val].iter());
+    neighbours.extend(v_to_f[f.a.0].iter());
+    neighbours.extend(v_to_f[f.b.0].iter());
+    neighbours.extend(v_to_f[f.c.0].iter());
     neighbours.sort();
     neighbours.dedup();
-    neighbours.retain(|x| *x != fid.val);
+    neighbours.retain(|x| *x != fid.0);
     Ok(())
 }

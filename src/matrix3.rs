@@ -63,8 +63,8 @@ impl Matrix3 {
     pub fn rotation(rad: Rad) -> Matrix3 {
         Matrix3 {
             data: [
-                [rad.val.cos(), -rad.val.sin(), 0.0],
-                [rad.val.sin(), rad.val.cos(), 0.0],
+                [rad.0.cos(), -rad.0.sin(), 0.0],
+                [rad.0.sin(), rad.0.cos(), 0.0],
                 [0.0, 0.0, 1.0],
             ],
         }

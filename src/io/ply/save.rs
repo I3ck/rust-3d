@@ -54,12 +54,12 @@ where
     write.write_all(header.as_bytes())?;
 
     for i in 0..mesh.num_vertices() {
-        let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating num_vertices
+        let vertex = mesh.vertex(VId(i)).unwrap(); // safe since iterating num_vertices
         write.write_all((vertex.to_str() + "\n").as_bytes())?;
     }
 
     for i in 0..mesh.num_faces() {
-        let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating num_faces
+        let face = mesh.face_vertex_ids(FId(i)).unwrap(); // safe since iterating num_faces
         write.write_all(
             ("3 ".to_string()
                 + &face.a.to_string()
@@ -110,7 +110,7 @@ where
     write.write_all(header.as_bytes())?;
 
     for i in 0..n_vertices {
-        let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating n_vertices
+        let vertex = mesh.vertex(VId(i)).unwrap(); // safe since iterating n_vertices
         let color = &colors[i];
         write.write_all(
             format!(
@@ -127,7 +127,7 @@ where
     }
 
     for i in 0..n_faces {
-        let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating n_faces
+        let face = mesh.face_vertex_ids(FId(i)).unwrap(); // safe since iterating n_faces
         write.write_all(
             ("3 ".to_string()
                 + &face.a.to_string()
@@ -191,7 +191,7 @@ where
     match precision {
         Precision::P32 => {
             for i in 0..mesh.num_vertices() {
-                let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating num_vertices
+                let vertex = mesh.vertex(VId(i)).unwrap(); // safe since iterating num_vertices
                 write.write(&(vertex.x() as f32).to_be_bytes())?;
                 write.write(&(vertex.y() as f32).to_be_bytes())?;
                 write.write(&(vertex.z() as f32).to_be_bytes())?;
@@ -200,7 +200,7 @@ where
 
         Precision::P64 => {
             for i in 0..mesh.num_vertices() {
-                let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating num_vertices
+                let vertex = mesh.vertex(VId(i)).unwrap(); // safe since iterating num_vertices
                 write.write(&(vertex.x()).to_be_bytes())?;
                 write.write(&(vertex.y()).to_be_bytes())?;
                 write.write(&(vertex.z()).to_be_bytes())?;
@@ -209,11 +209,11 @@ where
     }
 
     for i in 0..mesh.num_faces() {
-        let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating num_faces
+        let face = mesh.face_vertex_ids(FId(i)).unwrap(); // safe since iterating num_faces
         write.write(&3u8.to_be_bytes())?;
-        write.write(&(face.a.val as u32).to_be_bytes())?;
-        write.write(&(face.b.val as u32).to_be_bytes())?;
-        write.write(&(face.c.val as u32).to_be_bytes())?;
+        write.write(&(face.a.0 as u32).to_be_bytes())?;
+        write.write(&(face.b.0 as u32).to_be_bytes())?;
+        write.write(&(face.c.0 as u32).to_be_bytes())?;
     }
 
     Ok(())
@@ -286,7 +286,7 @@ where
     match precision {
         Precision::P32 => {
             for i in 0..n_vertices {
-                let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating n_vertices
+                let vertex = mesh.vertex(VId(i)).unwrap(); // safe since iterating n_vertices
                 let color = &colors[i];
                 write.write(&(vertex.x() as f32).to_be_bytes())?;
                 write.write(&(vertex.y() as f32).to_be_bytes())?;
@@ -299,7 +299,7 @@ where
 
         Precision::P64 => {
             for i in 0..n_vertices {
-                let vertex = mesh.vertex(VId { val: i }).unwrap(); // safe since iterating n_vertices
+                let vertex = mesh.vertex(VId(i)).unwrap(); // safe since iterating n_vertices
                 let color = &colors[i];
                 write.write(&(vertex.x()).to_be_bytes())?;
                 write.write(&(vertex.y()).to_be_bytes())?;
@@ -312,11 +312,11 @@ where
     }
 
     for i in 0..n_faces {
-        let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe since iterating n_faces
+        let face = mesh.face_vertex_ids(FId(i)).unwrap(); // safe since iterating n_faces
         write.write(&3u8.to_be_bytes())?;
-        write.write(&(face.a.val as u32).to_be_bytes())?;
-        write.write(&(face.b.val as u32).to_be_bytes())?;
-        write.write(&(face.c.val as u32).to_be_bytes())?;
+        write.write(&(face.a.0 as u32).to_be_bytes())?;
+        write.write(&(face.b.0 as u32).to_be_bytes())?;
+        write.write(&(face.c.0 as u32).to_be_bytes())?;
     }
 
     Ok(())

@@ -30,10 +30,10 @@ fn mesh_test() {
 
     assert!(mesh.num_faces() == 0);
     assert!(mesh.num_vertices() == 0);
-    assert!(mesh.face_vertex_ids(FId { val: 0 }).is_none());
-    assert!(mesh.face_vertices(FId { val: 0 }).is_none());
-    assert!(mesh.vertex(VId { val: 0 }).is_none());
-    assert!(mesh.face_normal(FId { val: 0 }).is_err());
+    assert!(mesh.face_vertex_ids(FId(0)).is_none());
+    assert!(mesh.face_vertices(FId(0)).is_none());
+    assert!(mesh.vertex(VId(0)).is_none());
+    assert!(mesh.face_normal(FId(0)).is_err());
 
     mesh.add_vertex(Point3D::new(0.0, 0.1, 0.2));
     assert!(mesh.num_vertices() == 1);
@@ -44,18 +44,10 @@ fn mesh_test() {
     assert!(mesh.num_vertices() == 3);
     assert!(mesh.num_faces() == 0);
 
-    assert!(mesh
-        .try_add_connection(VId { val: 0 }, VId { val: 0 }, VId { val: 0 })
-        .is_err());
-    assert!(mesh
-        .try_add_connection(VId { val: 0 }, VId { val: 1 }, VId { val: 1 })
-        .is_err());
-    assert!(mesh
-        .try_add_connection(VId { val: 0 }, VId { val: 1 }, VId { val: 3 })
-        .is_err());
-    assert!(mesh
-        .try_add_connection(VId { val: 0 }, VId { val: 1 }, VId { val: 2 })
-        .is_ok());
+    assert!(mesh.try_add_connection(VId(0), VId(0), VId(0)).is_err());
+    assert!(mesh.try_add_connection(VId(0), VId(1), VId(1)).is_err());
+    assert!(mesh.try_add_connection(VId(0), VId(1), VId(3)).is_err());
+    assert!(mesh.try_add_connection(VId(0), VId(1), VId(2)).is_ok());
     assert!(mesh.num_vertices() == 3);
     assert!(mesh.num_faces() == 1);
 
@@ -65,27 +57,27 @@ fn mesh_test() {
             Point3D::new(2.0, 2.0, 2.0),
             Point3D::new(3.0, 3.0, 3.0)
         )
-        .val == 1
+        .0 == 1
     );
     assert!(mesh.num_vertices() == 6);
     assert!(mesh.num_faces() == 2);
 
-    match mesh.face_vertex_ids(FId { val: 0 }) {
+    match mesh.face_vertex_ids(FId(0)) {
         None => assert!(false),
-        Some(face) => assert!(face.a.val == 0 && face.b.val == 1 && face.c.val == 2),
+        Some(face) => assert!(face.a.0 == 0 && face.b.0 == 1 && face.c.0 == 2),
     };
 
-    match mesh.face_vertex_ids(FId { val: 1 }) {
+    match mesh.face_vertex_ids(FId(1)) {
         None => assert!(false),
-        Some(face) => assert!(face.a.val == 3 && face.b.val == 4 && face.c.val == 5),
+        Some(face) => assert!(face.a.0 == 3 && face.b.0 == 4 && face.c.0 == 5),
     };
 
-    match mesh.face_vertices(FId { val: 0 }) {
+    match mesh.face_vertices(FId(0)) {
         None => assert!(false),
         Some([p1, p2, p3]) => assert!(p1.x() == 0.0 && p2.x() == 0.1 && p3.x() == 0.2),
     };
 
-    match mesh.face_vertices(FId { val: 1 }) {
+    match mesh.face_vertices(FId(1)) {
         None => assert!(false),
         Some([p1, p2, p3]) => assert!(p1.x() == 1.0 && p2.x() == 2.0 && p3.x() == 3.0),
     };

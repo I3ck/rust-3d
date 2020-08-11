@@ -60,6 +60,6 @@ impl IsTopologyUnit for Face3 {
 
 impl fmt::Display for Face3 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "({}, {}, {})", self.a.val, self.b.val, self.c.val)
+        write!(f, "({}, {}, {})", self.a.0, self.b.0, self.c.0)
     }
 }

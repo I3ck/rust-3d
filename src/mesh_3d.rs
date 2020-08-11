@@ -56,24 +56,18 @@ where
     }
 
     fn face_vertex_ids(&self, faceid: FId) -> Option<Face3> {
-        let id1 = 3 * faceid.val + 0;
-        let id2 = 3 * faceid.val + 1;
-        let id3 = 3 * faceid.val + 2;
+        let id1 = 3 * faceid.0 + 0;
+        let id2 = 3 * faceid.0 + 1;
+        let id3 = 3 * faceid.0 + 2;
 
         if id3 >= self.topology.len() {
             return None;
         }
 
         Some(Face3::new(
-            VId {
-                val: self.topology.get(id1),
-            },
-            VId {
-                val: self.topology.get(id2),
-            },
-            VId {
-                val: self.topology.get(id3),
-            },
+            VId(self.topology.get(id1)),
+            VId(self.topology.get(id2)),
+            VId(self.topology.get(id3)),
         ))
     }
 
@@ -87,7 +81,7 @@ where
     }
 
     fn vertex(&self, vertexid: VId) -> Option<P> {
-        self.pc.get_d(vertexid.val)
+        self.pc.get_d(vertexid.0)
     }
 }
 
@@ -101,28 +95,23 @@ where
         let vid1 = self.add_vertex(v1);
         let vid2 = self.add_vertex(v2);
         let vid3 = self.add_vertex(v3);
-        self.topology.push(vid1.val);
-        self.topology.push(vid2.val);
-        self.topology.push(vid3.val);
-        FId {
-            val: self.topology.len() / 3 - 1,
-        }
+        self.topology.push(vid1.0);
+        self.topology.push(vid2.0);
+        self.topology.push(vid3.0);
+        FId(self.topology.len() / 3 - 1)
     }
 
     fn try_add_connection(&mut self, vid1: VId, vid2: VId, vid3: VId) -> Result<FId> {
-        if vid1.val >= self.pc.len_d() || vid2.val >= self.pc.len_d() || vid3.val >= self.pc.len_d()
-        {
+        if vid1.0 >= self.pc.len_d() || vid2.0 >= self.pc.len_d() || vid3.0 >= self.pc.len_d() {
             return Err(ErrorKind::IncorrectVertexID);
         }
         if vid1 == vid2 || vid1 == vid3 || vid2 == vid3 {
             return Err(ErrorKind::FaceIDsNotUnique);
         }
-        self.topology.push(vid1.val);
-        self.topology.push(vid2.val);
-        self.topology.push(vid3.val);
-        Ok(FId {
-            val: self.topology.len() / 3 - 1,
-        })
+        self.topology.push(vid1.0);
+        self.topology.push(vid2.0);
+        self.topology.push(vid3.0);
+        Ok(FId(self.topology.len() / 3 - 1))
     }
 
     fn reserve_faces(&mut self, n: usize) {
@@ -138,14 +127,12 @@ where
 {
     fn add_vertex(&mut self, vertex: P) -> VId {
         self.pc.push_d(vertex);
-        VId {
-            val: self.pc.len_d() - 1,
-        }
+        VId(self.pc.len_d() - 1)
     }
 
     fn change_vertex(&mut self, vid: VId, vertex: P) -> Result<()> {
-        if vid.val < self.pc.len_d() {
-            self.pc.set_d(vid.val, vertex);
+        if vid.0 < self.pc.len_d() {
+            self.pc.set_d(vid.0, vertex);
             Ok(())
         } else {
             Err(ErrorKind::IncorrectVertexID)

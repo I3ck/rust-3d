@@ -60,7 +60,7 @@ where
 
     /// Fails if the vertex ID is out of bounds
     pub fn ensure_face_id(&self, id: FId) -> Result<()> {
-        if id.val >= self.mesh.num_faces() {
+        if id.0 >= self.mesh.num_faces() {
             return Err(ErrorKind::IncorrectFaceID);
         }
         Ok(())
@@ -129,15 +129,9 @@ where
     fn edges_of_face(&self, faceid: FId) -> Option<(EId, EId, EId)> {
         self.ensure_face_id(faceid).ok()?;
         Some((
-            EId {
-                val: faceid.val * 3 + 0,
-            },
-            EId {
-                val: faceid.val * 3 + 1,
-            },
-            EId {
-                val: faceid.val * 3 + 2,
-            },
+            EId(faceid.0 * 3 + 0),
+            EId(faceid.0 * 3 + 1),
+            EId(faceid.0 * 3 + 2),
         ))
     }
 

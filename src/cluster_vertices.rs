@@ -66,7 +66,7 @@ where
     let mut clusters = Vec::with_capacity(nv);
 
     for i in 0..nv {
-        let p = mesh.vertex(VId { val: i }).unwrap(); // safe, since index in range
+        let p = mesh.vertex(VId(i)).unwrap(); // safe, since index in range
         let cluster = cluster_of(p);
         cluster_map.insert(cluster, i); //@todo later this must keep the 'best' vertex instead of the last
         clusters.push(cluster);
@@ -76,9 +76,9 @@ where
 
     let new_vertex = |old_index| {
         let cluster = &clusters[old_index];
-        mesh.vertex(VId {
-            val: *cluster_map.get(cluster).unwrap(), // safe since any cluster in clusters also within cluster_map
-        })
+        mesh.vertex(VId(
+            *cluster_map.get(cluster).unwrap(), // safe since any cluster in clusters also within cluster_map
+        ))
         .unwrap() // safe, since index in range
     };
 
@@ -86,13 +86,9 @@ where
     result.reserve_faces(nf);
     result.reserve_vertices(3 * nf);
     for i in 0..nf {
-        let f = mesh.face_vertex_ids(FId { val: i }).unwrap();
+        let f = mesh.face_vertex_ids(FId(i)).unwrap();
 
-        result.add_face(
-            new_vertex(f.a.val),
-            new_vertex(f.b.val),
-            new_vertex(f.c.val),
-        );
+        result.add_face(new_vertex(f.a.0), new_vertex(f.b.0), new_vertex(f.c.0));
     }
 
     result = heal_mesh(&result)?;

@@ -82,7 +82,7 @@ impl Matrix4 {
     /// Creates a new matrix which applies rotation
     pub fn rotation(x: Rad, y: Rad, z: Rad) -> Matrix4 {
         let (mut mx, mut my, mut mz) = (Matrix4::default(), Matrix4::default(), Matrix4::default());
-        let (rad_x, rad_y, rad_z) = (x.val, y.val, z.val);
+        let (rad_x, rad_y, rad_z) = (x.0, y.0, z.0);
 
         mx.data[0][0] = 1.0;
         mx.data[0][1] = 0.0;
@@ -142,7 +142,7 @@ impl Matrix4 {
     where
         N: IsNormalized3D,
     {
-        let rad = r.val;
+        let rad = r.0;
         let ref u = axis;
         let mut result = Matrix4::default();
         result.data[0][0] = rad.cos() + u.x() * u.x() * (1.0 - rad.cos());
@@ -165,7 +165,7 @@ impl Matrix4 {
     }
     /// Creates a new matrix which applies perspective transformation
     pub fn perspective(close: f64, away: f64, fov: Rad) -> Matrix4 {
-        let fov_rad = fov.val;
+        let fov_rad = fov.0;
         let range = close - away;
         let tan_fov_half = (fov_rad / 2.0).tan();
 

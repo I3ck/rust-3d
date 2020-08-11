@@ -538,12 +538,8 @@ where
 
         skip_bytes(read, header.face.format.after.bytes)?;
 
-        mesh.try_add_connection(
-            VId { val: a as usize },
-            VId { val: b as usize },
-            VId { val: c as usize },
-        )
-        .or(Err(PlyError::InvalidMeshIndices))?;
+        mesh.try_add_connection(VId(a as usize), VId(b as usize), VId(c as usize))
+            .or(Err(PlyError::InvalidMeshIndices))?;
     }
 
     Ok(())
@@ -609,7 +605,7 @@ where
             let [a, b, c] = collect_index_line(&line)
                 .ok_or(PlyError::FaceStructure)
                 .line(*i_line, line)?;
-            mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
+            mesh.try_add_connection(VId(a), VId(b), VId(c))
                 .or(Err(PlyError::InvalidMeshIndices))
                 .line(*i_line, line)?;
             continue;

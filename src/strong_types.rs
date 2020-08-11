@@ -29,31 +29,29 @@ use std::fmt;
 macro_rules! strong_usize {
     ($NEW_NAME:ident) => {
         #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-        pub struct $NEW_NAME {
-            pub val: usize,
-        }
+        pub struct $NEW_NAME(pub usize);
 
         impl Into<usize> for $NEW_NAME {
             fn into(self) -> usize {
-                self.val
+                self.0
             }
         }
 
         impl AsRef<usize> for $NEW_NAME {
             fn as_ref(&self) -> &usize {
-                &self.val
+                &self.0
             }
         }
 
         impl AsMut<usize> for $NEW_NAME {
             fn as_mut(&mut self) -> &mut usize {
-                &mut self.val
+                &mut self.0
             }
         }
 
         impl fmt::Display for $NEW_NAME {
             fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-                write!(f, "{}", self.val)
+                write!(f, "{}", self.0)
             }
         }
     };
@@ -62,31 +60,29 @@ macro_rules! strong_usize {
 macro_rules! strong_f64 {
     ($NEW_NAME:ident) => {
         #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
-        pub struct $NEW_NAME {
-            pub val: f64,
-        }
+        pub struct $NEW_NAME(pub f64);
 
         impl Into<f64> for $NEW_NAME {
             fn into(self) -> f64 {
-                self.val
+                self.0
             }
         }
 
         impl AsRef<f64> for $NEW_NAME {
             fn as_ref(&self) -> &f64 {
-                &self.val
+                &self.0
             }
         }
 
         impl AsMut<f64> for $NEW_NAME {
             fn as_mut(&mut self) -> &mut f64 {
-                &mut self.val
+                &mut self.0
             }
         }
 
         impl fmt::Display for $NEW_NAME {
             fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-                write!(f, "{}", self.val)
+                write!(f, "{}", self.0)
             }
         }
     };

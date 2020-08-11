@@ -39,7 +39,7 @@ where
     let mut duped_vertices = Vec::with_capacity(3 * nf);
 
     for i in 0..nf {
-        let [v1, v2, v3] = mesh.face_vertices(FId { val: i }).unwrap(); // safe
+        let [v1, v2, v3] = mesh.face_vertices(FId(i)).unwrap(); // safe
         duped_vertices.push(v1);
         duped_vertices.push(v2);
         duped_vertices.push(v3);
@@ -61,7 +61,7 @@ where
         if a == b || a == c || b == c {
             continue;
         }
-        result.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })?;
+        result.try_add_connection(VId(a), VId(b), VId(c))?;
     }
 
     Ok(result)

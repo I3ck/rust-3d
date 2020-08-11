@@ -71,9 +71,9 @@ pub trait Is3D: IsND {
         if self.abs().get() == 0.0 || other.abs().get() == 0.0 {
             return Err(ErrorKind::CantCalculateAngleIfZeroLength);
         }
-        Ok(Rad {
-            val: (self.dot(other) / (self.abs() * other.abs()).get()).acos(),
-        })
+        Ok(Rad(
+            (self.dot(other) / (self.abs() * other.abs()).get()).acos()
+        ))
     }
     /// Transforms the position in a "x y z" string. E.g. "3.72 5.99 1.01"
     fn to_str(&self) -> String {

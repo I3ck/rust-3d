@@ -108,14 +108,14 @@ where
     let mut ns = vec![P::default(); n];
 
     for i in 0..nf {
-        let face = mesh.face_vertex_ids(FId { val: i }).unwrap(); // safe
-        let [v1, v2, v3] = mesh.face_vertices(FId { val: i }).unwrap(); // safe
+        let face = mesh.face_vertex_ids(FId(i)).unwrap(); // safe
+        let [v1, v2, v3] = mesh.face_vertices(FId(i)).unwrap(); // safe
         let v12 = conn(&v1, &v2);
         let v13 = conn(&v1, &v3);
         let n = Norm3D::new(cross(&v12, &v13)).unwrap_or(Norm3D::norm_z());
         for j in 0..3 {
-            let new = add(&ns[face.vid(j).unwrap().val], &n); // safe since iterating 0..3
-            ns[face.vid(j).unwrap().val] = new; // safe since iterating 0..3
+            let new = add(&ns[face.vid(j).unwrap().0], &n); // safe since iterating 0..3
+            ns[face.vid(j).unwrap().0] = new; // safe since iterating 0..3
         }
     }
 

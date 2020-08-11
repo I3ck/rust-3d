@@ -128,7 +128,7 @@ where
                     .ok_or(OffError::Face)
                     .line(i_line, line)?;
 
-                mesh.try_add_connection(VId { val: a }, VId { val: b }, VId { val: c })
+                mesh.try_add_connection(VId(a), VId(b), VId(c))
                     .or(Err(OffError::InvalidMeshIndices).line(i_line, line))?;
             }
         }

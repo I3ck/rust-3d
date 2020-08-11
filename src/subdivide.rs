@@ -51,15 +51,15 @@ where
 
     for i in 0..n_vertices {
         // safe since iterating n_vertices
-        mo.add_vertex(mi.vertex(VId { val: i }).unwrap());
+        mo.add_vertex(mi.vertex(VId(i)).unwrap());
     }
 
     for i in 0..n_faces {
         // safe since iterating n_faces
-        let f = mi.face_vertex_ids(FId { val: i }).unwrap();
+        let f = mi.face_vertex_ids(FId(i)).unwrap();
         let (vi1, vi2, vi3) = (f.a, f.b, f.c);
         // safe since iterating n_faces
-        let [v1, v2, v3] = mi.face_vertices(FId { val: i }).unwrap();
+        let [v1, v2, v3] = mi.face_vertices(FId(i)).unwrap();
 
         let ia = *added_edges
             .entry((min(vi1, vi2), max(vi1, vi2)))

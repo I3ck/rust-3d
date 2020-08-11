@@ -55,9 +55,7 @@ pub trait Is2D: IsND {
     }
     /// Calculates the angle to the other Is2D in radians
     fn rad_to(&self, other: &dyn Is2D) -> Rad {
-        Rad {
-            val: (other.y() - self.y()).atan2(other.x() - self.x()),
-        }
+        Rad((other.y() - self.y()).atan2(other.x() - self.x()))
     }
     /// Transforms the position in a "x y" string. E.g. "3.72 5.99"
     fn to_str(&self) -> String {

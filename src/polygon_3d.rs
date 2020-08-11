@@ -46,27 +46,22 @@ where
     }
 
     fn segment_vertex_ids(&self, segmentid: SId) -> Option<(VId, VId)> {
-        if segmentid.val >= self.pc.len() {
+        if segmentid.0 >= self.pc.len() {
             None
-        } else if segmentid.val == self.pc.len() - 1 {
-            Some((VId { val: segmentid.val }, VId { val: 0 }))
+        } else if segmentid.0 == self.pc.len() - 1 {
+            Some((VId(segmentid.0), VId(0)))
         } else {
-            Some((
-                VId { val: segmentid.val },
-                VId {
-                    val: segmentid.val + 1,
-                },
-            ))
+            Some((VId(segmentid.0), VId(segmentid.0 + 1)))
         }
     }
 
     fn segment_vertices(&self, segmentid: SId) -> Option<(P, P)> {
         let (vid1, vid2) = self.segment_vertex_ids(segmentid)?;
-        Some((self.pc[vid1.val].clone(), self.pc[vid2.val].clone()))
+        Some((self.pc[vid1.0].clone(), self.pc[vid2.0].clone()))
     }
 
     fn vertex(&self, vertexid: VId) -> Option<P> {
-        self.pc.get_d(vertexid.val).clone()
+        self.pc.get_d(vertexid.0).clone()
     }
 }
 
@@ -76,17 +71,15 @@ where
 {
     fn add_vertex(&mut self, vertex: P) -> VId {
         self.pc.data.push(vertex);
-        VId {
-            val: self.pc.len() - 1,
-        }
+        VId(self.pc.len() - 1)
     }
 
     fn change_vertex(&mut self, vertexid: VId, vertex: P) -> Result<()> {
-        if vertexid.val >= self.pc.len() {
+        if vertexid.0 >= self.pc.len() {
             return Err(ErrorKind::IncorrectVertexID);
         }
 
-        self.pc[vertexid.val] = vertex;
+        self.pc[vertexid.0] = vertex;
         Ok(())
     }
 }

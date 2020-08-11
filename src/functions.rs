@@ -243,8 +243,8 @@ where
     let nf = mesh.num_faces();
 
     for i in 0..nf {
-        let [v1, v2, v3] = mesh.face_vertices(FId { val: i }).unwrap(); // safe
-                                                                        //println!("face_vertices");
+        let [v1, v2, v3] = mesh.face_vertices(FId(i)).unwrap(); // safe
+                                                                //println!("face_vertices");
         if let Some(intersection) = intersection_ray_triangle(ray, &v1, &v2, &v3) {
             intersections.push(intersection);
         }

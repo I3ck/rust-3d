@@ -59,32 +59,32 @@ where
         let estimated_edges_per_vertex = 6; // true for all vertices within regular meshes, possibly best estimate
 
         for i in 0..n_faces {
-            match mesh.face_vertex_ids(FId { val: i }) {
+            match mesh.face_vertex_ids(FId(i)) {
                 None => {}
                 Some(face) => {
-                    tails.push(face.a.val);
-                    tails.push(face.b.val);
-                    tails.push(face.c.val);
+                    tails.push(face.a.0);
+                    tails.push(face.b.0);
+                    tails.push(face.c.0);
 
                     safe_append_at(
                         &mut vertices_start_edges,
                         estimated_edges_per_vertex,
                         n_edges,
-                        face.a.val,
+                        face.a.0,
                         i * 3 + 0,
                     );
                     safe_append_at(
                         &mut vertices_start_edges,
                         estimated_edges_per_vertex,
                         n_edges,
-                        face.b.val,
+                        face.b.0,
                         i * 3 + 1,
                     );
                     safe_append_at(
                         &mut vertices_start_edges,
                         estimated_edges_per_vertex,
                         n_edges,
-                        face.c.val,
+                        face.c.0,
                         i * 3 + 2,
                     );
                 }
@@ -104,19 +104,14 @@ where
         let mut cache = Vec::new();
         for i in 0..result.tails.len() {
             cache.clear();
-            let _ = result.next(EId { val: i }).and_then(&mut |next_id: EId| {
+            let _ = result.next(EId(i)).and_then(&mut |next_id: EId| {
                 result
-                    .edges_originating(
-                        VId {
-                            val: result.tails.get(next_id.val),
-                        },
-                        &mut cache,
-                    )
+                    .edges_originating(VId(result.tails.get(next_id.0)), &mut cache)
                     .ok()
             });
             for originating_id in cache.iter() {
                 let _ = result.next(*originating_id).map(|candidate_id| {
-                    if result.tails.get(candidate_id.val) == result.tails.get(i) {
+                    if result.tails.get(candidate_id.0) == result.tails.get(i) {
                         result.twins[i] = Some(candidate_id)
                     }
                 });
@@ -127,44 +122,38 @@ where
     /// Returns the ID of the vertex the edge originates from (None if id out of bounds)
     pub fn tail(&self, id: EId) -> Option<VId> {
         self.ensure_edge_id(id).ok()?;
-        Some(VId {
-            val: self.tails.get(id.val),
-        })
+        Some(VId(self.tails.get(id.0)))
     }
     /// Returns the ID of the face the edge belongs to (None if id out of bounds)
     pub fn face(&self, id: EId) -> Option<FId> {
         self.ensure_edge_id(id).ok()?;
-        Some(FId { val: id.val / 3 })
+        Some(FId(id.0 / 3))
     }
     /// Returns the ID of the twin edge (None if there isn't any / id out of bounds)
     pub fn twin(&self, id: EId) -> Option<EId> {
         self.ensure_edge_id(id).ok()?;
-        self.twins.get(id.val).cloned().flatten()
+        self.twins.get(id.0).cloned().flatten()
     }
     /// Returns the ID of the edge after this edge (None if id out of bounds)
     pub fn next(&self, id: EId) -> Option<EId> {
         self.ensure_edge_id(id).ok()?;
         if Self::last_in_face(id) {
-            return Some(EId { val: id.val - 2 });
+            return Some(EId(id.0 - 2));
         }
-        Some(EId { val: id.val + 1 })
+        Some(EId(id.0 + 1))
     }
     /// Returns the ID of the edge before this edge (None if id out of bounds)
     pub fn prev(&self, id: EId) -> Option<EId> {
         self.ensure_edge_id(id).ok()?;
         if Self::first_in_face(id) {
-            return Some(EId { val: id.val + 2 });
+            return Some(EId(id.0 + 2));
         }
-        Some(EId { val: id.val - 1 })
+        Some(EId(id.0 - 1))
     }
     /// Appends all edges originating (pointing away) from the given vertex (error if id out of bounds)
     pub fn edges_originating(&self, id: VId, result: &mut Vec<EId>) -> Result<()> {
         self.ensure_vertex_id(id)?;
-        result.extend(
-            self.vertices_start_edges[id.val]
-                .iter()
-                .map(|x| EId { val: x }),
-        );
+        result.extend(self.vertices_start_edges[id.0].iter().map(|x| EId(x)));
         Ok(())
     }
     /// Appends all edges ending (pointing at) the given vertex (error if id out of bounds)
@@ -206,22 +195,22 @@ where
     }
     /// Returns true if the give edge is the first within a face
     fn first_in_face(id: EId) -> bool {
-        id.val % 3 == 0
+        id.0 % 3 == 0
     }
     /// Returns true if the give edge is the last within a face
     fn last_in_face(id: EId) -> bool {
-        id.val % 3 == 2
+        id.0 % 3 == 2
     }
     /// Fails if the edge ID is out of bounds
     pub fn ensure_edge_id(&self, id: EId) -> Result<()> {
-        if id.val >= self.tails.len() {
+        if id.0 >= self.tails.len() {
             return Err(ErrorKind::IncorrectEdgeID);
         }
         Ok(())
     }
     /// Fails if the vertex ID is out of bounds
     pub fn ensure_vertex_id(&self, id: VId) -> Result<()> {
-        if id.val >= self.vertices_start_edges.len() {
+        if id.0 >= self.vertices_start_edges.len() {
             return Err(ErrorKind::IncorrectVertexID);
         }
         Ok(())

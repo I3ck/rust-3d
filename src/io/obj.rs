@@ -93,7 +93,7 @@ where
                 .line(i_line, line)?;
 
             // obj indexing starts at 1
-            mesh.try_add_connection(VId { val: a - 1 }, VId { val: b - 1 }, VId { val: c - 1 })
+            mesh.try_add_connection(VId(a - 1), VId(b - 1), VId(c - 1))
                 .or(Err(ObjError::InvalidMeshIndices))
                 .line(i_line, line)?;
         }

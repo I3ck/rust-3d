@@ -42,8 +42,8 @@ fn point_2d_test() {
     assert!(p2.y() == 0.0);
     assert!(p2.abs().get() == 1.0);
 
-    assert!(p1.rad_to(&p2).val == 0.0);
-    assert!(p2.rad_to(&p1).val == consts::PI);
+    assert!(p1.rad_to(&p2).0 == 0.0);
+    assert!(p2.rad_to(&p1).0 == consts::PI);
 
     let p3 = Point2D::new(2.0, 2.0);
     assert!(p1.cross(&p2) == 0.0);
@@ -97,20 +97,15 @@ fn point_2d_test() {
     assert!(p1.y() == 22.0);
 
     p1.set_xy(1.0, 0.0);
-    p1.rotate(Rad { val: 0.0 }, &origin);
+    p1.rotate(Rad(0.0), &origin);
     assert!(p1.x() == 1.0);
     assert!(p1.y() == 0.0);
 
-    p1.rotate(
-        Rad {
-            val: 2.0 * consts::PI,
-        },
-        &origin,
-    );
+    p1.rotate(Rad(2.0 * consts::PI), &origin);
     assert!((1.0 - p1.x()).abs() < eps);
     assert!((0.0 - p1.y()).abs() < eps);
 
-    p1.rotate(Rad { val: consts::PI }, &origin);
+    p1.rotate(Rad(consts::PI), &origin);
     assert!((-1.0 - p1.x()).abs() < eps);
     assert!((0.0 - p1.y()).abs() < eps);
 
