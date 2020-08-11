@@ -40,15 +40,15 @@ impl Box2D {
     /// Returns the minimum position of the box
     pub fn min_p(&self) -> Point2D {
         Point2D::new(
-            self.center.x() - 0.5 * self.size_x.get(),
-            self.center.y() - 0.5 * self.size_y.get(),
+            self.center.x() - 0.5 * *self.size_x,
+            self.center.y() - 0.5 * *self.size_y,
         )
     }
     /// Returns the maximum position of the box
     pub fn max_p(&self) -> Point2D {
         Point2D::new(
-            self.center.x() + 0.5 * self.size_x.get(),
-            self.center.y() + 0.5 * self.size_y.get(),
+            self.center.x() + 0.5 * *self.size_x,
+            self.center.y() + 0.5 * *self.size_y,
         )
     }
     /// Returns the sizes of the bounding box
@@ -158,12 +158,12 @@ impl IsEditable2D for Box2D {
 impl HasBoundingBox2D for Box2D {
     fn bounding_box(&self) -> BoundingBox2D {
         let p_min = Point2D {
-            x: self.center.x() - self.size_x.get() / 2.0,
-            y: self.center.y() - self.size_y.get() / 2.0,
+            x: self.center.x() - *self.size_x / 2.0,
+            y: self.center.y() - *self.size_y / 2.0,
         };
         let p_max = Point2D {
-            x: self.center.x() + self.size_x.get() / 2.0,
-            y: self.center.y() + self.size_y.get() / 2.0,
+            x: self.center.x() + *self.size_x / 2.0,
+            y: self.center.y() + *self.size_y / 2.0,
         };
         BoundingBox2D::new(&p_min, &p_max).unwrap() // safe
     }

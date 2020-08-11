@@ -50,10 +50,6 @@ impl Positive {
     pub fn one() -> Positive {
         Positive { val: 1.0 }
     }
-    /// Returns the wrapped value
-    pub fn get(&self) -> f64 {
-        self.val
-    }
     /// Returns the square root
     pub fn sqrt(&self) -> Positive {
         Positive {
@@ -125,7 +121,7 @@ impl Mul<NonNegative> for Positive {
 
 impl MulAssign for Positive {
     fn mul_assign(&mut self, other: Positive) {
-        self.val *= other.get();
+        self.val *= *other;
     }
 }
 
@@ -133,7 +129,7 @@ impl Div for Positive {
     type Output = NonNegative;
 
     fn div(self, other: Positive) -> NonNegative {
-        NonNegative::new(self.val / other.get()).unwrap() // safe
+        NonNegative::new(self.val / *other).unwrap() // safe
     }
 }
 
@@ -148,6 +144,13 @@ impl Div<NonNegative> for Positive {
 impl Into<f64> for Positive {
     fn into(self) -> f64 {
         self.val
+    }
+}
+
+impl std::ops::Deref for Positive {
+    type Target = f64;
+    fn deref(&self) -> &Self::Target {
+        &self.val
     }
 }
 

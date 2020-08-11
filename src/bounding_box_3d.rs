@@ -250,12 +250,11 @@ impl BoundingBox3D {
     }
     /// Tests whether this bounding box and the other overlap in any way
     pub fn collides_with(&self, other: &BoundingBox3D) -> bool {
-        2.0 * (self.center_bb().x - other.center_bb().x).abs()
-            < ((self.size_x() + other.size_x()).get())
+        2.0 * (self.center_bb().x - other.center_bb().x).abs() < (*(self.size_x() + other.size_x()))
             && 2.0 * (self.center_bb().y - other.center_bb().y).abs()
-                < ((self.size_y() + other.size_y()).get())
+                < (*(self.size_y() + other.size_y()))
             && 2.0 * (self.center_bb().z - other.center_bb().z).abs()
-                < ((self.size_z() + other.size_z()).get())
+                < (*(self.size_z() + other.size_z()))
     }
     /// Tests whether this bounding box crosses a certain x value
     pub fn crossing_x_value(&self, x: f64) -> bool {
@@ -410,12 +409,12 @@ impl HasDistanceTo<BoundingBox3D> for BoundingBox3D {
 impl IsScalable for BoundingBox3D {
     fn scale(&mut self, factor: Positive) {
         let c = self.center_bb();
-        let min_x = c.x - (0.5 * factor.get() * self.size_x().get());
-        let max_x = c.x + (0.5 * factor.get() * self.size_x().get());
-        let min_y = c.y - (0.5 * factor.get() * self.size_y().get());
-        let max_y = c.y + (0.5 * factor.get() * self.size_y().get());
-        let min_z = c.z - (0.5 * factor.get() * self.size_z().get());
-        let max_z = c.z + (0.5 * factor.get() * self.size_z().get());
+        let min_x = c.x - (0.5 * *factor * *self.size_x());
+        let max_x = c.x + (0.5 * *factor * *self.size_x());
+        let min_y = c.y - (0.5 * *factor * *self.size_y());
+        let max_y = c.y + (0.5 * *factor * *self.size_y());
+        let min_z = c.z - (0.5 * *factor * *self.size_z());
+        let max_z = c.z + (0.5 * *factor * *self.size_z());
 
         self.min.set_xyz(min_x, min_y, min_z);
         self.max.set_xyz(max_x, max_y, max_z);

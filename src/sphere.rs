@@ -139,14 +139,14 @@ impl IsEditable3D for Sphere {
 impl HasBoundingBox3D for Sphere {
     fn bounding_box(&self) -> BoundingBox3D {
         let p_min = Point3D {
-            x: self.center.x() - self.radius.get(),
-            y: self.center.y() - self.radius.get(),
-            z: self.center.z() - self.radius.get(),
+            x: self.center.x() - *self.radius,
+            y: self.center.y() - *self.radius,
+            z: self.center.z() - *self.radius,
         };
         let p_max = Point3D {
-            x: self.center.x() + self.radius.get(),
-            y: self.center.y() + self.radius.get(),
-            z: self.center.z() + self.radius.get(),
+            x: self.center.x() + *self.radius,
+            y: self.center.y() + *self.radius,
+            z: self.center.z() + *self.radius,
         };
         BoundingBox3D::new(&p_min, &p_max).unwrap() // safe
     }

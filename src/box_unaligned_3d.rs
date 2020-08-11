@@ -68,15 +68,15 @@ impl BoxUnaligned3D {
         }
     }
     fn d_x(&self) -> Point3D {
-        let d = self.size[0].get();
+        let d = *self.size[0];
         Point3D::new_from(&self.x_dir()) * d
     }
     fn d_y(&self) -> Point3D {
-        let d = self.size[1].get();
+        let d = *self.size[1];
         Point3D::new_from(&self.y_dir) * d
     }
     fn d_z(&self) -> Point3D {
-        let d = self.size[2].get();
+        let d = *self.size[2];
         Point3D::new_from(&self.z_dir) * d
     }
     pub fn x_dir(&self) -> Norm3D {
@@ -139,14 +139,14 @@ impl HasBoundingBox3D for BoxUnaligned3D {
 
         BoundingBox3D::new(
             &Point3D::new(
-                self.center.x() - 0.5 * max_size.get(),
-                self.center.y() - 0.5 * max_size.get(),
-                self.center.z() - 0.5 * max_size.get(),
+                self.center.x() - 0.5 * *max_size,
+                self.center.y() - 0.5 * *max_size,
+                self.center.z() - 0.5 * *max_size,
             ),
             &Point3D::new(
-                self.center.x() + 0.5 * max_size.get(),
-                self.center.y() + 0.5 * max_size.get(),
-                self.center.z() + 0.5 * max_size.get(),
+                self.center.x() + 0.5 * *max_size,
+                self.center.y() + 0.5 * *max_size,
+                self.center.z() + 0.5 * *max_size,
             ),
         )
         .unwrap() //@todo unwrap, see above

@@ -127,7 +127,7 @@ where
     T: Is2D,
 {
     fn is_allowed(&self, p: &T) -> bool {
-        dist_2d(p, &self.circle.center) <= self.circle.radius.get()
+        dist_2d(p, &self.circle.center) <= *self.circle.radius
     }
 }
 

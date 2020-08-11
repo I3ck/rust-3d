@@ -65,9 +65,9 @@ pub trait IsEditable3D: Is3D + IsEditableND {
     where
         P: Is3D,
     {
-        let x = other.x() + factor.get() * (self.x() - other.x());
-        let y = other.y() + factor.get() * (self.y() - other.y());
-        let z = other.z() + factor.get() * (self.z() - other.z());
+        let x = other.x() + *factor * (self.x() - other.x());
+        let y = other.y() + *factor * (self.y() - other.y());
+        let z = other.z() + *factor * (self.z() - other.z());
 
         self.set_xyz(x, y, z);
     }

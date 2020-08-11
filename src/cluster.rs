@@ -61,7 +61,7 @@ where
 
         let bb = bb_all?;
         let (start_x, start_y) = (bb.min_p().x(), bb.min_p().y());
-        let (size_x, size_y) = (bb.size_x().get(), bb.size_y().get());
+        let (size_x, size_y) = (*bb.size_x(), *bb.size_y());
         let (incr_x, incr_y) = (size_x / count_x as f64, size_y / count_y as f64);
 
         for (i, x) in data.iter().enumerate() {

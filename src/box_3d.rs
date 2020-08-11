@@ -41,17 +41,17 @@ impl Box3D {
     /// Returns the minimum position of the box
     pub fn min_p(&self) -> Point3D {
         Point3D::new(
-            self.center.x() - 0.5 * self.size_x.get(),
-            self.center.y() - 0.5 * self.size_y.get(),
-            self.center.z() - 0.5 * self.size_z.get(),
+            self.center.x() - 0.5 * *self.size_x,
+            self.center.y() - 0.5 * *self.size_y,
+            self.center.z() - 0.5 * *self.size_z,
         )
     }
     /// Returns the maximum position of the box
     pub fn max_p(&self) -> Point3D {
         Point3D::new(
-            self.center.x() + 0.5 * self.size_x.get(),
-            self.center.y() + 0.5 * self.size_y.get(),
-            self.center.z() + 0.5 * self.size_z.get(),
+            self.center.x() + 0.5 * *self.size_x,
+            self.center.y() + 0.5 * *self.size_y,
+            self.center.z() + 0.5 * *self.size_z,
         )
     }
     /// Returns the sizes of the bounding box
@@ -176,14 +176,14 @@ impl IsEditable3D for Box3D {
 impl HasBoundingBox3D for Box3D {
     fn bounding_box(&self) -> BoundingBox3D {
         let p_min = Point3D {
-            x: self.center.x() - self.size_x.get() / 2.0,
-            y: self.center.y() - self.size_y.get() / 2.0,
-            z: self.center.z() - self.size_z.get() / 2.0,
+            x: self.center.x() - *self.size_x / 2.0,
+            y: self.center.y() - *self.size_y / 2.0,
+            z: self.center.z() - *self.size_z / 2.0,
         };
         let p_max = Point3D {
-            x: self.center.x() + self.size_x.get() / 2.0,
-            y: self.center.y() + self.size_y.get() / 2.0,
-            z: self.center.z() + self.size_z.get() / 2.0,
+            x: self.center.x() + *self.size_x / 2.0,
+            y: self.center.y() + *self.size_y / 2.0,
+            z: self.center.z() + *self.size_z / 2.0,
         };
         BoundingBox3D::new(&p_min, &p_max).unwrap() // safe
     }

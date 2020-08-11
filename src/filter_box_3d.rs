@@ -138,12 +138,12 @@ where
     T: Is3D,
 {
     fn is_allowed(&self, p: &T) -> bool {
-        p.x() >= self.box_3d.x() - self.box_3d.size_x.get() / 2.0
-            && p.x() <= self.box_3d.x() + self.box_3d.size_x.get() / 2.0
-            && p.y() >= self.box_3d.y() - self.box_3d.size_y.get() / 2.0
-            && p.y() <= self.box_3d.y() + self.box_3d.size_y.get() / 2.0
-            && p.z() >= self.box_3d.z() - self.box_3d.size_z.get() / 2.0
-            && p.z() <= self.box_3d.z() + self.box_3d.size_z.get() / 2.0
+        p.x() >= self.box_3d.x() - *self.box_3d.size_x / 2.0
+            && p.x() <= self.box_3d.x() + *self.box_3d.size_x / 2.0
+            && p.y() >= self.box_3d.y() - *self.box_3d.size_y / 2.0
+            && p.y() <= self.box_3d.y() + *self.box_3d.size_y / 2.0
+            && p.z() >= self.box_3d.z() - *self.box_3d.size_z / 2.0
+            && p.z() <= self.box_3d.z() + *self.box_3d.size_z / 2.0
     }
 }
 

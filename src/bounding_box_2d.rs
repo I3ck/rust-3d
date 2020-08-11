@@ -195,10 +195,9 @@ impl BoundingBox2D {
     }
     /// Tests whether this bounding box and the other overlap in any way
     pub fn collides_with(&self, other: &BoundingBox2D) -> bool {
-        2.0 * (self.center_bb().x - other.center_bb().x).abs()
-            < ((self.size_x() + other.size_x()).get())
+        2.0 * (self.center_bb().x - other.center_bb().x).abs() < *(self.size_x() + other.size_x())
             && 2.0 * (self.center_bb().y - other.center_bb().y).abs()
-                < ((self.size_y() + other.size_y()).get())
+                < *(self.size_y() + other.size_y())
     }
     /// Tests whether this bounding box crosses a certain x value
     pub fn crossing_x_value(&self, x: f64) -> bool {
@@ -320,10 +319,10 @@ impl HasDistanceTo<BoundingBox2D> for BoundingBox2D {
 impl IsScalable for BoundingBox2D {
     fn scale(&mut self, factor: Positive) {
         let c = self.center_bb();
-        let min_x = c.x - (0.5 * factor.get() * self.size_x().get());
-        let max_x = c.x + (0.5 * factor.get() * self.size_x().get());
-        let min_y = c.y - (0.5 * factor.get() * self.size_y().get());
-        let max_y = c.y + (0.5 * factor.get() * self.size_y().get());
+        let min_x = c.x - (0.5 * *factor * *self.size_x());
+        let max_x = c.x + (0.5 * *factor * *self.size_x());
+        let min_y = c.y - (0.5 * *factor * *self.size_y());
+        let max_y = c.y + (0.5 * *factor * *self.size_y());
 
         self.min.set_xy(min_x, min_y);
         self.max.set_xy(max_x, max_y);

@@ -44,9 +44,9 @@ where
     let [sx, sy, sz] = bb.sizes();
     let min = P::new_from(&bb.min_p());
     let (nx, ny, nz) = (
-        (sx.get() / cluster_size) as usize,
-        (sy.get() / cluster_size) as usize,
-        (sz.get() / cluster_size) as usize,
+        (*sx / cluster_size) as usize,
+        (*sy / cluster_size) as usize,
+        (*sz / cluster_size) as usize,
     );
     if nx < 2 || ny < 2 || nz < 2 {
         return Err(ErrorKind::ClusterTooBig);

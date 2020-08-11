@@ -70,7 +70,7 @@ impl NonNegative {
 
 impl From<Positive> for NonNegative {
     fn from(x: Positive) -> Self {
-        NonNegative { val: x.get() }
+        NonNegative { val: *x }
     }
 }
 
@@ -98,7 +98,7 @@ impl Add<Positive> for NonNegative {
 
     fn add(self, other: Positive) -> NonNegative {
         NonNegative {
-            val: self.val + other.get(),
+            val: self.val + *other,
         }
     }
 }
@@ -111,7 +111,7 @@ impl AddAssign for NonNegative {
 
 impl AddAssign<Positive> for NonNegative {
     fn add_assign(&mut self, other: Positive) {
-        self.val += other.get();
+        self.val += *other;
     }
 }
 
@@ -130,7 +130,7 @@ impl Mul<Positive> for NonNegative {
 
     fn mul(self, other: Positive) -> NonNegative {
         NonNegative {
-            val: self.val * other.get(),
+            val: self.val * *other,
         }
     }
 }
@@ -143,7 +143,7 @@ impl MulAssign for NonNegative {
 
 impl MulAssign<Positive> for NonNegative {
     fn mul_assign(&mut self, other: Positive) {
-        self.val *= other.get();
+        self.val *= *other;
     }
 }
 
@@ -162,7 +162,7 @@ impl Div<Positive> for NonNegative {
 
     fn div(self, other: Positive) -> NonNegative {
         NonNegative {
-            val: self.val / other.get(),
+            val: self.val / *other,
         }
     }
 }
@@ -175,7 +175,7 @@ impl DivAssign for NonNegative {
 
 impl DivAssign<Positive> for NonNegative {
     fn div_assign(&mut self, other: Positive) {
-        self.val /= other.get();
+        self.val /= *other;
     }
 }
 

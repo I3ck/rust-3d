@@ -128,10 +128,10 @@ where
     T: Is2D,
 {
     fn is_allowed(&self, p: &T) -> bool {
-        p.x() >= self.box_2d.x() - self.box_2d.size_x.get() / 2.0
-            && p.x() <= self.box_2d.x() + self.box_2d.size_x.get() / 2.0
-            && p.y() >= self.box_2d.y() - self.box_2d.size_y.get() / 2.0
-            && p.y() <= self.box_2d.y() + self.box_2d.size_y.get() / 2.0
+        p.x() >= self.box_2d.x() - *self.box_2d.size_x / 2.0
+            && p.x() <= self.box_2d.x() + *self.box_2d.size_x / 2.0
+            && p.y() >= self.box_2d.y() - *self.box_2d.size_y / 2.0
+            && p.y() <= self.box_2d.y() + *self.box_2d.size_y / 2.0
     }
 }
 

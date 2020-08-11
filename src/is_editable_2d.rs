@@ -45,8 +45,8 @@ pub trait IsEditable2D: Is2D + IsEditableND {
     where
         P: Is2D,
     {
-        let x = other.x() + factor.get() * (self.x() - other.x());
-        let y = other.y() + factor.get() * (self.y() - other.y());
+        let x = other.x() + *factor * (self.x() - other.x());
+        let y = other.y() + *factor * (self.y() - other.y());
 
         self.set_xy(x, y);
     }

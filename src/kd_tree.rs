@@ -280,7 +280,7 @@ where
     }
 
     pub fn in_sphere(&self, sphere: &Sphere, pc: &mut Vec<P>) {
-        if dist_3d(&sphere.center, &self.val) <= sphere.radius.get() {
+        if dist_3d(&sphere.center, &self.val) <= *sphere.radius {
             pc.push(self.val.clone());
         }
 
@@ -312,8 +312,8 @@ where
             _ => (sphere.z(), self.val.z()),
         };
 
-        let border_left = current_search - sphere.radius.get();
-        let border_right = current_search + sphere.radius.get();
+        let border_left = current_search - *sphere.radius;
+        let border_right = current_search + *sphere.radius;
 
         match comp {
             Ok(res) => match res {
@@ -342,9 +342,9 @@ where
             dimension_dist(&box_3d.center, &self.val, 1),
             dimension_dist(&box_3d.center, &self.val, 2),
         ) {
-            if dist_x <= 0.5 * box_3d.size_x.get()
-                && dist_y <= 0.5 * box_3d.size_y.get()
-                && dist_z <= 0.5 * box_3d.size_z.get()
+            if dist_x <= 0.5 * *box_3d.size_x
+                && dist_y <= 0.5 * *box_3d.size_y
+                && dist_z <= 0.5 * *box_3d.size_z
             {
                 pc.push(self.val.clone());
             }
@@ -371,14 +371,14 @@ where
                 Err(_) => {}
             }
 
-            let (current_search, current_val, ref current_size) = match self.dimension {
-                0 => (box_3d.x(), self.val.x(), &box_3d.size_x),
-                1 => (box_3d.y(), self.val.y(), &box_3d.size_y),
-                _ => (box_3d.z(), self.val.z(), &box_3d.size_z),
+            let (current_search, current_val, current_size) = match self.dimension {
+                0 => (box_3d.x(), self.val.x(), box_3d.size_x),
+                1 => (box_3d.y(), self.val.y(), box_3d.size_y),
+                _ => (box_3d.z(), self.val.z(), box_3d.size_z),
             };
 
-            let border_left = current_search - 0.5 * current_size.get();
-            let border_right = current_search + 0.5 * current_size.get();
+            let border_left = current_search - 0.5 * *current_size;
+            let border_right = current_search + 0.5 * *current_size;
 
             match comp {
                 Ok(res) => match res {

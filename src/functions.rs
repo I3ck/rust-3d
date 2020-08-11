@@ -226,9 +226,9 @@ where
 {
     if let Some(bb) = x.bounding_box_maybe() {
         let m = Matrix4::scale(
-            size[0].get() / bb.size_x().get(),
-            size[1].get() / bb.size_y().get(),
-            size[2].get() / bb.size_z().get(),
+            *size[0] / *bb.size_x(),
+            *size[1] / *bb.size_y(),
+            *size[2] / *bb.size_z(),
         );
         x.transform(&m);
     }

@@ -34,8 +34,8 @@ where
     P: IsBuildable2D,
 {
     let mut pc = PointCloud2D::with_capacity(4);
-    let w = width.get();
-    let h = height.get();
+    let w = *width;
+    let h = *height;
     pc.push(P::new(center.x() - w / 2.0, center.y() - h / 2.0));
     pc.push(P::new(center.x() + w / 2.0, center.y() - h / 2.0));
     pc.push(P::new(center.x() + w / 2.0, center.y() + h / 2.0));
@@ -55,7 +55,7 @@ where
     P: IsBuildable2D,
 {
     let mut pc = PointCloud2D::with_capacity(n_points);
-    let d = diameter.get();
+    let d = *diameter;
     let p_dist = (end.0 - start.0).abs() / (n_points - 1) as f64;
 
     for i in 0..n_points {
@@ -80,7 +80,7 @@ where
     P: IsBuildable2D,
 {
     let mut pc = PointCloud2D::with_capacity(n_points);
-    let d = diameter.get();
+    let d = *diameter;
     let p_dist = (end.0 - start.0).abs() / (n_points - 1) as f64;
 
     for i in 0..n_points {
@@ -100,8 +100,8 @@ where
 {
     let mut pc = PointCloud2D::with_capacity(n_points);
     let p_dist = PI / (n_points - 1) as f64;
-    let a = ap.get();
-    let b = bp.get();
+    let a = *ap;
+    let b = *bp;
     let angle: f64 = 0.0;
 
     for i in 0..n_points {

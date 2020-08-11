@@ -136,7 +136,7 @@ where
     T: Is3D,
 {
     fn is_allowed(&self, p: &T) -> bool {
-        dist_3d(p, &self.sphere.center) <= self.sphere.radius.get()
+        dist_3d(p, &self.sphere.center) <= *self.sphere.radius
     }
 }
 

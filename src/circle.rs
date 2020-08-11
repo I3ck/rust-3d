@@ -129,12 +129,12 @@ impl IsEditable2D for Circle {
 impl HasBoundingBox2D for Circle {
     fn bounding_box(&self) -> BoundingBox2D {
         let p_min = Point2D {
-            x: self.center.x() - self.radius.get(),
-            y: self.center.y() - self.radius.get(),
+            x: self.center.x() - *self.radius,
+            y: self.center.y() - *self.radius,
         };
         let p_max = Point2D {
-            x: self.center.x() + self.radius.get(),
-            y: self.center.y() + self.radius.get(),
+            x: self.center.x() + *self.radius,
+            y: self.center.y() + *self.radius,
         };
         BoundingBox2D::new(&p_min, &p_max).unwrap() // safe
     }
