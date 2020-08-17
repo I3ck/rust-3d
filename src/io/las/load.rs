@@ -29,38 +29,112 @@ use super::types::*;
 use std::{
     convert::{TryFrom, TryInto},
     io::{BufRead, Read, Seek, SeekFrom},
+    iter::FusedIterator,
+    marker::PhantomData,
 };
 
 use super::super::from_bytes::*;
 
 //------------------------------------------------------------------------------
 
-/// Loads points from .las file into IsPushable<IsBuildable3D>
-pub fn load_las<IP, P, R>(read: &mut R, ip: &mut IP) -> LasResult<()>
+/// Iterator to incrementally load a .las file
+pub struct LasIterator<IP, P, R>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-    let header_raw = load_header(read)?;
-    let header = Header::try_from(header_raw)?;
+    read: R,
+    current: usize,
+    header: Header,
+    buffer: Vec<u8>,
+    phantom_ip: PhantomData<IP>,
+    phantom_p: PhantomData<P>,
+}
 
-    ip.reserve(header.n_point_records as usize);
+impl<IP, P, R> LasIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead + Seek,
+{
+    pub fn new(mut read: R) -> LasResult<Self> {
+        let header_raw = load_header(&mut read)?;
+        let header = Header::try_from(header_raw)?;
 
-    read.seek(SeekFrom::Start(header.offset_point_data as u64))?;
+        read.seek(SeekFrom::Start(header.offset_point_data as u64))?;
 
-    let mut buffer = vec![0u8; header.point_record_length as usize];
+        let buffer = vec![0u8; header.point_record_length as usize];
 
-    for _ in 0..header.n_point_records {
-        read.read_exact(&mut buffer)?;
+        Ok(Self {
+            read,
+            current: 0,
+            header,
+            buffer,
+            phantom_ip: PhantomData,
+            phantom_p: PhantomData,
+        })
+    }
 
-        let pd = PointData::from_bytes(buffer[0..12].try_into()?);
+    //@todo trait
+    pub fn n_points(&self) -> usize {
+        self.header.n_point_records as usize
+    }
 
-        let x = header.offset_x + (pd.x as f64 * header.scale_factor_x);
-        let y = header.offset_y + (pd.y as f64 * header.scale_factor_y);
-        let z = header.offset_z + (pd.z as f64 * header.scale_factor_z);
+    #[inline(always)]
+    fn fetch_one(&mut self) -> LasResult<P> {
+        self.read.read_exact(&mut self.buffer)?;
 
-        ip.push(P::new(x, y, z))
+        let pd = PointData::from_bytes(self.buffer[0..12].try_into()?);
+
+        let x = self.header.offset_x + (pd.x as f64 * self.header.scale_factor_x);
+        let y = self.header.offset_y + (pd.y as f64 * self.header.scale_factor_y);
+        let z = self.header.offset_z + (pd.z as f64 * self.header.scale_factor_z);
+
+        Ok(P::new(x, y, z))
+    }
+}
+
+impl<IP, P, R> Iterator for LasIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead + Seek,
+{
+    type Item = LasResult<P>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current < self.header.n_point_records as usize {
+            self.current += 1;
+            Some(self.fetch_one())
+        } else {
+            None
+        }
+    }
+}
+
+impl<IP, P, R> FusedIterator for LasIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead + Seek,
+{
+}
+
+//------------------------------------------------------------------------------
+
+/// Loads points from .las file into IsPushable<IsBuildable3D>
+pub fn load_las<IP, P, R>(read: R, ip: &mut IP) -> LasResult<()>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead + Seek,
+{
+    let iterator = LasIterator::<IP, P, R>::new(read)?;
+
+    ip.reserve(iterator.n_points());
+
+    for p in iterator {
+        ip.push(p?);
     }
 
     Ok(())
