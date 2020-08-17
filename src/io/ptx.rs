@@ -27,85 +27,136 @@ use crate::*;
 use std::{
     fmt,
     io::{BufRead, Error as ioError},
+    iter::FusedIterator,
+    marker::PhantomData,
 };
 
 use super::{types::*, utils::*};
 
+//@todo before the Iterator rework it was possible to reserve the point count per header
+
 //------------------------------------------------------------------------------
 
-/// Loads points from .ptx file into IsPushable<Is3D>
-pub fn load_ptx<IP, P, R>(read: &mut R, ip: &mut IP) -> PtxResult<()>
+/// Iterator to incrementally load a .ptx file
+pub struct PtxIterator<IP, P, R>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D + IsMatrix4Transformable,
     R: BufRead,
 {
-    let mut i_line = 0;
-    let mut line_buffer = Vec::new();
+    read: R,
+    i_line: usize,
+    line_buffer: Vec<u8>,
+    n_points_to_fetch: usize,
+    must_transform: bool,
+    transformation: Matrix4,
+    phantom_ip: PhantomData<IP>,
+    phantom_p: PhantomData<P>,
+}
 
-    let mut line: &[u8];
+impl<IP, P, R> PtxIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D + IsMatrix4Transformable,
+    R: BufRead,
+{
+    pub fn new(read: R) -> Self {
+        Self {
+            read,
+            i_line: 0,
+            line_buffer: Vec::new(),
+            n_points_to_fetch: 0,
+            must_transform: false,
+            transformation: Matrix4::identity(),
+            phantom_ip: PhantomData,
+            phantom_p: PhantomData,
+        }
+    }
 
-    loop {
-        let columns: usize;
-        {
-            let first_line = fetch_line(read, &mut line_buffer);
-            if first_line.is_err() {
-                break;
-            }
-            i_line += 1;
+    #[inline(always)]
+    fn fetch_one(
+        i_line: usize,
+        line: &[u8],
+        must_transform: bool,
+        transformation: &Matrix4,
+    ) -> PtxResult<P> {
+        let mut words = to_words_skip_empty(line);
 
-            columns = from_ascii(first_line.as_ref().unwrap())
-                .ok_or(PtxError::Columns)
-                .index(i_line)?;
-            // safe, since first_line being err causing break
+        let x = words
+            .next()
+            .and_then(|w| from_ascii(w))
+            .ok_or(PtxError::Point)
+            .line(i_line, line)?;
+        let y = words
+            .next()
+            .and_then(|w| from_ascii(w))
+            .ok_or(PtxError::Point)
+            .line(i_line, line)?;
+        let z = words
+            .next()
+            .and_then(|w| from_ascii(w))
+            .ok_or(PtxError::Point)
+            .line(i_line, line)?;
+
+        let mut p = P::new(x, y, z);
+
+        if must_transform {
+            p.transform(transformation)
         }
 
-        line = fetch_line(read, &mut line_buffer).index(i_line)?;
-        i_line += 1;
+        Ok(p)
+    }
 
-        let rows: usize = from_ascii(line).ok_or(PtxError::Rows).line(i_line, line)?;
+    #[inline(always)]
+    fn fetch_header(&mut self, columns: usize) -> PtxResult<()> {
+        let mut line = fetch_line(&mut self.read, &mut self.line_buffer).index(self.i_line)?;
+        self.i_line += 1;
+
+        let rows: usize = from_ascii(line)
+            .ok_or(PtxError::Rows)
+            .line(self.i_line, line)?;
 
         // skip scanner position line
-        fetch_line(read, &mut line_buffer).index(i_line)?;
-        i_line += 1;
+        fetch_line(&mut self.read, &mut self.line_buffer).index(self.i_line)?;
+        self.i_line += 1;
 
         // skip scanner x-axis line
-        fetch_line(read, &mut line_buffer).index(i_line)?;
-        i_line += 1;
+        fetch_line(&mut self.read, &mut self.line_buffer).index(self.i_line)?;
+        self.i_line += 1;
 
         // skip scanner y-axis line
-        fetch_line(read, &mut line_buffer).index(i_line)?;
-        i_line += 1;
+        fetch_line(&mut self.read, &mut self.line_buffer).index(self.i_line)?;
+        self.i_line += 1;
 
         // skip scanner z-axis line
-        fetch_line(read, &mut line_buffer).index(i_line)?;
-        i_line += 1;
+        fetch_line(&mut self.read, &mut self.line_buffer).index(self.i_line)?;
+        self.i_line += 1;
 
-        line = fetch_line(read, &mut line_buffer).index(i_line)?;
-        i_line += 1;
+        line = fetch_line(&mut self.read, &mut self.line_buffer).index(self.i_line)?;
+        self.i_line += 1;
         let [m11, m12, m13, m14] = read_matrix_row(line)
             .ok_or(PtxError::Matrix)
-            .line(i_line, line)?;
+            .line(self.i_line, line)?;
 
-        line = fetch_line(read, &mut line_buffer).index(i_line)?;
-        i_line += 1;
+        line = fetch_line(&mut self.read, &mut self.line_buffer).index(self.i_line)?;
+        self.i_line += 1;
         let [m21, m22, m23, m24] = read_matrix_row(line)
             .ok_or(PtxError::Matrix)
-            .line(i_line, line)?;
+            .line(self.i_line, line)?;
 
-        line = fetch_line(read, &mut line_buffer).index(i_line)?;
-        i_line += 1;
+        line = fetch_line(&mut self.read, &mut self.line_buffer).index(self.i_line)?;
+        self.i_line += 1;
         let [m31, m32, m33, m34] = read_matrix_row(line)
             .ok_or(PtxError::Matrix)
-            .line(i_line, line)?;
+            .line(self.i_line, line)?;
 
-        line = fetch_line(read, &mut line_buffer).index(i_line)?;
-        i_line += 1;
+        line = fetch_line(&mut self.read, &mut self.line_buffer).index(self.i_line)?;
+        self.i_line += 1;
         let [m41, m42, m43, m44] = read_matrix_row(line)
             .ok_or(PtxError::Matrix)
-            .line(i_line, line)?;
+            .line(self.i_line, line)?;
 
-        let m = Matrix4 {
+        self.transformation = Matrix4 {
             data: [
                 [m11, m12, m13, m14],
                 [m21, m22, m23, m24],
@@ -114,41 +165,81 @@ where
             ],
         };
 
-        let must_transform = m != Matrix4::identity();
+        self.must_transform = self.transformation != Matrix4::identity();
 
-        let n = columns * rows;
+        self.n_points_to_fetch = rows * columns;
 
-        ip.reserve(n);
+        Ok(())
+    }
+}
 
-        for _ in 0..n {
-            line = fetch_line(read, &mut line_buffer).index(i_line)?;
-            i_line += 1;
-
-            let mut words = to_words_skip_empty(line);
-
-            let x = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PtxError::Point)
-                .line(i_line, line)?;
-            let y = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PtxError::Point)
-                .line(i_line, line)?;
-            let z = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PtxError::Point)
-                .line(i_line, line)?;
-
-            let mut p = P::new(x, y, z);
-
-            if must_transform {
-                p.transform(&m)
+impl<IP, P, R> Iterator for PtxIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D + IsMatrix4Transformable,
+    R: BufRead,
+{
+    type Item = PtxResult<P>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.n_points_to_fetch == 0 {
+            let first_line = fetch_line(&mut self.read, &mut self.line_buffer);
+            if first_line.is_err() {
+                return None;
             }
-            ip.push(p)
+            self.i_line += 1;
+            // unwrap safe, is_err() checked above
+            match from_ascii(first_line.as_ref().unwrap())
+                .ok_or(PtxError::Columns)
+                .index(self.i_line)
+                .and_then(|columns| self.fetch_header(columns))
+            {
+                Ok(()) => (),
+                Err(e) => return Some(Err(e)),
+            }
         }
+
+        // makes sense to check again, since fetch_header might update this
+        if self.n_points_to_fetch > 0 {
+            self.n_points_to_fetch -= 1;
+            match fetch_line(&mut self.read, &mut self.line_buffer).index(self.i_line) {
+                Ok(line) => {
+                    self.i_line += 1;
+                    Some(Self::fetch_one(
+                        self.i_line,
+                        line,
+                        self.must_transform,
+                        &self.transformation,
+                    ))
+                }
+                Err(e) => Some(Err(e.into())),
+            }
+        } else {
+            None
+        }
+    }
+}
+
+impl<IP, P, R> FusedIterator for PtxIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D + IsMatrix4Transformable,
+    R: BufRead,
+{
+}
+
+//------------------------------------------------------------------------------
+
+/// Loads points from .ptx file into IsPushable<Is3D>
+pub fn load_ptx<IP, P, R>(read: R, ip: &mut IP) -> PtxResult<()>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D + IsMatrix4Transformable,
+    R: BufRead,
+{
+    let iterator = PtxIterator::<IP, P, R>::new(read);
+
+    for p in iterator {
+        ip.push(p?)
     }
 
     Ok(())
