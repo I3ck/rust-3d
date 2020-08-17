@@ -33,8 +33,6 @@ use std::{
 
 use super::{types::*, utils::*};
 
-//@todo before the Iterator rework it was possible to reserve the point count per header
-
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .ptx file
@@ -179,7 +177,7 @@ where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: BufRead,
 {
-    type Item = PtxResult<P>;
+    type Item = PtxResult<ReserveOrData<P>>;
     fn next(&mut self) -> Option<Self::Item> {
         if self.n_points_to_fetch == 0 {
             let first_line = fetch_line(&mut self.read, &mut self.line_buffer);
@@ -193,23 +191,23 @@ where
                 .index(self.i_line)
                 .and_then(|columns| self.fetch_header(columns))
             {
-                Ok(()) => (),
+                Ok(()) => return Some(Ok(ReserveOrData::Reserve(self.n_points_to_fetch))),
                 Err(e) => return Some(Err(e)),
             }
-        }
-
-        // makes sense to check again, since fetch_header might update this
-        if self.n_points_to_fetch > 0 {
+        } else if self.n_points_to_fetch > 0 {
             self.n_points_to_fetch -= 1;
             match fetch_line(&mut self.read, &mut self.line_buffer).index(self.i_line) {
                 Ok(line) => {
                     self.i_line += 1;
-                    Some(Self::fetch_one(
-                        self.i_line,
-                        line,
-                        self.must_transform,
-                        &self.transformation,
-                    ))
+                    Some(
+                        Self::fetch_one(
+                            self.i_line,
+                            line,
+                            self.must_transform,
+                            &self.transformation,
+                        )
+                        .map(|x| ReserveOrData::Data(x)),
+                    )
                 }
                 Err(e) => Some(Err(e.into())),
             }
@@ -238,8 +236,11 @@ where
 {
     let iterator = PtxIterator::<IP, P, R>::new(read);
 
-    for p in iterator {
-        ip.push(p?)
+    for rd in iterator {
+        match rd? {
+            ReserveOrData::Reserve(x) => ip.reserve(x),
+            ReserveOrData::Data(x) => ip.push(x),
+        }
     }
 
     Ok(())

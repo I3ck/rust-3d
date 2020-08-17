@@ -38,6 +38,13 @@ pub trait LineInfoResult<T, E>: Sized {
 
 //------------------------------------------------------------------------------
 
+pub enum ReserveOrData<T> {
+    Reserve(usize),
+    Data(T),
+}
+
+//------------------------------------------------------------------------------
+
 /// Wrapper type with additional line information
 #[derive(Debug)]
 pub enum WithLineInfo<T> {
