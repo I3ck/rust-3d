@@ -35,10 +35,6 @@ use super::{types::*, utils::*};
 
 //------------------------------------------------------------------------------
 
-//@todo before the Iterator rework it was possible to reserve the point count per block
-
-//------------------------------------------------------------------------------
-
 /// Iterator to incrementally load a .pts file
 pub struct PtsIterator<IP, P, R>
 where
@@ -105,7 +101,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = PtsResult<P>;
+    type Item = PtsResult<ReserveOrData<P>>;
     fn next(&mut self) -> Option<Self::Item> {
         while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
             self.i_line += 1;
@@ -126,11 +122,15 @@ where
                         Ok(n) => Some(n),
                         Err(e) => return Some(Err(e)),
                     };
+                    // unwrap safe since assigned above
+                    return Some(Ok(ReserveOrData::Reserve(self.n_vertices.unwrap())));
                 }
                 Some(n) => {
                     if self.n_vertices_added < n {
                         self.n_vertices_added += 1;
-                        return Some(Self::fetch_one(self.i_line, line));
+                        return Some(
+                            Self::fetch_one(self.i_line, line).map(|x| ReserveOrData::Data(x)),
+                        );
                     } else {
                         // New block
                         self.n_vertices_added = 0;
@@ -144,6 +144,8 @@ where
                             Ok(n) => Some(n),
                             Err(e) => return Some(Err(e)),
                         };
+                        // unwrap safe since assigned above
+                        return Some(Ok(ReserveOrData::Reserve(self.n_vertices.unwrap())));
                     }
                 }
             }
@@ -169,8 +171,11 @@ where
 {
     let iterator = PtsIterator::<IP, P, R>::new(read);
 
-    for p in iterator {
-        ip.push(p?)
+    for rd in iterator {
+        match rd? {
+            ReserveOrData::Reserve(x) => ip.reserve(x),
+            ReserveOrData::Data(x) => ip.push(x),
+        }
     }
 
     Ok(())
