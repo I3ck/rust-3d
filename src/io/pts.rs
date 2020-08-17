@@ -27,83 +27,150 @@ use crate::*;
 use std::{
     fmt,
     io::{BufRead, Error as ioError},
+    iter::FusedIterator,
+    marker::PhantomData,
 };
 
 use super::{types::*, utils::*};
 
 //------------------------------------------------------------------------------
 
-/// Loads IsPushable<Is3D> from the .pts file format
-pub fn load_pts<IP, P, R>(read: &mut R, ip: &mut IP) -> PtsResult<()>
+//@todo before the Iterator rework it was possible to reserve the point count per block
+
+//------------------------------------------------------------------------------
+
+/// Iterator to incrementally load a .pts file
+pub struct PtsIterator<IP, P, R>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
-    let mut line_buffer = Vec::new();
-    let mut i_line = 0;
+    read: R,
+    i_line: usize,
+    line_buffer: Vec<u8>,
+    n_vertices: Option<usize>,
+    n_vertices_added: usize,
+    phantom_ip: PhantomData<IP>,
+    phantom_p: PhantomData<P>,
+}
 
-    let mut n_vertices = None;
-    let mut n_added = 0;
-
-    while let Ok(line) = fetch_line(read, &mut line_buffer) {
-        i_line += 1;
-
-        if line.is_empty() {
-            continue;
+impl<IP, P, R> PtsIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    pub fn new(read: R) -> Self {
+        Self {
+            read,
+            i_line: 0,
+            line_buffer: Vec::new(),
+            n_vertices: None,
+            n_vertices_added: 0,
+            phantom_ip: PhantomData,
+            phantom_p: PhantomData,
         }
+    }
 
-        match n_vertices {
-            None => {
-                let mut words = to_words_skip_empty(line);
-                n_vertices = Some(
-                    words
+    #[inline(always)]
+    pub fn fetch_one(i_line: usize, line: &[u8]) -> PtsResult<P> {
+        let mut words = to_words_skip_empty(line);
+
+        let x = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(PtsError::Vertex)
+            .line(i_line, line)?;
+
+        let y = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(PtsError::Vertex)
+            .line(i_line, line)?;
+
+        let z = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(PtsError::Vertex)
+            .line(i_line, line)?;
+
+        Ok(P::new(x, y, z))
+    }
+}
+
+impl<IP, P, R> Iterator for PtsIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    type Item = PtsResult<P>;
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+            self.i_line += 1;
+
+            if line.is_empty() {
+                continue;
+            }
+
+            match self.n_vertices {
+                None => {
+                    let mut words = to_words_skip_empty(line);
+                    self.n_vertices = match words
                         .next()
                         .and_then(|word| from_ascii(word))
                         .ok_or(PtsError::VertexCount)
-                        .line(i_line, line)?,
-                );
-                ip.reserve(n_vertices.unwrap());
-            }
-            Some(n) => {
-                if n_added < n {
-                    let mut words = to_words_skip_empty(line);
-
-                    let x = words
-                        .next()
-                        .and_then(|word| from_ascii(word))
-                        .ok_or(PtsError::Vertex)
-                        .line(i_line, line)?;
-
-                    let y = words
-                        .next()
-                        .and_then(|word| from_ascii(word))
-                        .ok_or(PtsError::Vertex)
-                        .line(i_line, line)?;
-
-                    let z = words
-                        .next()
-                        .and_then(|word| from_ascii(word))
-                        .ok_or(PtsError::Vertex)
-                        .line(i_line, line)?;
-
-                    ip.push(P::new(x, y, z));
-                    n_added += 1;
-                } else {
-                    // New block
-                    n_added = 0;
-                    let mut words = to_words_skip_empty(line);
-                    n_vertices = Some(
-                        words
+                        .line(self.i_line, line)
+                    {
+                        Ok(n) => Some(n),
+                        Err(e) => return Some(Err(e)),
+                    };
+                }
+                Some(n) => {
+                    if self.n_vertices_added < n {
+                        self.n_vertices_added += 1;
+                        return Some(Self::fetch_one(self.i_line, line));
+                    } else {
+                        // New block
+                        self.n_vertices_added = 0;
+                        let mut words = to_words_skip_empty(line);
+                        self.n_vertices = match words
                             .next()
                             .and_then(|word| from_ascii(word))
                             .ok_or(PtsError::VertexCount)
-                            .line(i_line, line)?,
-                    );
-                    ip.reserve(n_vertices.unwrap());
+                            .line(self.i_line, line)
+                        {
+                            Ok(n) => Some(n),
+                            Err(e) => return Some(Err(e)),
+                        };
+                    }
                 }
             }
         }
+        None
+    }
+}
+
+impl<IP, P, R> FusedIterator for PtsIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+}
+
+/// Loads IsPushable<Is3D> from the .pts file format
+pub fn load_pts<IP, P, R>(read: R, ip: &mut IP) -> PtsResult<()>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    let iterator = PtsIterator::<IP, P, R>::new(read);
+
+    for p in iterator {
+        ip.push(p?)
     }
 
     Ok(())
