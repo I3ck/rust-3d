@@ -27,9 +27,109 @@ use crate::*;
 use std::{
     fmt,
     io::{BufRead, Error as ioError, Write},
+    iter::FusedIterator,
+    marker::PhantomData,
 };
 
 use super::{types::*, utils::*};
+
+//------------------------------------------------------------------------------
+
+/// Iterator to incrementally load a .xy file
+pub struct XyIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable2D,
+    R: BufRead,
+{
+    read: R,
+    i_line: usize,
+    line_buffer: Vec<u8>,
+    delim_determined: bool,
+    delim: u8,
+    phantom_ip: PhantomData<IP>,
+    phantom_p: PhantomData<P>,
+}
+
+impl<IP, P, R> XyIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable2D,
+    R: BufRead,
+{
+    pub fn new(read: R) -> Self {
+        Self {
+            read,
+            i_line: 0,
+            line_buffer: Vec::new(),
+            delim_determined: false,
+            delim: 0,
+            phantom_ip: PhantomData,
+            phantom_p: PhantomData,
+        }
+    }
+
+    #[inline(always)]
+    fn fetch_one(
+        delim_determined: &mut bool,
+        delim: &mut u8,
+        i_line: usize,
+        line: &[u8],
+    ) -> XyIOResult<P> {
+        if !*delim_determined {
+            *delim = estimate_delimiter(1, &line)
+                .ok_or(XyError::EstimateDelimiter)
+                .line(i_line, line)?;
+            *delim_determined = true;
+        }
+
+        let mut words = line.split(|x| *x == *delim).skip_empty();
+
+        let x = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(XyError::Vertex)
+            .line(i_line, line)?;
+
+        let y = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(XyError::Vertex)
+            .line(i_line, line)?;
+
+        Ok(P::new(x, y))
+    }
+}
+
+impl<IP, P, R> Iterator for XyIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable2D,
+    R: BufRead,
+{
+    type Item = XyIOResult<P>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+            self.i_line += 1;
+            Some(Self::fetch_one(
+                &mut self.delim_determined,
+                &mut self.delim,
+                self.i_line,
+                line,
+            ))
+        } else {
+            None
+        }
+    }
+}
+
+impl<IP, P, R> FusedIterator for XyIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable2D,
+    R: BufRead,
+{
+}
 
 //------------------------------------------------------------------------------
 
@@ -50,44 +150,16 @@ where
 }
 
 /// Loads a IsPushable<Is2D> as x y coordinates. E.g. used to load the .xy file format or .csv files
-pub fn load_xy<IP, P, R>(read: &mut R, ip: &mut IP) -> XyIOResult<()>
+pub fn load_xy<IP, P, R>(read: R, ip: &mut IP) -> XyIOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable2D,
     R: BufRead,
 {
-    let mut delim_determined = false;
-    let mut delim = 0;
-    let mut line_buffer = Vec::new();
+    let iterator = XyIterator::<IP, P, R>::new(read);
 
-    let mut i_line = 0;
-
-    while let Ok(line) = fetch_line(read, &mut line_buffer) {
-        i_line += 1;
-
-        if !delim_determined {
-            delim = estimate_delimiter(1, line)
-                .ok_or(XyError::EstimateDelimiter)
-                .line(i_line, line)?;
-
-            delim_determined = true;
-        }
-
-        let mut words = line.split(|x| *x == delim).skip_empty();
-
-        let x = words
-            .next()
-            .and_then(|word| from_ascii(word))
-            .ok_or(XyError::Vertex)
-            .line(i_line, line)?;
-
-        let y = words
-            .next()
-            .and_then(|word| from_ascii(word))
-            .ok_or(XyError::Vertex)
-            .line(i_line, line)?;
-
-        ip.push(P::new(x, y));
+    for p in iterator {
+        ip.push(p?)
     }
 
     Ok(())
