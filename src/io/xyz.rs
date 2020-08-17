@@ -27,9 +27,115 @@ use crate::*;
 use std::{
     fmt,
     io::{BufRead, Error as ioError, Write},
+    iter::FusedIterator,
+    marker::PhantomData,
 };
 
 use super::{types::*, utils::*};
+
+//------------------------------------------------------------------------------
+
+/// Iterator to incrementally load a .xyz file
+pub struct XyzIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    read: R,
+    i_line: usize,
+    line_buffer: Vec<u8>,
+    delim_determined: bool,
+    delim: u8,
+    phantom_ip: PhantomData<IP>,
+    phantom_p: PhantomData<P>,
+}
+
+impl<IP, P, R> XyzIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    pub fn new(read: R) -> Self {
+        Self {
+            read,
+            i_line: 0,
+            line_buffer: Vec::new(),
+            delim_determined: false,
+            delim: 0,
+            phantom_ip: PhantomData,
+            phantom_p: PhantomData,
+        }
+    }
+
+    #[inline(always)]
+    fn fetch_one(
+        delim_determined: &mut bool,
+        delim: &mut u8,
+        i_line: usize,
+        line: &[u8],
+    ) -> XyzIOResult<P> {
+        if !*delim_determined {
+            *delim = estimate_delimiter(2, &line)
+                .ok_or(XyzError::EstimateDelimiter)
+                .line(i_line, line)?;
+            *delim_determined = true;
+        }
+
+        let mut words = line.split(|x| *x == *delim).skip_empty();
+
+        let x = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(XyzError::Vertex)
+            .line(i_line, line)?;
+
+        let y = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(XyzError::Vertex)
+            .line(i_line, line)?;
+
+        let z = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(XyzError::Vertex)
+            .line(i_line, line)?;
+
+        Ok(P::new(x, y, z))
+    }
+}
+
+impl<IP, P, R> Iterator for XyzIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    type Item = XyzIOResult<P>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+            self.i_line += 1;
+            Some(Self::fetch_one(
+                &mut self.delim_determined,
+                &mut self.delim,
+                self.i_line,
+                line,
+            ))
+        } else {
+            None
+        }
+    }
+}
+
+impl<IP, P, R> FusedIterator for XyzIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+}
 
 //------------------------------------------------------------------------------
 
@@ -60,49 +166,16 @@ where
 }
 
 /// Loads a IsPushable<Is3D> as x y z coordinates. E.g. used to load the .xyz file format or .csv file
-pub fn load_xyz<IP, P, R>(read: &mut R, ip: &mut IP) -> XyzIOResult<()>
+pub fn load_xyz<IP, P, R>(read: R, ip: &mut IP) -> XyzIOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
-    let mut delim_determined = false;
-    let mut delim = 0;
-    let mut line_buffer = Vec::new();
+    let iterator = XyzIterator::<IP, P, R>::new(read);
 
-    let mut i_line = 0;
-
-    while let Ok(line) = fetch_line(read, &mut line_buffer) {
-        i_line += 1;
-
-        if !delim_determined {
-            delim = estimate_delimiter(2, &line)
-                .ok_or(XyzError::EstimateDelimiter)
-                .line(i_line, line)?;
-            delim_determined = true;
-        }
-
-        let mut words = line.split(|x| *x == delim).skip_empty();
-
-        let x = words
-            .next()
-            .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::Vertex)
-            .line(i_line, line)?;
-
-        let y = words
-            .next()
-            .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::Vertex)
-            .line(i_line, line)?;
-
-        let z = words
-            .next()
-            .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::Vertex)
-            .line(i_line, line)?;
-
-        ip.push(P::new(x, y, z));
+    for p in iterator {
+        ip.push(p?)
     }
 
     Ok(())
