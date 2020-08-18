@@ -359,7 +359,7 @@ where
                     return Ok(Header::Full(FullHeader {
                         format,
                         vertex: vertex_data,
-                        face: FaceData {
+                        face: super::types::FaceData {
                             count: n_faces,
                             format: FaceFormat {
                                 before: face_before,

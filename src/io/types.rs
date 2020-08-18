@@ -45,6 +45,13 @@ pub enum DataReserve<T> {
 
 //------------------------------------------------------------------------------
 
+pub enum FaceData<T> {
+    Face([usize; 3]), //@todo VId or usize?
+    Data(T),
+}
+
+//------------------------------------------------------------------------------
+
 pub enum FaceDataReserve<T> {
     Face([usize; 3]), //@todo VId or usize?
     Data(T),

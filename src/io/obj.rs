@@ -90,27 +90,82 @@ where
 
 //------------------------------------------------------------------------------
 
+/// Iterator to incrementally load a mesh from a .obj file
+pub struct ObjMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    read: R,
+    i_line: usize,
+    line_buffer: Vec<u8>,
+    phantom_p: PhantomData<P>,
+}
+
+impl<P, R> ObjMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    pub fn new(read: R) -> Self {
+        Self {
+            read,
+            i_line: 0,
+            line_buffer: Vec::new(),
+            phantom_p: PhantomData,
+        }
+    }
+}
+
+impl<P, R> Iterator for ObjMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    type Item = ObjResult<FaceData<P>>;
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+            self.i_line += 1;
+
+            if line.starts_with(b"v ") {
+                return Some(fetch_vertex(line, self.i_line).map(|x| FaceData::Data(x)));
+            } else if line.starts_with(b"f ") {
+                return Some(fetch_face(line, self.i_line).map(|x| FaceData::Face(x)));
+            }
+        }
+
+        None
+    }
+}
+
+impl<P, R> FusedIterator for ObjMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+}
+
+//------------------------------------------------------------------------------
+
 /// Loads an IsMesh3D from the .obj file format
-pub fn load_obj_mesh<EM, P, R>(read: &mut R, mesh: &mut EM) -> ObjResult<()>
+pub fn load_obj_mesh<EM, P, R>(read: R, mesh: &mut EM) -> ObjResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: BufRead,
 {
-    let mut line_buffer = Vec::new();
-    let mut i_line = 0;
+    let iterator = ObjMeshIterator::new(read);
 
-    while let Ok(line) = fetch_line(read, &mut line_buffer) {
-        i_line += 1;
-
-        if line.starts_with(b"v ") {
-            mesh.add_vertex(fetch_vertex(line, i_line)?);
-        } else if line.starts_with(b"f ") {
-            let [a, b, c] = fetch_face(line, i_line)?;
-
-            mesh.try_add_connection(VId(a), VId(b), VId(c))
-                .or(Err(ObjError::InvalidMeshIndices))
-                .line(i_line, line)?;
+    for rd in iterator {
+        match rd? {
+            FaceData::Data(x) => {
+                mesh.add_vertex(x);
+            }
+            FaceData::Face([a, b, c]) => {
+                mesh.try_add_connection(VId(a), VId(b), VId(c))
+                    .map_err(|_| ObjError::InvalidMeshIndices)
+                    .simple()?;
+            }
         }
     }
 
