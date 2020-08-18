@@ -374,11 +374,24 @@ where
     R: BufRead,
     IPN: IsPushable<P>,
 {
-    if is_ascii(read, format).simple()? {
-        load_stl_triplets_ascii(read, ip, face_normals)
-    } else {
-        load_stl_triplets_binary(read, ip, face_normals).simple()
+    let iterator = StlMeshIterator::new(read, format)?;
+
+    for fr in iterator {
+        match fr? {
+            DataReserve::Reserve(n) => {
+                ip.reserve(3 * n);
+                face_normals.reserve(n);
+            }
+            DataReserve::Data(face) => {
+                ip.push(face.x);
+                ip.push(face.y);
+                ip.push(face.z);
+                face_normals.push(face.n);
+            }
+        }
     }
+
+    Ok(())
 }
 
 //------------------------------------------------------------------------------
@@ -562,89 +575,6 @@ where
             }
             Err(_) => (),
         }
-    }
-
-    Ok(())
-}
-
-//------------------------------------------------------------------------------
-
-fn load_stl_triplets_ascii<IP, P, R, IPN>(
-    read: &mut R,
-    ip: &mut IP,
-    face_normals: &mut IPN,
-) -> StlIOResult<()>
-where
-    IP: IsPushable<P>,
-    P: IsBuildable3D,
-    R: BufRead,
-    IPN: IsPushable<P>,
-{
-    let mut i_line = 0;
-    let mut line_buffer = Vec::new();
-
-    // skip first line
-    read.read_until(b'\n', &mut line_buffer).index(i_line)?;
-    i_line += 1;
-
-    loop {
-        match read_stl_facet(read, &mut line_buffer, &mut i_line) {
-            Ok([a, b, c, n]) => {
-                ip.push(a);
-                ip.push(b);
-                ip.push(c);
-                face_normals.push(n);
-            }
-            Err(WithLineInfo::None(StlError::LoadFileEndReached))
-            | Err(WithLineInfo::Index(_, StlError::LoadFileEndReached))
-            | Err(WithLineInfo::Line(_, _, StlError::LoadFileEndReached)) => break,
-            Err(x) => return Err(x),
-        }
-    }
-
-    Ok(())
-}
-
-//------------------------------------------------------------------------------
-
-fn load_stl_triplets_binary<IP, P, R, IPN>(
-    read: &mut R,
-    ip: &mut IP,
-    face_normals: &mut IPN,
-) -> StlResult<()>
-where
-    IP: IsPushable<P>,
-    P: IsBuildable3D,
-    R: Read,
-    IPN: IsPushable<P>,
-{
-    // Drop header ('solid' is already dropped)
-    {
-        let mut buffer = [0u8; 75];
-        read.read_exact(&mut buffer)?;
-    }
-
-    let n_triangles = LittleReader::read_u32(read)?;
-    if n_triangles > MAX_TRIANGLES_BINARY {
-        return Err(StlError::InvalidFaceCount);
-    }
-
-    ip.reserve(3 * n_triangles as usize);
-    face_normals.reserve(n_triangles as usize);
-
-    for _ in 0..n_triangles {
-        let t = read_stl_triangle(read)?;
-
-        let n = P::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
-        let x = P::new(t.x[0] as f64, t.x[1] as f64, t.x[2] as f64);
-        let y = P::new(t.y[0] as f64, t.y[1] as f64, t.y[2] as f64);
-        let z = P::new(t.z[0] as f64, t.z[1] as f64, t.z[2] as f64);
-
-        ip.push(x);
-        ip.push(y);
-        ip.push(z);
-
-        face_normals.push(n)
     }
 
     Ok(())
