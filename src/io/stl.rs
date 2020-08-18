@@ -44,9 +44,9 @@ const MAX_TRIANGLES_BINARY: u32 = 1_000_000_000;
 //------------------------------------------------------------------------------
 
 pub struct StlFace<P> {
-    pub x: P,
-    pub y: P,
-    pub z: P,
+    pub a: P,
+    pub b: P,
+    pub c: P,
     pub n: P,
 }
 
@@ -213,13 +213,11 @@ where
                 Err(e) => Some(Err(e).simple()),
                 Ok(t) => {
                     let n = P::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
-                    let x = P::new(t.x[0] as f64, t.x[1] as f64, t.x[2] as f64);
-                    let y = P::new(t.y[0] as f64, t.y[1] as f64, t.y[2] as f64);
-                    let z = P::new(t.z[0] as f64, t.z[1] as f64, t.z[2] as f64);
+                    let a = P::new(t.x[0] as f64, t.x[1] as f64, t.x[2] as f64);
+                    let b = P::new(t.y[0] as f64, t.y[1] as f64, t.y[2] as f64);
+                    let c = P::new(t.z[0] as f64, t.z[1] as f64, t.z[2] as f64);
 
-                    //@todo also push normal
-
-                    Some(Ok(DataReserve::Data(StlFace { x, y, z, n })))
+                    Some(Ok(DataReserve::Data(StlFace { a, b, c, n })))
                 }
             }
         } else {
@@ -288,7 +286,7 @@ where
         }
 
         match read_stl_facet(&mut self.read, &mut self.line_buffer, &mut self.i_line) {
-            Ok([x, y, z, n]) => return Some(Ok(DataReserve::Data(StlFace { x, y, z, n }))),
+            Ok([a, b, c, n]) => return Some(Ok(DataReserve::Data(StlFace { a, b, c, n }))),
             Err(WithLineInfo::None(StlError::LoadFileEndReached))
             | Err(WithLineInfo::Index(_, StlError::LoadFileEndReached))
             | Err(WithLineInfo::Line(_, _, StlError::LoadFileEndReached)) => return None,
@@ -328,7 +326,7 @@ where
                 mesh.reserve_faces(n);
             }
             DataReserve::Data(face) => {
-                mesh.add_face(face.x, face.y, face.z);
+                mesh.add_face(face.a, face.b, face.c);
                 face_normals.push(face.n);
             }
         }
@@ -363,7 +361,7 @@ where
                 face_normals.reserve(n);
             }
             DataReserve::Data(face) => {
-                let [a, b, c, n] = [face.x, face.y, face.z, face.n];
+                let [a, b, c, n] = [face.a, face.b, face.c, face.n];
                 let id_a = *map.entry(a.clone()).or_insert_with(|| {
                     let value = mesh.num_vertices();
                     mesh.add_vertex(a);
@@ -421,9 +419,9 @@ where
                 face_normals.reserve(n);
             }
             DataReserve::Data(face) => {
-                ip.push(face.x);
-                ip.push(face.y);
-                ip.push(face.z);
+                ip.push(face.a);
+                ip.push(face.b);
+                ip.push(face.c);
                 face_normals.push(face.n);
             }
         }
