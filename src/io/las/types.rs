@@ -151,6 +151,7 @@ pub enum LasError {
     BinaryData,
     UnknownPointFormat,
     UnsupportedVersion,
+    Header,
 }
 
 impl fmt::Debug for LasError {
@@ -160,6 +161,7 @@ impl fmt::Debug for LasError {
             Self::BinaryData => write!(f, "Unable to parse binary data"),
             Self::UnknownPointFormat => write!(f, "Unknown point format"),
             Self::UnsupportedVersion => write!(f, "Unsupported version"),
+            Self::Header => write!(f, "Could not parse header"),
         }
     }
 }

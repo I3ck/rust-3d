@@ -46,7 +46,7 @@ where
 {
     read: R,
     current: usize,
-    header: Header,
+    header: Option<Header>,
     buffer: Vec<u8>,
     phantom_ip: PhantomData<IP>,
     phantom_p: PhantomData<P>,
@@ -58,40 +58,40 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-    pub fn new(mut read: R) -> LasResult<Self> {
-        let header_raw = load_header(&mut read)?;
-        let header = Header::try_from(header_raw)?;
-
-        read.seek(SeekFrom::Start(header.offset_point_data as u64))?;
-
-        let buffer = vec![0u8; header.point_record_length as usize];
-
-        Ok(Self {
+    pub fn new(read: R) -> Self {
+        Self {
             read,
             current: 0,
-            header,
-            buffer,
+            header: None,
+            buffer: Vec::new(),
             phantom_ip: PhantomData,
             phantom_p: PhantomData,
-        })
+        }
     }
 
     //@todo trait
     pub fn n_points(&self) -> usize {
-        self.header.n_point_records as usize
+        self.header
+            .as_ref()
+            .map(|x| x.n_point_records as usize)
+            .unwrap_or(0)
     }
 
     #[inline(always)]
     fn fetch_one(&mut self) -> LasResult<P> {
-        self.read.read_exact(&mut self.buffer)?;
+        if let Some(ref header) = self.header {
+            self.read.read_exact(&mut self.buffer)?;
 
-        let pd = PointData::from_bytes(self.buffer[0..12].try_into()?);
+            let pd = PointData::from_bytes(self.buffer[0..12].try_into()?);
 
-        let x = self.header.offset_x + (pd.x as f64 * self.header.scale_factor_x);
-        let y = self.header.offset_y + (pd.y as f64 * self.header.scale_factor_y);
-        let z = self.header.offset_z + (pd.z as f64 * self.header.scale_factor_z);
+            let x = header.offset_x + (pd.x as f64 * header.scale_factor_x);
+            let y = header.offset_y + (pd.y as f64 * header.scale_factor_y);
+            let z = header.offset_z + (pd.z as f64 * header.scale_factor_z);
 
-        Ok(P::new(x, y, z))
+            Ok(P::new(x, y, z))
+        } else {
+            Err(LasError::Header)
+        }
     }
 }
 
@@ -103,7 +103,23 @@ where
 {
     type Item = LasResult<P>;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.current < self.header.n_point_records as usize {
+        if self.header.is_none() {
+            if let Ok(header) = load_header(&mut self.read).and_then(|x| Header::try_from(x)) {
+                if let Ok(_) = self
+                    .read
+                    .seek(SeekFrom::Start(header.offset_point_data as u64))
+                {
+                    self.buffer = vec![0u8; header.point_record_length as usize];
+                    self.header = Some(header);
+                } else {
+                    return Some(Err(LasError::BinaryData));
+                }
+            } else {
+                return Some(Err(LasError::Header));
+            }
+        }
+        // unwrap safe since header is always assigned
+        if self.current < self.header.as_ref().unwrap().n_point_records as usize {
             self.current += 1;
             Some(self.fetch_one())
         } else {
@@ -129,9 +145,9 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-    let iterator = LasIterator::<IP, P, R>::new(read)?;
+    let iterator = LasIterator::<IP, P, R>::new(read);
 
-    ip.reserve(iterator.n_points());
+    ip.reserve(iterator.n_points()); //@todo incorrect, will yield 0 initially
 
     for p in iterator {
         ip.push(p?);
