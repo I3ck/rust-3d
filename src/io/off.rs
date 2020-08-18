@@ -38,7 +38,7 @@ use super::{types::*, utils::*};
 /// Iterator to incrementally load points from a .off file
 pub struct OffPointsIterator<IP, P, R>
 where
-    IP: IsPushable<P>,
+    IP: IsPushable<P>, //@todo these aren't used for the iterators, remove
     P: IsBuildable3D,
     R: BufRead,
 {
@@ -155,103 +155,188 @@ where
 
 //------------------------------------------------------------------------------
 
+/// Iterator to incrementally load points from a .off file
+pub struct OffMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    read: R,
+    i_line: usize,
+    line_buffer: Vec<u8>,
+    off_seen: bool,
+    counts: Option<[usize; 2]>,
+    n_vertices_added: usize,
+    phantom_p: PhantomData<P>,
+}
+
+impl<P, R> OffMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    pub fn new(read: R) -> Self {
+        Self {
+            read,
+            i_line: 0,
+            line_buffer: Vec::new(),
+            off_seen: false,
+            counts: None,
+            n_vertices_added: 0,
+            phantom_p: PhantomData,
+        }
+    }
+
+    #[inline(always)]
+    fn fetch_vertex(line: &[u8], i_line: usize) -> OffResult<P> {
+        let mut words = to_words_skip_empty(line);
+
+        let x = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(OffError::Vertex)
+            .line(i_line, line)?;
+
+        let y = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(OffError::Vertex)
+            .line(i_line, line)?;
+
+        let z = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(OffError::Vertex)
+            .line(i_line, line)?;
+
+        Ok(P::new(x, y, z))
+    }
+
+    #[inline(always)]
+    fn fetch_face(line: &[u8], i_line: usize) -> OffResult<[usize; 3]> {
+        let mut words = to_words_skip_empty(line);
+
+        let count_face = words
+            .next()
+            .ok_or(OffError::FaceVertexCount)
+            .line(i_line, line)?;
+
+        if count_face == b"3" {
+            let a = words
+                .next()
+                .and_then(|word| from_ascii(word))
+                .ok_or(OffError::Face)
+                .line(i_line, line)?;
+
+            let b = words
+                .next()
+                .and_then(|word| from_ascii(word))
+                .ok_or(OffError::Face)
+                .line(i_line, line)?;
+
+            let c = words
+                .next()
+                .and_then(|word| from_ascii(word))
+                .ok_or(OffError::Face)
+                .line(i_line, line)?;
+
+            Ok([a, b, c])
+        } else {
+            Err(OffError::FaceVertexCount).line(i_line, line)
+        }
+    }
+
+    #[inline(always)]
+    fn fetch_counts(line: &[u8], i_line: usize) -> OffResult<[usize; 2]> {
+        let mut words = to_words_skip_empty(line);
+        let n_vertices = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(OffError::VertexCount)
+            .line(i_line, line)?;
+        let n_faces = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(OffError::FaceCount)
+            .line(i_line, line)?;
+
+        Ok([n_vertices, n_faces])
+    }
+}
+
+impl<P, R> Iterator for OffMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    type Item = OffResult<FaceOrData<P>>;
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+            self.i_line += 1;
+
+            if !self.off_seen && line.starts_with(b"OFF") {
+                self.off_seen = true;
+                continue;
+            }
+
+            if line.is_empty() || line.starts_with(b"#") {
+                continue;
+            }
+
+            if self.counts.is_none() {
+                match Self::fetch_counts(line, self.i_line) {
+                    Ok(counts) => {
+                        self.counts = Some(counts);
+                        return Some(Ok(FaceOrData::ReserveDataFaces(counts[0], counts[1])));
+                    }
+                    Err(e) => return Some(Err(e)),
+                }
+            }
+
+            // safe since checked above
+            if self.n_vertices_added < self.counts.unwrap()[0] {
+                self.n_vertices_added += 1;
+                return Some(Self::fetch_vertex(line, self.i_line).map(|x| FaceOrData::Data(x)));
+            } else {
+                return Some(Self::fetch_face(line, self.i_line).map(|x| FaceOrData::Face(x)));
+            }
+        }
+
+        None
+    }
+}
+
+impl<P, R> FusedIterator for OffMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+}
+
+//------------------------------------------------------------------------------
+
 /// Loads an IsMesh3D from the off file format
-pub fn load_off_mesh<EM, P, R>(read: &mut R, mesh: &mut EM) -> OffResult<()>
+pub fn load_off_mesh<EM, P, R>(read: R, mesh: &mut EM) -> OffResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
     R: BufRead,
 {
-    let mut line_buffer = Vec::new();
-    let mut i_line = 0;
+    let iterator = OffMeshIterator::<P, R>::new(read);
 
-    let mut off_seen = false;
-    let mut counts = None;
-
-    while let Ok(line) = fetch_line(read, &mut line_buffer) {
-        i_line += 1;
-
-        if !off_seen && line.starts_with(b"OFF") {
-            off_seen = true;
-            continue;
-        }
-
-        if line.is_empty() || line.starts_with(b"#") {
-            continue;
-        }
-
-        if counts.is_none() {
-            let mut words = to_words_skip_empty(line);
-            let n_vertices = words
-                .next()
-                .and_then(|word| from_ascii(word))
-                .ok_or(OffError::VertexCount)
-                .line(i_line, line)?;
-            let n_faces = words
-                .next()
-                .and_then(|word| from_ascii(word))
-                .ok_or(OffError::FaceCount)
-                .line(i_line, line)?;
-
-            mesh.reserve_vertices(n_vertices);
-            mesh.reserve_faces(n_faces);
-
-            counts = Some([n_vertices, n_faces]);
-            continue;
-        }
-
-        // safe since checked above
-        if mesh.num_vertices() < counts.unwrap()[0] {
-            let mut words = to_words_skip_empty(line);
-
-            let x = words
-                .next()
-                .and_then(|word| from_ascii(word))
-                .ok_or(OffError::Vertex)
-                .line(i_line, line)?;
-
-            let y = words
-                .next()
-                .and_then(|word| from_ascii(word))
-                .ok_or(OffError::Vertex)
-                .line(i_line, line)?;
-
-            let z = words
-                .next()
-                .and_then(|word| from_ascii(word))
-                .ok_or(OffError::Vertex)
-                .line(i_line, line)?;
-
-            mesh.add_vertex(P::new(x, y, z));
-        } else {
-            let mut words = to_words_skip_empty(line);
-
-            let count_face = words
-                .next()
-                .ok_or(OffError::FaceVertexCount)
-                .line(i_line, line)?;
-
-            if count_face == b"3" {
-                let a = words
-                    .next()
-                    .and_then(|word| from_ascii(word))
-                    .ok_or(OffError::Face)
-                    .line(i_line, line)?;
-
-                let b = words
-                    .next()
-                    .and_then(|word| from_ascii(word))
-                    .ok_or(OffError::Face)
-                    .line(i_line, line)?;
-
-                let c = words
-                    .next()
-                    .and_then(|word| from_ascii(word))
-                    .ok_or(OffError::Face)
-                    .line(i_line, line)?;
-
+    for rd in iterator {
+        match rd? {
+            FaceOrData::Face([a, b, c]) => {
                 mesh.try_add_connection(VId(a), VId(b), VId(c))
-                    .or(Err(OffError::InvalidMeshIndices).line(i_line, line))?;
+                    .map_err(|_| OffError::InvalidMeshIndices)
+                    .simple()?;
+            }
+            FaceOrData::ReserveDataFaces(n_vertices, n_faces) => {
+                mesh.reserve_vertices(n_vertices);
+                mesh.reserve_faces(n_faces);
+            }
+            FaceOrData::Data(x) => {
+                mesh.add_vertex(x);
             }
         }
     }
