@@ -27,9 +27,131 @@ use crate::*;
 use std::{
     fmt,
     io::{BufRead, Error as ioError},
+    iter::FusedIterator,
+    marker::PhantomData,
 };
 
 use super::{types::*, utils::*};
+
+//------------------------------------------------------------------------------
+
+/// Iterator to incrementally load points from a .off file
+pub struct OffPointsIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    read: R,
+    i_line: usize,
+    line_buffer: Vec<u8>,
+    off_seen: bool,
+    n_vertices: Option<usize>,
+    n_added: usize,
+    phantom_ip: PhantomData<IP>,
+    phantom_p: PhantomData<P>,
+}
+
+impl<IP, P, R> OffPointsIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    pub fn new(read: R) -> Self {
+        Self {
+            read,
+            i_line: 0,
+            line_buffer: Vec::new(),
+            off_seen: false,
+            n_vertices: None,
+            n_added: 0,
+            phantom_ip: PhantomData,
+            phantom_p: PhantomData,
+        }
+    }
+
+    #[inline(always)]
+    fn fetch_one(line: &[u8], i_line: usize) -> OffResult<P> {
+        let mut words = to_words_skip_empty(line);
+
+        let x = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(OffError::Vertex)
+            .line(i_line, line)?;
+
+        let y = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(OffError::Vertex)
+            .line(i_line, line)?;
+
+        let z = words
+            .next()
+            .and_then(|word| from_ascii(word))
+            .ok_or(OffError::Vertex)
+            .line(i_line, line)?;
+
+        Ok(P::new(x, y, z))
+    }
+}
+
+impl<IP, P, R> Iterator for OffPointsIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    type Item = OffResult<ReserveOrData<P>>;
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+            self.i_line += 1;
+
+            if !self.off_seen && line.starts_with(b"OFF") {
+                self.off_seen = true;
+                continue;
+            }
+
+            if line.is_empty() || line.starts_with(b"#") {
+                continue;
+            }
+
+            if self.n_vertices.is_none() {
+                let mut words = to_words_skip_empty(line);
+                match words
+                    .next()
+                    .and_then(|word| from_ascii(word))
+                    .ok_or(OffError::VertexCount)
+                    .line(self.i_line, line)
+                {
+                    Ok(n) => {
+                        self.n_vertices = Some(n);
+                        return Some(Ok(ReserveOrData::Reserve(self.n_vertices.unwrap())));
+                    }
+                    Err(e) => return Some(Err(e)),
+                }
+            }
+
+            // safe since checked above
+            if self.n_added < self.n_vertices.unwrap() {
+                self.n_added += 1;
+                return Some(Self::fetch_one(line, self.i_line).map(|x| ReserveOrData::Data(x)));
+            } else {
+                return None;
+            }
+        }
+        None
+    }
+}
+
+impl<IP, P, R> FusedIterator for OffPointsIterator<IP, P, R>
+where
+    IP: IsPushable<P>,
+    P: IsBuildable3D,
+    R: BufRead,
+{
+}
 
 //------------------------------------------------------------------------------
 
@@ -138,71 +260,18 @@ where
 }
 
 /// Loads IsPushable<Is3D> from the .off file format
-pub fn load_off_points<IP, P, R>(read: &mut R, ip: &mut IP) -> OffResult<()>
+pub fn load_off_points<IP, P, R>(read: R, ip: &mut IP) -> OffResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
-    let mut line_buffer = Vec::new();
-    let mut i_line = 0;
+    let iterator = OffPointsIterator::<IP, P, R>::new(read);
 
-    let mut off_seen = false;
-    let mut n_vertices = None;
-    let mut n_added = 0;
-
-    while let Ok(line) = fetch_line(read, &mut line_buffer) {
-        i_line += 1;
-
-        if !off_seen && line.starts_with(b"OFF") {
-            off_seen = true;
-            continue;
-        }
-
-        if line.is_empty() || line.starts_with(b"#") {
-            continue;
-        }
-
-        if n_vertices.is_none() {
-            let mut words = to_words_skip_empty(line);
-            n_vertices = Some(
-                words
-                    .next()
-                    .and_then(|word| from_ascii(word))
-                    .ok_or(OffError::VertexCount)
-                    .line(i_line, line)?,
-            );
-            ip.reserve(n_vertices.unwrap());
-
-            continue;
-        }
-
-        // safe since checked above
-        if n_added < n_vertices.unwrap() {
-            let mut words = to_words_skip_empty(line);
-
-            let x = words
-                .next()
-                .and_then(|word| from_ascii(word))
-                .ok_or(OffError::Vertex)
-                .line(i_line, line)?;
-
-            let y = words
-                .next()
-                .and_then(|word| from_ascii(word))
-                .ok_or(OffError::Vertex)
-                .line(i_line, line)?;
-
-            let z = words
-                .next()
-                .and_then(|word| from_ascii(word))
-                .ok_or(OffError::Vertex)
-                .line(i_line, line)?;
-
-            ip.push(P::new(x, y, z));
-            n_added += 1;
-        } else {
-            break;
+    for rd in iterator {
+        match rd? {
+            ReserveOrData::Reserve(x) => ip.reserve(x),
+            ReserveOrData::Data(x) => ip.push(x),
         }
     }
 
