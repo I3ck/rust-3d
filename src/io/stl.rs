@@ -341,7 +341,7 @@ where
 
 /// Loads a Mesh from .stl file with unique vertices, dropping invalid triangles
 pub fn load_stl_mesh_unique<EM, P, R, IPN>(
-    read: &mut R,
+    read: R,
     format: StlFormat,
     mesh: &mut EM,
     face_normals: &mut IPN,
@@ -352,11 +352,49 @@ where
     R: BufRead,
     IPN: IsPushable<P>,
 {
-    if is_ascii(read, format).simple()? {
-        load_stl_mesh_unique_ascii(read, mesh, face_normals)
-    } else {
-        load_stl_mesh_unique_binary(read, mesh, face_normals).simple()
+    let mut map = FnvHashMap::default();
+    let iterator = StlMeshIterator::<P, R>::new(read, format)?;
+
+    for fr in iterator {
+        match fr? {
+            DataReserve::Reserve(n) => {
+                //Can't reserve vertices since not sure how many are unique
+                mesh.reserve_faces(n);
+                face_normals.reserve(n);
+            }
+            DataReserve::Data(face) => {
+                let [a, b, c, n] = [face.x, face.y, face.z, face.n];
+                let id_a = *map.entry(a.clone()).or_insert_with(|| {
+                    let value = mesh.num_vertices();
+                    mesh.add_vertex(a);
+                    value
+                });
+
+                let id_b = *map.entry(b.clone()).or_insert_with(|| {
+                    let value = mesh.num_vertices();
+                    mesh.add_vertex(b);
+                    value
+                });
+
+                let id_c = *map.entry(c.clone()).or_insert_with(|| {
+                    let value = mesh.num_vertices();
+                    mesh.add_vertex(c);
+                    value
+                });
+
+                // Ignore this issues since this only fails if a triangle uses a vertex multiple times
+                // Simply do not add this triangle and normal
+                match mesh.try_add_connection(VId(id_a), VId(id_b), VId(id_c)) {
+                    Ok(_) => {
+                        face_normals.push(n);
+                    }
+                    Err(_) => (),
+                }
+            }
+        }
     }
+
+    Ok(())
 }
 
 //------------------------------------------------------------------------------
@@ -446,138 +484,6 @@ where
         y: array_from_bytes_le!(f32, 3, &buffer[24..36])?,
         z: array_from_bytes_le!(f32, 3, &buffer[36..48])?,
     })
-}
-
-//------------------------------------------------------------------------------
-
-fn load_stl_mesh_unique_ascii<EM, P, R, IPN>(
-    read: &mut R,
-    mesh: &mut EM,
-    face_normals: &mut IPN,
-) -> StlIOResult<()>
-where
-    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D + Clone,
-    R: BufRead,
-    IPN: IsPushable<P>,
-{
-    let mut i_line = 0;
-    let mut line_buffer = Vec::new();
-
-    // skip first line
-    read.read_until(b'\n', &mut line_buffer).index(i_line)?;
-    i_line += 1;
-
-    let mut map = FnvHashMap::default();
-
-    loop {
-        match read_stl_facet::<P, _>(read, &mut line_buffer, &mut i_line) {
-            Ok([a, b, c, n]) => {
-                let id_a = *map.entry(a.clone()).or_insert_with(|| {
-                    let value = mesh.num_vertices();
-                    mesh.add_vertex(a);
-                    value
-                });
-
-                let id_b = *map.entry(b.clone()).or_insert_with(|| {
-                    let value = mesh.num_vertices();
-                    mesh.add_vertex(b);
-                    value
-                });
-
-                let id_c = *map.entry(c.clone()).or_insert_with(|| {
-                    let value = mesh.num_vertices();
-                    mesh.add_vertex(c);
-                    value
-                });
-
-                // Ignore this issues since this only fails if a triangle uses a vertex multiple times
-                // Simply do not add this triangle and normal
-                match mesh.try_add_connection(VId(id_a), VId(id_b), VId(id_c)) {
-                    Ok(_) => {
-                        face_normals.push(n);
-                    }
-                    Err(_) => (),
-                }
-            }
-            Err(WithLineInfo::None(StlError::LoadFileEndReached))
-            | Err(WithLineInfo::Index(_, StlError::LoadFileEndReached))
-            | Err(WithLineInfo::Line(_, _, StlError::LoadFileEndReached)) => break,
-            Err(x) => return Err(x),
-        }
-    }
-
-    Ok(())
-}
-
-//------------------------------------------------------------------------------
-
-fn load_stl_mesh_unique_binary<EM, P, R, IPN>(
-    read: &mut R,
-    mesh: &mut EM,
-    face_normals: &mut IPN,
-) -> StlResult<()>
-where
-    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D + Clone,
-    R: Read,
-    IPN: IsPushable<P>,
-{
-    // Drop header ('solid' is already dropped)
-    {
-        let mut buffer = [0u8; 75];
-        read.read_exact(&mut buffer)?;
-    }
-
-    let n_triangles = LittleReader::read_u32(read)?;
-    if n_triangles > MAX_TRIANGLES_BINARY {
-        return Err(StlError::InvalidFaceCount);
-    }
-
-    mesh.reserve_vertices((0.5 * n_triangles as f64) as usize);
-    mesh.reserve_faces(n_triangles as usize);
-
-    face_normals.reserve(n_triangles as usize);
-
-    let mut map = FnvHashMap::default();
-
-    for _ in 0..n_triangles {
-        let t = read_stl_triangle(read)?;
-
-        let n = P::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
-        let x = P::new(t.x[0] as f64, t.x[1] as f64, t.x[2] as f64);
-        let y = P::new(t.y[0] as f64, t.y[1] as f64, t.y[2] as f64);
-        let z = P::new(t.z[0] as f64, t.z[1] as f64, t.z[2] as f64);
-
-        let id_x = *map.entry(x.clone()).or_insert_with(|| {
-            let value = mesh.num_vertices();
-            mesh.add_vertex(x);
-            value
-        });
-
-        let id_y = *map.entry(y.clone()).or_insert_with(|| {
-            let value = mesh.num_vertices();
-            mesh.add_vertex(y);
-            value
-        });
-
-        let id_z = *map.entry(z.clone()).or_insert_with(|| {
-            let value = mesh.num_vertices();
-            mesh.add_vertex(z);
-            value
-        });
-
-        // Ignore this issues since this only fails if a triangle uses a vertex multiple times
-        // Simply do not add this triangle
-        match mesh.try_add_connection(VId(id_x), VId(id_y), VId(id_z)) {
-            Ok(_) => {
-                face_normals.push(n);
-            }
-            Err(_) => (),
-        }
-    }
-
-    Ok(())
 }
 
 //------------------------------------------------------------------------------
