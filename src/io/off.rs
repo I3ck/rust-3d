@@ -66,31 +66,6 @@ where
             phantom_p: PhantomData,
         }
     }
-
-    #[inline(always)]
-    fn fetch_one(line: &[u8], i_line: usize) -> OffResult<P> {
-        let mut words = to_words_skip_empty(line);
-
-        let x = words
-            .next()
-            .and_then(|word| from_ascii(word))
-            .ok_or(OffError::Vertex)
-            .line(i_line, line)?;
-
-        let y = words
-            .next()
-            .and_then(|word| from_ascii(word))
-            .ok_or(OffError::Vertex)
-            .line(i_line, line)?;
-
-        let z = words
-            .next()
-            .and_then(|word| from_ascii(word))
-            .ok_or(OffError::Vertex)
-            .line(i_line, line)?;
-
-        Ok(P::new(x, y, z))
-    }
 }
 
 impl<P, R> Iterator for OffPointsIterator<P, R>
@@ -131,7 +106,7 @@ where
             // safe since checked above
             if self.n_added < self.n_vertices.unwrap() {
                 self.n_added += 1;
-                return Some(Self::fetch_one(line, self.i_line).map(|x| ReserveOrData::Data(x)));
+                return Some(fetch_vertex(line, self.i_line).map(|x| ReserveOrData::Data(x)));
             } else {
                 return None;
             }
@@ -179,31 +154,6 @@ where
             n_vertices_added: 0,
             phantom_p: PhantomData,
         }
-    }
-
-    #[inline(always)]
-    fn fetch_vertex(line: &[u8], i_line: usize) -> OffResult<P> {
-        let mut words = to_words_skip_empty(line);
-
-        let x = words
-            .next()
-            .and_then(|word| from_ascii(word))
-            .ok_or(OffError::Vertex)
-            .line(i_line, line)?;
-
-        let y = words
-            .next()
-            .and_then(|word| from_ascii(word))
-            .ok_or(OffError::Vertex)
-            .line(i_line, line)?;
-
-        let z = words
-            .next()
-            .and_then(|word| from_ascii(word))
-            .ok_or(OffError::Vertex)
-            .line(i_line, line)?;
-
-        Ok(P::new(x, y, z))
     }
 
     #[inline(always)]
@@ -290,7 +240,7 @@ where
             // safe since checked above
             if self.n_vertices_added < self.counts.unwrap()[0] {
                 self.n_vertices_added += 1;
-                return Some(Self::fetch_vertex(line, self.i_line).map(|x| FaceOrData::Data(x)));
+                return Some(fetch_vertex(line, self.i_line).map(|x| FaceOrData::Data(x)));
             } else {
                 return Some(Self::fetch_face(line, self.i_line).map(|x| FaceOrData::Face(x)));
             }
@@ -397,4 +347,34 @@ impl From<ioError> for OffError {
     fn from(_error: ioError) -> Self {
         OffError::AccessFile
     }
+}
+
+//------------------------------------------------------------------------------
+
+#[inline(always)]
+fn fetch_vertex<P>(line: &[u8], i_line: usize) -> OffResult<P>
+where
+    P: IsBuildable3D,
+{
+    let mut words = to_words_skip_empty(line);
+
+    let x = words
+        .next()
+        .and_then(|word| from_ascii(word))
+        .ok_or(OffError::Vertex)
+        .line(i_line, line)?;
+
+    let y = words
+        .next()
+        .and_then(|word| from_ascii(word))
+        .ok_or(OffError::Vertex)
+        .line(i_line, line)?;
+
+    let z = words
+        .next()
+        .and_then(|word| from_ascii(word))
+        .ok_or(OffError::Vertex)
+        .line(i_line, line)?;
+
+    Ok(P::new(x, y, z))
 }
