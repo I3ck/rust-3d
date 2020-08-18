@@ -27,6 +27,8 @@ use crate::*;
 use std::{
     fmt,
     io::{BufRead, Error as ioError, Read, Write},
+    iter::FusedIterator,
+    marker::PhantomData,
 };
 
 use fnv::FnvHashMap;
@@ -38,6 +40,15 @@ use super::{byte_reader::*, from_bytes::*, types::*, utils::*};
 //@todo can be resolved in a better way once https://github.com/rust-lang/rust/issues/48043 is on stable
 //@todo work around in case the binary data is invalid
 const MAX_TRIANGLES_BINARY: u32 = 1_000_000_000;
+
+//------------------------------------------------------------------------------
+
+pub struct StlFace<P> {
+    pub x: P,
+    pub y: P,
+    pub z: P,
+    pub n: P,
+}
 
 //------------------------------------------------------------------------------
 
@@ -76,9 +87,228 @@ where
 
 //------------------------------------------------------------------------------
 
+pub struct StlMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    inner: BinaryOrAsciiIterator<P, R>,
+}
+
+impl<P, R> StlMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    pub fn new(mut read: R, format: StlFormat) -> StlIOResult<Self> {
+        if is_ascii(&mut read, format).simple()? {
+            Ok(Self {
+                inner: BinaryOrAsciiIterator::Ascii(StlMeshAsciiIterator::new(read)),
+            })
+        } else {
+            Ok(Self {
+                inner: BinaryOrAsciiIterator::Binary(StlMeshBinaryIterator::new(read)),
+            })
+        }
+    }
+}
+
+impl<P, R> Iterator for StlMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    type Item = StlIOResult<DataReserve<StlFace<P>>>;
+    fn next(&mut self) -> Option<Self::Item> {
+        match &mut self.inner {
+            BinaryOrAsciiIterator::Ascii(x) => x.next(),
+            BinaryOrAsciiIterator::Binary(x) => x.next(),
+        }
+    }
+}
+
+impl<P, R> FusedIterator for StlMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+}
+
+//------------------------------------------------------------------------------
+
+enum BinaryOrAsciiIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    Binary(StlMeshBinaryIterator<P, R>),
+    Ascii(StlMeshAsciiIterator<P, R>),
+}
+
+//------------------------------------------------------------------------------
+
+#[allow(dead_code)] //@todo remove
+struct StlMeshBinaryIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: Read,
+{
+    read: R,
+    header_read: bool,
+    n_triangles: usize,
+    current: usize,
+    phantom: PhantomData<P>, //@todo others name this phantom_p, unecessary there in most cases
+}
+
+impl<P, R> StlMeshBinaryIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: Read,
+{
+    pub fn new(read: R) -> Self {
+        Self {
+            read,
+            header_read: false,
+            n_triangles: 0,
+            current: 0,
+            phantom: PhantomData,
+        }
+    }
+}
+
+impl<P, R> Iterator for StlMeshBinaryIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: Read,
+{
+    type Item = StlIOResult<DataReserve<StlFace<P>>>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if !self.header_read {
+            self.header_read = true;
+            // Drop header ('solid' is already dropped)
+            {
+                let mut buffer = [0u8; 75];
+                if let Err(e) = self.read.read_exact(&mut buffer) {
+                    return Some(Err(e.into()).simple());
+                }
+            }
+
+            return match LittleReader::read_u32(&mut self.read) {
+                Err(e) => Some(Err(e.into()).simple()),
+                Ok(n_triangles) => {
+                    if n_triangles > MAX_TRIANGLES_BINARY {
+                        return Some(Err(StlError::InvalidFaceCount).simple());
+                    }
+
+                    self.n_triangles = n_triangles as usize;
+
+                    Some(Ok(DataReserve::Reserve(n_triangles as usize)))
+                }
+            };
+        }
+
+        if self.current < self.n_triangles {
+            self.current += 1;
+            match read_stl_triangle(&mut self.read) {
+                Err(e) => Some(Err(e).simple()),
+                Ok(t) => {
+                    let n = P::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
+                    let x = P::new(t.x[0] as f64, t.x[1] as f64, t.x[2] as f64);
+                    let y = P::new(t.y[0] as f64, t.y[1] as f64, t.y[2] as f64);
+                    let z = P::new(t.z[0] as f64, t.z[1] as f64, t.z[2] as f64);
+
+                    //@todo also push normal
+
+                    Some(Ok(DataReserve::Data(StlFace { x, y, z, n })))
+                }
+            }
+        } else {
+            None
+        }
+    }
+}
+
+impl<P, R> FusedIterator for StlMeshBinaryIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: Read,
+{
+}
+
+//------------------------------------------------------------------------------
+
+#[allow(dead_code)] //@todo remove
+struct StlMeshAsciiIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: Read,
+{
+    read: R,
+    header_read: bool,
+    i_line: usize,
+    line_buffer: Vec<u8>,
+    phantom: PhantomData<P>,
+}
+
+impl<P, R> StlMeshAsciiIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    pub fn new(read: R) -> Self {
+        Self {
+            read,
+            header_read: false,
+            i_line: 0,
+            line_buffer: Vec::new(),
+            phantom: PhantomData,
+        }
+    }
+}
+
+impl<P, R> Iterator for StlMeshAsciiIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    type Item = StlIOResult<DataReserve<StlFace<P>>>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if !self.header_read {
+            self.header_read = true;
+
+            // skip first line
+            if let Err(e) = self
+                .read
+                .read_until(b'\n', &mut self.line_buffer)
+                .index(self.i_line)
+            {
+                return Some(Err(e.into()));
+            }
+            self.i_line += 1;
+        }
+
+        match read_stl_facet(&mut self.read, &mut self.line_buffer, &mut self.i_line) {
+            Ok([x, y, z, n]) => return Some(Ok(DataReserve::Data(StlFace { x, y, z, n }))),
+            Err(WithLineInfo::None(StlError::LoadFileEndReached))
+            | Err(WithLineInfo::Index(_, StlError::LoadFileEndReached))
+            | Err(WithLineInfo::Line(_, _, StlError::LoadFileEndReached)) => return None,
+            Err(x) => return Some(Err(x)),
+        }
+    }
+}
+
+impl<P, R> FusedIterator for StlMeshAsciiIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+}
+
+//------------------------------------------------------------------------------
+
 /// Loads a Mesh from .stl file with duplicate vertices
 pub fn load_stl_mesh_duped<EM, P, R, IPN>(
-    read: &mut R,
+    read: R,
     format: StlFormat,
     mesh: &mut EM,
     face_normals: &mut IPN,
@@ -89,11 +319,22 @@ where
     R: BufRead,
     IPN: IsPushable<P>,
 {
-    if is_ascii(read, format).simple()? {
-        load_stl_mesh_duped_ascii(read, mesh, face_normals)
-    } else {
-        load_stl_mesh_duped_binary(read, mesh, face_normals).simple()
+    let iterator = StlMeshIterator::new(read, format)?;
+
+    for fr in iterator {
+        match fr? {
+            DataReserve::Reserve(n) => {
+                mesh.reserve_vertices(3 * n);
+                mesh.reserve_faces(n);
+            }
+            DataReserve::Data(face) => {
+                mesh.add_face(face.x, face.y, face.z);
+                face_normals.push(face.n);
+            }
+        }
     }
+
+    Ok(())
 }
 
 //------------------------------------------------------------------------------
@@ -170,40 +411,6 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_stl_mesh_duped_ascii<EM, P, R, IPN>(
-    read: &mut R,
-    mesh: &mut EM,
-    face_normals: &mut IPN,
-) -> StlIOResult<()>
-where
-    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D + Clone,
-    R: BufRead,
-    IPN: IsPushable<P>,
-{
-    let mut i_line = 0;
-    let mut line_buffer = Vec::new();
-
-    // skip first line
-    read.read_until(b'\n', &mut line_buffer).index(i_line)?;
-    i_line += 1;
-
-    loop {
-        match read_stl_facet(read, &mut line_buffer, &mut i_line) {
-            Ok([a, b, c, n]) => {
-                mesh.add_face(a, b, c);
-                face_normals.push(n);
-            }
-            Err(WithLineInfo::None(StlError::LoadFileEndReached))
-            | Err(WithLineInfo::Index(_, StlError::LoadFileEndReached))
-            | Err(WithLineInfo::Line(_, _, StlError::LoadFileEndReached)) => break,
-            Err(x) => return Err(x),
-        }
-    }
-
-    Ok(())
-}
-
 struct StlTriangle {
     pub n: [f32; 3],
     pub x: [f32; 3],
@@ -226,50 +433,6 @@ where
         y: array_from_bytes_le!(f32, 3, &buffer[24..36])?,
         z: array_from_bytes_le!(f32, 3, &buffer[36..48])?,
     })
-}
-
-//------------------------------------------------------------------------------
-
-fn load_stl_mesh_duped_binary<EM, P, R, IPN>(
-    read: &mut R,
-    mesh: &mut EM,
-    face_normals: &mut IPN,
-) -> StlResult<()>
-where
-    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D + Clone,
-    R: Read,
-    IPN: IsPushable<P>,
-{
-    // Drop header ('solid' is already dropped)
-    {
-        let mut buffer = [0u8; 75];
-        read.read_exact(&mut buffer)?;
-    }
-
-    let n_triangles = LittleReader::read_u32(read)?;
-    if n_triangles > MAX_TRIANGLES_BINARY {
-        return Err(StlError::InvalidFaceCount);
-    }
-
-    mesh.reserve_vertices(3 * n_triangles as usize);
-    mesh.reserve_faces(n_triangles as usize);
-
-    face_normals.reserve(n_triangles as usize);
-
-    for _ in 0..n_triangles {
-        let t = read_stl_triangle(read)?;
-
-        let n = P::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
-        let x = P::new(t.x[0] as f64, t.x[1] as f64, t.x[2] as f64);
-        let y = P::new(t.y[0] as f64, t.y[1] as f64, t.y[2] as f64);
-        let z = P::new(t.z[0] as f64, t.z[1] as f64, t.z[2] as f64);
-
-        mesh.add_face(x, y, z);
-        face_normals.push(n)
-    }
-
-    Ok(())
 }
 
 //------------------------------------------------------------------------------

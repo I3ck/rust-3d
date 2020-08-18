@@ -1,4 +1,4 @@
-Ensure IO iterators behave correctly if called again once they yielded None
+Ensure IO iterators behave correctly if called again once they yielded None / errors
 
 BoundingBox for Meshes (and similar) not fully correct since using entire point cloud for checks
 (It's possible many points aren't used)
