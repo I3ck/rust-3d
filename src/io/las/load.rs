@@ -147,7 +147,7 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_header<R>(read: &mut R) -> LasResult<HeaderRaw>
+fn load_header<R>(mut read: R) -> LasResult<HeaderRaw>
 where
     R: Read,
 {
