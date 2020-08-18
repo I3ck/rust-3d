@@ -213,7 +213,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = OffResult<FaceOrData<P>>;
+    type Item = OffResult<FaceDataReserve<P>>;
     fn next(&mut self) -> Option<Self::Item> {
         while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
             self.i_line += 1;
@@ -231,7 +231,7 @@ where
                 match Self::fetch_counts(line, self.i_line) {
                     Ok(counts) => {
                         self.counts = Some(counts);
-                        return Some(Ok(FaceOrData::ReserveDataFaces(counts[0], counts[1])));
+                        return Some(Ok(FaceDataReserve::ReserveDataFaces(counts[0], counts[1])));
                     }
                     Err(e) => return Some(Err(e)),
                 }
@@ -240,9 +240,9 @@ where
             // safe since checked above
             if self.n_vertices_added < self.counts.unwrap()[0] {
                 self.n_vertices_added += 1;
-                return Some(fetch_vertex(line, self.i_line).map(|x| FaceOrData::Data(x)));
+                return Some(fetch_vertex(line, self.i_line).map(|x| FaceDataReserve::Data(x)));
             } else {
-                return Some(Self::fetch_face(line, self.i_line).map(|x| FaceOrData::Face(x)));
+                return Some(Self::fetch_face(line, self.i_line).map(|x| FaceDataReserve::Face(x)));
             }
         }
 
@@ -270,16 +270,16 @@ where
 
     for rd in iterator {
         match rd? {
-            FaceOrData::Face([a, b, c]) => {
+            FaceDataReserve::Face([a, b, c]) => {
                 mesh.try_add_connection(VId(a), VId(b), VId(c))
                     .map_err(|_| OffError::InvalidMeshIndices)
                     .simple()?;
             }
-            FaceOrData::ReserveDataFaces(n_vertices, n_faces) => {
+            FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
                 mesh.reserve_vertices(n_vertices);
                 mesh.reserve_faces(n_faces);
             }
-            FaceOrData::Data(x) => {
+            FaceDataReserve::Data(x) => {
                 mesh.add_vertex(x);
             }
         }

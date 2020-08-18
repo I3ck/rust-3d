@@ -38,7 +38,7 @@ pub trait LineInfoResult<T, E>: Sized {
 
 //------------------------------------------------------------------------------
 
-//@todo better names? FaceOrData vs ReserveOrData
+//@todo better names? FaceDataReserve vs ReserveOrData
 pub enum ReserveOrData<T> {
     Reserve(usize),
     Data(T),
@@ -46,8 +46,7 @@ pub enum ReserveOrData<T> {
 
 //------------------------------------------------------------------------------
 
-//@todo better names? FaceOrData vs ReserveOrData
-pub enum FaceOrData<T> {
+pub enum FaceDataReserve<T> {
     Face([usize; 3]), //@todo VId or usize?
     Data(T),
     ReserveDataFaces(usize, usize),
