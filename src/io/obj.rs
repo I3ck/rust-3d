@@ -47,53 +47,11 @@ where
         i_line += 1;
 
         if line.starts_with(b"v ") {
-            let mut words = to_words_skip_empty(line);
-
-            // skip "v"
-            words.next().ok_or(ObjError::Vertex).line(i_line, line)?;
-
-            let x = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::Vertex)
-                .line(i_line, line)?;
-
-            let y = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::Vertex)
-                .line(i_line, line)?;
-
-            let z = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::Vertex)
-                .line(i_line, line)?;
-
-            mesh.add_vertex(P::new(x, y, z));
+            mesh.add_vertex(fetch_vertex(line, i_line)?);
         } else if line.starts_with(b"f ") {
-            let mut words = to_words_skip_empty(line);
+            let [a, b, c] = fetch_face(line, i_line)?;
 
-            // skip "f"
-            words.next().ok_or(ObjError::Face).line(i_line, line)?;
-
-            let mut tmp = words.next().ok_or(ObjError::Face).line(i_line, line)?;
-            let a: usize = from_ascii(until_bytes(tmp, b'/'))
-                .ok_or(ObjError::Face)
-                .line(i_line, line)?;
-
-            tmp = words.next().ok_or(ObjError::Face).line(i_line, line)?;
-            let b: usize = from_ascii(until_bytes(tmp, b'/'))
-                .ok_or(ObjError::Face)
-                .line(i_line, line)?;
-
-            tmp = words.next().ok_or(ObjError::Face).line(i_line, line)?;
-            let c: usize = from_ascii(until_bytes(tmp, b'/'))
-                .ok_or(ObjError::Face)
-                .line(i_line, line)?;
-
-            // obj indexing starts at 1
-            mesh.try_add_connection(VId(a - 1), VId(b - 1), VId(c - 1))
+            mesh.try_add_connection(VId(a), VId(b), VId(c))
                 .or(Err(ObjError::InvalidMeshIndices))
                 .line(i_line, line)?;
         }
@@ -116,30 +74,7 @@ where
         i_line += 1;
 
         if line.starts_with(b"v ") {
-            let mut words = to_words_skip_empty(line);
-
-            // skip "v"
-            words.next().ok_or(ObjError::Vertex).line(i_line, line)?;
-
-            let x = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::Vertex)
-                .line(i_line, line)?;
-
-            let y = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::Vertex)
-                .line(i_line, line)?;
-
-            let z = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(ObjError::Vertex)
-                .line(i_line, line)?;
-
-            ip.push(P::new(x, y, z));
+            ip.push(fetch_vertex(line, i_line)?);
         }
     }
 
@@ -180,4 +115,64 @@ impl From<ioError> for ObjError {
     fn from(_error: ioError) -> Self {
         ObjError::AccessFile
     }
+}
+
+//------------------------------------------------------------------------------
+
+#[inline(always)]
+fn fetch_vertex<P>(line: &[u8], i_line: usize) -> ObjResult<P>
+where
+    P: IsBuildable3D,
+{
+    let mut words = to_words_skip_empty(line);
+
+    // skip "v"
+    words.next().ok_or(ObjError::Vertex).line(i_line, line)?;
+
+    let x = words
+        .next()
+        .and_then(|w| from_ascii(w))
+        .ok_or(ObjError::Vertex)
+        .line(i_line, line)?;
+
+    let y = words
+        .next()
+        .and_then(|w| from_ascii(w))
+        .ok_or(ObjError::Vertex)
+        .line(i_line, line)?;
+
+    let z = words
+        .next()
+        .and_then(|w| from_ascii(w))
+        .ok_or(ObjError::Vertex)
+        .line(i_line, line)?;
+
+    Ok(P::new(x, y, z))
+}
+
+#[inline(always)]
+fn fetch_face(line: &[u8], i_line: usize) -> ObjResult<[usize; 3]> {
+    let mut words = to_words_skip_empty(line);
+
+    // skip "f"
+    words.next().ok_or(ObjError::Face).line(i_line, line)?;
+
+    let mut tmp = words.next().ok_or(ObjError::Face).line(i_line, line)?;
+    let a: usize = from_ascii(until_bytes(tmp, b'/'))
+        .ok_or(ObjError::Face)
+        .line(i_line, line)?;
+
+    tmp = words.next().ok_or(ObjError::Face).line(i_line, line)?;
+    let b: usize = from_ascii(until_bytes(tmp, b'/'))
+        .ok_or(ObjError::Face)
+        .line(i_line, line)?;
+
+    tmp = words.next().ok_or(ObjError::Face).line(i_line, line)?;
+    let c: usize = from_ascii(until_bytes(tmp, b'/'))
+        .ok_or(ObjError::Face)
+        .line(i_line, line)?;
+
+    //@todo could fail if 0 in file
+    //obj indexing starts at 1
+    Ok([a - 1, b - 1, c - 1])
 }
