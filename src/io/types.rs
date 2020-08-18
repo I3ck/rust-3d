@@ -38,10 +38,9 @@ pub trait LineInfoResult<T, E>: Sized {
 
 //------------------------------------------------------------------------------
 
-//@todo better names? FaceDataReserve vs ReserveOrData
-pub enum ReserveOrData<T> {
-    Reserve(usize),
+pub enum DataReserve<T> {
     Data(T),
+    Reserve(usize),
 }
 
 //------------------------------------------------------------------------------

@@ -88,7 +88,7 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-    type Item = LasResult<ReserveOrData<P>>;
+    type Item = LasResult<DataReserve<P>>;
     fn next(&mut self) -> Option<Self::Item> {
         if self.header.is_none() {
             if let Ok(header) = load_header(&mut self.read).and_then(|x| Header::try_from(x)) {
@@ -99,7 +99,7 @@ where
                     self.buffer = vec![0u8; header.point_record_length as usize];
                     let n = header.n_point_records;
                     self.header = Some(header);
-                    return Some(Ok(ReserveOrData::Reserve(n as usize)));
+                    return Some(Ok(DataReserve::Reserve(n as usize)));
                 } else {
                     return Some(Err(LasError::BinaryData));
                 }
@@ -110,7 +110,7 @@ where
         // unwrap safe since header is always assigned
         if self.current < self.header.as_ref().unwrap().n_point_records as usize {
             self.current += 1;
-            Some(self.fetch_one().map(|x| ReserveOrData::Data(x)))
+            Some(self.fetch_one().map(|x| DataReserve::Data(x)))
         } else {
             None
         }
@@ -137,8 +137,8 @@ where
 
     for rd in iterator {
         match rd? {
-            ReserveOrData::Reserve(x) => ip.reserve(x),
-            ReserveOrData::Data(x) => ip.push(x),
+            DataReserve::Reserve(x) => ip.reserve(x),
+            DataReserve::Data(x) => ip.push(x),
         }
     }
 

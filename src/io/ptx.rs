@@ -172,7 +172,7 @@ where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: BufRead,
 {
-    type Item = PtxResult<ReserveOrData<P>>;
+    type Item = PtxResult<DataReserve<P>>;
     fn next(&mut self) -> Option<Self::Item> {
         if self.n_points_to_fetch == 0 {
             let first_line = fetch_line(&mut self.read, &mut self.line_buffer);
@@ -186,7 +186,7 @@ where
                 .index(self.i_line)
                 .and_then(|columns| self.fetch_header(columns))
             {
-                Ok(()) => return Some(Ok(ReserveOrData::Reserve(self.n_points_to_fetch))),
+                Ok(()) => return Some(Ok(DataReserve::Reserve(self.n_points_to_fetch))),
                 Err(e) => return Some(Err(e)),
             }
         } else if self.n_points_to_fetch > 0 {
@@ -201,7 +201,7 @@ where
                             self.must_transform,
                             &self.transformation,
                         )
-                        .map(|x| ReserveOrData::Data(x)),
+                        .map(|x| DataReserve::Data(x)),
                     )
                 }
                 Err(e) => Some(Err(e.into())),
@@ -232,8 +232,8 @@ where
 
     for rd in iterator {
         match rd? {
-            ReserveOrData::Reserve(x) => ip.reserve(x),
-            ReserveOrData::Data(x) => ip.push(x),
+            DataReserve::Reserve(x) => ip.reserve(x),
+            DataReserve::Data(x) => ip.push(x),
         }
     }
 

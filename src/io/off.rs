@@ -73,7 +73,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = OffResult<ReserveOrData<P>>;
+    type Item = OffResult<DataReserve<P>>;
     fn next(&mut self) -> Option<Self::Item> {
         while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
             self.i_line += 1;
@@ -97,7 +97,7 @@ where
                 {
                     Ok(n) => {
                         self.n_vertices = Some(n);
-                        return Some(Ok(ReserveOrData::Reserve(self.n_vertices.unwrap())));
+                        return Some(Ok(DataReserve::Reserve(self.n_vertices.unwrap())));
                     }
                     Err(e) => return Some(Err(e)),
                 }
@@ -106,7 +106,7 @@ where
             // safe since checked above
             if self.n_added < self.n_vertices.unwrap() {
                 self.n_added += 1;
-                return Some(fetch_vertex(line, self.i_line).map(|x| ReserveOrData::Data(x)));
+                return Some(fetch_vertex(line, self.i_line).map(|x| DataReserve::Data(x)));
             } else {
                 return None;
             }
@@ -299,8 +299,8 @@ where
 
     for rd in iterator {
         match rd? {
-            ReserveOrData::Reserve(x) => ip.reserve(x),
-            ReserveOrData::Data(x) => ip.push(x),
+            DataReserve::Reserve(x) => ip.reserve(x),
+            DataReserve::Data(x) => ip.push(x),
         }
     }
 
