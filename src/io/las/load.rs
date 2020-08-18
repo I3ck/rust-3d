@@ -33,7 +33,7 @@ use std::{
     marker::PhantomData,
 };
 
-use super::super::from_bytes::*;
+use super::super::{from_bytes::*, types::*};
 
 //------------------------------------------------------------------------------
 
@@ -58,23 +58,15 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-    pub fn new(read: R) -> Self {
-        Self {
+    pub fn new(read: R) -> LasResult<Self> {
+        Ok(Self {
             read,
             current: 0,
             header: None,
             buffer: Vec::new(),
             phantom_ip: PhantomData,
             phantom_p: PhantomData,
-        }
-    }
-
-    //@todo trait
-    pub fn n_points(&self) -> usize {
-        self.header
-            .as_ref()
-            .map(|x| x.n_point_records as usize)
-            .unwrap_or(0)
+        })
     }
 
     #[inline(always)]
@@ -101,7 +93,7 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-    type Item = LasResult<P>;
+    type Item = LasResult<ReserveOrData<P>>;
     fn next(&mut self) -> Option<Self::Item> {
         if self.header.is_none() {
             if let Ok(header) = load_header(&mut self.read).and_then(|x| Header::try_from(x)) {
@@ -110,7 +102,9 @@ where
                     .seek(SeekFrom::Start(header.offset_point_data as u64))
                 {
                     self.buffer = vec![0u8; header.point_record_length as usize];
+                    let n = header.n_point_records;
                     self.header = Some(header);
+                    return Some(Ok(ReserveOrData::Reserve(n as usize)));
                 } else {
                     return Some(Err(LasError::BinaryData));
                 }
@@ -121,7 +115,7 @@ where
         // unwrap safe since header is always assigned
         if self.current < self.header.as_ref().unwrap().n_point_records as usize {
             self.current += 1;
-            Some(self.fetch_one())
+            Some(self.fetch_one().map(|x| ReserveOrData::Data(x)))
         } else {
             None
         }
@@ -145,12 +139,13 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-    let iterator = LasIterator::<IP, P, R>::new(read);
+    let iterator = LasIterator::<IP, P, R>::new(read)?;
 
-    ip.reserve(iterator.n_points()); //@todo incorrect, will yield 0 initially
-
-    for p in iterator {
-        ip.push(p?);
+    for rd in iterator {
+        match rd? {
+            ReserveOrData::Reserve(x) => ip.reserve(x),
+            ReserveOrData::Data(x) => ip.push(x),
+        }
     }
 
     Ok(())
