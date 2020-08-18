@@ -36,9 +36,8 @@ use super::{types::*, utils::*};
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .xy file
-pub struct XyIterator<IP, P, R>
+pub struct XyIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable2D,
     R: BufRead,
 {
@@ -47,13 +46,11 @@ where
     line_buffer: Vec<u8>,
     delim_determined: bool,
     delim: u8,
-    phantom_ip: PhantomData<IP>,
     phantom_p: PhantomData<P>,
 }
 
-impl<IP, P, R> XyIterator<IP, P, R>
+impl<P, R> XyIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable2D,
     R: BufRead,
 {
@@ -64,7 +61,6 @@ where
             line_buffer: Vec::new(),
             delim_determined: false,
             delim: 0,
-            phantom_ip: PhantomData,
             phantom_p: PhantomData,
         }
     }
@@ -101,9 +97,8 @@ where
     }
 }
 
-impl<IP, P, R> Iterator for XyIterator<IP, P, R>
+impl<P, R> Iterator for XyIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable2D,
     R: BufRead,
 {
@@ -123,9 +118,8 @@ where
     }
 }
 
-impl<IP, P, R> FusedIterator for XyIterator<IP, P, R>
+impl<P, R> FusedIterator for XyIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable2D,
     R: BufRead,
 {
@@ -156,7 +150,7 @@ where
     P: IsBuildable2D,
     R: BufRead,
 {
-    let iterator = XyIterator::<IP, P, R>::new(read);
+    let iterator = XyIterator::new(read);
 
     for p in iterator {
         ip.push(p?)

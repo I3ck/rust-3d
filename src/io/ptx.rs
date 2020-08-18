@@ -36,9 +36,8 @@ use super::{types::*, utils::*};
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .ptx file
-pub struct PtxIterator<IP, P, R>
+pub struct PtxIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D + IsMatrix4Transformable,
     R: BufRead,
 {
@@ -48,13 +47,11 @@ where
     n_points_to_fetch: usize,
     must_transform: bool,
     transformation: Matrix4,
-    phantom_ip: PhantomData<IP>,
     phantom_p: PhantomData<P>,
 }
 
-impl<IP, P, R> PtxIterator<IP, P, R>
+impl<P, R> PtxIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D + IsMatrix4Transformable,
     R: BufRead,
 {
@@ -66,7 +63,6 @@ where
             n_points_to_fetch: 0,
             must_transform: false,
             transformation: Matrix4::identity(),
-            phantom_ip: PhantomData,
             phantom_p: PhantomData,
         }
     }
@@ -171,9 +167,8 @@ where
     }
 }
 
-impl<IP, P, R> Iterator for PtxIterator<IP, P, R>
+impl<P, R> Iterator for PtxIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D + IsMatrix4Transformable,
     R: BufRead,
 {
@@ -217,9 +212,8 @@ where
     }
 }
 
-impl<IP, P, R> FusedIterator for PtxIterator<IP, P, R>
+impl<P, R> FusedIterator for PtxIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D + IsMatrix4Transformable,
     R: BufRead,
 {
@@ -234,7 +228,7 @@ where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: BufRead,
 {
-    let iterator = PtxIterator::<IP, P, R>::new(read);
+    let iterator = PtxIterator::new(read);
 
     for rd in iterator {
         match rd? {

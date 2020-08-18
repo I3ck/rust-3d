@@ -36,9 +36,8 @@ use super::{types::*, utils::*};
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .xyz file
-pub struct XyzIterator<IP, P, R>
+pub struct XyzIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
@@ -47,13 +46,11 @@ where
     line_buffer: Vec<u8>,
     delim_determined: bool,
     delim: u8,
-    phantom_ip: PhantomData<IP>,
     phantom_p: PhantomData<P>,
 }
 
-impl<IP, P, R> XyzIterator<IP, P, R>
+impl<P, R> XyzIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
@@ -64,7 +61,6 @@ where
             line_buffer: Vec::new(),
             delim_determined: false,
             delim: 0,
-            phantom_ip: PhantomData,
             phantom_p: PhantomData,
         }
     }
@@ -107,9 +103,8 @@ where
     }
 }
 
-impl<IP, P, R> Iterator for XyzIterator<IP, P, R>
+impl<P, R> Iterator for XyzIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
@@ -129,9 +124,8 @@ where
     }
 }
 
-impl<IP, P, R> FusedIterator for XyzIterator<IP, P, R>
+impl<P, R> FusedIterator for XyzIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
@@ -172,7 +166,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let iterator = XyzIterator::<IP, P, R>::new(read);
+    let iterator = XyzIterator::new(read);
 
     for p in iterator {
         ip.push(p?)

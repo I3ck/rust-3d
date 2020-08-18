@@ -36,9 +36,8 @@ use super::{types::*, utils::*};
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .pts file
-pub struct PtsIterator<IP, P, R>
+pub struct PtsIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
@@ -47,13 +46,11 @@ where
     line_buffer: Vec<u8>,
     n_vertices: Option<usize>,
     n_vertices_added: usize,
-    phantom_ip: PhantomData<IP>,
     phantom_p: PhantomData<P>,
 }
 
-impl<IP, P, R> PtsIterator<IP, P, R>
+impl<P, R> PtsIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
@@ -64,7 +61,6 @@ where
             line_buffer: Vec::new(),
             n_vertices: None,
             n_vertices_added: 0,
-            phantom_ip: PhantomData,
             phantom_p: PhantomData,
         }
     }
@@ -95,9 +91,8 @@ where
     }
 }
 
-impl<IP, P, R> Iterator for PtsIterator<IP, P, R>
+impl<P, R> Iterator for PtsIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
@@ -154,9 +149,8 @@ where
     }
 }
 
-impl<IP, P, R> FusedIterator for PtsIterator<IP, P, R>
+impl<P, R> FusedIterator for PtsIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
@@ -169,7 +163,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let iterator = PtsIterator::<IP, P, R>::new(read);
+    let iterator = PtsIterator::new(read);
 
     for rd in iterator {
         match rd? {

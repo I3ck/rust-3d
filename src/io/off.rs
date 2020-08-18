@@ -36,9 +36,8 @@ use super::{types::*, utils::*};
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load points from a .off file
-pub struct OffPointsIterator<IP, P, R>
+pub struct OffPointsIterator<P, R>
 where
-    IP: IsPushable<P>, //@todo these aren't used for the iterators, remove
     P: IsBuildable3D,
     R: BufRead,
 {
@@ -48,13 +47,11 @@ where
     off_seen: bool,
     n_vertices: Option<usize>,
     n_added: usize,
-    phantom_ip: PhantomData<IP>,
     phantom_p: PhantomData<P>,
 }
 
-impl<IP, P, R> OffPointsIterator<IP, P, R>
+impl<P, R> OffPointsIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
@@ -66,7 +63,6 @@ where
             off_seen: false,
             n_vertices: None,
             n_added: 0,
-            phantom_ip: PhantomData,
             phantom_p: PhantomData,
         }
     }
@@ -97,9 +93,8 @@ where
     }
 }
 
-impl<IP, P, R> Iterator for OffPointsIterator<IP, P, R>
+impl<P, R> Iterator for OffPointsIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
@@ -145,9 +140,8 @@ where
     }
 }
 
-impl<IP, P, R> FusedIterator for OffPointsIterator<IP, P, R>
+impl<P, R> FusedIterator for OffPointsIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
@@ -351,7 +345,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let iterator = OffPointsIterator::<IP, P, R>::new(read);
+    let iterator = OffPointsIterator::new(read);
 
     for rd in iterator {
         match rd? {

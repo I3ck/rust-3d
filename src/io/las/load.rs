@@ -38,9 +38,8 @@ use super::super::{from_bytes::*, types::*};
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .las file
-pub struct LasIterator<IP, P, R>
+pub struct LasIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
@@ -48,13 +47,11 @@ where
     current: usize,
     header: Option<Header>,
     buffer: Vec<u8>,
-    phantom_ip: PhantomData<IP>,
     phantom_p: PhantomData<P>,
 }
 
-impl<IP, P, R> LasIterator<IP, P, R>
+impl<P, R> LasIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
@@ -64,7 +61,6 @@ where
             current: 0,
             header: None,
             buffer: Vec::new(),
-            phantom_ip: PhantomData,
             phantom_p: PhantomData,
         })
     }
@@ -87,9 +83,8 @@ where
     }
 }
 
-impl<IP, P, R> Iterator for LasIterator<IP, P, R>
+impl<P, R> Iterator for LasIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
@@ -122,9 +117,8 @@ where
     }
 }
 
-impl<IP, P, R> FusedIterator for LasIterator<IP, P, R>
+impl<P, R> FusedIterator for LasIterator<P, R>
 where
-    IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
@@ -139,7 +133,7 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-    let iterator = LasIterator::<IP, P, R>::new(read)?;
+    let iterator = LasIterator::new(read)?;
 
     for rd in iterator {
         match rd? {
