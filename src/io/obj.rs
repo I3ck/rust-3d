@@ -27,9 +27,66 @@ use crate::*;
 use std::{
     fmt,
     io::{BufRead, Error as ioError},
+    iter::FusedIterator,
+    marker::PhantomData,
 };
 
 use super::{types::*, utils::*};
+
+//------------------------------------------------------------------------------
+
+/// Iterator to incrementally load points from a .obj file
+pub struct ObjPointsIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    read: R,
+    i_line: usize,
+    line_buffer: Vec<u8>,
+    phantom_p: PhantomData<P>,
+}
+
+impl<P, R> ObjPointsIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    pub fn new(read: R) -> Self {
+        Self {
+            read,
+            i_line: 0,
+            line_buffer: Vec::new(),
+            phantom_p: PhantomData,
+        }
+    }
+}
+
+impl<P, R> Iterator for ObjPointsIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    type Item = ObjResult<P>;
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+            self.i_line += 1;
+
+            if line.starts_with(b"v ") {
+                return Some(fetch_vertex(line, self.i_line));
+            }
+        }
+
+        None
+    }
+}
+
+impl<P, R> FusedIterator for ObjPointsIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+}
 
 //------------------------------------------------------------------------------
 
@@ -61,21 +118,16 @@ where
 }
 
 /// Loads IsPushable<Is3D> from the .obj file format
-pub fn load_obj_points<IP, P, R>(read: &mut R, ip: &mut IP) -> ObjResult<()>
+pub fn load_obj_points<IP, P, R>(read: R, ip: &mut IP) -> ObjResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
-    let mut line_buffer = Vec::new();
-    let mut i_line = 0;
+    let iterator = ObjPointsIterator::new(read);
 
-    while let Ok(line) = fetch_line(read, &mut line_buffer) {
-        i_line += 1;
-
-        if line.starts_with(b"v ") {
-            ip.push(fetch_vertex(line, i_line)?);
-        }
+    for p in iterator {
+        ip.push(p?)
     }
 
     Ok(())
