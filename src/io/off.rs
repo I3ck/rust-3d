@@ -124,7 +124,7 @@ where
 
 //------------------------------------------------------------------------------
 
-/// Iterator to incrementally load points from a .off file
+/// Iterator to incrementally load a mesh from a .off file
 pub struct OffMeshIterator<P, R>
 where
     P: IsBuildable3D,
