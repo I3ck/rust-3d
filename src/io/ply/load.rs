@@ -59,14 +59,12 @@ where
             mesh.reserve_faces(header.face.count);
 
             match header.format {
-                Format::Ascii => {
-                    load_mesh_ascii(read, mesh, &header, &mut line_buffer, &mut i_line)
-                }
+                Format::Ascii => load_mesh_ascii(read, mesh, header, &mut i_line),
                 Format::LittleEndian => {
-                    load_mesh_binary::<LittleReader, _, _, _>(read, mesh, &header).simple()
+                    load_mesh_binary::<LittleReader, _, _, _>(read, mesh, header).simple()
                 }
                 Format::BigEndian => {
-                    load_mesh_binary::<BigReader, _, _, _>(read, mesh, &header).simple()
+                    load_mesh_binary::<BigReader, _, _, _>(read, mesh, header).simple()
                 }
             }?;
 
@@ -76,12 +74,12 @@ where
             ip.reserve(header.vertex.count);
 
             match header.format {
-                Format::Ascii => load_points_ascii(read, ip, &header, &mut line_buffer, i_line),
+                Format::Ascii => load_points_ascii(read, ip, header, i_line),
                 Format::LittleEndian => {
-                    load_points_binary::<LittleReader, _, _, _>(read, ip, &header).simple()
+                    load_points_binary::<LittleReader, _, _, _>(read, ip, header).simple()
                 }
                 Format::BigEndian => {
-                    load_points_binary::<BigReader, _, _, _>(read, ip, &header).simple()
+                    load_points_binary::<BigReader, _, _, _>(read, ip, header).simple()
                 }
             }?;
 
@@ -105,12 +103,12 @@ where
         mesh.reserve_faces(header.face.count);
 
         match header.format {
-            Format::Ascii => load_mesh_ascii(read, mesh, &header, &mut line_buffer, &mut i_line),
+            Format::Ascii => load_mesh_ascii(read, mesh, header, &mut i_line),
             Format::LittleEndian => {
-                load_mesh_binary::<LittleReader, _, _, _>(read, mesh, &header).simple()
+                load_mesh_binary::<LittleReader, _, _, _>(read, mesh, header).simple()
             }
             Format::BigEndian => {
-                load_mesh_binary::<BigReader, _, _, _>(read, mesh, &header).simple()
+                load_mesh_binary::<BigReader, _, _, _>(read, mesh, header).simple()
             }
         }
     } else {
@@ -134,11 +132,11 @@ where
     ip.reserve(header.vertex.count);
 
     match header.format {
-        Format::Ascii => load_points_ascii(read, ip, &header, &mut line_buffer, i_line),
+        Format::Ascii => load_points_ascii(read, ip, header, i_line),
         Format::LittleEndian => {
-            load_points_binary::<LittleReader, _, _, _>(read, ip, &header).simple()
+            load_points_binary::<LittleReader, _, _, _>(read, ip, header).simple()
         }
-        Format::BigEndian => load_points_binary::<BigReader, _, _, _>(read, ip, &header).simple(),
+        Format::BigEndian => load_points_binary::<BigReader, _, _, _>(read, ip, header).simple(),
     }
 }
 
@@ -388,26 +386,26 @@ where
 
 //------------------------------------------------------------------------------
 
-struct PlyBinaryPointsInternalIterator<'a, BR, P, R>
+struct PlyBinaryPointsInternalIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
     BR: IsByteReader,
 {
     read: R,
-    header: &'a PartialHeader,
+    header: PartialHeader,
     current: usize,
     phantom_p: PhantomData<P>,
     phantom_br: PhantomData<BR>,
 }
 
-impl<'a, BR, P, R> PlyBinaryPointsInternalIterator<'a, BR, P, R>
+impl<BR, P, R> PlyBinaryPointsInternalIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
     BR: IsByteReader,
 {
-    pub fn new(read: R, header: &'a PartialHeader) -> Self {
+    pub fn new(read: R, header: PartialHeader) -> Self {
         Self {
             read,
             header,
@@ -448,7 +446,7 @@ where
     }
 }
 
-impl<'a, BR, P, R> Iterator for PlyBinaryPointsInternalIterator<'a, BR, P, R>
+impl<BR, P, R> Iterator for PlyBinaryPointsInternalIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -465,7 +463,7 @@ where
     }
 }
 
-impl<'a, BR, P, R> FusedIterator for PlyBinaryPointsInternalIterator<'a, BR, P, R>
+impl<BR, P, R> FusedIterator for PlyBinaryPointsInternalIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -475,36 +473,31 @@ where
 
 //------------------------------------------------------------------------------
 
-struct PlyAsciiPointsInternalIterator<'a, P, R>
+struct PlyAsciiPointsInternalIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
 {
     read: R,
-    header: &'a PartialHeader,
+    header: PartialHeader,
     current: usize,
     i_line: usize,
-    line_buffer: &'a mut Vec<u8>,
+    line_buffer: Vec<u8>,
     phantom: PhantomData<P>,
 }
 
-impl<'a, P, R> PlyAsciiPointsInternalIterator<'a, P, R>
+impl<P, R> PlyAsciiPointsInternalIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
 {
-    pub fn new(
-        read: R,
-        header: &'a PartialHeader,
-        line_buffer: &'a mut Vec<u8>,
-        i_line: usize,
-    ) -> Self {
+    pub fn new(read: R, header: PartialHeader, i_line: usize) -> Self {
         Self {
             read,
             header,
             current: 0,
             i_line,
-            line_buffer,
+            line_buffer: Vec::new(),
             phantom: PhantomData,
         }
     }
@@ -548,7 +541,7 @@ where
     }
 }
 
-impl<'a, P, R> Iterator for PlyAsciiPointsInternalIterator<'a, P, R>
+impl<P, R> Iterator for PlyAsciiPointsInternalIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -571,7 +564,7 @@ where
     }
 }
 
-impl<'a, P, R> FusedIterator for PlyAsciiPointsInternalIterator<'a, P, R>
+impl<P, R> FusedIterator for PlyAsciiPointsInternalIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -580,38 +573,33 @@ where
 
 //------------------------------------------------------------------------------
 
-struct PlyAsciiFacesInternalIterator<'a, R>
+struct PlyAsciiFacesInternalIterator<R>
 where
     R: BufRead,
 {
     read: R,
-    header: &'a FullHeader,
+    header: FullHeader,
     current: usize,
     i_line: usize,
-    line_buffer: &'a mut Vec<u8>,
+    line_buffer: Vec<u8>,
 }
 
-impl<'a, R> PlyAsciiFacesInternalIterator<'a, R>
+impl<R> PlyAsciiFacesInternalIterator<R>
 where
     R: BufRead,
 {
-    pub fn new(
-        read: R,
-        header: &'a FullHeader,
-        line_buffer: &'a mut Vec<u8>,
-        i_line: usize,
-    ) -> Self {
+    pub fn new(read: R, header: FullHeader, i_line: usize) -> Self {
         Self {
             read,
             header,
             current: 0,
             i_line,
-            line_buffer,
+            line_buffer: Vec::new(),
         }
     }
 }
 
-impl<'a, R> Iterator for PlyAsciiFacesInternalIterator<'a, R>
+impl<R> Iterator for PlyAsciiFacesInternalIterator<R>
 where
     R: BufRead,
 {
@@ -633,27 +621,27 @@ where
     }
 }
 
-impl<'a, R> FusedIterator for PlyAsciiFacesInternalIterator<'a, R> where R: BufRead {}
+impl<R> FusedIterator for PlyAsciiFacesInternalIterator<R> where R: BufRead {}
 
 //------------------------------------------------------------------------------
 
-struct PlyBinaryFacesInternalIterator<'a, BR, R>
+struct PlyBinaryFacesInternalIterator<BR, R>
 where
     R: Read,
     BR: IsByteReader,
 {
     read: R,
-    header: &'a FullHeader,
+    header: FullHeader,
     current: usize,
     phantom: PhantomData<BR>,
 }
 
-impl<'a, BR, R> PlyBinaryFacesInternalIterator<'a, BR, R>
+impl<BR, R> PlyBinaryFacesInternalIterator<BR, R>
 where
     R: Read,
     BR: IsByteReader,
 {
-    pub fn new(read: R, header: &'a FullHeader) -> Self {
+    pub fn new(read: R, header: FullHeader) -> Self {
         Self {
             read,
             header,
@@ -682,7 +670,7 @@ where
     }
 }
 
-impl<'a, BR, R> Iterator for PlyBinaryFacesInternalIterator<'a, BR, R>
+impl<BR, R> Iterator for PlyBinaryFacesInternalIterator<BR, R>
 where
     R: Read,
     BR: IsByteReader,
@@ -698,7 +686,7 @@ where
     }
 }
 
-impl<'a, BR, R> FusedIterator for PlyBinaryFacesInternalIterator<'a, BR, R>
+impl<BR, R> FusedIterator for PlyBinaryFacesInternalIterator<BR, R>
 where
     R: Read,
     BR: IsByteReader,
@@ -710,7 +698,7 @@ where
 fn load_points_binary<BR, IP, P, R>(
     read: &mut R,
     ip: &mut IP,
-    header: &PartialHeader,
+    header: PartialHeader,
 ) -> PlyResult<()>
 where
     IP: IsPushable<P>,
@@ -732,8 +720,7 @@ where
 fn load_points_ascii<IP, P, R>(
     read: &mut R,
     ip: &mut IP,
-    header: &PartialHeader,
-    line_buffer: &mut Vec<u8>,
+    header: PartialHeader,
     i_line: usize,
 ) -> PlyIOResult<()>
 where
@@ -741,7 +728,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let iterator = PlyAsciiPointsInternalIterator::new(read, header, line_buffer, i_line);
+    let iterator = PlyAsciiPointsInternalIterator::new(read, header, i_line);
 
     for p in iterator {
         ip.push(p?)
@@ -755,7 +742,7 @@ where
 fn load_mesh_binary<BR, EM, P, R>(
     mut read: &mut R,
     mesh: &mut EM,
-    header: &FullHeader,
+    header: FullHeader,
 ) -> PlyResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
@@ -765,7 +752,7 @@ where
 {
     let partial_header = header.clone().into(); //@todo avoid clone by using borrow / as_ref traits
 
-    let pi = PlyBinaryPointsInternalIterator::<BR, _, _>::new(&mut read, &partial_header);
+    let pi = PlyBinaryPointsInternalIterator::<BR, _, _>::new(&mut read, partial_header);
 
     for p in pi {
         mesh.add_vertex(p?);
@@ -787,8 +774,7 @@ where
 fn load_mesh_ascii<EM, P, R>(
     mut read: &mut R,
     mesh: &mut EM,
-    header: &FullHeader,
-    line_buffer: &mut Vec<u8>,
+    header: FullHeader,
     i_line: &mut usize,
 ) -> PlyIOResult<()>
 where
@@ -798,13 +784,13 @@ where
 {
     let partial_header = header.clone().into(); //@todo avoid clone by using borrow / as_ref traits
 
-    let pi = PlyAsciiPointsInternalIterator::new(&mut read, &partial_header, line_buffer, *i_line); //@todo i_line must be updated
+    let pi = PlyAsciiPointsInternalIterator::new(&mut read, partial_header, *i_line); //@todo i_line must be updated
 
     for p in pi {
         mesh.add_vertex(p?);
     }
 
-    let fi = PlyAsciiFacesInternalIterator::new(&mut read, header, line_buffer, *i_line);
+    let fi = PlyAsciiFacesInternalIterator::new(&mut read, header, *i_line);
 
     for f in fi {
         let [a, b, c] = f?;
