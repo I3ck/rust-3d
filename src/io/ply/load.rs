@@ -47,7 +47,7 @@ pub fn load_ply_either<EM, IP, P, R>(
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     IP: IsPushable<P>,
-    P: IsBuildable3D + Clone,
+    P: IsBuildable3D,
     R: BufRead,
 {
     let mut line_buffer = Vec::new();
@@ -96,7 +96,7 @@ where
 pub fn load_ply_mesh<EM, P, R>(read: &mut R, mesh: &mut EM) -> PlyIOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D + Clone,
+    P: IsBuildable3D,
     R: BufRead,
 {
     let mut line_buffer = Vec::new();
@@ -126,7 +126,7 @@ where
 pub fn load_ply_points<IP, P, R>(read: &mut R, ip: &mut IP) -> PlyIOResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D + Clone,
+    P: IsBuildable3D,
     R: BufRead,
 {
     let mut line_buffer = Vec::new();
@@ -392,7 +392,7 @@ where
 
 struct PlyBinaryPointsIterator<'a, BR, P, R>
 where
-    P: IsBuildable3D + Clone, //@todo Clone required?
+    P: IsBuildable3D,
     R: Read,
     BR: IsByteReader,
 {
@@ -405,7 +405,7 @@ where
 
 impl<'a, BR, P, R> PlyBinaryPointsIterator<'a, BR, P, R>
 where
-    P: IsBuildable3D + Clone, //@todo Clone required?
+    P: IsBuildable3D,
     R: Read,
     BR: IsByteReader,
 {
@@ -452,7 +452,7 @@ where
 
 impl<'a, BR, P, R> Iterator for PlyBinaryPointsIterator<'a, BR, P, R>
 where
-    P: IsBuildable3D + Clone, //@todo Clone required?
+    P: IsBuildable3D,
     R: Read,
     BR: IsByteReader,
 {
@@ -469,7 +469,7 @@ where
 
 impl<'a, BR, P, R> FusedIterator for PlyBinaryPointsIterator<'a, BR, P, R>
 where
-    P: IsBuildable3D + Clone, //@todo Clone required?
+    P: IsBuildable3D,
     R: Read,
     BR: IsByteReader,
 {
@@ -484,7 +484,7 @@ fn load_points_binary<BR, IP, P, R>(
 ) -> PlyResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D + Clone, //@todo Clone required?
+    P: IsBuildable3D,
     R: Read,
     BR: IsByteReader,
 {
@@ -508,7 +508,7 @@ fn load_points_ascii<IP, P, R>(
 ) -> PlyIOResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D + Clone,
+    P: IsBuildable3D,
     R: BufRead,
 {
     let mut n_pushed = 0;
@@ -570,7 +570,7 @@ where
 fn load_mesh_binary<BR, EM, P, R>(read: &mut R, mesh: &mut EM, header: &FullHeader) -> PlyResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D + Clone,
+    P: IsBuildable3D,
     R: Read,
     BR: IsByteReader,
 {
@@ -630,7 +630,7 @@ fn load_mesh_ascii<EM, P, R>(
 ) -> PlyIOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D + Clone,
+    P: IsBuildable3D,
     R: BufRead,
 {
     while let Ok(line) = fetch_line(read, line_buffer) {
