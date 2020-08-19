@@ -76,9 +76,7 @@ where
             ip.reserve(header.vertex.count);
 
             match header.format {
-                Format::Ascii => {
-                    load_points_ascii(read, ip, &header, &mut line_buffer, &mut i_line)
-                }
+                Format::Ascii => load_points_ascii(read, ip, &header, &mut line_buffer, i_line),
                 Format::LittleEndian => {
                     load_points_binary::<LittleReader, _, _, _>(read, ip, &header).simple()
                 }
@@ -136,7 +134,7 @@ where
     ip.reserve(header.vertex.count);
 
     match header.format {
-        Format::Ascii => load_points_ascii(read, ip, &header, &mut line_buffer, &mut i_line),
+        Format::Ascii => load_points_ascii(read, ip, &header, &mut line_buffer, i_line),
         Format::LittleEndian => {
             load_points_binary::<LittleReader, _, _, _>(read, ip, &header).simple()
         }
@@ -477,6 +475,110 @@ where
 
 //------------------------------------------------------------------------------
 
+struct PlyAsciiPointsIterator<'a, P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    read: R,
+    header: &'a PartialHeader,
+    current: usize,
+    i_line: usize,
+    line_buffer: &'a mut Vec<u8>,
+    phantom: PhantomData<P>,
+}
+
+impl<'a, P, R> PlyAsciiPointsIterator<'a, P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    pub fn new(
+        read: R,
+        header: &'a PartialHeader,
+        line_buffer: &'a mut Vec<u8>,
+        i_line: usize,
+    ) -> Self {
+        Self {
+            read,
+            header,
+            current: 0,
+            i_line,
+            line_buffer,
+            phantom: PhantomData,
+        }
+    }
+
+    #[inline(always)]
+    fn fetch_one(header: &PartialHeader, line: &[u8], i_line: usize) -> PlyIOResult<P> {
+        let mut words = to_words_skip_empty(line);
+
+        skip_n(&mut words, header.vertex.format.before.words);
+
+        let first = words
+            .next()
+            .and_then(|w| from_ascii(w))
+            .ok_or(PlyError::InvalidVertex)
+            .line(i_line, line)?;
+
+        skip_n(&mut words, header.vertex.format.between_first_snd.words);
+
+        let snd = words
+            .next()
+            .and_then(|w| from_ascii(w))
+            .ok_or(PlyError::InvalidVertex)
+            .line(i_line, line)?;
+
+        skip_n(&mut words, header.vertex.format.between_snd_third.words);
+
+        let third = words
+            .next()
+            .and_then(|w| from_ascii(w))
+            .ok_or(PlyError::InvalidVertex)
+            .line(i_line, line)?;
+
+        // no need to skip 'after' since we're done with this line anyway
+
+        Ok(point_with_order(
+            first,
+            snd,
+            third,
+            header.vertex.format.order,
+        ))
+    }
+}
+
+impl<'a, P, R> Iterator for PlyAsciiPointsIterator<'a, P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    type Item = PlyIOResult<P>;
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+            self.i_line += 1;
+            if self.current < self.header.vertex.count {
+                return Some(Self::fetch_one(&self.header, line, self.i_line));
+            }
+        }
+
+        if self.current != self.header.vertex.count {
+            Some(Err(PlyError::LoadVertexCountIncorrect).simple())
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, P, R> FusedIterator for PlyAsciiPointsIterator<'a, P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+}
+
+//------------------------------------------------------------------------------
+
 fn load_points_binary<BR, IP, P, R>(
     read: &mut R,
     ip: &mut IP,
@@ -504,62 +606,17 @@ fn load_points_ascii<IP, P, R>(
     ip: &mut IP,
     header: &PartialHeader,
     line_buffer: &mut Vec<u8>,
-    i_line: &mut usize,
+    i_line: usize,
 ) -> PlyIOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
-    let mut n_pushed = 0;
+    let iterator = PlyAsciiPointsIterator::new(read, header, line_buffer, i_line);
 
-    while let Ok(line) = fetch_line(read, line_buffer) {
-        *i_line += 1;
-
-        if header.vertex.count > n_pushed {
-            let mut words = to_words_skip_empty(line);
-
-            skip_n(&mut words, header.vertex.format.before.words);
-
-            let first = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PlyError::InvalidVertex)
-                .line(*i_line, line)?;
-
-            skip_n(&mut words, header.vertex.format.between_first_snd.words);
-
-            let snd = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PlyError::InvalidVertex)
-                .line(*i_line, line)?;
-
-            skip_n(&mut words, header.vertex.format.between_snd_third.words);
-
-            let third = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PlyError::InvalidVertex)
-                .line(*i_line, line)?;
-
-            // no need to skip 'after' since we're done with this line anyway
-
-            ip.push(point_with_order(
-                first,
-                snd,
-                third,
-                header.vertex.format.order,
-            ));
-
-            n_pushed += 1;
-
-            continue;
-        }
-    }
-
-    if header.vertex.count != n_pushed {
-        return Err(PlyError::LoadVertexCountIncorrect).simple();
+    for p in iterator {
+        ip.push(p?)
     }
 
     Ok(())
