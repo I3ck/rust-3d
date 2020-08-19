@@ -637,6 +637,76 @@ impl<'a, R> FusedIterator for PlyAsciiFacesIterator<'a, R> where R: BufRead {}
 
 //------------------------------------------------------------------------------
 
+struct PlyBinaryFacesIterator<'a, BR, R>
+where
+    R: Read,
+    BR: IsByteReader,
+{
+    read: R,
+    header: &'a FullHeader,
+    current: usize,
+    phantom: PhantomData<BR>,
+}
+
+impl<'a, BR, R> PlyBinaryFacesIterator<'a, BR, R>
+where
+    R: Read,
+    BR: IsByteReader,
+{
+    pub fn new(read: R, header: &'a FullHeader) -> Self {
+        Self {
+            read,
+            header,
+            current: 0,
+            phantom: PhantomData,
+        }
+    }
+
+    #[inline(always)]
+    fn fetch_one(&mut self) -> PlyResult<[usize; 3]> {
+        skip_bytes(&mut self.read, self.header.face.format.before.bytes)?;
+
+        let element_count = read_face_type::<BR, _>(&mut self.read, self.header.face.format.count)?;
+
+        if element_count != 3 {
+            return Err(PlyError::FaceStructure);
+        }
+
+        let a = read_face_type::<BR, _>(&mut self.read, self.header.face.format.index)?;
+        let b = read_face_type::<BR, _>(&mut self.read, self.header.face.format.index)?;
+        let c = read_face_type::<BR, _>(&mut self.read, self.header.face.format.index)?;
+
+        skip_bytes(&mut self.read, self.header.face.format.after.bytes)?;
+
+        Ok([a, b, c])
+    }
+}
+
+impl<'a, BR, R> Iterator for PlyBinaryFacesIterator<'a, BR, R>
+where
+    R: Read,
+    BR: IsByteReader,
+{
+    type Item = PlyResult<[usize; 3]>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current < self.header.face.count {
+            self.current += 1;
+            Some(self.fetch_one())
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, BR, R> FusedIterator for PlyBinaryFacesIterator<'a, BR, R>
+where
+    R: Read,
+    BR: IsByteReader,
+{
+}
+
+//------------------------------------------------------------------------------
+
 fn load_points_binary<BR, IP, P, R>(
     read: &mut R,
     ip: &mut IP,
@@ -701,22 +771,11 @@ where
         mesh.add_vertex(p?);
     }
 
-    for _ in 0..header.face.count {
-        skip_bytes(read, header.face.format.before.bytes)?;
+    let fi = PlyBinaryFacesIterator::<BR, _>::new(&mut read, header);
 
-        let element_count = read_face_type::<BR, _>(read, header.face.format.count)?;
-
-        if element_count != 3 {
-            return Err(PlyError::FaceStructure);
-        }
-
-        let a = read_face_type::<BR, _>(read, header.face.format.index)?;
-        let b = read_face_type::<BR, _>(read, header.face.format.index)?;
-        let c = read_face_type::<BR, _>(read, header.face.format.index)?;
-
-        skip_bytes(read, header.face.format.after.bytes)?;
-
-        mesh.try_add_connection(VId(a as usize), VId(b as usize), VId(c as usize))
+    for f in fi {
+        let [a, b, c] = f?;
+        mesh.try_add_connection(VId(a), VId(b), VId(c))
             .or(Err(PlyError::InvalidMeshIndices))?;
     }
 
