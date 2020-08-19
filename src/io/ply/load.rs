@@ -580,6 +580,63 @@ where
 
 //------------------------------------------------------------------------------
 
+struct PlyAsciiFacesIterator<'a, R>
+where
+    R: BufRead,
+{
+    read: R,
+    header: &'a FullHeader,
+    current: usize,
+    i_line: usize,
+    line_buffer: &'a mut Vec<u8>,
+}
+
+impl<'a, R> PlyAsciiFacesIterator<'a, R>
+where
+    R: BufRead,
+{
+    pub fn new(
+        read: R,
+        header: &'a FullHeader,
+        line_buffer: &'a mut Vec<u8>,
+        i_line: usize,
+    ) -> Self {
+        Self {
+            read,
+            header,
+            current: 0,
+            i_line,
+            line_buffer,
+        }
+    }
+}
+
+impl<'a, R> Iterator for PlyAsciiFacesIterator<'a, R>
+where
+    R: BufRead,
+{
+    type Item = PlyIOResult<[usize; 3]>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current < self.header.face.count {
+            self.current += 1;
+            while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+                self.i_line += 1;
+                return Some(
+                    collect_index_line(&line)
+                        .ok_or(PlyError::FaceStructure)
+                        .line(self.i_line, line),
+                );
+            }
+        }
+
+        None
+    }
+}
+
+impl<'a, R> FusedIterator for PlyAsciiFacesIterator<'a, R> where R: BufRead {}
+
+//------------------------------------------------------------------------------
+
 fn load_points_binary<BR, IP, P, R>(
     read: &mut R,
     ip: &mut IP,
@@ -682,28 +739,19 @@ where
 {
     let partial_header = header.clone().into(); //@todo avoid clone by using borrow / as_ref traits
 
-    let pi = PlyAsciiPointsIterator::new(&mut read, &partial_header, line_buffer, *i_line);
+    let pi = PlyAsciiPointsIterator::new(&mut read, &partial_header, line_buffer, *i_line); //@todo i_line must be updated
 
     for p in pi {
         mesh.add_vertex(p?);
     }
 
-    while let Ok(line) = fetch_line(read, line_buffer) {
-        *i_line += 1;
+    let fi = PlyAsciiFacesIterator::new(&mut read, header, line_buffer, *i_line);
 
-        if header.face.count > mesh.num_faces() {
-            let [a, b, c] = collect_index_line(&line)
-                .ok_or(PlyError::FaceStructure)
-                .line(*i_line, line)?;
-            mesh.try_add_connection(VId(a), VId(b), VId(c))
-                .or(Err(PlyError::InvalidMeshIndices))
-                .line(*i_line, line)?;
-            continue;
-        }
-    }
-
-    if header.vertex.count != mesh.num_vertices() {
-        return Err(PlyError::LoadVertexCountIncorrect).simple();
+    for f in fi {
+        let [a, b, c] = f?;
+        mesh.try_add_connection(VId(a), VId(b), VId(c))
+            .or(Err(PlyError::InvalidMeshIndices))
+            .simple()?;
     }
 
     Ok(())
