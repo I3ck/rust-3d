@@ -27,112 +27,166 @@ use crate::*;
 use std::{
     fmt,
     io::{BufRead, Error as ioError},
+    iter::FusedIterator,
+    marker::PhantomData,
 };
 
 use super::{types::*, utils::*};
 
 //------------------------------------------------------------------------------
 
+/// Iterator to incrementally load a .gcode file
+pub struct GcodeIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    read: R,
+    i_line: usize,
+    line_buffer: Vec<u8>,
+    //start_pushed: bool, //@todo this was removed, why always push 0/0/0?
+    ra: RelativeAbsolute,
+    x: f64,
+    y: f64,
+    z: f64,
+    phantom_p: PhantomData<P>,
+}
+
+impl<P, R> GcodeIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    pub fn new(read: R) -> Self {
+        Self {
+            read,
+            i_line: 0,
+            line_buffer: Vec::new(),
+            //start_pushed: false, //@todo this was removed, why always push 0/0/0?
+            ra: RelativeAbsolute::Absolute,
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+            phantom_p: PhantomData,
+        }
+    }
+}
+
+impl<P, R> Iterator for GcodeIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    type Item = GcodeResult<P>;
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+            self.i_line += 1;
+
+            if line.len() >= 4 && line[0] == b'G' {
+                if line[2] == b' ' && (line[1] == b'1' || line[1] == b'2' || line[1] == b'3') {
+                    // Move according to absolute/relative
+                    let mut any_changed = false;
+                    match command(&line[3..])
+                        .ok_or(GcodeError::Command)
+                        .line(self.i_line, line)
+                    {
+                        Err(e) => return Some(Err(e)),
+                        Ok([opt_x, opt_y, opt_z]) => {
+                            if let Some(new_x) = opt_x {
+                                any_changed = true;
+                                match self.ra {
+                                    RelativeAbsolute::Absolute => self.x = new_x,
+                                    RelativeAbsolute::Relative => self.x += new_x,
+                                }
+                            }
+
+                            if let Some(new_y) = opt_y {
+                                any_changed = true;
+                                match self.ra {
+                                    RelativeAbsolute::Absolute => self.y = new_y,
+                                    RelativeAbsolute::Relative => self.y += new_y,
+                                }
+                            }
+
+                            if let Some(new_z) = opt_z {
+                                any_changed = true;
+                                match self.ra {
+                                    RelativeAbsolute::Absolute => self.z = new_z,
+                                    RelativeAbsolute::Relative => self.z += new_z,
+                                }
+                            }
+
+                            if any_changed {
+                                return Some(Ok(P::new(self.x, self.y, self.z)));
+                            }
+                        }
+                    }
+                } else if line[1] == b'9' && line[3] == b' ' {
+                    // G9x
+                    if line[2] == b'0' {
+                        // G90
+                        self.ra = RelativeAbsolute::Absolute;
+                    } else if line[2] == b'1' {
+                        // G91
+                        self.ra = RelativeAbsolute::Relative;
+                    } else if line[2] == b'2' {
+                        // G92
+                        // Move according absolute
+                        let mut any_changed = false;
+                        match command(&line[4..])
+                            .ok_or(GcodeError::Command)
+                            .line(self.i_line, line)
+                        {
+                            Err(e) => return Some(Err(e)),
+                            Ok([opt_x, opt_y, opt_z]) => {
+                                if let Some(new_x) = opt_x {
+                                    any_changed = true;
+                                    self.x = new_x
+                                }
+
+                                if let Some(new_y) = opt_y {
+                                    any_changed = true;
+                                    self.y = new_y
+                                }
+
+                                if let Some(new_z) = opt_z {
+                                    any_changed = true;
+                                    self.z = new_z
+                                }
+
+                                if any_changed {
+                                    return Some(Ok(P::new(self.x, self.y, self.z)));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        None
+    }
+}
+
+impl<P, R> FusedIterator for GcodeIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+}
+
+//------------------------------------------------------------------------------
+
 /// Loads a IsPushable<Is3D> as x y z coordinates from gcode
-pub fn load_gcode_points<IP, P, R>(read: &mut R, ip: &mut IP) -> GcodeResult<()>
+pub fn load_gcode_points<IP, P, R>(read: R, ip: &mut IP) -> GcodeResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
-    let mut line_buffer = Vec::new();
+    let iterator = GcodeIterator::new(read);
 
-    let mut i_line = 0;
-
-    let mut start_pushed = false;
-    let mut ra = RelativeAbsolute::Absolute;
-    let mut x = 0.0;
-    let mut y = 0.0;
-    let mut z = 0.0;
-
-    while let Ok(line) = fetch_line(read, &mut line_buffer) {
-        i_line += 1;
-
-        if line.len() >= 4 && line[0] == b'G' {
-            if line[2] == b' ' && (line[1] == b'1' || line[1] == b'2' || line[1] == b'3') {
-                // Move according to absolute/relative
-                let mut any_changed = false;
-                let [opt_x, opt_y, opt_z] = command(&line[3..])
-                    .ok_or(GcodeError::Command)
-                    .line(i_line, line)?;
-
-                if let Some(new_x) = opt_x {
-                    any_changed = true;
-                    match ra {
-                        RelativeAbsolute::Absolute => x = new_x,
-                        RelativeAbsolute::Relative => x += new_x,
-                    }
-                }
-
-                if let Some(new_y) = opt_y {
-                    any_changed = true;
-                    match ra {
-                        RelativeAbsolute::Absolute => y = new_y,
-                        RelativeAbsolute::Relative => y += new_y,
-                    }
-                }
-
-                if let Some(new_z) = opt_z {
-                    any_changed = true;
-                    match ra {
-                        RelativeAbsolute::Absolute => z = new_z,
-                        RelativeAbsolute::Relative => z += new_z,
-                    }
-                }
-
-                if any_changed {
-                    if !start_pushed {
-                        ip.push(P::new(0.0, 0.0, 0.0));
-                        start_pushed = true
-                    }
-                    ip.push(P::new(x, y, z));
-                }
-            } else if line[1] == b'9' && line[3] == b' ' {
-                // G9x
-                if line[2] == b'0' {
-                    // G90
-                    ra = RelativeAbsolute::Absolute;
-                } else if line[2] == b'1' {
-                    // G91
-                    ra = RelativeAbsolute::Relative;
-                } else if line[2] == b'2' {
-                    // G92
-                    // Move according absolute
-                    let mut any_changed = false;
-                    let [opt_x, opt_y, opt_z] = command(&line[4..])
-                        .ok_or(GcodeError::Command)
-                        .line(i_line, line)?;
-
-                    if let Some(new_x) = opt_x {
-                        any_changed = true;
-                        x = new_x
-                    }
-
-                    if let Some(new_y) = opt_y {
-                        any_changed = true;
-                        y = new_y
-                    }
-
-                    if let Some(new_z) = opt_z {
-                        any_changed = true;
-                        z = new_z
-                    }
-
-                    if any_changed {
-                        if !start_pushed {
-                            ip.push(P::new(0.0, 0.0, 0.0));
-                            start_pushed = true
-                        }
-                        ip.push(P::new(x, y, z));
-                    }
-                }
-            }
-        }
+    for p in iterator {
+        ip.push(p?)
     }
 
     Ok(())
