@@ -392,6 +392,7 @@ where
     R: BufRead,
 {
     inner: BinaryOrAsciiPlyPointsInteralIterator<P, R>,
+    to_reserve: Option<usize>,
 }
 
 impl<P, R> PlyPointsIterator<P, R>
@@ -404,6 +405,7 @@ where
         let mut i_line = 0;
 
         let header: PartialHeader = load_header(&mut read, &mut line_buffer, &mut i_line)?.into();
+        let to_reserve = Some(header.vertex.count);
 
         let inner = match header.format {
             Format::Ascii => BinaryOrAsciiPlyPointsInteralIterator::Ascii(
@@ -417,9 +419,7 @@ where
             ),
         };
 
-        Ok(Self { inner })
-
-        //@todo must send reserve first (header.vertex.count)
+        Ok(Self { inner, to_reserve })
     }
 }
 
@@ -428,13 +428,20 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = PlyIOResult<P>;
+    type Item = PlyIOResult<DataReserve<P>>;
     fn next(&mut self) -> Option<Self::Item> {
-        //@todo here ensure to send a reserve on first iter instead
-        match &mut self.inner {
-            BinaryOrAsciiPlyPointsInteralIterator::Ascii(x) => x.next(),
-            BinaryOrAsciiPlyPointsInteralIterator::BinaryLittle(x) => x.next().map(|x| x.simple()),
-            BinaryOrAsciiPlyPointsInteralIterator::BinaryBig(x) => x.next().map(|x| x.simple()),
+        if let Some(to_reserve) = self.to_reserve {
+            self.to_reserve = None;
+            Some(Ok(DataReserve::Reserve(to_reserve)))
+        } else {
+            match &mut self.inner {
+                BinaryOrAsciiPlyPointsInteralIterator::Ascii(x) => x.next(),
+                BinaryOrAsciiPlyPointsInteralIterator::BinaryLittle(x) => {
+                    x.next().map(|x| x.simple())
+                }
+                BinaryOrAsciiPlyPointsInteralIterator::BinaryBig(x) => x.next().map(|x| x.simple()),
+            }
+            .map(|x| x.map(|x| DataReserve::Data(x)))
         }
     }
 }
