@@ -386,6 +386,80 @@ where
 
 //------------------------------------------------------------------------------
 
+pub struct PlyPointsIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    inner: BinaryOrAsciiPlyPointsInteralIterator<P, R>,
+}
+
+impl<P, R> PlyPointsIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    pub fn new(mut read: R) -> PlyIOResult<Self> {
+        let mut line_buffer = Vec::new();
+        let mut i_line = 0;
+
+        let header: PartialHeader = load_header(&mut read, &mut line_buffer, &mut i_line)?.into();
+
+        let inner = match header.format {
+            Format::Ascii => BinaryOrAsciiPlyPointsInteralIterator::Ascii(
+                PlyAsciiPointsInternalIterator::new(read, header, i_line),
+            ),
+            Format::LittleEndian => BinaryOrAsciiPlyPointsInteralIterator::BinaryLittle(
+                PlyBinaryPointsInternalIterator::new(read, header),
+            ),
+            Format::BigEndian => BinaryOrAsciiPlyPointsInteralIterator::BinaryBig(
+                PlyBinaryPointsInternalIterator::new(read, header),
+            ),
+        };
+
+        Ok(Self { inner })
+
+        //@todo must send reserve first (header.vertex.count)
+    }
+}
+
+impl<P, R> Iterator for PlyPointsIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    type Item = PlyIOResult<P>;
+    fn next(&mut self) -> Option<Self::Item> {
+        //@todo here ensure to send a reserve on first iter instead
+        match &mut self.inner {
+            BinaryOrAsciiPlyPointsInteralIterator::Ascii(x) => x.next(),
+            BinaryOrAsciiPlyPointsInteralIterator::BinaryLittle(x) => x.next().map(|x| x.simple()),
+            BinaryOrAsciiPlyPointsInteralIterator::BinaryBig(x) => x.next().map(|x| x.simple()),
+        }
+    }
+}
+
+impl<P, R> FusedIterator for PlyPointsIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+}
+
+//------------------------------------------------------------------------------
+
+enum BinaryOrAsciiPlyPointsInteralIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    Ascii(PlyAsciiPointsInternalIterator<P, R>),
+    BinaryLittle(PlyBinaryPointsInternalIterator<LittleReader, P, R>),
+    BinaryBig(PlyBinaryPointsInternalIterator<BigReader, P, R>),
+}
+
+//------------------------------------------------------------------------------
+
 struct PlyBinaryPointsInternalIterator<BR, P, R>
 where
     P: IsBuildable3D,
