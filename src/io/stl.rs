@@ -87,7 +87,7 @@ where
 
 //------------------------------------------------------------------------------
 
-pub struct StlMeshIterator<P, R>
+pub struct StlIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -95,7 +95,7 @@ where
     inner: BinaryOrAsciiIterator<P, R>,
 }
 
-impl<P, R> StlMeshIterator<P, R>
+impl<P, R> StlIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -103,17 +103,17 @@ where
     pub fn new(mut read: R, format: StlFormat) -> StlIOResult<Self> {
         if is_ascii(&mut read, format).simple()? {
             Ok(Self {
-                inner: BinaryOrAsciiIterator::Ascii(StlMeshAsciiIterator::new(read)),
+                inner: BinaryOrAsciiIterator::Ascii(StlAsciiIterator::new(read)),
             })
         } else {
             Ok(Self {
-                inner: BinaryOrAsciiIterator::Binary(StlMeshBinaryIterator::new(read)),
+                inner: BinaryOrAsciiIterator::Binary(StlBinaryIterator::new(read)),
             })
         }
     }
 }
 
-impl<P, R> Iterator for StlMeshIterator<P, R>
+impl<P, R> Iterator for StlIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -127,7 +127,7 @@ where
     }
 }
 
-impl<P, R> FusedIterator for StlMeshIterator<P, R>
+impl<P, R> FusedIterator for StlIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -141,14 +141,13 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    Binary(StlMeshBinaryIterator<P, R>),
-    Ascii(StlMeshAsciiIterator<P, R>),
+    Binary(StlBinaryIterator<P, R>),
+    Ascii(StlAsciiIterator<P, R>),
 }
 
 //------------------------------------------------------------------------------
 
-#[allow(dead_code)] //@todo remove
-struct StlMeshBinaryIterator<P, R>
+struct StlBinaryIterator<P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -160,7 +159,7 @@ where
     phantom: PhantomData<P>, //@todo others name this phantom_p, unecessary there in most cases
 }
 
-impl<P, R> StlMeshBinaryIterator<P, R>
+impl<P, R> StlBinaryIterator<P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -176,7 +175,7 @@ where
     }
 }
 
-impl<P, R> Iterator for StlMeshBinaryIterator<P, R>
+impl<P, R> Iterator for StlBinaryIterator<P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -226,7 +225,7 @@ where
     }
 }
 
-impl<P, R> FusedIterator for StlMeshBinaryIterator<P, R>
+impl<P, R> FusedIterator for StlBinaryIterator<P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -235,8 +234,7 @@ where
 
 //------------------------------------------------------------------------------
 
-#[allow(dead_code)] //@todo remove
-struct StlMeshAsciiIterator<P, R>
+struct StlAsciiIterator<P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -248,7 +246,7 @@ where
     phantom: PhantomData<P>,
 }
 
-impl<P, R> StlMeshAsciiIterator<P, R>
+impl<P, R> StlAsciiIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -264,7 +262,7 @@ where
     }
 }
 
-impl<P, R> Iterator for StlMeshAsciiIterator<P, R>
+impl<P, R> Iterator for StlAsciiIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -295,7 +293,7 @@ where
     }
 }
 
-impl<P, R> FusedIterator for StlMeshAsciiIterator<P, R>
+impl<P, R> FusedIterator for StlAsciiIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -317,7 +315,7 @@ where
     R: BufRead,
     IPN: IsPushable<P>,
 {
-    let iterator = StlMeshIterator::new(read, format)?;
+    let iterator = StlIterator::new(read, format)?;
 
     for fr in iterator {
         match fr? {
@@ -351,7 +349,7 @@ where
     IPN: IsPushable<P>,
 {
     let mut map = FnvHashMap::default();
-    let iterator = StlMeshIterator::<P, R>::new(read, format)?;
+    let iterator = StlIterator::<P, R>::new(read, format)?;
 
     for fr in iterator {
         match fr? {
@@ -410,7 +408,7 @@ where
     R: BufRead,
     IPN: IsPushable<P>,
 {
-    let iterator = StlMeshIterator::new(read, format)?;
+    let iterator = StlIterator::new(read, format)?;
 
     for fr in iterator {
         match fr? {
