@@ -26,7 +26,11 @@ use crate::*;
 
 use core::convert::TryFrom;
 
-use std::io::{BufRead, Read};
+use std::{
+    io::{BufRead, Read},
+    iter::FusedIterator,
+    marker::PhantomData,
+};
 
 use super::super::{byte_reader::*, types::*, utils::*};
 
@@ -386,6 +390,93 @@ where
 
 //------------------------------------------------------------------------------
 
+struct PlyBinaryPointsIterator<'a, BR, P, R>
+where
+    P: IsBuildable3D + Clone, //@todo Clone required?
+    R: Read,
+    BR: IsByteReader,
+{
+    read: R,
+    header: &'a PartialHeader,
+    current: usize,
+    phantom_p: PhantomData<P>,
+    phantom_br: PhantomData<BR>,
+}
+
+impl<'a, BR, P, R> PlyBinaryPointsIterator<'a, BR, P, R>
+where
+    P: IsBuildable3D + Clone, //@todo Clone required?
+    R: Read,
+    BR: IsByteReader,
+{
+    pub fn new(read: R, header: &'a PartialHeader) -> Self {
+        Self {
+            read,
+            header,
+            current: 0,
+            phantom_p: PhantomData,
+            phantom_br: PhantomData,
+        }
+    }
+
+    #[inline(always)]
+    fn fetch_one(&mut self) -> PlyResult<P> {
+        skip_bytes(&mut self.read, self.header.vertex.format.before.bytes)?;
+
+        let first = read_vertex_type::<BR, _>(&mut self.read, self.header.vertex.format.first)?;
+
+        skip_bytes(
+            &mut self.read,
+            self.header.vertex.format.between_first_snd.bytes,
+        )?;
+
+        let snd = read_vertex_type::<BR, _>(&mut self.read, self.header.vertex.format.snd)?;
+
+        skip_bytes(
+            &mut self.read,
+            self.header.vertex.format.between_snd_third.bytes,
+        )?;
+
+        let third = read_vertex_type::<BR, _>(&mut self.read, self.header.vertex.format.third)?;
+
+        skip_bytes(&mut self.read, self.header.vertex.format.after.bytes)?;
+
+        Ok(point_with_order(
+            first,
+            snd,
+            third,
+            self.header.vertex.format.order,
+        ))
+    }
+}
+
+impl<'a, BR, P, R> Iterator for PlyBinaryPointsIterator<'a, BR, P, R>
+where
+    P: IsBuildable3D + Clone, //@todo Clone required?
+    R: Read,
+    BR: IsByteReader,
+{
+    type Item = PlyResult<P>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current < self.header.vertex.count {
+            self.current += 1;
+            Some(self.fetch_one())
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, BR, P, R> FusedIterator for PlyBinaryPointsIterator<'a, BR, P, R>
+where
+    P: IsBuildable3D + Clone, //@todo Clone required?
+    R: Read,
+    BR: IsByteReader,
+{
+}
+
+//------------------------------------------------------------------------------
+
 fn load_points_binary<BR, IP, P, R>(
     read: &mut R,
     ip: &mut IP,
@@ -393,31 +484,14 @@ fn load_points_binary<BR, IP, P, R>(
 ) -> PlyResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D + Clone,
+    P: IsBuildable3D + Clone, //@todo Clone required?
     R: Read,
     BR: IsByteReader,
 {
-    for _ in 0..header.vertex.count {
-        skip_bytes(read, header.vertex.format.before.bytes)?;
+    let iterator = PlyBinaryPointsIterator::<BR, _, _>::new(read, header);
 
-        let first = read_vertex_type::<BR, _>(read, header.vertex.format.first)?;
-
-        skip_bytes(read, header.vertex.format.between_first_snd.bytes)?;
-
-        let snd = read_vertex_type::<BR, _>(read, header.vertex.format.snd)?;
-
-        skip_bytes(read, header.vertex.format.between_snd_third.bytes)?;
-
-        let third = read_vertex_type::<BR, _>(read, header.vertex.format.third)?;
-
-        skip_bytes(read, header.vertex.format.after.bytes)?;
-
-        ip.push(point_with_order(
-            first,
-            snd,
-            third,
-            header.vertex.format.order,
-        ));
+    for p in iterator {
+        ip.push(p?)
     }
 
     Ok(())
