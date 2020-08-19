@@ -130,7 +130,7 @@ impl TryFrom<[Xyz; 3]> for VertexOrder {
 
 //------------------------------------------------------------------------------
 
-#[derive(Default, Debug)]
+#[derive(Default, Clone, Debug)]
 pub struct BytesWords {
     pub bytes: usize,
     pub words: usize,
@@ -186,7 +186,7 @@ impl TryFrom<Type> for FaceType {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct VertexFormat {
     pub order: VertexOrder,
     pub first: VertexType,
@@ -200,7 +200,7 @@ pub struct VertexFormat {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FaceFormat {
     pub count: FaceType,
     pub index: FaceType,
@@ -228,13 +228,13 @@ pub enum HeaderReadState {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct VertexData {
     pub count: usize,
     pub format: VertexFormat,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FaceData {
     pub count: usize,
     pub format: FaceFormat,
@@ -248,14 +248,14 @@ pub enum Header {
     Partial(PartialHeader),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FullHeader {
     pub format: Format,
     pub vertex: VertexData,
     pub face: FaceData,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PartialHeader {
     pub format: Format,
     pub vertex: VertexData,

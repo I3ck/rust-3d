@@ -555,9 +555,10 @@ where
 {
     type Item = PlyIOResult<P>;
     fn next(&mut self) -> Option<Self::Item> {
-        while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
-            self.i_line += 1;
-            if self.current < self.header.vertex.count {
+        if self.current < self.header.vertex.count {
+            self.current += 1;
+            while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+                self.i_line += 1;
                 return Some(Self::fetch_one(&self.header, line, self.i_line));
             }
         }
@@ -624,34 +625,23 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_mesh_binary<BR, EM, P, R>(read: &mut R, mesh: &mut EM, header: &FullHeader) -> PlyResult<()>
+fn load_mesh_binary<BR, EM, P, R>(
+    mut read: &mut R,
+    mesh: &mut EM,
+    header: &FullHeader,
+) -> PlyResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D,
     R: Read,
     BR: IsByteReader,
 {
-    for _ in 0..header.vertex.count {
-        skip_bytes(read, header.vertex.format.before.bytes)?;
+    let partial_header = header.clone().into(); //@todo avoid clone by using borrow / as_ref traits
 
-        let first = read_vertex_type::<BR, _>(read, header.vertex.format.first)?;
+    let pi = PlyBinaryPointsIterator::<BR, _, _>::new(&mut read, &partial_header);
 
-        skip_bytes(read, header.vertex.format.between_first_snd.bytes)?;
-
-        let snd = read_vertex_type::<BR, _>(read, header.vertex.format.snd)?;
-
-        skip_bytes(read, header.vertex.format.between_snd_third.bytes)?;
-
-        let third = read_vertex_type::<BR, _>(read, header.vertex.format.third)?;
-
-        skip_bytes(read, header.vertex.format.after.bytes)?;
-
-        mesh.add_vertex(point_with_order(
-            first,
-            snd,
-            third,
-            header.vertex.format.order,
-        ));
+    for p in pi {
+        mesh.add_vertex(p?);
     }
 
     for _ in 0..header.face.count {
@@ -679,7 +669,7 @@ where
 //------------------------------------------------------------------------------
 
 fn load_mesh_ascii<EM, P, R>(
-    read: &mut R,
+    mut read: &mut R,
     mesh: &mut EM,
     header: &FullHeader,
     line_buffer: &mut Vec<u8>,
@@ -690,47 +680,16 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
+    let partial_header = header.clone().into(); //@todo avoid clone by using borrow / as_ref traits
+
+    let pi = PlyAsciiPointsIterator::new(&mut read, &partial_header, line_buffer, *i_line);
+
+    for p in pi {
+        mesh.add_vertex(p?);
+    }
+
     while let Ok(line) = fetch_line(read, line_buffer) {
         *i_line += 1;
-
-        if header.vertex.count > mesh.num_vertices() {
-            let mut words = to_words_skip_empty(line);
-
-            skip_n(&mut words, header.vertex.format.before.words);
-
-            let first = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PlyError::InvalidVertex)
-                .line(*i_line, line)?;
-
-            skip_n(&mut words, header.vertex.format.between_first_snd.words);
-
-            let snd = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PlyError::InvalidVertex)
-                .line(*i_line, line)?;
-
-            skip_n(&mut words, header.vertex.format.between_snd_third.words);
-
-            let third = words
-                .next()
-                .and_then(|w| from_ascii(w))
-                .ok_or(PlyError::InvalidVertex)
-                .line(*i_line, line)?;
-
-            // no need to skip 'after' since we're done with this line anyway
-
-            mesh.add_vertex(point_with_order(
-                first,
-                snd,
-                third,
-                header.vertex.format.order,
-            ));
-
-            continue;
-        }
 
         if header.face.count > mesh.num_faces() {
             let [a, b, c] = collect_index_line(&line)
