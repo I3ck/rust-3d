@@ -125,19 +125,16 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let mut line_buffer = Vec::new();
-    let mut i_line = 0;
+    let iterator = PlyPointsIterator::new(read)?;
 
-    let header: PartialHeader = load_header(read, &mut line_buffer, &mut i_line)?.into();
-    ip.reserve(header.vertex.count);
-
-    match header.format {
-        Format::Ascii => load_points_ascii(read, ip, header, i_line),
-        Format::LittleEndian => {
-            load_points_binary::<LittleReader, _, _, _>(read, ip, header).simple()
+    for rp in iterator {
+        match rp? {
+            DataReserve::Reserve(x) => ip.reserve(x),
+            DataReserve::Data(x) => ip.push(x),
         }
-        Format::BigEndian => load_points_binary::<BigReader, _, _, _>(read, ip, header).simple(),
     }
+
+    Ok(())
 }
 
 //------------------------------------------------------------------------------
