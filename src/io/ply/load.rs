@@ -34,7 +34,7 @@ use super::{header::*, iterators::*, iterators_internal::*, types::*};
 
 /// Loads an IsMesh3D from the .ply file format if possible, otherwise tries loading point data. Returning which of the two was possible
 pub fn load_ply_either<EM, IP, P, R>(
-    read: &mut R,
+    mut read: R,
     mesh: &mut EM,
     ip: &mut IP,
 ) -> PlyIOResult<MeshOrPoints>
@@ -47,18 +47,18 @@ where
     let mut line_buffer = Vec::new();
     let mut i_line = 0;
 
-    match load_header(read, &mut line_buffer, &mut i_line)? {
+    match load_header(&mut read, &mut line_buffer, &mut i_line)? {
         Header::Full(header) => {
             mesh.reserve_vertices(header.vertex.count);
             mesh.reserve_faces(header.face.count);
 
             match header.format {
-                Format::Ascii => load_mesh_ascii(read, mesh, header, &mut i_line),
+                Format::Ascii => load_mesh_ascii(&mut read, mesh, header, &mut i_line),
                 Format::LittleEndian => {
-                    load_mesh_binary::<LittleReader, _, _, _>(read, mesh, header).simple()
+                    load_mesh_binary::<LittleReader, _, _, _>(&mut read, mesh, header).simple()
                 }
                 Format::BigEndian => {
-                    load_mesh_binary::<BigReader, _, _, _>(read, mesh, header).simple()
+                    load_mesh_binary::<BigReader, _, _, _>(&mut read, mesh, header).simple()
                 }
             }?;
 
@@ -68,12 +68,12 @@ where
             ip.reserve(header.vertex.count);
 
             match header.format {
-                Format::Ascii => load_points_ascii(read, ip, header, i_line),
+                Format::Ascii => load_points_ascii(&mut read, ip, header, i_line),
                 Format::LittleEndian => {
-                    load_points_binary::<LittleReader, _, _, _>(read, ip, header).simple()
+                    load_points_binary::<LittleReader, _, _, _>(&mut read, ip, header).simple()
                 }
                 Format::BigEndian => {
-                    load_points_binary::<BigReader, _, _, _>(read, ip, header).simple()
+                    load_points_binary::<BigReader, _, _, _>(&mut read, ip, header).simple()
                 }
             }?;
 
@@ -83,7 +83,7 @@ where
 }
 
 /// Loads an IsMesh3D from the .ply file format
-pub fn load_ply_mesh<EM, P, R>(read: &mut R, mesh: &mut EM) -> PlyIOResult<()>
+pub fn load_ply_mesh<EM, P, R>(read: R, mesh: &mut EM) -> PlyIOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D,
@@ -114,7 +114,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads the points from the .ply file into IsPushable<Is3D>
-pub fn load_ply_points<IP, P, R>(read: &mut R, ip: &mut IP) -> PlyIOResult<()>
+pub fn load_ply_points<IP, P, R>(read: R, ip: &mut IP) -> PlyIOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,

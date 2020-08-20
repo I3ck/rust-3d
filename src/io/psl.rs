@@ -149,7 +149,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads a IsPushable<Is3D> as x y z coordinates from .psl files
-pub fn load_psl<IP, P, R>(read: &mut R, ip: &mut IP) -> PslResult<()>
+pub fn load_psl<IP, P, R>(read: R, ip: &mut IP) -> PslResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,

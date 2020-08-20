@@ -427,7 +427,7 @@ where
 
 /// Loads points from .stl file as triplets into IsPushable<IsBuildable3D>
 pub fn load_stl_triplets<IP, P, R, IPN>(
-    read: &mut R,
+    read: R,
     format: StlFormat,
     ip: &mut IP,
     face_normals: &mut IPN,
