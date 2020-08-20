@@ -101,14 +101,11 @@ where
     type Item = usize;
 
     fn next(&mut self) -> Option<usize> {
-        let result = if self.index < self.max {
-            Some(self.parent.get(self.index))
+        if self.index < self.max {
+            self.index += 1;
+            Some(self.parent.get(self.index - 1))
         } else {
             None
-        };
-
-        self.index += 1;
-
-        result
+        }
     }
 }
