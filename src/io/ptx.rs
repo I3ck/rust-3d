@@ -42,6 +42,7 @@ where
     R: BufRead,
 {
     read: R,
+    is_done: bool,
     i_line: usize,
     line_buffer: Vec<u8>,
     n_points_to_fetch: usize,
@@ -58,6 +59,7 @@ where
     pub fn new(read: R) -> Self {
         Self {
             read,
+            is_done: false,
             i_line: 0,
             line_buffer: Vec::new(),
             n_points_to_fetch: 0,
@@ -174,9 +176,13 @@ where
 {
     type Item = PtxResult<DataReserve<P>>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         if self.n_points_to_fetch == 0 {
             let first_line = fetch_line(&mut self.read, &mut self.line_buffer);
             if first_line.is_err() {
+                self.is_done = true;
                 return None;
             }
             self.i_line += 1;
@@ -187,7 +193,10 @@ where
                 .and_then(|columns| self.fetch_header(columns))
             {
                 Ok(()) => return Some(Ok(DataReserve::Reserve(self.n_points_to_fetch))),
-                Err(e) => return Some(Err(e)),
+                Err(e) => {
+                    self.is_done = true;
+                    return Some(Err(e));
+                }
             }
         } else if self.n_points_to_fetch > 0 {
             self.n_points_to_fetch -= 1;
@@ -204,9 +213,13 @@ where
                         .map(|x| DataReserve::Data(x)),
                     )
                 }
-                Err(e) => Some(Err(e.into())),
+                Err(e) => {
+                    self.is_done = true;
+                    Some(Err(e.into()))
+                }
             }
         } else {
+            self.is_done = true;
             None
         }
     }
