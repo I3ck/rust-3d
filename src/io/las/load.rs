@@ -44,6 +44,7 @@ where
     R: BufRead + Seek,
 {
     read: R,
+    is_done: bool,
     current: usize,
     header: Option<Header>,
     buffer: Vec<u8>,
@@ -58,6 +59,7 @@ where
     pub fn new(read: R) -> LasResult<Self> {
         Ok(Self {
             read,
+            is_done: false,
             current: 0,
             header: None,
             buffer: Vec::new(),
@@ -90,6 +92,9 @@ where
 {
     type Item = LasResult<DataReserve<P>>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         if self.header.is_none() {
             if let Ok(header) = load_header(&mut self.read).and_then(|x| Header::try_from(x)) {
                 if let Ok(_) = self
@@ -101,17 +106,23 @@ where
                     self.header = Some(header);
                     return Some(Ok(DataReserve::Reserve(n as usize)));
                 } else {
+                    self.is_done = true;
                     return Some(Err(LasError::BinaryData));
                 }
             } else {
+                self.is_done = true;
                 return Some(Err(LasError::Header));
             }
         }
         // unwrap safe since header is always assigned
         if self.current < self.header.as_ref().unwrap().n_point_records as usize {
             self.current += 1;
-            Some(self.fetch_one().map(|x| DataReserve::Data(x)))
+            Some(self.fetch_one().map(|x| DataReserve::Data(x)).map_err(|e| {
+                self.is_done = true;
+                e
+            }))
         } else {
+            self.is_done = true;
             None
         }
     }
