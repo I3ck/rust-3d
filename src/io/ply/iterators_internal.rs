@@ -199,6 +199,7 @@ where
     BR: IsByteReader,
 {
     read: R,
+    is_done: bool,
     header: PartialHeader,
     current: usize,
     phantom_p: PhantomData<P>,
@@ -214,6 +215,7 @@ where
     pub fn new(read: R, header: PartialHeader) -> Self {
         Self {
             read,
+            is_done: false,
             header,
             current: 0,
             phantom_p: PhantomData,
@@ -264,10 +266,17 @@ where
 {
     type Item = PlyResult<P>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         if self.current < self.header.vertex.count {
             self.current += 1;
-            Some(self.fetch_one())
+            Some(self.fetch_one().map_err(|e| {
+                self.is_done = true;
+                e
+            }))
         } else {
+            self.is_done = true;
             None
         }
     }
@@ -289,6 +298,7 @@ where
     R: BufRead,
 {
     read: R,
+    is_done: bool,
     header: PartialHeader,
     current: usize,
     i_line: usize,
@@ -304,6 +314,7 @@ where
     pub fn new(read: R, header: PartialHeader, i_line: usize) -> Self {
         Self {
             read,
+            is_done: false,
             header,
             current: 0,
             i_line,
@@ -362,13 +373,23 @@ where
 {
     type Item = PlyIOResult<P>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         if self.current < self.header.vertex.count {
             self.current += 1;
             while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
                 self.i_line += 1;
-                return Some(Self::fetch_one(&self.header, line, self.i_line));
+                return Some(
+                    Self::fetch_one(&self.header, line, self.i_line).map_err(|e| {
+                        self.is_done = true;
+                        e
+                    }),
+                );
             }
         }
+
+        self.is_done = true;
 
         if self.current != self.header.vertex.count {
             Some(Err(PlyError::LoadVertexCountIncorrect).simple())
@@ -392,6 +413,7 @@ where
     R: BufRead,
 {
     read: R,
+    is_done: bool,
     header: FullHeader,
     current: usize,
     i_line: usize,
@@ -405,6 +427,7 @@ where
     pub fn new(read: R, header: FullHeader, i_line: usize) -> Self {
         Self {
             read,
+            is_done: false,
             header,
             current: 0,
             i_line,
@@ -419,6 +442,9 @@ where
 {
     type Item = PlyIOResult<[usize; 3]>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         if self.current < self.header.face.count {
             self.current += 1;
             while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
@@ -426,10 +452,16 @@ where
                 return Some(
                     collect_index_line(&line)
                         .ok_or(PlyError::FaceStructure)
-                        .line(self.i_line, line),
+                        .line(self.i_line, line)
+                        .map_err(|e| {
+                            self.is_done = true;
+                            e
+                        }),
                 );
             }
         }
+
+        self.is_done = true;
 
         None
     }
@@ -445,6 +477,7 @@ where
     BR: IsByteReader,
 {
     read: R,
+    is_done: bool,
     header: FullHeader,
     current: usize,
     phantom: PhantomData<BR>,
@@ -458,6 +491,7 @@ where
     pub fn new(read: R, header: FullHeader) -> Self {
         Self {
             read,
+            is_done: false,
             header,
             current: 0,
             phantom: PhantomData,
@@ -491,10 +525,17 @@ where
 {
     type Item = PlyResult<[usize; 3]>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         if self.current < self.header.face.count {
             self.current += 1;
-            Some(self.fetch_one())
+            Some(self.fetch_one().map_err(|e| {
+                self.is_done = true;
+                e
+            }))
         } else {
+            self.is_done = true;
             None
         }
     }

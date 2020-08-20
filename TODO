@@ -1,4 +1,3 @@
-Ensure IO iterators behave correctly if called again once they yielded None / errors
 .psl Iterator missing
 
 BoundingBox for Meshes (and similar) not fully correct since using entire point cloud for checks
