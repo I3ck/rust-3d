@@ -1,5 +1,3 @@
-.psl Iterator missing
-
 BoundingBox for Meshes (and similar) not fully correct since using entire point cloud for checks
 (It's possible many points aren't used)
 
