@@ -42,6 +42,7 @@ where
     R: BufRead,
 {
     read: R,
+    is_done: bool,
     i_line: usize,
     line_buffer: Vec<u8>,
     //start_pushed: bool, //@todo this was removed, why always push 0/0/0?
@@ -60,6 +61,7 @@ where
     pub fn new(read: R) -> Self {
         Self {
             read,
+            is_done: false,
             i_line: 0,
             line_buffer: Vec::new(),
             //start_pushed: false, //@todo this was removed, why always push 0/0/0?
@@ -79,6 +81,9 @@ where
 {
     type Item = GcodeResult<P>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
             self.i_line += 1;
 
@@ -90,7 +95,10 @@ where
                         .ok_or(GcodeError::Command)
                         .line(self.i_line, line)
                     {
-                        Err(e) => return Some(Err(e)),
+                        Err(e) => {
+                            self.is_done = true;
+                            return Some(Err(e));
+                        }
                         Ok([opt_x, opt_y, opt_z]) => {
                             if let Some(new_x) = opt_x {
                                 any_changed = true;
@@ -137,7 +145,10 @@ where
                             .ok_or(GcodeError::Command)
                             .line(self.i_line, line)
                         {
-                            Err(e) => return Some(Err(e)),
+                            Err(e) => {
+                                self.is_done = true;
+                                return Some(Err(e));
+                            }
                             Ok([opt_x, opt_y, opt_z]) => {
                                 if let Some(new_x) = opt_x {
                                     any_changed = true;
@@ -163,6 +174,8 @@ where
                 }
             }
         }
+        self.is_done = true;
+
         None
     }
 }
