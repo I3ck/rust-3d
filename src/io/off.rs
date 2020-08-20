@@ -266,26 +266,24 @@ where
             }
 
             // safe since checked above
-            if self.n_vertices_added < self.counts.unwrap()[0] {
-                self.n_vertices_added += 1;
-                return Some(
-                    fetch_vertex(line, self.i_line)
-                        .map(|x| FaceDataReserve::Data(x))
-                        .map_err(|e| {
-                            self.is_done = true;
-                            e
-                        }),
-                );
-            } else {
-                return Some(
+            return Some(
+                (if self.n_vertices_added < self.counts.unwrap()[0] {
+                    self.n_vertices_added += 1;
+
+                    fetch_vertex(line, self.i_line).map(|x| FaceDataReserve::Data(x))
+                } else {
                     Self::fetch_face(line, self.i_line)
                         .map(|x| FaceDataReserve::Face(x))
                         .map_err(|e| {
                             self.is_done = true;
                             e
-                        }),
-                );
-            }
+                        })
+                })
+                .map_err(|e| {
+                    self.is_done = true;
+                    e
+                }),
+            );
         }
 
         self.is_done = true;
