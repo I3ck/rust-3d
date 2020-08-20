@@ -154,6 +154,7 @@ where
     R: Read,
 {
     read: R,
+    is_done: bool,
     header_read: bool,
     n_triangles: usize,
     current: usize,
@@ -168,6 +169,7 @@ where
     pub fn new(read: R) -> Self {
         Self {
             read,
+            is_done: false,
             header_read: false,
             n_triangles: 0,
             current: 0,
@@ -183,20 +185,28 @@ where
 {
     type Item = StlIOResult<DataReserve<StlFace<P>>>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         if !self.header_read {
             self.header_read = true;
             // Drop header ('solid' is already dropped)
             {
                 let mut buffer = [0u8; 75];
                 if let Err(e) = self.read.read_exact(&mut buffer) {
+                    self.is_done = true;
                     return Some(Err(e.into()).simple());
                 }
             }
 
             return match LittleReader::read_u32(&mut self.read) {
-                Err(e) => Some(Err(e.into()).simple()),
+                Err(e) => {
+                    self.is_done = true;
+                    Some(Err(e.into()).simple())
+                }
                 Ok(n_triangles) => {
                     if n_triangles > MAX_TRIANGLES_BINARY {
+                        self.is_done = true;
                         return Some(Err(StlError::InvalidFaceCount).simple());
                     }
 
@@ -210,7 +220,10 @@ where
         if self.current < self.n_triangles {
             self.current += 1;
             match read_stl_triangle(&mut self.read) {
-                Err(e) => Some(Err(e).simple()),
+                Err(e) => {
+                    self.is_done = true;
+                    Some(Err(e).simple())
+                }
                 Ok(t) => {
                     let n = P::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
                     let a = P::new(t.x[0] as f64, t.x[1] as f64, t.x[2] as f64);
@@ -221,6 +234,7 @@ where
                 }
             }
         } else {
+            self.is_done = true;
             None
         }
     }
@@ -241,6 +255,7 @@ where
     R: Read,
 {
     read: R,
+    is_done: bool,
     header_read: bool,
     i_line: usize,
     line_buffer: Vec<u8>,
@@ -255,6 +270,7 @@ where
     pub fn new(read: R) -> Self {
         Self {
             read,
+            is_done: false,
             header_read: false,
             i_line: 0,
             line_buffer: Vec::new(),
@@ -270,6 +286,9 @@ where
 {
     type Item = StlIOResult<DataReserve<StlFace<P>>>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         if !self.header_read {
             self.header_read = true;
 
@@ -279,6 +298,7 @@ where
                 .read_until(b'\n', &mut self.line_buffer)
                 .index(self.i_line)
             {
+                self.is_done = true;
                 return Some(Err(e.into()));
             }
             self.i_line += 1;
@@ -288,8 +308,14 @@ where
             Ok([a, b, c, n]) => return Some(Ok(DataReserve::Data(StlFace { a, b, c, n }))),
             Err(WithLineInfo::None(StlError::LoadFileEndReached))
             | Err(WithLineInfo::Index(_, StlError::LoadFileEndReached))
-            | Err(WithLineInfo::Line(_, _, StlError::LoadFileEndReached)) => return None,
-            Err(x) => return Some(Err(x)),
+            | Err(WithLineInfo::Line(_, _, StlError::LoadFileEndReached)) => {
+                self.is_done = true;
+                return None;
+            }
+            Err(x) => {
+                self.is_done = true;
+                return Some(Err(x));
+            }
         }
     }
 }
