@@ -189,7 +189,7 @@ where
     R: Read,
     BR: IsByteReader,
 {
-    let iterator = PlyMeshBinaryIterator::<BR, _, _>::new(read, header);
+    let iterator = PlyBinaryMeshIterator::<BR, _, _>::new(read, header);
 
     for fd in iterator {
         match fd? {
@@ -219,7 +219,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let iterator = PlyMeshAsciiIterator::new(read, header, *i_line);
+    let iterator = PlyAsciiMeshIterator::new(read, header, *i_line);
 
     for fd in iterator {
         match fd? {

@@ -36,7 +36,7 @@ use super::{types::*, utils::*};
 
 //------------------------------------------------------------------------------
 
-pub struct PlyMeshAsciiIterator<P, R>
+pub struct PlyAsciiMeshIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -46,7 +46,7 @@ where
     f_iter: Option<PlyAsciiFacesIterator<R>>,
 }
 
-impl<P, R> PlyMeshAsciiIterator<P, R>
+impl<P, R> PlyAsciiMeshIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -61,7 +61,7 @@ where
     }
 }
 
-impl<P, R> Iterator for PlyMeshAsciiIterator<P, R>
+impl<P, R> Iterator for PlyAsciiMeshIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -93,7 +93,7 @@ where
     }
 }
 
-impl<P, R> FusedIterator for PlyMeshAsciiIterator<P, R>
+impl<P, R> FusedIterator for PlyAsciiMeshIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -102,7 +102,7 @@ where
 
 //------------------------------------------------------------------------------
 
-pub struct PlyMeshBinaryIterator<BR, P, R>
+pub struct PlyBinaryMeshIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -113,7 +113,7 @@ where
     f_iter: Option<PlyBinaryFacesIterator<BR, R>>,
 }
 
-impl<BR, P, R> PlyMeshBinaryIterator<BR, P, R>
+impl<BR, P, R> PlyBinaryMeshIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -129,7 +129,7 @@ where
     }
 }
 
-impl<BR, P, R> Iterator for PlyMeshBinaryIterator<BR, P, R>
+impl<BR, P, R> Iterator for PlyBinaryMeshIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -158,7 +158,7 @@ where
     }
 }
 
-impl<BR, P, R> FusedIterator for PlyMeshBinaryIterator<BR, P, R>
+impl<BR, P, R> FusedIterator for PlyBinaryMeshIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -185,10 +185,9 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    //@todo naming convention between the iterators is mixed (AsciiPoints vs MeshAscii)
-    Ascii(PlyMeshAsciiIterator<P, R>),
-    BinaryLittle(PlyMeshBinaryIterator<LittleReader, P, R>),
-    BinaryBig(PlyMeshBinaryIterator<BigReader, P, R>),
+    Ascii(PlyAsciiMeshIterator<P, R>),
+    BinaryLittle(PlyBinaryMeshIterator<LittleReader, P, R>),
+    BinaryBig(PlyBinaryMeshIterator<BigReader, P, R>),
 }
 
 //------------------------------------------------------------------------------

@@ -56,13 +56,13 @@ where
 
             let inner = match header.format {
                 Format::Ascii => BinaryOrAsciiPlyMeshInteralIterator::Ascii(
-                    PlyMeshAsciiIterator::new(read, header, i_line),
+                    PlyAsciiMeshIterator::new(read, header, i_line),
                 ),
                 Format::LittleEndian => BinaryOrAsciiPlyMeshInteralIterator::BinaryLittle(
-                    PlyMeshBinaryIterator::new(read, header),
+                    PlyBinaryMeshIterator::new(read, header),
                 ),
                 Format::BigEndian => BinaryOrAsciiPlyMeshInteralIterator::BinaryBig(
-                    PlyMeshBinaryIterator::new(read, header),
+                    PlyBinaryMeshIterator::new(read, header),
                 ),
             };
 
