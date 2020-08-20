@@ -42,6 +42,7 @@ where
     R: BufRead,
 {
     read: R,
+    is_done: bool,
     i_line: usize,
     line_buffer: Vec<u8>,
     delim_determined: bool,
@@ -57,6 +58,7 @@ where
     pub fn new(read: R) -> Self {
         Self {
             read,
+            is_done: false,
             i_line: 0,
             line_buffer: Vec::new(),
             delim_determined: false,
@@ -110,15 +112,25 @@ where
 {
     type Item = XyzIOResult<P>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
             self.i_line += 1;
-            Some(Self::fetch_one(
-                &mut self.delim_determined,
-                &mut self.delim,
-                self.i_line,
-                line,
-            ))
+            Some(
+                Self::fetch_one(
+                    &mut self.delim_determined,
+                    &mut self.delim,
+                    self.i_line,
+                    line,
+                )
+                .map_err(|e| {
+                    self.is_done = true;
+                    e
+                }),
+            )
         } else {
+            self.is_done = true;
             None
         }
     }
