@@ -23,12 +23,14 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //! Module for IO operations of the ply file format
 
 mod header;
+mod iterators;
 mod iterators_internal;
 mod load;
 mod save;
 mod types;
 mod utils;
 
+pub use iterators::*;
 pub use load::*;
 pub use save::*;
 pub use types::{MeshOrPoints, PlyError};

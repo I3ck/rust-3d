@@ -24,14 +24,11 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use std::{
-    io::{BufRead, Read},
-    iter::FusedIterator,
-};
+use std::io::{BufRead, Read};
 
 use super::super::{byte_reader::*, types::*};
 
-use super::{header::*, iterators_internal::*, types::*};
+use super::{header::*, iterators::*, iterators_internal::*, types::*};
 
 //------------------------------------------------------------------------------
 
@@ -138,156 +135,6 @@ where
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-
-/// Iterator to incrementally load a mesh from a .ply file
-pub struct PlyMeshIterator<P, R>
-where
-    P: IsBuildable3D,
-    R: BufRead,
-{
-    inner: BinaryOrAsciiPlyMeshInteralIterator<P, R>,
-    to_reserve_data_faces: Option<(usize, usize)>,
-}
-
-impl<P, R> PlyMeshIterator<P, R>
-where
-    P: IsBuildable3D,
-    R: BufRead,
-{
-    pub fn new(mut read: R) -> PlyIOResult<Self> {
-        let mut line_buffer = Vec::new();
-        let mut i_line = 0;
-
-        if let Header::Full(header) = load_header(&mut read, &mut line_buffer, &mut i_line)? {
-            let to_reserve_data_faces = Some((header.vertex.count, header.face.count));
-
-            let inner = match header.format {
-                Format::Ascii => BinaryOrAsciiPlyMeshInteralIterator::Ascii(
-                    PlyMeshAsciiIteratorInternal::new(read, header, i_line),
-                ),
-                Format::LittleEndian => BinaryOrAsciiPlyMeshInteralIterator::BinaryLittle(
-                    PlyMeshBinaryIteratorInternal::new(read, header),
-                ),
-                Format::BigEndian => BinaryOrAsciiPlyMeshInteralIterator::BinaryBig(
-                    PlyMeshBinaryIteratorInternal::new(read, header),
-                ),
-            };
-
-            Ok(Self {
-                inner,
-                to_reserve_data_faces,
-            })
-        } else {
-            Err(PlyError::LoadHeaderInvalid).simple()
-        }
-    }
-}
-
-impl<P, R> Iterator for PlyMeshIterator<P, R>
-where
-    P: IsBuildable3D,
-    R: BufRead,
-{
-    type Item = PlyIOResult<FaceDataReserve<P>>;
-    fn next(&mut self) -> Option<Self::Item> {
-        if let Some(to_reserve_data_faces) = self.to_reserve_data_faces {
-            self.to_reserve_data_faces = None;
-            Some(Ok(FaceDataReserve::ReserveDataFaces(
-                to_reserve_data_faces.0,
-                to_reserve_data_faces.1,
-            )))
-        } else {
-            match &mut self.inner {
-                BinaryOrAsciiPlyMeshInteralIterator::Ascii(x) => {
-                    x.next().map(|x| x.map(|x| x.into()))
-                }
-                BinaryOrAsciiPlyMeshInteralIterator::BinaryLittle(x) => {
-                    x.next().map(|x| x.map(|x| x.into()).simple())
-                }
-                BinaryOrAsciiPlyMeshInteralIterator::BinaryBig(x) => {
-                    x.next().map(|x| x.map(|x| x.into()).simple())
-                }
-            }
-        }
-    }
-}
-
-impl<P, R> FusedIterator for PlyMeshIterator<P, R>
-where
-    P: IsBuildable3D,
-    R: BufRead,
-{
-}
-
-//------------------------------------------------------------------------------
-
-/// Iterator to incrementally load points from a .ply file
-pub struct PlyPointsIterator<P, R>
-where
-    P: IsBuildable3D,
-    R: BufRead,
-{
-    inner: BinaryOrAsciiPlyPointsInteralIterator<P, R>,
-    to_reserve: Option<usize>,
-}
-
-impl<P, R> PlyPointsIterator<P, R>
-where
-    P: IsBuildable3D,
-    R: BufRead,
-{
-    pub fn new(mut read: R) -> PlyIOResult<Self> {
-        let mut line_buffer = Vec::new();
-        let mut i_line = 0;
-
-        let header: PartialHeader = load_header(&mut read, &mut line_buffer, &mut i_line)?.into();
-        let to_reserve = Some(header.vertex.count);
-
-        let inner = match header.format {
-            Format::Ascii => BinaryOrAsciiPlyPointsInteralIterator::Ascii(
-                PlyAsciiPointsInternalIterator::new(read, header, i_line),
-            ),
-            Format::LittleEndian => BinaryOrAsciiPlyPointsInteralIterator::BinaryLittle(
-                PlyBinaryPointsInternalIterator::new(read, header),
-            ),
-            Format::BigEndian => BinaryOrAsciiPlyPointsInteralIterator::BinaryBig(
-                PlyBinaryPointsInternalIterator::new(read, header),
-            ),
-        };
-
-        Ok(Self { inner, to_reserve })
-    }
-}
-
-impl<P, R> Iterator for PlyPointsIterator<P, R>
-where
-    P: IsBuildable3D,
-    R: BufRead,
-{
-    type Item = PlyIOResult<DataReserve<P>>;
-    fn next(&mut self) -> Option<Self::Item> {
-        if let Some(to_reserve) = self.to_reserve {
-            self.to_reserve = None;
-            Some(Ok(DataReserve::Reserve(to_reserve)))
-        } else {
-            match &mut self.inner {
-                BinaryOrAsciiPlyPointsInteralIterator::Ascii(x) => x.next(),
-                BinaryOrAsciiPlyPointsInteralIterator::BinaryLittle(x) => {
-                    x.next().map(|x| x.simple())
-                }
-                BinaryOrAsciiPlyPointsInteralIterator::BinaryBig(x) => x.next().map(|x| x.simple()),
-            }
-            .map(|x| x.map(|x| DataReserve::Data(x)))
-        }
-    }
-}
-
-impl<P, R> FusedIterator for PlyPointsIterator<P, R>
-where
-    P: IsBuildable3D,
-    R: BufRead,
-{
-}
 
 //------------------------------------------------------------------------------
 
