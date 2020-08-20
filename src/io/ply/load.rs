@@ -95,25 +95,26 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let mut line_buffer = Vec::new();
-    let mut i_line = 0;
+    let iterator = PlyMeshIterator::new(read)?;
 
-    if let Header::Full(header) = load_header(read, &mut line_buffer, &mut i_line)? {
-        mesh.reserve_vertices(header.vertex.count);
-        mesh.reserve_faces(header.face.count);
-
-        match header.format {
-            Format::Ascii => load_mesh_ascii(read, mesh, header, &mut i_line),
-            Format::LittleEndian => {
-                load_mesh_binary::<LittleReader, _, _, _>(read, mesh, header).simple()
+    for fr in iterator {
+        match fr? {
+            FaceDataReserve::Data(p) => {
+                mesh.add_vertex(p);
             }
-            Format::BigEndian => {
-                load_mesh_binary::<BigReader, _, _, _>(read, mesh, header).simple()
+            FaceDataReserve::ReserveDataFaces(n_d, n_f) => {
+                mesh.reserve_vertices(n_d);
+                mesh.reserve_faces(n_f);
+            }
+            FaceDataReserve::Face([a, b, c]) => {
+                mesh.try_add_connection(VId(a), VId(b), VId(c))
+                    .or(Err(PlyError::InvalidMeshIndices))
+                    .simple()?;
             }
         }
-    } else {
-        Err(PlyError::LoadHeaderInvalid).simple()
     }
+
+    Ok(())
 }
 
 //------------------------------------------------------------------------------
@@ -522,6 +523,87 @@ where
 
 //------------------------------------------------------------------------------
 
+pub struct PlyMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    inner: BinaryOrAsciiPlyMeshInteralIterator<P, R>,
+    to_reserve_data_faces: Option<(usize, usize)>,
+}
+
+impl<P, R> PlyMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    pub fn new(mut read: R) -> PlyIOResult<Self> {
+        let mut line_buffer = Vec::new();
+        let mut i_line = 0;
+
+        if let Header::Full(header) = load_header(&mut read, &mut line_buffer, &mut i_line)? {
+            let to_reserve_data_faces = Some((header.vertex.count, header.face.count));
+
+            let inner = match header.format {
+                Format::Ascii => BinaryOrAsciiPlyMeshInteralIterator::Ascii(
+                    PlyMeshAsciiIteratorInternal::new(read, header, i_line),
+                ),
+                Format::LittleEndian => BinaryOrAsciiPlyMeshInteralIterator::BinaryLittle(
+                    PlyMeshBinaryIteratorInternal::new(read, header),
+                ),
+                Format::BigEndian => BinaryOrAsciiPlyMeshInteralIterator::BinaryBig(
+                    PlyMeshBinaryIteratorInternal::new(read, header),
+                ),
+            };
+
+            Ok(Self {
+                inner,
+                to_reserve_data_faces,
+            })
+        } else {
+            Err(PlyError::LoadHeaderInvalid).simple()
+        }
+    }
+}
+
+impl<P, R> Iterator for PlyMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    type Item = PlyIOResult<FaceDataReserve<P>>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(to_reserve_data_faces) = self.to_reserve_data_faces {
+            self.to_reserve_data_faces = None;
+            Some(Ok(FaceDataReserve::ReserveDataFaces(
+                to_reserve_data_faces.0,
+                to_reserve_data_faces.1,
+            )))
+        } else {
+            match &mut self.inner {
+                BinaryOrAsciiPlyMeshInteralIterator::Ascii(x) => {
+                    x.next().map(|x| x.map(|x| x.into()))
+                }
+                BinaryOrAsciiPlyMeshInteralIterator::BinaryLittle(x) => {
+                    x.next().map(|x| x.map(|x| x.into()).simple())
+                }
+                BinaryOrAsciiPlyMeshInteralIterator::BinaryBig(x) => {
+                    x.next().map(|x| x.map(|x| x.into()).simple())
+                }
+            }
+        }
+    }
+}
+
+impl<P, R> FusedIterator for PlyMeshIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+}
+
+//------------------------------------------------------------------------------
+
 pub struct PlyPointsIterator<P, R>
 where
     P: IsBuildable3D,
@@ -599,6 +681,19 @@ where
     Ascii(PlyAsciiPointsInternalIterator<P, R>),
     BinaryLittle(PlyBinaryPointsInternalIterator<LittleReader, P, R>),
     BinaryBig(PlyBinaryPointsInternalIterator<BigReader, P, R>),
+}
+
+//------------------------------------------------------------------------------
+
+enum BinaryOrAsciiPlyMeshInteralIterator<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    //@todo naming convention between the iterators is mixed (AsciiPoints vs MeshAscii)
+    Ascii(PlyMeshAsciiIteratorInternal<P, R>),
+    BinaryLittle(PlyMeshBinaryIteratorInternal<LittleReader, P, R>),
+    BinaryBig(PlyMeshBinaryIteratorInternal<BigReader, P, R>),
 }
 
 //------------------------------------------------------------------------------
