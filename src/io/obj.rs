@@ -42,6 +42,7 @@ where
     R: BufRead,
 {
     read: R,
+    is_done: bool,
     i_line: usize,
     line_buffer: Vec<u8>,
     phantom_p: PhantomData<P>,
@@ -55,6 +56,7 @@ where
     pub fn new(read: R) -> Self {
         Self {
             read,
+            is_done: false,
             i_line: 0,
             line_buffer: Vec::new(),
             phantom_p: PhantomData,
@@ -69,13 +71,21 @@ where
 {
     type Item = ObjResult<P>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
             self.i_line += 1;
 
             if line.starts_with(b"v ") {
-                return Some(fetch_vertex(line, self.i_line));
+                return Some(fetch_vertex(line, self.i_line).map_err(|e| {
+                    self.is_done = true;
+                    e
+                }));
             }
         }
+
+        self.is_done = true;
 
         None
     }
@@ -97,6 +107,7 @@ where
     R: BufRead,
 {
     read: R,
+    is_done: bool,
     i_line: usize,
     line_buffer: Vec<u8>,
     phantom_p: PhantomData<P>,
@@ -110,6 +121,7 @@ where
     pub fn new(read: R) -> Self {
         Self {
             read,
+            is_done: false,
             i_line: 0,
             line_buffer: Vec::new(),
             phantom_p: PhantomData,
@@ -124,15 +136,34 @@ where
 {
     type Item = ObjResult<FaceData<P>>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
             self.i_line += 1;
 
             if line.starts_with(b"v ") {
-                return Some(fetch_vertex(line, self.i_line).map(|x| FaceData::Data(x)));
+                return Some(
+                    fetch_vertex(line, self.i_line)
+                        .map(|x| FaceData::Data(x))
+                        .map_err(|e| {
+                            self.is_done = true;
+                            e
+                        }),
+                );
             } else if line.starts_with(b"f ") {
-                return Some(fetch_face(line, self.i_line).map(|x| FaceData::Face(x)));
+                return Some(
+                    fetch_face(line, self.i_line)
+                        .map(|x| FaceData::Face(x))
+                        .map_err(|e| {
+                            self.is_done = true;
+                            e
+                        }),
+                );
             }
         }
+
+        self.is_done = true;
 
         None
     }
