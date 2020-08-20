@@ -42,6 +42,7 @@ where
     R: BufRead,
 {
     read: R,
+    is_done: bool,
     i_line: usize,
     line_buffer: Vec<u8>,
     n_vertices: Option<usize>,
@@ -57,6 +58,7 @@ where
     pub fn new(read: R) -> Self {
         Self {
             read,
+            is_done: false,
             i_line: 0,
             line_buffer: Vec::new(),
             n_vertices: None,
@@ -98,6 +100,9 @@ where
 {
     type Item = PtsResult<DataReserve<P>>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
             self.i_line += 1;
 
@@ -115,7 +120,10 @@ where
                         .line(self.i_line, line)
                     {
                         Ok(n) => Some(n),
-                        Err(e) => return Some(Err(e)),
+                        Err(e) => {
+                            self.is_done = true;
+                            return Some(Err(e));
+                        }
                     };
                     // unwrap safe since assigned above
                     return Some(Ok(DataReserve::Reserve(self.n_vertices.unwrap())));
@@ -124,7 +132,12 @@ where
                     if self.n_vertices_added < n {
                         self.n_vertices_added += 1;
                         return Some(
-                            Self::fetch_one(self.i_line, line).map(|x| DataReserve::Data(x)),
+                            Self::fetch_one(self.i_line, line)
+                                .map(|x| DataReserve::Data(x))
+                                .map_err(|e| {
+                                    self.is_done = true;
+                                    e
+                                }),
                         );
                     } else {
                         // New block
@@ -137,7 +150,10 @@ where
                             .line(self.i_line, line)
                         {
                             Ok(n) => Some(n),
-                            Err(e) => return Some(Err(e)),
+                            Err(e) => {
+                                self.is_done = true;
+                                return Some(Err(e));
+                            }
                         };
                         // unwrap safe since assigned above
                         return Some(Ok(DataReserve::Reserve(self.n_vertices.unwrap())));
@@ -145,6 +161,9 @@ where
                 }
             }
         }
+
+        self.is_done = true;
+
         None
     }
 }
