@@ -87,6 +87,7 @@ where
 
 //------------------------------------------------------------------------------
 
+/// Iterator to incrementally load a .stl file
 pub struct StlIterator<P, R>
 where
     P: IsBuildable3D,

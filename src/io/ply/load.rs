@@ -523,6 +523,7 @@ where
 
 //------------------------------------------------------------------------------
 
+/// Iterator to incrementally load a mesh from a .ply file
 pub struct PlyMeshIterator<P, R>
 where
     P: IsBuildable3D,
@@ -604,6 +605,7 @@ where
 
 //------------------------------------------------------------------------------
 
+/// Iterator to incrementally load points from a .ply file
 pub struct PlyPointsIterator<P, R>
 where
     P: IsBuildable3D,
