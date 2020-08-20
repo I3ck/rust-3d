@@ -56,13 +56,13 @@ where
 
             let inner = match header.format {
                 Format::Ascii => BinaryOrAsciiPlyMeshInteralIterator::Ascii(
-                    PlyMeshAsciiIteratorInternal::new(read, header, i_line),
+                    PlyMeshAsciiIterator::new(read, header, i_line),
                 ),
                 Format::LittleEndian => BinaryOrAsciiPlyMeshInteralIterator::BinaryLittle(
-                    PlyMeshBinaryIteratorInternal::new(read, header),
+                    PlyMeshBinaryIterator::new(read, header),
                 ),
                 Format::BigEndian => BinaryOrAsciiPlyMeshInteralIterator::BinaryBig(
-                    PlyMeshBinaryIteratorInternal::new(read, header),
+                    PlyMeshBinaryIterator::new(read, header),
                 ),
             };
 
@@ -138,13 +138,13 @@ where
 
         let inner = match header.format {
             Format::Ascii => BinaryOrAsciiPlyPointsInteralIterator::Ascii(
-                PlyAsciiPointsInternalIterator::new(read, header, i_line),
+                PlyAsciiPointsIterator::new(read, header, i_line),
             ),
             Format::LittleEndian => BinaryOrAsciiPlyPointsInteralIterator::BinaryLittle(
-                PlyBinaryPointsInternalIterator::new(read, header),
+                PlyBinaryPointsIterator::new(read, header),
             ),
             Format::BigEndian => BinaryOrAsciiPlyPointsInteralIterator::BinaryBig(
-                PlyBinaryPointsInternalIterator::new(read, header),
+                PlyBinaryPointsIterator::new(read, header),
             ),
         };
 

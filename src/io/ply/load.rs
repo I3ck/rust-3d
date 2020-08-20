@@ -149,7 +149,7 @@ where
     R: Read,
     BR: IsByteReader,
 {
-    let iterator = PlyBinaryPointsInternalIterator::<BR, _, _>::new(read, header);
+    let iterator = PlyBinaryPointsIterator::<BR, _, _>::new(read, header);
 
     for p in iterator {
         ip.push(p?)
@@ -171,7 +171,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let iterator = PlyAsciiPointsInternalIterator::new(read, header, i_line);
+    let iterator = PlyAsciiPointsIterator::new(read, header, i_line);
 
     for p in iterator {
         ip.push(p?)
@@ -189,7 +189,7 @@ where
     R: Read,
     BR: IsByteReader,
 {
-    let iterator = PlyMeshBinaryIteratorInternal::<BR, _, _>::new(read, header);
+    let iterator = PlyMeshBinaryIterator::<BR, _, _>::new(read, header);
 
     for fd in iterator {
         match fd? {
@@ -219,7 +219,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let iterator = PlyMeshAsciiIteratorInternal::new(read, header, *i_line);
+    let iterator = PlyMeshAsciiIterator::new(read, header, *i_line);
 
     for fd in iterator {
         match fd? {

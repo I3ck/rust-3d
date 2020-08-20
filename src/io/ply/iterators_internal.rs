@@ -36,17 +36,17 @@ use super::{types::*, utils::*};
 
 //------------------------------------------------------------------------------
 
-pub struct PlyMeshAsciiIteratorInternal<P, R>
+pub struct PlyMeshAsciiIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
 {
     header: FullHeader,
-    p_iter: Option<PlyAsciiPointsInternalIterator<P, R>>,
-    f_iter: Option<PlyAsciiFacesInternalIterator<R>>,
+    p_iter: Option<PlyAsciiPointsIterator<P, R>>,
+    f_iter: Option<PlyAsciiFacesIterator<R>>,
 }
 
-impl<P, R> PlyMeshAsciiIteratorInternal<P, R>
+impl<P, R> PlyMeshAsciiIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -55,17 +55,13 @@ where
         let partial_header: PartialHeader = header.clone().into();
         Self {
             header,
-            p_iter: Some(PlyAsciiPointsInternalIterator::new(
-                read,
-                partial_header,
-                i_line,
-            )),
+            p_iter: Some(PlyAsciiPointsIterator::new(read, partial_header, i_line)),
             f_iter: None,
         }
     }
 }
 
-impl<P, R> Iterator for PlyMeshAsciiIteratorInternal<P, R>
+impl<P, R> Iterator for PlyMeshAsciiIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -80,7 +76,7 @@ where
                     // unwrap safe, since in if let Some()
                     let p_iter = self.p_iter.take().unwrap();
                     let (read, i_line) = p_iter.destruct();
-                    self.f_iter = Some(PlyAsciiFacesInternalIterator::new(
+                    self.f_iter = Some(PlyAsciiFacesIterator::new(
                         read,
                         self.header.clone(),
                         i_line,
@@ -97,7 +93,7 @@ where
     }
 }
 
-impl<P, R> FusedIterator for PlyMeshAsciiIteratorInternal<P, R>
+impl<P, R> FusedIterator for PlyMeshAsciiIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -106,18 +102,18 @@ where
 
 //------------------------------------------------------------------------------
 
-pub struct PlyMeshBinaryIteratorInternal<BR, P, R>
+pub struct PlyMeshBinaryIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
     BR: IsByteReader,
 {
     header: FullHeader,
-    p_iter: Option<PlyBinaryPointsInternalIterator<BR, P, R>>,
-    f_iter: Option<PlyBinaryFacesInternalIterator<BR, R>>,
+    p_iter: Option<PlyBinaryPointsIterator<BR, P, R>>,
+    f_iter: Option<PlyBinaryFacesIterator<BR, R>>,
 }
 
-impl<BR, P, R> PlyMeshBinaryIteratorInternal<BR, P, R>
+impl<BR, P, R> PlyMeshBinaryIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -127,13 +123,13 @@ where
         let partial_header: PartialHeader = header.clone().into();
         Self {
             header,
-            p_iter: Some(PlyBinaryPointsInternalIterator::new(read, partial_header)),
+            p_iter: Some(PlyBinaryPointsIterator::new(read, partial_header)),
             f_iter: None,
         }
     }
 }
 
-impl<BR, P, R> Iterator for PlyMeshBinaryIteratorInternal<BR, P, R>
+impl<BR, P, R> Iterator for PlyMeshBinaryIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -149,10 +145,7 @@ where
                     // unwrap safe, since in if let Some()
                     let p_iter = self.p_iter.take().unwrap();
                     let read = p_iter.destruct();
-                    self.f_iter = Some(PlyBinaryFacesInternalIterator::new(
-                        read,
-                        self.header.clone(),
-                    ));
+                    self.f_iter = Some(PlyBinaryFacesIterator::new(read, self.header.clone()));
                 }
             }
         }
@@ -165,7 +158,7 @@ where
     }
 }
 
-impl<BR, P, R> FusedIterator for PlyMeshBinaryIteratorInternal<BR, P, R>
+impl<BR, P, R> FusedIterator for PlyMeshBinaryIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -180,9 +173,9 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    Ascii(PlyAsciiPointsInternalIterator<P, R>),
-    BinaryLittle(PlyBinaryPointsInternalIterator<LittleReader, P, R>),
-    BinaryBig(PlyBinaryPointsInternalIterator<BigReader, P, R>),
+    Ascii(PlyAsciiPointsIterator<P, R>),
+    BinaryLittle(PlyBinaryPointsIterator<LittleReader, P, R>),
+    BinaryBig(PlyBinaryPointsIterator<BigReader, P, R>),
 }
 
 //------------------------------------------------------------------------------
@@ -193,14 +186,14 @@ where
     R: BufRead,
 {
     //@todo naming convention between the iterators is mixed (AsciiPoints vs MeshAscii)
-    Ascii(PlyMeshAsciiIteratorInternal<P, R>),
-    BinaryLittle(PlyMeshBinaryIteratorInternal<LittleReader, P, R>),
-    BinaryBig(PlyMeshBinaryIteratorInternal<BigReader, P, R>),
+    Ascii(PlyMeshAsciiIterator<P, R>),
+    BinaryLittle(PlyMeshBinaryIterator<LittleReader, P, R>),
+    BinaryBig(PlyMeshBinaryIterator<BigReader, P, R>),
 }
 
 //------------------------------------------------------------------------------
 
-pub struct PlyBinaryPointsInternalIterator<BR, P, R>
+pub struct PlyBinaryPointsIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -213,7 +206,7 @@ where
     phantom_br: PhantomData<BR>,
 }
 
-impl<BR, P, R> PlyBinaryPointsInternalIterator<BR, P, R>
+impl<BR, P, R> PlyBinaryPointsIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -264,7 +257,7 @@ where
     }
 }
 
-impl<BR, P, R> Iterator for PlyBinaryPointsInternalIterator<BR, P, R>
+impl<BR, P, R> Iterator for PlyBinaryPointsIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -281,7 +274,7 @@ where
     }
 }
 
-impl<BR, P, R> FusedIterator for PlyBinaryPointsInternalIterator<BR, P, R>
+impl<BR, P, R> FusedIterator for PlyBinaryPointsIterator<BR, P, R>
 where
     P: IsBuildable3D,
     R: Read,
@@ -291,7 +284,7 @@ where
 
 //------------------------------------------------------------------------------
 
-pub struct PlyAsciiPointsInternalIterator<P, R>
+pub struct PlyAsciiPointsIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -304,7 +297,7 @@ where
     phantom: PhantomData<P>,
 }
 
-impl<P, R> PlyAsciiPointsInternalIterator<P, R>
+impl<P, R> PlyAsciiPointsIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -363,7 +356,7 @@ where
     }
 }
 
-impl<P, R> Iterator for PlyAsciiPointsInternalIterator<P, R>
+impl<P, R> Iterator for PlyAsciiPointsIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -386,7 +379,7 @@ where
     }
 }
 
-impl<P, R> FusedIterator for PlyAsciiPointsInternalIterator<P, R>
+impl<P, R> FusedIterator for PlyAsciiPointsIterator<P, R>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -395,7 +388,7 @@ where
 
 //------------------------------------------------------------------------------
 
-pub struct PlyAsciiFacesInternalIterator<R>
+pub struct PlyAsciiFacesIterator<R>
 where
     R: BufRead,
 {
@@ -406,7 +399,7 @@ where
     line_buffer: Vec<u8>,
 }
 
-impl<R> PlyAsciiFacesInternalIterator<R>
+impl<R> PlyAsciiFacesIterator<R>
 where
     R: BufRead,
 {
@@ -421,7 +414,7 @@ where
     }
 }
 
-impl<R> Iterator for PlyAsciiFacesInternalIterator<R>
+impl<R> Iterator for PlyAsciiFacesIterator<R>
 where
     R: BufRead,
 {
@@ -443,11 +436,11 @@ where
     }
 }
 
-impl<R> FusedIterator for PlyAsciiFacesInternalIterator<R> where R: BufRead {}
+impl<R> FusedIterator for PlyAsciiFacesIterator<R> where R: BufRead {}
 
 //------------------------------------------------------------------------------
 
-pub struct PlyBinaryFacesInternalIterator<BR, R>
+pub struct PlyBinaryFacesIterator<BR, R>
 where
     R: Read,
     BR: IsByteReader,
@@ -458,7 +451,7 @@ where
     phantom: PhantomData<BR>,
 }
 
-impl<BR, R> PlyBinaryFacesInternalIterator<BR, R>
+impl<BR, R> PlyBinaryFacesIterator<BR, R>
 where
     R: Read,
     BR: IsByteReader,
@@ -492,7 +485,7 @@ where
     }
 }
 
-impl<BR, R> Iterator for PlyBinaryFacesInternalIterator<BR, R>
+impl<BR, R> Iterator for PlyBinaryFacesIterator<BR, R>
 where
     R: Read,
     BR: IsByteReader,
@@ -508,7 +501,7 @@ where
     }
 }
 
-impl<BR, R> FusedIterator for PlyBinaryFacesInternalIterator<BR, R>
+impl<BR, R> FusedIterator for PlyBinaryFacesIterator<BR, R>
 where
     R: Read,
     BR: IsByteReader,
