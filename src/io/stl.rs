@@ -120,6 +120,7 @@ where
     R: BufRead,
 {
     type Item = StlIOResult<DataReserve<StlFace<P>>>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         match &mut self.inner {
             BinaryOrAsciiIterator::Ascii(x) => x.next(),
@@ -184,6 +185,7 @@ where
     R: Read,
 {
     type Item = StlIOResult<DataReserve<StlFace<P>>>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
@@ -285,6 +287,7 @@ where
     R: BufRead,
 {
     type Item = StlIOResult<DataReserve<StlFace<P>>>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;

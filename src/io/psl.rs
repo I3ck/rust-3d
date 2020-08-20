@@ -106,6 +106,7 @@ where
     R: Read,
 {
     type Item = PslResult<P>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;

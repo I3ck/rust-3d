@@ -82,6 +82,7 @@ where
     R: BufRead,
 {
     type Item = PlyIOResult<FaceDataReserve<P>>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(to_reserve_data_faces) = self.to_reserve_data_faces {
             self.to_reserve_data_faces = None;
@@ -158,6 +159,7 @@ where
     R: BufRead,
 {
     type Item = PlyIOResult<DataReserve<P>>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(to_reserve) = self.to_reserve {
             self.to_reserve = None;

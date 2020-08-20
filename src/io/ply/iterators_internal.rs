@@ -67,6 +67,7 @@ where
     R: BufRead,
 {
     type Item = PlyIOResult<io::types::FaceData<P>>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut p_iter) = self.p_iter {
             match p_iter.next() {
@@ -136,6 +137,7 @@ where
     BR: IsByteReader,
 {
     type Item = PlyResult<io::types::FaceData<P>>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut p_iter) = self.p_iter {
             match p_iter.next() {
@@ -265,6 +267,7 @@ where
     BR: IsByteReader,
 {
     type Item = PlyResult<P>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
@@ -372,6 +375,7 @@ where
     R: BufRead,
 {
     type Item = PlyIOResult<P>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
@@ -441,6 +445,7 @@ where
     R: BufRead,
 {
     type Item = PlyIOResult<[usize; 3]>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
@@ -524,6 +529,7 @@ where
     BR: IsByteReader,
 {
     type Item = PlyResult<[usize; 3]>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;

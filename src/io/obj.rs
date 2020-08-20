@@ -70,6 +70,7 @@ where
     R: BufRead,
 {
     type Item = ObjResult<P>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
@@ -135,6 +136,7 @@ where
     R: BufRead,
 {
     type Item = ObjResult<FaceData<P>>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;

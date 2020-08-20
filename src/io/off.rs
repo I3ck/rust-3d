@@ -76,6 +76,7 @@ where
     R: BufRead,
 {
     type Item = OffResult<DataReserve<P>>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
@@ -236,6 +237,7 @@ where
     R: BufRead,
 {
     type Item = OffResult<FaceDataReserve<P>>;
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;

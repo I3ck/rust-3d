@@ -49,6 +49,7 @@ where
 {
     type Item = &'a [T];
 
+    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         loop {
             match self.iterator.next() {

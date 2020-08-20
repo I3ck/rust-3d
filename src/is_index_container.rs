@@ -100,6 +100,7 @@ where
 {
     type Item = usize;
 
+    #[inline(always)]
     fn next(&mut self) -> Option<usize> {
         if self.index < self.max {
             self.index += 1;
