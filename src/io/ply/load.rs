@@ -383,6 +383,145 @@ where
 
 //------------------------------------------------------------------------------
 
+struct PlyMeshAsciiIteratorInternal<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    header: FullHeader,
+    p_iter: Option<PlyAsciiPointsInternalIterator<P, R>>,
+    f_iter: Option<PlyAsciiFacesInternalIterator<R>>,
+}
+
+impl<P, R> PlyMeshAsciiIteratorInternal<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    pub fn new(read: R, header: FullHeader, i_line: usize) -> Self {
+        let partial_header: PartialHeader = header.clone().into();
+        Self {
+            header,
+            p_iter: Some(PlyAsciiPointsInternalIterator::new(
+                read,
+                partial_header,
+                i_line,
+            )),
+            f_iter: None,
+        }
+    }
+}
+
+impl<P, R> Iterator for PlyMeshAsciiIteratorInternal<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+    type Item = PlyIOResult<io::types::FaceData<P>>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(ref mut p_iter) = self.p_iter {
+            match p_iter.next() {
+                Some(x) => return Some(x.map(|x| io::types::FaceData::Data(x))),
+                None => {
+                    // point iteration done, switch to face iteration
+                    // unwrap safe, since in if let Some()
+                    let p_iter = self.p_iter.take().unwrap();
+                    let (read, i_line) = p_iter.destruct();
+                    self.f_iter = Some(PlyAsciiFacesInternalIterator::new(
+                        read,
+                        self.header.clone(),
+                        i_line,
+                    ));
+                }
+            }
+        }
+        //unwrap safe, either is always constructed
+        self.f_iter
+            .as_mut()
+            .unwrap()
+            .next()
+            .map(|x| x.map(|x| io::types::FaceData::Face(x)))
+    }
+}
+
+impl<P, R> FusedIterator for PlyMeshAsciiIteratorInternal<P, R>
+where
+    P: IsBuildable3D,
+    R: BufRead,
+{
+}
+
+//------------------------------------------------------------------------------
+
+struct PlyMeshBinaryIteratorInternal<BR, P, R>
+where
+    P: IsBuildable3D,
+    R: Read,
+    BR: IsByteReader,
+{
+    header: FullHeader,
+    p_iter: Option<PlyBinaryPointsInternalIterator<BR, P, R>>,
+    f_iter: Option<PlyBinaryFacesInternalIterator<BR, R>>,
+}
+
+impl<BR, P, R> PlyMeshBinaryIteratorInternal<BR, P, R>
+where
+    P: IsBuildable3D,
+    R: Read,
+    BR: IsByteReader,
+{
+    pub fn new(read: R, header: FullHeader) -> Self {
+        let partial_header: PartialHeader = header.clone().into();
+        Self {
+            header,
+            p_iter: Some(PlyBinaryPointsInternalIterator::new(read, partial_header)),
+            f_iter: None,
+        }
+    }
+}
+
+impl<BR, P, R> Iterator for PlyMeshBinaryIteratorInternal<BR, P, R>
+where
+    P: IsBuildable3D,
+    R: Read,
+    BR: IsByteReader,
+{
+    type Item = PlyResult<io::types::FaceData<P>>;
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(ref mut p_iter) = self.p_iter {
+            match p_iter.next() {
+                Some(x) => return Some(x.map(|x| io::types::FaceData::Data(x))),
+                None => {
+                    // point iteration done, switch to face iteration
+                    // unwrap safe, since in if let Some()
+                    let p_iter = self.p_iter.take().unwrap();
+                    let read = p_iter.destruct();
+                    self.f_iter = Some(PlyBinaryFacesInternalIterator::new(
+                        read,
+                        self.header.clone(),
+                    ));
+                }
+            }
+        }
+        //unwrap safe, either is always constructed
+        self.f_iter
+            .as_mut()
+            .unwrap()
+            .next()
+            .map(|x| x.map(|x| io::types::FaceData::Face(x)))
+    }
+}
+
+impl<BR, P, R> FusedIterator for PlyMeshBinaryIteratorInternal<BR, P, R>
+where
+    P: IsBuildable3D,
+    R: Read,
+    BR: IsByteReader,
+{
+}
+
+//------------------------------------------------------------------------------
+
 pub struct PlyPointsIterator<P, R>
 where
     P: IsBuildable3D,
@@ -493,6 +632,10 @@ where
         }
     }
 
+    pub fn destruct(self) -> R {
+        self.read
+    }
+
     #[inline(always)]
     fn fetch_one(&mut self) -> PlyResult<P> {
         skip_bytes(&mut self.read, self.header.vertex.format.before.bytes)?;
@@ -578,6 +721,10 @@ where
             line_buffer: Vec::new(),
             phantom: PhantomData,
         }
+    }
+
+    pub fn destruct(self) -> (R, usize) {
+        (self.read, self.i_line)
     }
 
     #[inline(always)]
@@ -817,31 +964,25 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_mesh_binary<BR, EM, P, R>(
-    mut read: &mut R,
-    mesh: &mut EM,
-    header: FullHeader,
-) -> PlyResult<()>
+fn load_mesh_binary<BR, EM, P, R>(read: &mut R, mesh: &mut EM, header: FullHeader) -> PlyResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D,
     R: Read,
     BR: IsByteReader,
 {
-    let partial_header = header.clone().into(); //@todo avoid clone by using borrow / as_ref traits
+    let iterator = PlyMeshBinaryIteratorInternal::<BR, _, _>::new(read, header);
 
-    let pi = PlyBinaryPointsInternalIterator::<BR, _, _>::new(&mut read, partial_header);
-
-    for p in pi {
-        mesh.add_vertex(p?);
-    }
-
-    let fi = PlyBinaryFacesInternalIterator::<BR, _>::new(&mut read, header);
-
-    for f in fi {
-        let [a, b, c] = f?;
-        mesh.try_add_connection(VId(a), VId(b), VId(c))
-            .or(Err(PlyError::InvalidMeshIndices))?;
+    for fd in iterator {
+        match fd? {
+            io::types::FaceData::Data(p) => {
+                mesh.add_vertex(p);
+            }
+            io::types::FaceData::Face([a, b, c]) => {
+                mesh.try_add_connection(VId(a), VId(b), VId(c))
+                    .or(Err(PlyError::InvalidMeshIndices))?;
+            }
+        }
     }
 
     Ok(())
@@ -850,7 +991,7 @@ where
 //------------------------------------------------------------------------------
 
 fn load_mesh_ascii<EM, P, R>(
-    mut read: &mut R,
+    read: &mut R,
     mesh: &mut EM,
     header: FullHeader,
     i_line: &mut usize,
@@ -860,21 +1001,19 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    let partial_header = header.clone().into(); //@todo avoid clone by using borrow / as_ref traits
+    let iterator = PlyMeshAsciiIteratorInternal::new(read, header, *i_line);
 
-    let pi = PlyAsciiPointsInternalIterator::new(&mut read, partial_header, *i_line); //@todo i_line must be updated
-
-    for p in pi {
-        mesh.add_vertex(p?);
-    }
-
-    let fi = PlyAsciiFacesInternalIterator::new(&mut read, header, *i_line);
-
-    for f in fi {
-        let [a, b, c] = f?;
-        mesh.try_add_connection(VId(a), VId(b), VId(c))
-            .or(Err(PlyError::InvalidMeshIndices))
-            .simple()?;
+    for fd in iterator {
+        match fd? {
+            io::types::FaceData::Data(p) => {
+                mesh.add_vertex(p);
+            }
+            io::types::FaceData::Face([a, b, c]) => {
+                mesh.try_add_connection(VId(a), VId(b), VId(c))
+                    .or(Err(PlyError::InvalidMeshIndices))
+                    .simple()?;
+            }
+        }
     }
 
     Ok(())
