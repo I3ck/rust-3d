@@ -42,6 +42,7 @@ where
     R: BufRead,
 {
     read: R,
+    is_done: bool,
     i_line: usize,
     line_buffer: Vec<u8>,
     off_seen: bool,
@@ -58,6 +59,7 @@ where
     pub fn new(read: R) -> Self {
         Self {
             read,
+            is_done: false,
             i_line: 0,
             line_buffer: Vec::new(),
             off_seen: false,
@@ -75,6 +77,10 @@ where
 {
     type Item = OffResult<DataReserve<P>>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
+
         while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
             self.i_line += 1;
 
@@ -99,18 +105,32 @@ where
                         self.n_vertices = Some(n);
                         return Some(Ok(DataReserve::Reserve(self.n_vertices.unwrap())));
                     }
-                    Err(e) => return Some(Err(e)),
+                    Err(e) => {
+                        self.is_done = true;
+                        return Some(Err(e));
+                    }
                 }
             }
 
             // safe since checked above
             if self.n_added < self.n_vertices.unwrap() {
                 self.n_added += 1;
-                return Some(fetch_vertex(line, self.i_line).map(|x| DataReserve::Data(x)));
+                return Some(
+                    fetch_vertex(line, self.i_line)
+                        .map(|x| DataReserve::Data(x))
+                        .map_err(|e| {
+                            self.is_done = true;
+                            e
+                        }),
+                );
             } else {
+                self.is_done = true;
                 return None;
             }
         }
+
+        self.is_done = true;
+
         None
     }
 }
@@ -131,6 +151,7 @@ where
     R: BufRead,
 {
     read: R,
+    is_done: bool,
     i_line: usize,
     line_buffer: Vec<u8>,
     off_seen: bool,
@@ -147,6 +168,7 @@ where
     pub fn new(read: R) -> Self {
         Self {
             read,
+            is_done: false,
             i_line: 0,
             line_buffer: Vec::new(),
             off_seen: false,
@@ -215,6 +237,9 @@ where
 {
     type Item = OffResult<FaceDataReserve<P>>;
     fn next(&mut self) -> Option<Self::Item> {
+        if self.is_done {
+            return None;
+        }
         while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
             self.i_line += 1;
 
@@ -233,18 +258,37 @@ where
                         self.counts = Some(counts);
                         return Some(Ok(FaceDataReserve::ReserveDataFaces(counts[0], counts[1])));
                     }
-                    Err(e) => return Some(Err(e)),
+                    Err(e) => {
+                        self.is_done = true;
+                        return Some(Err(e));
+                    }
                 }
             }
 
             // safe since checked above
             if self.n_vertices_added < self.counts.unwrap()[0] {
                 self.n_vertices_added += 1;
-                return Some(fetch_vertex(line, self.i_line).map(|x| FaceDataReserve::Data(x)));
+                return Some(
+                    fetch_vertex(line, self.i_line)
+                        .map(|x| FaceDataReserve::Data(x))
+                        .map_err(|e| {
+                            self.is_done = true;
+                            e
+                        }),
+                );
             } else {
-                return Some(Self::fetch_face(line, self.i_line).map(|x| FaceDataReserve::Face(x)));
+                return Some(
+                    Self::fetch_face(line, self.i_line)
+                        .map(|x| FaceDataReserve::Face(x))
+                        .map_err(|e| {
+                            self.is_done = true;
+                            e
+                        }),
+                );
             }
         }
+
+        self.is_done = true;
 
         None
     }
