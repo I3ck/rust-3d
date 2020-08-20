@@ -40,6 +40,30 @@ where
     P: IsBuildable3D,
     R: Read,
 {
+    let n_passes = fetch_header_return_n_passes(read)?;
+
+    for _ in 0..n_passes {
+        let n_lines = fetch_pass_header_return_n_lines(read)?;
+
+        for _ in 0..n_lines {
+            let n_points = fetch_line_header_return_n_points(read)?;
+
+            for _ in 0..n_points {
+                ip.push(fetch_point(read)?);
+            }
+        }
+    }
+
+    Ok(())
+}
+
+//------------------------------------------------------------------------------
+
+#[inline(always)]
+fn fetch_header_return_n_passes<R>(read: &mut R) -> PslResult<i32>
+where
+    R: Read,
+{
     // header
     {
         let mut buffer = [0u8; 4];
@@ -64,42 +88,65 @@ where
         read.read_exact(&mut buffer)?;
     }
 
-    for _ in 0..n_passes {
-        let n_lines = LittleReader::read_i32(read)?;
-        let _scanner_id = LittleReader::read_i32(read)?;
+    Ok(n_passes)
+}
 
-        // reserved 14*i32
-        {
-            let mut buffer = [0u8; 56];
-            read.read_exact(&mut buffer)?;
-        }
+//------------------------------------------------------------------------------
 
-        for _ in 0..n_lines {
-            let n_points = LittleReader::read_i32(read)?;
+#[inline(always)]
+fn fetch_pass_header_return_n_lines<R>(read: &mut R) -> PslResult<i32>
+where
+    R: Read,
+{
+    let n_lines = LittleReader::read_i32(read)?;
+    let _scanner_id = LittleReader::read_i32(read)?;
 
-            // ijk 3*f32
-            {
-                let mut buffer = [0u8; 12];
-                read.read_exact(&mut buffer)?;
-            }
-
-            // reserved 12*i32
-            {
-                let mut buffer = [0u8; 48];
-                read.read_exact(&mut buffer)?;
-            }
-
-            for _ in 0..n_points {
-                let x = LittleReader::read_f32(read)?;
-                let y = LittleReader::read_f32(read)?;
-                let z = LittleReader::read_f32(read)?;
-
-                ip.push(P::new(x as f64, y as f64, z as f64));
-            }
-        }
+    // reserved 14*i32
+    {
+        let mut buffer = [0u8; 56];
+        read.read_exact(&mut buffer)?;
     }
 
-    Ok(())
+    Ok(n_lines)
+}
+
+//------------------------------------------------------------------------------
+
+#[inline(always)]
+fn fetch_line_header_return_n_points<R>(read: &mut R) -> PslResult<i32>
+where
+    R: Read,
+{
+    let n_points = LittleReader::read_i32(read)?;
+
+    // ijk 3*f32
+    {
+        let mut buffer = [0u8; 12];
+        read.read_exact(&mut buffer)?;
+    }
+
+    // reserved 12*i32
+    {
+        let mut buffer = [0u8; 48];
+        read.read_exact(&mut buffer)?;
+    }
+
+    Ok(n_points)
+}
+
+//------------------------------------------------------------------------------
+
+#[inline(always)]
+fn fetch_point<R, P>(read: &mut R) -> PslResult<P>
+where
+    R: Read,
+    P: IsBuildable3D,
+{
+    let x = LittleReader::read_f32(read)?;
+    let y = LittleReader::read_f32(read)?;
+    let z = LittleReader::read_f32(read)?;
+
+    Ok(P::new(x as f64, y as f64, z as f64))
 }
 
 //------------------------------------------------------------------------------
