@@ -68,7 +68,7 @@ where
     }
 
     #[inline(always)]
-    pub fn fetch_one(i_line: usize, line: &[u8]) -> PtsResult<P> {
+    pub fn fetch_one(i_line: usize, line: &[u8]) -> PtsIOResult<P> {
         let mut words = to_words_skip_empty(line);
 
         let x = words
@@ -98,7 +98,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = PtsResult<DataReserve<P>>;
+    type Item = PtsIOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -177,7 +177,7 @@ where
 }
 
 /// Loads IsPushable<Is3D> from the .pts file format
-pub fn load_pts<IP, P, R>(read: R, ip: &mut IP) -> PtsResult<()>
+pub fn load_pts<IP, P, R>(read: R, ip: &mut IP) -> PtsIOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -205,7 +205,7 @@ pub enum PtsError {
 }
 
 /// Result type for .pts file operations
-pub type PtsResult<T> = IOResult<T, PtsError>;
+pub type PtsIOResult<T> = IOResult<T, PtsError>;
 
 impl fmt::Debug for PtsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
