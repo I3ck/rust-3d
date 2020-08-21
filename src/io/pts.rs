@@ -68,26 +68,23 @@ where
     }
 
     #[inline(always)]
-    pub fn fetch_one(i_line: usize, line: &[u8]) -> PtsIOResult<P> {
+    pub fn fetch_one(line: &[u8]) -> PtsResult<P> {
         let mut words = to_words_skip_empty(line);
 
         let x = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(PtsError::Vertex)
-            .line(i_line, line)?;
+            .ok_or(PtsError::Vertex)?;
 
         let y = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(PtsError::Vertex)
-            .line(i_line, line)?;
+            .ok_or(PtsError::Vertex)?;
 
         let z = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(PtsError::Vertex)
-            .line(i_line, line)?;
+            .ok_or(PtsError::Vertex)?;
 
         Ok(P::new(x, y, z))
     }
@@ -133,8 +130,9 @@ where
                     if self.n_vertices_added < n {
                         self.n_vertices_added += 1;
                         return Some(
-                            Self::fetch_one(self.i_line, line)
+                            Self::fetch_one(line)
                                 .map(|x| DataReserve::Data(x))
+                                .line(self.i_line, line)
                                 .map_err(|e| {
                                     self.is_done = true;
                                     e
@@ -206,6 +204,7 @@ pub enum PtsError {
 
 /// Result type for .pts file operations
 pub type PtsIOResult<T> = IOResult<T, PtsError>;
+type PtsResult<T> = std::result::Result<T, PtsError>;
 
 impl fmt::Debug for PtsError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
