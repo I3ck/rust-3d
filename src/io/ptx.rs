@@ -75,7 +75,7 @@ where
         line: &[u8],
         must_transform: bool,
         transformation: &Matrix4,
-    ) -> PtxResult<P> {
+    ) -> PtxIOResult<P> {
         let mut words = to_words_skip_empty(line);
 
         let x = words
@@ -104,7 +104,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_header(&mut self, columns: usize) -> PtxResult<()> {
+    fn fetch_header(&mut self, columns: usize) -> PtxIOResult<()> {
         let mut line = fetch_line(&mut self.read, &mut self.line_buffer).index(self.i_line)?;
         self.i_line += 1;
 
@@ -174,7 +174,7 @@ where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: BufRead,
 {
-    type Item = PtxResult<DataReserve<P>>;
+    type Item = PtxIOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -236,7 +236,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads points from .ptx file into IsPushable<Is3D>
-pub fn load_ptx<IP, P, R>(read: R, ip: &mut IP) -> PtxResult<()>
+pub fn load_ptx<IP, P, R>(read: R, ip: &mut IP) -> PtxIOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D + IsMatrix4Transformable,
@@ -281,7 +281,7 @@ pub enum PtxError {
 }
 
 /// Result type for .ptx file operations
-pub type PtxResult<T> = IOResult<T, PtxError>;
+pub type PtxIOResult<T> = IOResult<T, PtxError>;
 
 impl fmt::Debug for PtxError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
