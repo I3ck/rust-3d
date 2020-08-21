@@ -69,7 +69,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = ObjResult<P>;
+    type Item = ObjIOResult<P>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -135,7 +135,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = ObjResult<FaceData<P>>;
+    type Item = ObjIOResult<FaceData<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -181,7 +181,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads an IsMesh3D from the .obj file format
-pub fn load_obj_mesh<EM, P, R>(read: R, mesh: &mut EM) -> ObjResult<()>
+pub fn load_obj_mesh<EM, P, R>(read: R, mesh: &mut EM) -> ObjIOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -206,7 +206,7 @@ where
 }
 
 /// Loads IsPushable<Is3D> from the .obj file format
-pub fn load_obj_points<IP, P, R>(read: R, ip: &mut IP) -> ObjResult<()>
+pub fn load_obj_points<IP, P, R>(read: R, ip: &mut IP) -> ObjIOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -232,7 +232,7 @@ pub enum ObjError {
 }
 
 /// Result type for .obj file operations
-pub type ObjResult<T> = IOResult<T, ObjError>;
+pub type ObjIOResult<T> = IOResult<T, ObjError>;
 
 impl fmt::Debug for ObjError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -260,7 +260,7 @@ impl From<ioError> for ObjError {
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn fetch_vertex<P>(line: &[u8], i_line: usize) -> ObjResult<P>
+fn fetch_vertex<P>(line: &[u8], i_line: usize) -> ObjIOResult<P>
 where
     P: IsBuildable3D,
 {
@@ -291,7 +291,7 @@ where
 }
 
 #[inline(always)]
-fn fetch_face(line: &[u8], i_line: usize) -> ObjResult<[usize; 3]> {
+fn fetch_face(line: &[u8], i_line: usize) -> ObjIOResult<[usize; 3]> {
     let mut words = to_words_skip_empty(line);
 
     // skip "f"
