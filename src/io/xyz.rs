@@ -68,16 +68,9 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(
-        delim_determined: &mut bool,
-        delim: &mut u8,
-        i_line: usize,
-        line: &[u8],
-    ) -> XyzIOResult<P> {
+    fn fetch_one(delim_determined: &mut bool, delim: &mut u8, line: &[u8]) -> XyzResult<P> {
         if !*delim_determined {
-            *delim = estimate_delimiter(2, &line)
-                .ok_or(XyzError::EstimateDelimiter)
-                .line(i_line, line)?;
+            *delim = estimate_delimiter(2, &line).ok_or(XyzError::EstimateDelimiter)?;
             *delim_determined = true;
         }
 
@@ -86,20 +79,17 @@ where
         let x = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::Vertex)
-            .line(i_line, line)?;
+            .ok_or(XyzError::Vertex)?;
 
         let y = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::Vertex)
-            .line(i_line, line)?;
+            .ok_or(XyzError::Vertex)?;
 
         let z = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::Vertex)
-            .line(i_line, line)?;
+            .ok_or(XyzError::Vertex)?;
 
         Ok(P::new(x, y, z))
     }
@@ -119,16 +109,12 @@ where
         if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
             self.i_line += 1;
             Some(
-                Self::fetch_one(
-                    &mut self.delim_determined,
-                    &mut self.delim,
-                    self.i_line,
-                    line,
-                )
-                .map_err(|e| {
-                    self.is_done = true;
-                    e
-                }),
+                Self::fetch_one(&mut self.delim_determined, &mut self.delim, line)
+                    .line(self.i_line, line)
+                    .map_err(|e| {
+                        self.is_done = true;
+                        e
+                    }),
             )
         } else {
             self.is_done = true;
