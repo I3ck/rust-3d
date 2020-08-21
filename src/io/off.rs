@@ -117,8 +117,9 @@ where
             if self.n_added < self.n_vertices.unwrap() {
                 self.n_added += 1;
                 return Some(
-                    fetch_vertex(line, self.i_line)
+                    fetch_vertex(line)
                         .map(|x| DataReserve::Data(x))
+                        .line(self.i_line, line)
                         .map_err(|e| {
                             self.is_done = true;
                             e
@@ -180,52 +181,44 @@ where
     }
 
     #[inline(always)]
-    fn fetch_face(line: &[u8], i_line: usize) -> OffIOResult<[usize; 3]> {
+    fn fetch_face(line: &[u8]) -> OffResult<[usize; 3]> {
         let mut words = to_words_skip_empty(line);
 
-        let count_face = words
-            .next()
-            .ok_or(OffError::FaceVertexCount)
-            .line(i_line, line)?;
+        let count_face = words.next().ok_or(OffError::FaceVertexCount)?;
 
         if count_face == b"3" {
             let a = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::Face)
-                .line(i_line, line)?;
+                .ok_or(OffError::Face)?;
 
             let b = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::Face)
-                .line(i_line, line)?;
+                .ok_or(OffError::Face)?;
 
             let c = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::Face)
-                .line(i_line, line)?;
+                .ok_or(OffError::Face)?;
 
             Ok([a, b, c])
         } else {
-            Err(OffError::FaceVertexCount).line(i_line, line)
+            Err(OffError::FaceVertexCount)
         }
     }
 
     #[inline(always)]
-    fn fetch_counts(line: &[u8], i_line: usize) -> OffIOResult<[usize; 2]> {
+    fn fetch_counts(line: &[u8]) -> OffResult<[usize; 2]> {
         let mut words = to_words_skip_empty(line);
         let n_vertices = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(OffError::VertexCount)
-            .line(i_line, line)?;
+            .ok_or(OffError::VertexCount)?;
         let n_faces = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(OffError::FaceCount)
-            .line(i_line, line)?;
+            .ok_or(OffError::FaceCount)?;
 
         Ok([n_vertices, n_faces])
     }
@@ -255,14 +248,14 @@ where
             }
 
             if self.counts.is_none() {
-                match Self::fetch_counts(line, self.i_line) {
+                match Self::fetch_counts(line) {
                     Ok(counts) => {
                         self.counts = Some(counts);
                         return Some(Ok(FaceDataReserve::ReserveDataFaces(counts[0], counts[1])));
                     }
                     Err(e) => {
                         self.is_done = true;
-                        return Some(Err(e));
+                        return Some(Err(e).line(self.i_line, line));
                     }
                 }
             }
@@ -272,10 +265,13 @@ where
                 (if self.n_vertices_added < self.counts.unwrap()[0] {
                     self.n_vertices_added += 1;
 
-                    fetch_vertex(line, self.i_line).map(|x| FaceDataReserve::Data(x))
+                    fetch_vertex(line)
+                        .map(|x| FaceDataReserve::Data(x))
+                        .line(self.i_line, line)
                 } else {
-                    Self::fetch_face(line, self.i_line)
+                    Self::fetch_face(line)
                         .map(|x| FaceDataReserve::Face(x))
+                        .line(self.i_line, line)
                         .map_err(|e| {
                             self.is_done = true;
                             e
@@ -366,6 +362,7 @@ pub enum OffError {
 
 /// Result type for .off file operations
 pub type OffIOResult<T> = IOResult<T, OffError>;
+type OffResult<T> = std::result::Result<T, OffError>;
 
 impl fmt::Debug for OffError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -396,7 +393,7 @@ impl From<ioError> for OffError {
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn fetch_vertex<P>(line: &[u8], i_line: usize) -> OffIOResult<P>
+fn fetch_vertex<P>(line: &[u8]) -> OffResult<P>
 where
     P: IsBuildable3D,
 {
@@ -405,20 +402,17 @@ where
     let x = words
         .next()
         .and_then(|word| from_ascii(word))
-        .ok_or(OffError::Vertex)
-        .line(i_line, line)?;
+        .ok_or(OffError::Vertex)?;
 
     let y = words
         .next()
         .and_then(|word| from_ascii(word))
-        .ok_or(OffError::Vertex)
-        .line(i_line, line)?;
+        .ok_or(OffError::Vertex)?;
 
     let z = words
         .next()
         .and_then(|word| from_ascii(word))
-        .ok_or(OffError::Vertex)
-        .line(i_line, line)?;
+        .ok_or(OffError::Vertex)?;
 
     Ok(P::new(x, y, z))
 }
