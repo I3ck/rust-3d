@@ -331,7 +331,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(header: &PartialHeader, line: &[u8], i_line: usize) -> PlyIOResult<P> {
+    fn fetch_one(header: &PartialHeader, line: &[u8]) -> PlyResult<P> {
         let mut words = to_words_skip_empty(line);
 
         skip_n(&mut words, header.vertex.format.before.words);
@@ -339,24 +339,21 @@ where
         let first = words
             .next()
             .and_then(|w| from_ascii(w))
-            .ok_or(PlyError::InvalidVertex)
-            .line(i_line, line)?;
+            .ok_or(PlyError::InvalidVertex)?;
 
         skip_n(&mut words, header.vertex.format.between_first_snd.words);
 
         let snd = words
             .next()
             .and_then(|w| from_ascii(w))
-            .ok_or(PlyError::InvalidVertex)
-            .line(i_line, line)?;
+            .ok_or(PlyError::InvalidVertex)?;
 
         skip_n(&mut words, header.vertex.format.between_snd_third.words);
 
         let third = words
             .next()
             .and_then(|w| from_ascii(w))
-            .ok_or(PlyError::InvalidVertex)
-            .line(i_line, line)?;
+            .ok_or(PlyError::InvalidVertex)?;
 
         // no need to skip 'after' since we're done with this line anyway
 
@@ -385,10 +382,12 @@ where
             while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
                 self.i_line += 1;
                 return Some(
-                    Self::fetch_one(&self.header, line, self.i_line).map_err(|e| {
-                        self.is_done = true;
-                        e
-                    }),
+                    Self::fetch_one(&self.header, line)
+                        .line(self.i_line, line)
+                        .map_err(|e| {
+                            self.is_done = true;
+                            e
+                        }),
                 );
             }
         }
