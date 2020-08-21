@@ -75,7 +75,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = OffResult<DataReserve<P>>;
+    type Item = OffIOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -180,7 +180,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_face(line: &[u8], i_line: usize) -> OffResult<[usize; 3]> {
+    fn fetch_face(line: &[u8], i_line: usize) -> OffIOResult<[usize; 3]> {
         let mut words = to_words_skip_empty(line);
 
         let count_face = words
@@ -214,7 +214,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_counts(line: &[u8], i_line: usize) -> OffResult<[usize; 2]> {
+    fn fetch_counts(line: &[u8], i_line: usize) -> OffIOResult<[usize; 2]> {
         let mut words = to_words_skip_empty(line);
         let n_vertices = words
             .next()
@@ -236,7 +236,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = OffResult<FaceDataReserve<P>>;
+    type Item = OffIOResult<FaceDataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -304,7 +304,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads an IsMesh3D from the off file format
-pub fn load_off_mesh<EM, P, R>(read: R, mesh: &mut EM) -> OffResult<()>
+pub fn load_off_mesh<EM, P, R>(read: R, mesh: &mut EM) -> OffIOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -333,7 +333,7 @@ where
 }
 
 /// Loads IsPushable<Is3D> from the .off file format
-pub fn load_off_points<IP, P, R>(read: R, ip: &mut IP) -> OffResult<()>
+pub fn load_off_points<IP, P, R>(read: R, ip: &mut IP) -> OffIOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -365,7 +365,7 @@ pub enum OffError {
 }
 
 /// Result type for .off file operations
-pub type OffResult<T> = IOResult<T, OffError>;
+pub type OffIOResult<T> = IOResult<T, OffError>;
 
 impl fmt::Debug for OffError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -396,7 +396,7 @@ impl From<ioError> for OffError {
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn fetch_vertex<P>(line: &[u8], i_line: usize) -> OffResult<P>
+fn fetch_vertex<P>(line: &[u8], i_line: usize) -> OffIOResult<P>
 where
     P: IsBuildable3D,
 {
