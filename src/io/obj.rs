@@ -79,7 +79,7 @@ where
             self.i_line += 1;
 
             if line.starts_with(b"v ") {
-                return Some(fetch_vertex(line, self.i_line).map_err(|e| {
+                return Some(fetch_vertex(line).line(self.i_line, line).map_err(|e| {
                     self.is_done = true;
                     e
                 }));
@@ -146,8 +146,9 @@ where
 
             if line.starts_with(b"v ") {
                 return Some(
-                    fetch_vertex(line, self.i_line)
+                    fetch_vertex(line)
                         .map(|x| FaceData::Data(x))
+                        .line(self.i_line, line)
                         .map_err(|e| {
                             self.is_done = true;
                             e
@@ -155,8 +156,9 @@ where
                 );
             } else if line.starts_with(b"f ") {
                 return Some(
-                    fetch_face(line, self.i_line)
+                    fetch_face(line)
                         .map(|x| FaceData::Face(x))
+                        .line(self.i_line, line)
                         .map_err(|e| {
                             self.is_done = true;
                             e
@@ -233,6 +235,7 @@ pub enum ObjError {
 
 /// Result type for .obj file operations
 pub type ObjIOResult<T> = IOResult<T, ObjError>;
+type ObjResult<T> = std::result::Result<T, ObjError>;
 
 impl fmt::Debug for ObjError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -260,57 +263,48 @@ impl From<ioError> for ObjError {
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn fetch_vertex<P>(line: &[u8], i_line: usize) -> ObjIOResult<P>
+fn fetch_vertex<P>(line: &[u8]) -> ObjResult<P>
 where
     P: IsBuildable3D,
 {
     let mut words = to_words_skip_empty(line);
 
     // skip "v"
-    words.next().ok_or(ObjError::Vertex).line(i_line, line)?;
+    words.next().ok_or(ObjError::Vertex)?;
 
     let x = words
         .next()
         .and_then(|w| from_ascii(w))
-        .ok_or(ObjError::Vertex)
-        .line(i_line, line)?;
+        .ok_or(ObjError::Vertex)?;
 
     let y = words
         .next()
         .and_then(|w| from_ascii(w))
-        .ok_or(ObjError::Vertex)
-        .line(i_line, line)?;
+        .ok_or(ObjError::Vertex)?;
 
     let z = words
         .next()
         .and_then(|w| from_ascii(w))
-        .ok_or(ObjError::Vertex)
-        .line(i_line, line)?;
+        .ok_or(ObjError::Vertex)?;
 
     Ok(P::new(x, y, z))
 }
 
 #[inline(always)]
-fn fetch_face(line: &[u8], i_line: usize) -> ObjIOResult<[usize; 3]> {
+fn fetch_face(line: &[u8]) -> ObjResult<[usize; 3]> {
     let mut words = to_words_skip_empty(line);
 
     // skip "f"
-    words.next().ok_or(ObjError::Face).line(i_line, line)?;
+    words.next().ok_or(ObjError::Face)?;
 
-    let mut tmp = words.next().ok_or(ObjError::Face).line(i_line, line)?;
-    let a: usize = from_ascii(until_bytes(tmp, b'/'))
-        .ok_or(ObjError::Face)
-        .line(i_line, line)?;
+    let mut tmp = words.next().ok_or(ObjError::Face)?;
+    let a: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(ObjError::Face)?;
 
-    tmp = words.next().ok_or(ObjError::Face).line(i_line, line)?;
-    let b: usize = from_ascii(until_bytes(tmp, b'/'))
-        .ok_or(ObjError::Face)
-        .line(i_line, line)?;
+    tmp = words.next().ok_or(ObjError::Face)?;
+    let b: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(ObjError::Face)?;
 
-    tmp = words.next().ok_or(ObjError::Face).line(i_line, line)?;
-    let c: usize = from_ascii(until_bytes(tmp, b'/'))
-        .ok_or(ObjError::Face)
-        .line(i_line, line)?;
+    tmp = words.next().ok_or(ObjError::Face)?;
+    let c: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(ObjError::Face)?;
 
     //@todo could fail if 0 in file
     //obj indexing starts at 1
