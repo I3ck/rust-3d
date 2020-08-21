@@ -70,29 +70,21 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(
-        i_line: usize,
-        line: &[u8],
-        must_transform: bool,
-        transformation: &Matrix4,
-    ) -> PtxIOResult<P> {
+    fn fetch_one(line: &[u8], must_transform: bool, transformation: &Matrix4) -> PtxResult<P> {
         let mut words = to_words_skip_empty(line);
 
         let x = words
             .next()
             .and_then(|w| from_ascii(w))
-            .ok_or(PtxError::Point)
-            .line(i_line, line)?;
+            .ok_or(PtxError::Point)?;
         let y = words
             .next()
             .and_then(|w| from_ascii(w))
-            .ok_or(PtxError::Point)
-            .line(i_line, line)?;
+            .ok_or(PtxError::Point)?;
         let z = words
             .next()
             .and_then(|w| from_ascii(w))
-            .ok_or(PtxError::Point)
-            .line(i_line, line)?;
+            .ok_or(PtxError::Point)?;
 
         let mut p = P::new(x, y, z);
 
@@ -205,13 +197,9 @@ where
                 Ok(line) => {
                     self.i_line += 1;
                     Some(
-                        Self::fetch_one(
-                            self.i_line,
-                            line,
-                            self.must_transform,
-                            &self.transformation,
-                        )
-                        .map(|x| DataReserve::Data(x)),
+                        Self::fetch_one(line, self.must_transform, &self.transformation)
+                            .map(|x| DataReserve::Data(x))
+                            .line(self.i_line, line),
                     )
                 }
                 Err(e) => {
@@ -282,6 +270,7 @@ pub enum PtxError {
 
 /// Result type for .ptx file operations
 pub type PtxIOResult<T> = IOResult<T, PtxError>;
+type PtxResult<T> = std::result::Result<T, PtxError>;
 
 impl fmt::Debug for PtxError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
