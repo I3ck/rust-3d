@@ -109,12 +109,15 @@ where
 pub type IOResult<T, E> = Result<T, WithLineInfo<E>>;
 
 impl<T, E> LineInfoResult<T, E> for Result<T, E> {
+    #[inline(always)]
     fn simple(self) -> Result<T, WithLineInfo<E>> {
         self.map_err(|e| WithLineInfo::None(e))
     }
+    #[inline(always)]
     fn index(self, i: usize) -> Result<T, WithLineInfo<E>> {
         self.map_err(|e| WithLineInfo::Index(i, e))
     }
+    #[inline(always)]
     fn line(self, i: usize, line: &[u8]) -> Result<T, WithLineInfo<E>> {
         self.map_err(|e| WithLineInfo::Line(i, String::from_utf8_lossy(line).to_string(), e))
     }
