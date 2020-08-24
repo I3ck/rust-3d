@@ -43,11 +43,11 @@ const MAX_TRIANGLES_BINARY: u32 = 1_000_000_000;
 
 //------------------------------------------------------------------------------
 
-pub struct StlFace<P> {
+pub struct StlFace<P, N> {
     pub a: P,
     pub b: P,
     pub c: P,
-    pub n: P,
+    pub n: N,
 }
 
 //------------------------------------------------------------------------------
@@ -88,17 +88,19 @@ where
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .stl file
-pub struct StlIterator<P, R>
+pub struct StlIterator<P, N, R>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: BufRead,
 {
-    inner: BinaryOrAsciiIterator<P, R>,
+    inner: BinaryOrAsciiIterator<P, N, R>,
 }
 
-impl<P, R> StlIterator<P, R>
+impl<P, N, R> StlIterator<P, N, R>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: BufRead,
 {
     pub fn new(mut read: R, format: StlFormat) -> StlIOResult<Self> {
@@ -114,12 +116,13 @@ where
     }
 }
 
-impl<P, R> Iterator for StlIterator<P, R>
+impl<P, N, R> Iterator for StlIterator<P, N, R>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: BufRead,
 {
-    type Item = StlIOResult<DataReserve<StlFace<P>>>;
+    type Item = StlIOResult<DataReserve<StlFace<P, N>>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         match &mut self.inner {
@@ -129,29 +132,32 @@ where
     }
 }
 
-impl<P, R> FusedIterator for StlIterator<P, R>
+impl<P, N, R> FusedIterator for StlIterator<P, N, R>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: BufRead,
 {
 }
 
 //------------------------------------------------------------------------------
 
-enum BinaryOrAsciiIterator<P, R>
+enum BinaryOrAsciiIterator<P, N, R>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: BufRead,
 {
-    Binary(StlBinaryIterator<P, R>),
-    Ascii(StlAsciiIterator<P, R>),
+    Binary(StlBinaryIterator<P, N, R>),
+    Ascii(StlAsciiIterator<P, N, R>),
 }
 
 //------------------------------------------------------------------------------
 
-struct StlBinaryIterator<P, R>
+struct StlBinaryIterator<P, N, R>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: Read,
 {
     read: R,
@@ -159,12 +165,14 @@ where
     header_read: bool,
     n_triangles: usize,
     current: usize,
-    phantom: PhantomData<P>, //@todo others name this phantom_p, unecessary there in most cases
+    phantom_p: PhantomData<P>, //@todo others name this phantom_p, unecessary there in most cases
+    phantom_n: PhantomData<N>,
 }
 
-impl<P, R> StlBinaryIterator<P, R>
+impl<P, N, R> StlBinaryIterator<P, N, R>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: Read,
 {
     pub fn new(read: R) -> Self {
@@ -174,17 +182,19 @@ where
             header_read: false,
             n_triangles: 0,
             current: 0,
-            phantom: PhantomData,
+            phantom_p: PhantomData,
+            phantom_n: PhantomData,
         }
     }
 }
 
-impl<P, R> Iterator for StlBinaryIterator<P, R>
+impl<P, N, R> Iterator for StlBinaryIterator<P, N, R>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: Read,
 {
-    type Item = StlIOResult<DataReserve<StlFace<P>>>;
+    type Item = StlIOResult<DataReserve<StlFace<P, N>>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -227,7 +237,7 @@ where
                     Some(Err(e).simple())
                 }
                 Ok(t) => {
-                    let n = P::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
+                    let n = N::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
                     let a = P::new(t.x[0] as f64, t.x[1] as f64, t.x[2] as f64);
                     let b = P::new(t.y[0] as f64, t.y[1] as f64, t.y[2] as f64);
                     let c = P::new(t.z[0] as f64, t.z[1] as f64, t.z[2] as f64);
@@ -242,18 +252,20 @@ where
     }
 }
 
-impl<P, R> FusedIterator for StlBinaryIterator<P, R>
+impl<P, N, R> FusedIterator for StlBinaryIterator<P, N, R>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: Read,
 {
 }
 
 //------------------------------------------------------------------------------
 
-struct StlAsciiIterator<P, R>
+struct StlAsciiIterator<P, N, R>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: Read,
 {
     read: R,
@@ -261,12 +273,14 @@ where
     header_read: bool,
     i_line: usize,
     line_buffer: Vec<u8>,
-    phantom: PhantomData<P>,
+    phantom_p: PhantomData<P>,
+    phantom_n: PhantomData<N>,
 }
 
-impl<P, R> StlAsciiIterator<P, R>
+impl<P, N, R> StlAsciiIterator<P, N, R>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: BufRead,
 {
     pub fn new(read: R) -> Self {
@@ -276,17 +290,19 @@ where
             header_read: false,
             i_line: 0,
             line_buffer: Vec::new(),
-            phantom: PhantomData,
+            phantom_p: PhantomData,
+            phantom_n: PhantomData,
         }
     }
 }
 
-impl<P, R> Iterator for StlAsciiIterator<P, R>
+impl<P, N, R> Iterator for StlAsciiIterator<P, N, R>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: BufRead,
 {
-    type Item = StlIOResult<DataReserve<StlFace<P>>>;
+    type Item = StlIOResult<DataReserve<StlFace<P, N>>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -308,7 +324,7 @@ where
         }
 
         match read_stl_facet(&mut self.read, &mut self.line_buffer, &mut self.i_line) {
-            Ok([a, b, c, n]) => return Some(Ok(DataReserve::Data(StlFace { a, b, c, n }))),
+            Ok((a, b, c, n)) => return Some(Ok(DataReserve::Data(StlFace { a, b, c, n }))),
             Err(WithLineInfo::None(StlError::LoadFileEndReached))
             | Err(WithLineInfo::Index(_, StlError::LoadFileEndReached))
             | Err(WithLineInfo::Line(_, _, StlError::LoadFileEndReached)) => {
@@ -323,9 +339,10 @@ where
     }
 }
 
-impl<P, R> FusedIterator for StlAsciiIterator<P, R>
+impl<P, N, R> FusedIterator for StlAsciiIterator<P, N, R>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: BufRead,
 {
 }
@@ -333,7 +350,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads a Mesh from .stl file with duplicate vertices
-pub fn load_stl_mesh_duped<EM, P, R, IPN>(
+pub fn load_stl_mesh_duped<EM, P, N, R, IPN>(
     read: R,
     format: StlFormat,
     mesh: &mut EM,
@@ -342,8 +359,9 @@ pub fn load_stl_mesh_duped<EM, P, R, IPN>(
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: BufRead,
-    IPN: IsPushable<P>,
+    IPN: IsPushable<N>,
 {
     let iterator = StlIterator::new(read, format)?;
 
@@ -366,7 +384,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads a Mesh from .stl file with unique vertices, dropping invalid triangles
-pub fn load_stl_mesh_unique<EM, P, R, IPN>(
+pub fn load_stl_mesh_unique<EM, P, N, R, IPN>(
     read: R,
     format: StlFormat,
     mesh: &mut EM,
@@ -375,11 +393,12 @@ pub fn load_stl_mesh_unique<EM, P, R, IPN>(
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
+    N: IsBuildable3D,
     R: BufRead,
-    IPN: IsPushable<P>,
+    IPN: IsPushable<N>,
 {
     let mut map = FnvHashMap::default();
-    let iterator = StlIterator::<P, R>::new(read, format)?;
+    let iterator = StlIterator::<P, N, R>::new(read, format)?;
 
     for fr in iterator {
         match fr? {
@@ -389,7 +408,7 @@ where
                 face_normals.reserve(n);
             }
             DataReserve::Data(face) => {
-                let [a, b, c, n] = [face.a, face.b, face.c, face.n];
+                let (a, b, c, n) = (face.a, face.b, face.c, face.n);
                 let id_a = *map.entry(a.clone()).or_insert_with(|| {
                     let value = mesh.num_vertices();
                     mesh.add_vertex(a);
@@ -426,7 +445,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads points from .stl file as triplets into IsPushable<IsBuildable3D>
-pub fn load_stl_triplets<IP, P, R, IPN>(
+pub fn load_stl_triplets<IP, P, N, R, IPN>(
     read: R,
     format: StlFormat,
     ip: &mut IP,
@@ -435,8 +454,9 @@ pub fn load_stl_triplets<IP, P, R, IPN>(
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: BufRead,
-    IPN: IsPushable<P>,
+    IPN: IsPushable<N>,
 {
     let iterator = StlIterator::new(read, format)?;
 
@@ -514,13 +534,14 @@ where
 
 //------------------------------------------------------------------------------
 
-fn read_stl_facet<P, R>(
+fn read_stl_facet<P, N, R>(
     read: &mut R,
     line_buffer: &mut Vec<u8>,
     i_line: &mut usize,
-) -> StlIOResult<[P; 4]>
+) -> StlIOResult<(P, P, P, N)>
 where
     P: IsBuildable3D,
+    N: IsBuildable3D,
     R: BufRead,
 {
     let mut line: &[u8];
@@ -536,7 +557,7 @@ where
         return Err(StlError::Facet).line(*i_line, line);
     }
 
-    let n = read_stl_normal(&line).unwrap_or(P::new(0.0, 0.0, 1.0));
+    let n = read_stl_normal(&line).unwrap_or(N::new(0.0, 0.0, 1.0));
 
     line = trim_start(fetch_line(read, line_buffer).index(*i_line)?);
     *i_line += 1;
@@ -580,7 +601,7 @@ where
         return Err(StlError::EndFacet).line(*i_line, line);
     }
 
-    Ok([a, b, c, n])
+    Ok((a, b, c, n))
 }
 
 //------------------------------------------------------------------------------
