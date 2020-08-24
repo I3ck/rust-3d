@@ -534,6 +534,7 @@ where
 
 //------------------------------------------------------------------------------
 
+#[inline(always)]
 fn read_stl_facet<P, N, R>(
     read: &mut R,
     line_buffer: &mut Vec<u8>,
@@ -606,6 +607,7 @@ where
 
 //------------------------------------------------------------------------------
 
+#[inline(always)]
 fn read_stl_vertex<P>(line: &[u8]) -> Option<P>
 where
     P: IsBuildable3D,
@@ -624,6 +626,7 @@ where
 
 //------------------------------------------------------------------------------
 
+#[inline(always)]
 fn read_stl_normal<P>(line: &[u8]) -> Option<P>
 where
     P: IsBuildable3D,
@@ -645,6 +648,7 @@ where
 
 //------------------------------------------------------------------------------
 
+#[inline(always)]
 fn str_exp<P>(p: &P) -> String
 where
     P: Is3D,

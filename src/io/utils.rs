@@ -58,6 +58,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Trims white space at the start of the input
+#[inline(always)]
 pub fn trim_start(text: &[u8]) -> &[u8] {
     let mut to_drop = 0;
     for c in text {

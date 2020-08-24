@@ -208,6 +208,7 @@ where
 
 //------------------------------------------------------------------------------
 
+#[inline(always)]
 fn command(line: &[u8]) -> Option<[Option<f64>; 3]> {
     let mut n_found = 0;
     let mut x = None;
