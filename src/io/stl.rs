@@ -341,7 +341,7 @@ pub fn load_stl_mesh_duped<EM, P, R, IPN>(
 ) -> StlIOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D + Clone,
+    P: IsBuildable3D,
     R: BufRead,
     IPN: IsPushable<P>,
 {
