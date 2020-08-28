@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! DynamicPrecisionIndexVec is a memory efficient container with a usize interface. It uses u8 -> u16 -> u32 -> usize for storage depending on the largest index's size
 
-use crate::{IsIndexContainer, IsIndexContainerIterator};
+use crate::{IsClearable, IsIndexContainer, IsIndexContainerIterator};
 
 use std::{u16, u32, u8, usize};
 
@@ -173,6 +173,14 @@ impl DynamicPrecisionIndexVec {
             Mode::U32(_) => u32::MAX as usize,
             Mode::Usize(_) => usize::MAX,
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+impl IsClearable for DynamicPrecisionIndexVec {
+    fn clear(&mut self) {
+        self.mode.clear()
     }
 }
 
@@ -337,5 +345,16 @@ enum Mode {
 impl Default for Mode {
     fn default() -> Self {
         Self::U8(Vec::new())
+    }
+}
+
+impl IsClearable for Mode {
+    fn clear(&mut self) {
+        match self {
+            Self::U8(x) => x.clear(),
+            Self::U16(x) => x.clear(),
+            Self::U32(x) => x.clear(),
+            Self::Usize(x) => x.clear(),
+        }
     }
 }

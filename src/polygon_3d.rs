@@ -150,6 +150,15 @@ where
     }
 }
 
+impl<P> IsClearable for Polygon3D<P>
+where
+    P: IsBuildable3D,
+{
+    fn clear(&mut self) {
+        self.pc.clear()
+    }
+}
+
 impl<P> Default for Polygon3D<P>
 where
     //https://github.com/rust-lang/rust/issues/26925

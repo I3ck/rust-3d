@@ -355,6 +355,15 @@ where
     }
 }
 
+impl<P> IsClearable for PointCloud2D<P>
+where
+    P: Is2D,
+{
+    fn clear(&mut self) {
+        self.data.clear()
+    }
+}
+
 impl<P> Default for PointCloud2D<P>
 where
     //https://github.com/rust-lang/rust/issues/26925

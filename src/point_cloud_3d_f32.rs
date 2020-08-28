@@ -179,6 +179,15 @@ where
     }
 }
 
+impl<P> IsClearable for PointCloud3Df32<P>
+where
+    P: IsBuildable3D,
+{
+    fn clear(&mut self) {
+        self.data.clear()
+    }
+}
+
 impl<P> Into<Vec<f32>> for PointCloud3Df32<P>
 where
     P: IsBuildable3D,

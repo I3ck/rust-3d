@@ -97,3 +97,9 @@ where
         })
     }
 }
+
+impl<T> IsClearable for LinkedList<T> {
+    fn clear(&mut self) {
+        self.clear()
+    }
+}

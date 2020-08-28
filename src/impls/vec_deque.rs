@@ -143,3 +143,9 @@ where
         })
     }
 }
+
+impl<T> IsClearable for VecDeque<T> {
+    fn clear(&mut self) {
+        self.clear()
+    }
+}

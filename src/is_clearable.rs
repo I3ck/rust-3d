@@ -20,48 +20,12 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//! U32IndexVec is a u32 container with a usize interface (make sure your use case doesn't go out of bounds)
-
-use crate::{IsClearable, IsIndexContainer, IsIndexContainerIterator};
+//! Trait for types than can be cleared
 
 //------------------------------------------------------------------------------
 
-#[derive(Clone, Default)]
-/// U32IndexVec is a u32 container with a usize interface (make sure your use case doesn't go out of bounds)
-pub struct U32IndexVec {
-    pub data: Vec<u32>,
-}
-
-impl IsClearable for U32IndexVec {
-    fn clear(&mut self) {
-        self.data.clear()
-    }
-}
-
-impl IsIndexContainer for U32IndexVec {
-    fn ensure_supported(&mut self, _x: usize) {}
-
-    fn get(&self, i: usize) -> usize {
-        self.data[i] as usize
-    }
-
-    fn set(&mut self, i: usize, x: usize) {
-        self.data[i] = x as u32
-    }
-
-    fn push(&mut self, x: usize) {
-        self.data.push(x as u32)
-    }
-
-    fn len(&self) -> usize {
-        self.data.len()
-    }
-
-    fn reserve(&mut self, n: usize) {
-        self.data.reserve(n)
-    }
-
-    fn iter(&self) -> IsIndexContainerIterator<Self> {
-        IsIndexContainerIterator::new(self)
-    }
+/// Trait for types than can be cleared
+pub trait IsClearable {
+    /// Should clear the object, leaving it in an empty state
+    fn clear(&mut self);
 }

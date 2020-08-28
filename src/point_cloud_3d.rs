@@ -365,6 +365,15 @@ where
     }
 }
 
+impl<P> IsClearable for PointCloud3D<P>
+where
+    P: Is3D,
+{
+    fn clear(&mut self) {
+        self.data.clear()
+    }
+}
+
 impl<P> Default for PointCloud3D<P>
 where
     //https://github.com/rust-lang/rust/issues/26925

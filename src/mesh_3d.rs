@@ -205,6 +205,18 @@ where
     }
 }
 
+impl<P, ID, IC> IsClearable for Mesh3D<P, ID, IC>
+where
+    P: Is3D,
+    ID: IsDataContainer<P> + IsClearable,
+    IC: IsIndexContainer + IsClearable,
+{
+    fn clear(&mut self) {
+        self.pc.clear();
+        self.topology.clear();
+    }
+}
+
 impl<P, ID, IC> From<(ID, IC)> for Mesh3D<P, ID, IC>
 where
     P: Is3D,

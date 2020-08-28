@@ -172,3 +172,9 @@ impl IsIndexContainer for Vec<usize> {
         IsIndexContainerIterator::new(self)
     }
 }
+
+impl<T> IsClearable for Vec<T> {
+    fn clear(&mut self) {
+        self.clear()
+    }
+}

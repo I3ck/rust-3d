@@ -150,6 +150,15 @@ where
     }
 }
 
+impl<P> IsClearable for Polygon2D<P>
+where
+    P: IsBuildable2D,
+{
+    fn clear(&mut self) {
+        self.pc.clear()
+    }
+}
+
 impl<P> fmt::Display for Polygon2D<P>
 where
     P: IsBuildable2D + fmt::Display,
