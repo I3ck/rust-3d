@@ -193,12 +193,16 @@ where
 
     for fd in iterator {
         match fd? {
-            io::types::FaceData::Data(p) => {
+            io::types::FaceDataReserve::Data(p) => {
                 mesh.add_vertex(p);
             }
-            io::types::FaceData::Face([a, b, c]) => {
+            io::types::FaceDataReserve::Face([a, b, c]) => {
                 mesh.try_add_connection(VId(a), VId(b), VId(c))
                     .or(Err(PlyError::InvalidMeshIndices))?;
+            }
+            io::types::FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
+                mesh.reserve_vertices(n_vertices);
+                mesh.reserve_faces(n_faces);
             }
         }
     }
@@ -223,13 +227,17 @@ where
 
     for fd in iterator {
         match fd? {
-            io::types::FaceData::Data(p) => {
+            io::types::FaceDataReserve::Data(p) => {
                 mesh.add_vertex(p);
             }
-            io::types::FaceData::Face([a, b, c]) => {
+            io::types::FaceDataReserve::Face([a, b, c]) => {
                 mesh.try_add_connection(VId(a), VId(b), VId(c))
                     .or(Err(PlyError::InvalidMeshIndices))
                     .simple()?;
+            }
+            io::types::FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
+                mesh.reserve_vertices(n_vertices);
+                mesh.reserve_faces(n_faces);
             }
         }
     }

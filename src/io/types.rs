@@ -46,27 +46,10 @@ pub enum DataReserve<T> {
 
 //------------------------------------------------------------------------------
 
-pub enum FaceData<T> {
-    Face([usize; 3]), //@todo VId or usize?
-    Data(T),
-}
-//@todo implement From<T> and use
-
-//------------------------------------------------------------------------------
-
 pub enum FaceDataReserve<T> {
     Face([usize; 3]), //@todo VId or usize?
     Data(T),
     ReserveDataFaces(usize, usize),
-}
-
-impl<T> From<FaceData<T>> for FaceDataReserve<T> {
-    fn from(x: FaceData<T>) -> Self {
-        match x {
-            FaceData::Data(x) => Self::Data(x),
-            FaceData::Face(x) => Self::Face(x),
-        }
-    }
 }
 
 impl<T> From<DataReserve<T>> for FaceDataReserve<T> {

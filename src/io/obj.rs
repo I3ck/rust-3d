@@ -135,7 +135,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = ObjIOResult<FaceData<P>>;
+    type Item = ObjIOResult<FaceDataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -147,7 +147,7 @@ where
             if line.starts_with(b"v ") {
                 return Some(
                     fetch_vertex(line)
-                        .map(|x| FaceData::Data(x))
+                        .map(|x| FaceDataReserve::Data(x))
                         .line(self.i_line, line)
                         .map_err(|e| {
                             self.is_done = true;
@@ -157,7 +157,7 @@ where
             } else if line.starts_with(b"f ") {
                 return Some(
                     fetch_face(line)
-                        .map(|x| FaceData::Face(x))
+                        .map(|x| FaceDataReserve::Face(x))
                         .line(self.i_line, line)
                         .map_err(|e| {
                             self.is_done = true;
@@ -193,13 +193,17 @@ where
 
     for rd in iterator {
         match rd? {
-            FaceData::Data(x) => {
+            FaceDataReserve::Data(x) => {
                 mesh.add_vertex(x);
             }
-            FaceData::Face([a, b, c]) => {
+            FaceDataReserve::Face([a, b, c]) => {
                 mesh.try_add_connection(VId(a), VId(b), VId(c))
                     .map_err(|_| ObjError::InvalidMeshIndices)
                     .simple()?;
+            }
+            io::types::FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
+                mesh.reserve_vertices(n_vertices);
+                mesh.reserve_faces(n_faces);
             }
         }
     }

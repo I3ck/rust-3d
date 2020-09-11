@@ -66,12 +66,12 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = PlyIOResult<io::types::FaceData<P>>;
+    type Item = PlyIOResult<io::types::FaceDataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut p_iter) = self.p_iter {
             match p_iter.next() {
-                Some(x) => return Some(x.map(|x| io::types::FaceData::Data(x))),
+                Some(x) => return Some(x.map(|x| io::types::FaceDataReserve::Data(x))),
                 None => {
                     // point iteration done, switch to face iteration
                     // unwrap safe, since in if let Some()
@@ -90,7 +90,7 @@ where
             .as_mut()
             .unwrap()
             .next()
-            .map(|x| x.map(|x| io::types::FaceData::Face(x)))
+            .map(|x| x.map(|x| io::types::FaceDataReserve::Face(x)))
     }
 }
 
@@ -136,12 +136,12 @@ where
     R: Read,
     BR: IsByteReader,
 {
-    type Item = PlyResult<io::types::FaceData<P>>;
+    type Item = PlyResult<io::types::FaceDataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut p_iter) = self.p_iter {
             match p_iter.next() {
-                Some(x) => return Some(x.map(|x| io::types::FaceData::Data(x))),
+                Some(x) => return Some(x.map(|x| io::types::FaceDataReserve::Data(x))),
                 None => {
                     // point iteration done, switch to face iteration
                     // unwrap safe, since in if let Some()
@@ -156,7 +156,7 @@ where
             .as_mut()
             .unwrap()
             .next()
-            .map(|x| x.map(|x| io::types::FaceData::Face(x)))
+            .map(|x| x.map(|x| io::types::FaceDataReserve::Face(x)))
     }
 }
 
