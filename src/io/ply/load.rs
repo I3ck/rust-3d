@@ -152,7 +152,10 @@ where
     let iterator = PlyBinaryPointsIterator::<BR, _, _>::new(read, header);
 
     for p in iterator {
-        ip.push(p?)
+        match p? {
+            DataReserve::Data(x) => ip.push(x),
+            DataReserve::Reserve(n) => ip.reserve(n),
+        }
     }
 
     Ok(())
@@ -174,7 +177,10 @@ where
     let iterator = PlyAsciiPointsIterator::new(read, header, i_line);
 
     for p in iterator {
-        ip.push(p?)
+        match p? {
+            DataReserve::Data(x) => ip.push(x),
+            DataReserve::Reserve(n) => ip.reserve(n),
+        }
     }
 
     Ok(())

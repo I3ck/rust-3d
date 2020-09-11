@@ -172,7 +172,6 @@ where
                 }
                 BinaryOrAsciiPlyPointsInteralIterator::BinaryBig(x) => x.next().map(|x| x.simple()),
             }
-            .map(|x| x.map(|x| DataReserve::Data(x)))
         }
     }
 }

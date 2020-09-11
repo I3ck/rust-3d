@@ -31,7 +31,7 @@ use std::{
     marker::PhantomData,
 };
 
-use super::byte_reader::*;
+use super::{byte_reader::*, types::*};
 
 //------------------------------------------------------------------------------
 
@@ -105,7 +105,7 @@ where
     P: IsBuildable3D,
     R: Read,
 {
-    type Item = PslResult<P>;
+    type Item = PslResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -132,10 +132,14 @@ where
 
         self.reduce_count();
 
-        return Some(fetch_point(&mut self.read).map_err(|e| {
-            self.is_done = true;
-            e
-        }));
+        return Some(
+            fetch_point(&mut self.read)
+                .map(|x| DataReserve::Data(x))
+                .map_err(|e| {
+                    self.is_done = true;
+                    e
+                }),
+        );
     }
 }
 
@@ -158,7 +162,10 @@ where
     let iterator = PslIterator::new(read);
 
     for p in iterator {
-        ip.push(p?)
+        match p? {
+            DataReserve::Data(x) => ip.push(x),
+            DataReserve::Reserve(n) => ip.reserve(n),
+        }
     }
 
     Ok(())

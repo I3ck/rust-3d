@@ -79,7 +79,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = GcodeResult<P>;
+    type Item = GcodeResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -126,7 +126,7 @@ where
                             }
 
                             if any_changed {
-                                return Some(Ok(P::new(self.x, self.y, self.z)));
+                                return Some(Ok(DataReserve::Data(P::new(self.x, self.y, self.z))));
                             }
                         }
                     }
@@ -167,7 +167,9 @@ where
                                 }
 
                                 if any_changed {
-                                    return Some(Ok(P::new(self.x, self.y, self.z)));
+                                    return Some(Ok(DataReserve::Data(P::new(
+                                        self.x, self.y, self.z,
+                                    ))));
                                 }
                             }
                         }
@@ -200,7 +202,10 @@ where
     let iterator = GcodeIterator::new(read);
 
     for p in iterator {
-        ip.push(p?)
+        match p? {
+            DataReserve::Data(x) => ip.push(x),
+            DataReserve::Reserve(n) => ip.reserve(n),
+        }
     }
 
     Ok(())

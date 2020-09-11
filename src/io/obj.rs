@@ -69,7 +69,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = ObjIOResult<P>;
+    type Item = ObjIOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -79,10 +79,15 @@ where
             self.i_line += 1;
 
             if line.starts_with(b"v ") {
-                return Some(fetch_vertex(line).line(self.i_line, line).map_err(|e| {
-                    self.is_done = true;
-                    e
-                }));
+                return Some(
+                    fetch_vertex(line)
+                        .map(|x| DataReserve::Data(x))
+                        .line(self.i_line, line)
+                        .map_err(|e| {
+                            self.is_done = true;
+                            e
+                        }),
+                );
             }
         }
 
@@ -221,7 +226,10 @@ where
     let iterator = ObjPointsIterator::new(read);
 
     for p in iterator {
-        ip.push(p?)
+        match p? {
+            DataReserve::Data(x) => ip.push(x),
+            DataReserve::Reserve(n) => ip.reserve(n),
+        }
     }
 
     Ok(())

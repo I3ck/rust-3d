@@ -100,7 +100,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = XyzIOResult<P>;
+    type Item = XyzIOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -110,6 +110,7 @@ where
             self.i_line += 1;
             Some(
                 Self::fetch_one(&mut self.delim_determined, &mut self.delim, line)
+                    .map(|x| DataReserve::Data(x))
                     .line(self.i_line, line)
                     .map_err(|e| {
                         self.is_done = true;
@@ -168,7 +169,10 @@ where
     let iterator = XyzIterator::new(read);
 
     for p in iterator {
-        ip.push(p?)
+        match p? {
+            DataReserve::Data(x) => ip.push(x),
+            DataReserve::Reserve(n) => ip.reserve(n),
+        }
     }
 
     Ok(())

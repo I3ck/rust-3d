@@ -71,7 +71,7 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut p_iter) = self.p_iter {
             match p_iter.next() {
-                Some(x) => return Some(x.map(|x| io::types::FaceDataReserve::Data(x))),
+                Some(x) => return Some(x.map(|x| x.into())),
                 None => {
                     // point iteration done, switch to face iteration
                     // unwrap safe, since in if let Some()
@@ -141,7 +141,7 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut p_iter) = self.p_iter {
             match p_iter.next() {
-                Some(x) => return Some(x.map(|x| io::types::FaceDataReserve::Data(x))),
+                Some(x) => return Some(x.map(|x| x.into())),
                 None => {
                     // point iteration done, switch to face iteration
                     // unwrap safe, since in if let Some()
@@ -266,7 +266,7 @@ where
     R: Read,
     BR: IsByteReader,
 {
-    type Item = PlyResult<P>;
+    type Item = PlyResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -274,7 +274,7 @@ where
         }
         if self.current < self.header.vertex.count {
             self.current += 1;
-            Some(self.fetch_one().map_err(|e| {
+            Some(self.fetch_one().map(|x| DataReserve::Data(x)).map_err(|e| {
                 self.is_done = true;
                 e
             }))
@@ -371,7 +371,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = PlyIOResult<P>;
+    type Item = PlyIOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -383,6 +383,7 @@ where
                 self.i_line += 1;
                 return Some(
                     Self::fetch_one(&self.header, line)
+                        .map(|x| DataReserve::Data(x))
                         .line(self.i_line, line)
                         .map_err(|e| {
                             self.is_done = true;
