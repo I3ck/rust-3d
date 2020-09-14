@@ -285,7 +285,6 @@ impl Into<PartialHeader> for Header {
 pub enum PlyError {
     LoadStartNotFound,
     LoadFormatNotFound,
-    LoadVertexIndexDefinitionNotFound,
     LoadHeaderInvalid,
     LoadVertexCountIncorrect,
     AccessFile,
@@ -314,9 +313,6 @@ impl fmt::Debug for PlyError {
         match self {
             Self::LoadStartNotFound => write!(f, "Start of .ply header not found"),
             Self::LoadFormatNotFound => write!(f, "Format of .ply missing or not supported"),
-            Self::LoadVertexIndexDefinitionNotFound => {
-                write!(f, "Index definition in .ply not found")
-            }
             Self::LoadHeaderInvalid => write!(f, "Header of .ply seems to be invalid"),
             Self::LoadVertexCountIncorrect => write!(f, "Vertex count of .ply not found"),
             Self::ColorArrayIncorrectLength => {
