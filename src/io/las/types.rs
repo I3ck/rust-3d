@@ -22,13 +22,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for types for the .las file format
 
-use std::{
-    convert::{TryFrom, TryInto},
-    fmt,
-    io::Error as ioError,
-};
+use std::convert::{TryFrom, TryInto};
 
-use super::super::from_bytes::*;
+use super::super::types::*;
 
 //------------------------------------------------------------------------------
 
@@ -46,11 +42,11 @@ pub struct Header {
 }
 
 impl TryFrom<HeaderRaw> for Header {
-    type Error = LasError;
+    type Error = IOError;
 
-    fn try_from(x: HeaderRaw) -> LasResult<Header> {
+    fn try_from(x: HeaderRaw) -> IOResult2<Header> {
         if x.version_major > 1 || x.version_minor > 4 {
-            return Err(LasError::UnsupportedVersion);
+            return Err(IOError::UnsupportedVersion);
         }
 
         // These are conversions according to the legacy mode
@@ -61,7 +57,7 @@ impl TryFrom<HeaderRaw> for Header {
         };
 
         if x.point_record_format > 10 {
-            return Err(LasError::UnknownPointFormat);
+            return Err(IOError::UnknownPointFormat);
         }
 
         Ok(Header {
@@ -140,55 +136,5 @@ impl PointData {
             y: i32::from_le_bytes(buffer[4..8].try_into().unwrap()),
             z: i32::from_le_bytes(buffer[8..12].try_into().unwrap()),
         }
-    }
-}
-
-//------------------------------------------------------------------------------
-
-/// Error type for .las file operation
-pub enum LasError {
-    AccessFile,
-    BinaryData,
-    UnknownPointFormat,
-    UnsupportedVersion,
-    Header,
-}
-
-impl fmt::Debug for LasError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::AccessFile => write!(f, "Unable to access file"),
-            Self::BinaryData => write!(f, "Unable to parse binary data"),
-            Self::UnknownPointFormat => write!(f, "Unknown point format"),
-            Self::UnsupportedVersion => write!(f, "Unsupported version"),
-            Self::Header => write!(f, "Could not parse header"),
-        }
-    }
-}
-
-impl fmt::Display for LasError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-/// Result type for .las file operation
-pub type LasResult<T> = std::result::Result<T, LasError>;
-
-impl From<ioError> for LasError {
-    fn from(_error: ioError) -> Self {
-        LasError::AccessFile
-    }
-}
-
-impl From<std::array::TryFromSliceError> for LasError {
-    fn from(_error: std::array::TryFromSliceError) -> Self {
-        LasError::BinaryData
-    }
-}
-
-impl From<FromBytesError> for LasError {
-    fn from(_error: FromBytesError) -> Self {
-        LasError::BinaryData
     }
 }

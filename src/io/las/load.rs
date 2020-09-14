@@ -56,7 +56,7 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-    pub fn new(read: R) -> LasResult<Self> {
+    pub fn new(read: R) -> IOResult2<Self> {
         Ok(Self {
             read,
             is_done: false,
@@ -68,7 +68,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(&mut self) -> LasResult<P> {
+    fn fetch_one(&mut self) -> IOResult2<P> {
         if let Some(ref header) = self.header {
             self.read.read_exact(&mut self.buffer)?;
 
@@ -80,7 +80,7 @@ where
 
             Ok(P::new(x, y, z))
         } else {
-            Err(LasError::Header)
+            Err(IOError::Header)
         }
     }
 }
@@ -90,7 +90,7 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-    type Item = LasResult<DataReserve<P>>;
+    type Item = IOResult2<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -108,11 +108,11 @@ where
                     return Some(Ok(DataReserve::Reserve(n as usize)));
                 } else {
                     self.is_done = true;
-                    return Some(Err(LasError::BinaryData));
+                    return Some(Err(IOError::BinaryData));
                 }
             } else {
                 self.is_done = true;
-                return Some(Err(LasError::Header));
+                return Some(Err(IOError::Header));
             }
         }
         // unwrap safe since header is always assigned
@@ -139,7 +139,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads points from .las file into IsPushable<IsBuildable3D>
-pub fn load_las<IP, P, R>(read: R, ip: &mut IP) -> LasResult<()>
+pub fn load_las<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -159,7 +159,7 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_header<R>(mut read: R) -> LasResult<HeaderRaw>
+fn load_header<R>(mut read: R) -> IOResult2<HeaderRaw>
 where
     R: Read,
 {

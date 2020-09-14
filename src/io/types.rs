@@ -27,6 +27,8 @@ use std::{
     result::Result,
 };
 
+use super::from_bytes::FromBytesError;
+
 //------------------------------------------------------------------------------
 
 /// Trait for adding line information to (error) types
@@ -83,6 +85,56 @@ where
             Self::Index(i, x) => write!(f, "Line #{}: '{}'", i, x),
             Self::Line(i, l, x) => write!(f, "Line #{}: '{}' '{}'", i, x, l),
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+pub enum IOError {
+    AccessFile,
+    Header,
+    UnsupportedVersion,
+    UnknownPointFormat,
+    BinaryData,
+    LineParse(usize),
+}
+
+pub type IOResult2<T> = Result<T, IOError>; //@todo rename
+
+impl From<std::io::Error> for IOError {
+    fn from(_error: std::io::Error) -> Self {
+        IOError::AccessFile
+    }
+}
+
+impl From<std::array::TryFromSliceError> for IOError {
+    fn from(_error: std::array::TryFromSliceError) -> Self {
+        Self::BinaryData
+    }
+}
+
+impl From<FromBytesError> for IOError {
+    fn from(_error: FromBytesError) -> Self {
+        Self::BinaryData
+    }
+}
+
+impl std::fmt::Debug for IOError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::AccessFile => write!(f, "Unable to access file"),
+            Self::LineParse(x) => write!(f, "Unable to parse line {}", x),
+            Self::BinaryData => write!(f, "Unable to parse binary data"),
+            Self::UnknownPointFormat => write!(f, "Unknown point format"),
+            Self::UnsupportedVersion => write!(f, "Unsupported version"),
+            Self::Header => write!(f, "Could not parse header"),
+        }
+    }
+}
+
+impl std::fmt::Display for IOError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
     }
 }
 

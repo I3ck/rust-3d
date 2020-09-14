@@ -66,7 +66,7 @@ pub enum ErrorKind {
     ObjError(ObjError),
     OffError(OffError),
     PslError(PslError),
-    GcodeError(GcodeError),
+    IOError2(IOError), //@todo rename
 }
 
 //------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ impl fmt::Debug for ErrorKind {
             Self::ObjError(x) => x.fmt(f),
             Self::OffError(x) => x.fmt(f),
             Self::PslError(x) => x.fmt(f),
-            Self::GcodeError(x) => x.fmt(f),
+            Self::IOError2(x) => x.fmt(f),
         }
     }
 }
@@ -176,8 +176,8 @@ impl From<OffError> for ErrorKind {
     }
 }
 
-impl From<GcodeError> for ErrorKind {
-    fn from(error: GcodeError) -> Self {
-        Self::GcodeError(error)
+impl From<IOError> for ErrorKind {
+    fn from(error: IOError) -> Self {
+        Self::IOError2(error)
     }
 }

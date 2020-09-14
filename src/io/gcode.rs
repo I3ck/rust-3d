@@ -24,12 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use std::{
-    fmt,
-    io::{BufRead, Error as ioError},
-    iter::FusedIterator,
-    marker::PhantomData,
-};
+use std::{io::BufRead, iter::FusedIterator, marker::PhantomData};
 
 use super::{types::*, utils::*};
 
@@ -79,7 +74,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = GcodeResult<DataReserve<P>>;
+    type Item = IOResult2<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -92,10 +87,7 @@ where
                 if line[2] == b' ' && (line[1] == b'1' || line[1] == b'2' || line[1] == b'3') {
                     // Move according to absolute/relative
                     let mut any_changed = false;
-                    match command(&line[3..])
-                        .ok_or(GcodeError::Command)
-                        .line(self.i_line, line)
-                    {
+                    match command(&line[3..]).ok_or(IOError::LineParse(self.i_line)) {
                         Err(e) => {
                             self.is_done = true;
                             return Some(Err(e));
@@ -142,10 +134,7 @@ where
                         // G92
                         // Move according absolute
                         let mut any_changed = false;
-                        match command(&line[4..])
-                            .ok_or(GcodeError::Command)
-                            .line(self.i_line, line)
-                        {
+                        match command(&line[4..]).ok_or(IOError::LineParse(self.i_line)) {
                             Err(e) => {
                                 self.is_done = true;
                                 return Some(Err(e));
@@ -193,7 +182,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads a IsPushable<Is3D> as x y z coordinates from gcode
-pub fn load_gcode_points<IP, P, R>(read: R, ip: &mut IP) -> GcodeResult<()>
+pub fn load_gcode_points<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -263,34 +252,4 @@ fn command(line: &[u8]) -> Option<[Option<f64>; 3]> {
 enum RelativeAbsolute {
     Relative,
     Absolute,
-}
-
-/// Error type for .gcode file operations
-pub enum GcodeError {
-    AccessFile,
-    Command,
-}
-
-/// Result type for .gcode file operations
-pub type GcodeResult<T> = IOResult<T, GcodeError>;
-
-impl fmt::Debug for GcodeError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::Command => write!(f, "Unable to parse command"),
-            Self::AccessFile => write!(f, "Unable to access file"),
-        }
-    }
-}
-
-impl fmt::Display for GcodeError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl From<ioError> for GcodeError {
-    fn from(_error: ioError) -> Self {
-        GcodeError::AccessFile
-    }
 }
