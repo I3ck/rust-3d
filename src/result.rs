@@ -62,7 +62,6 @@ pub enum ErrorKind {
     PtxError(PtxError),
     XyError(XyError),
     XyzError(XyzError),
-    ObjError(ObjError),
     OffError(OffError),
     PslError(PslError),
     IOError2(IOError), //@todo rename
@@ -107,7 +106,6 @@ impl fmt::Debug for ErrorKind {
             Self::PtxError(x) => x.fmt(f),
             Self::XyError(x) => x.fmt(f),
             Self::XyzError(x) => x.fmt(f),
-            Self::ObjError(x) => x.fmt(f),
             Self::OffError(x) => x.fmt(f),
             Self::PslError(x) => x.fmt(f),
             Self::IOError2(x) => x.fmt(f),
@@ -153,12 +151,6 @@ impl From<XyError> for ErrorKind {
 impl From<XyzError> for ErrorKind {
     fn from(error: XyzError) -> Self {
         Self::XyzError(error)
-    }
-}
-
-impl From<ObjError> for ErrorKind {
-    fn from(error: ObjError) -> Self {
-        Self::ObjError(error)
     }
 }
 

@@ -24,12 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use std::{
-    fmt,
-    io::{BufRead, Error as ioError},
-    iter::FusedIterator,
-    marker::PhantomData,
-};
+use std::{io::BufRead, iter::FusedIterator, marker::PhantomData};
 
 use super::{types::*, utils::*};
 
@@ -69,7 +64,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = ObjIOResult<DataReserve<P>>;
+    type Item = IOResult2<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -80,9 +75,8 @@ where
 
             if line.starts_with(b"v ") {
                 return Some(
-                    fetch_vertex(line)
+                    fetch_vertex(self.i_line, line)
                         .map(|x| DataReserve::Data(x))
-                        .line(self.i_line, line)
                         .map_err(|e| {
                             self.is_done = true;
                             e
@@ -140,7 +134,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = ObjIOResult<FaceDataReserve<P>>;
+    type Item = IOResult2<FaceDataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -151,9 +145,8 @@ where
 
             if line.starts_with(b"v ") {
                 return Some(
-                    fetch_vertex(line)
+                    fetch_vertex(self.i_line, line)
                         .map(|x| FaceDataReserve::Data(x))
-                        .line(self.i_line, line)
                         .map_err(|e| {
                             self.is_done = true;
                             e
@@ -161,9 +154,8 @@ where
                 );
             } else if line.starts_with(b"f ") {
                 return Some(
-                    fetch_face(line)
+                    fetch_face(self.i_line, line)
                         .map(|x| FaceDataReserve::Face(x))
-                        .line(self.i_line, line)
                         .map_err(|e| {
                             self.is_done = true;
                             e
@@ -188,7 +180,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads an IsMesh3D from the .obj file format
-pub fn load_obj_mesh<EM, P, R>(read: R, mesh: &mut EM) -> ObjIOResult<()>
+pub fn load_obj_mesh<EM, P, R>(read: R, mesh: &mut EM) -> IOResult2<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -203,8 +195,7 @@ where
             }
             FaceDataReserve::Face([a, b, c]) => {
                 mesh.try_add_connection(VId(a), VId(b), VId(c))
-                    .map_err(|_| ObjError::InvalidMeshIndices)
-                    .simple()?;
+                    .map_err(|_| IOError::InvalidMeshIndices)?;
             }
             io::types::FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
                 mesh.reserve_vertices(n_vertices);
@@ -217,7 +208,7 @@ where
 }
 
 /// Loads IsPushable<Is3D> from the .obj file format
-pub fn load_obj_points<IP, P, R>(read: R, ip: &mut IP) -> ObjIOResult<()>
+pub fn load_obj_points<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -237,86 +228,49 @@ where
 
 //------------------------------------------------------------------------------
 
-/// Error type for .obj file operations
-pub enum ObjError {
-    AccessFile,
-    InvalidMeshIndices,
-    Face,
-    Vertex,
-}
-
-/// Result type for .obj file operations
-pub type ObjIOResult<T> = IOResult<T, ObjError>;
-type ObjResult<T> = std::result::Result<T, ObjError>;
-
-impl fmt::Debug for ObjError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::AccessFile => write!(f, "Unable to access file"),
-            Self::Face => write!(f, "Unable to parse face"),
-            Self::Vertex => write!(f, "Unable to parse vertex"),
-            Self::InvalidMeshIndices => write!(f, "File contains invalid mesh indices"),
-        }
-    }
-}
-
-impl fmt::Display for ObjError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl From<ioError> for ObjError {
-    fn from(_error: ioError) -> Self {
-        ObjError::AccessFile
-    }
-}
-
-//------------------------------------------------------------------------------
-
 #[inline(always)]
-fn fetch_vertex<P>(line: &[u8]) -> ObjResult<P>
+fn fetch_vertex<P>(i_line: usize, line: &[u8]) -> IOResult2<P>
 where
     P: IsBuildable3D,
 {
     let mut words = to_words_skip_empty(line);
 
     // skip "v"
-    words.next().ok_or(ObjError::Vertex)?;
+    words.next().ok_or(IOError::Vertex(Some(i_line)))?;
 
     let x = words
         .next()
         .and_then(|w| from_ascii(w))
-        .ok_or(ObjError::Vertex)?;
+        .ok_or(IOError::Vertex(Some(i_line)))?;
 
     let y = words
         .next()
         .and_then(|w| from_ascii(w))
-        .ok_or(ObjError::Vertex)?;
+        .ok_or(IOError::Vertex(Some(i_line)))?;
 
     let z = words
         .next()
         .and_then(|w| from_ascii(w))
-        .ok_or(ObjError::Vertex)?;
+        .ok_or(IOError::Vertex(Some(i_line)))?;
 
     Ok(P::new(x, y, z))
 }
 
 #[inline(always)]
-fn fetch_face(line: &[u8]) -> ObjResult<[usize; 3]> {
+fn fetch_face(i_line: usize, line: &[u8]) -> IOResult2<[usize; 3]> {
     let mut words = to_words_skip_empty(line);
 
     // skip "f"
-    words.next().ok_or(ObjError::Face)?;
+    words.next().ok_or(IOError::Face(Some(i_line)))?;
 
-    let mut tmp = words.next().ok_or(ObjError::Face)?;
-    let a: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(ObjError::Face)?;
+    let mut tmp = words.next().ok_or(IOError::Face(Some(i_line)))?;
+    let a: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(IOError::Face(Some(i_line)))?;
 
-    tmp = words.next().ok_or(ObjError::Face)?;
-    let b: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(ObjError::Face)?;
+    tmp = words.next().ok_or(IOError::Face(Some(i_line)))?;
+    let b: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(IOError::Face(Some(i_line)))?;
 
-    tmp = words.next().ok_or(ObjError::Face)?;
-    let c: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(ObjError::Face)?;
+    tmp = words.next().ok_or(IOError::Face(Some(i_line)))?;
+    let c: usize = from_ascii(until_bytes(tmp, b'/')).ok_or(IOError::Face(Some(i_line)))?;
 
     //@todo could fail if 0 in file
     //obj indexing starts at 1
