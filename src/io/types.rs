@@ -29,6 +29,8 @@ use std::{
 
 use super::from_bytes::FromBytesError;
 
+use super::ply::Type;
+
 //------------------------------------------------------------------------------
 
 /// Trait for adding line information to (error) types
@@ -90,13 +92,27 @@ where
 
 //------------------------------------------------------------------------------
 
+//@todo consider split into load/save
 pub enum IOError {
     AccessFile,
     Header,
     UnsupportedVersion,
     UnknownPointFormat,
     BinaryData,
+    VertexCount,
+    InvalidMeshIndices,
+    ColorArrayLength,
+    InvalidPlyType(String),
+    InvalidPlyVertexType(Type),
+    InvalidPlyFaceType(Type),
+    InvalidPlyVertexDimensionDefinition,
+    Vertex(Option<usize>),
+    Face(Option<usize>),
+    Property(usize),
+    MissingStart(usize),
     LineParse(usize),
+    InvalidProperty(usize),
+    UnkownFormat(usize),
 }
 
 pub type IOResult2<T> = Result<T, IOError>; //@todo rename
@@ -128,6 +144,23 @@ impl std::fmt::Debug for IOError {
             Self::UnknownPointFormat => write!(f, "Unknown point format"),
             Self::UnsupportedVersion => write!(f, "Unsupported version"),
             Self::Header => write!(f, "Could not parse header"),
+            Self::InvalidProperty(x) => write!(f, "Invalid property on line {}", x),
+            Self::MissingStart(x) => write!(f, "Start not found on line {}", x),
+            Self::UnkownFormat(x) => write!(f, "Unknown format on line {}", x),
+            Self::Vertex(Some(x)) => write!(f, "Unable to parse vertex on line {}", x),
+            Self::Vertex(None) => write!(f, "Unable to parse vertex"),
+            Self::Face(Some(x)) => write!(f, "Unable to parse face on line {}", x),
+            Self::Face(None) => write!(f, "Unable to parse face"),
+            Self::Property(x) => write!(f, "Unable to parse property on line {}", x),
+            Self::VertexCount => write!(f, "Vertex count does not match"),
+            Self::ColorArrayLength => write!(f, "Length of color array does not match others"),
+            Self::InvalidPlyType(x) => write!(f, "Invalid type in header '{}'", x),
+            Self::InvalidPlyVertexType(x) => write!(f, "Invalid vertex type in header {}", x),
+            Self::InvalidPlyFaceType(x) => write!(f, "Invalid face type in header {}", x),
+            Self::InvalidMeshIndices => write!(f, "File contains invalid mesh indices"),
+            Self::InvalidPlyVertexDimensionDefinition => {
+                write!(f, "Invalid order / definition of vertex dimension order")
+            }
         }
     }
 }

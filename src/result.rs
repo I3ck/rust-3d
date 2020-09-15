@@ -58,7 +58,6 @@ pub enum ErrorKind {
     ClusterTooBig,
     CantCalculateAngleIfZeroLength,
     TriFace3DNotSpanningVolume,
-    PlyError(PlyError),
     StlError(StlError),
     PtxError(PtxError),
     XyError(XyError),
@@ -104,7 +103,6 @@ impl fmt::Debug for ErrorKind {
                 f,
                 "TriFace3D must be constructed from points spanning a volume"
             ),
-            Self::PlyError(x) => x.fmt(f),
             Self::StlError(x) => x.fmt(f),
             Self::PtxError(x) => x.fmt(f),
             Self::XyError(x) => x.fmt(f),
@@ -137,12 +135,6 @@ impl From<ParseIntError> for ErrorKind {
 impl From<ioError> for ErrorKind {
     fn from(_error: ioError) -> Self {
         ErrorKind::IOError
-    }
-}
-
-impl From<PlyError> for ErrorKind {
-    fn from(error: PlyError) -> Self {
-        Self::PlyError(error)
     }
 }
 

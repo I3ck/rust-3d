@@ -47,7 +47,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    pub fn new(mut read: R) -> PlyIOResult<Self> {
+    pub fn new(mut read: R) -> IOResult2<Self> {
         let mut line_buffer = Vec::new();
         let mut i_line = 0;
 
@@ -71,7 +71,7 @@ where
                 to_reserve_data_faces,
             })
         } else {
-            Err(PlyError::LoadHeaderInvalid).simple()
+            Err(IOError::Header)
         }
     }
 }
@@ -81,7 +81,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = PlyIOResult<FaceDataReserve<P>>;
+    type Item = IOResult2<FaceDataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(to_reserve_data_faces) = self.to_reserve_data_faces {
@@ -96,10 +96,10 @@ where
                     x.next().map(|x| x.map(|x| x.into()))
                 }
                 BinaryOrAsciiPlyMeshInteralIterator::BinaryLittle(x) => {
-                    x.next().map(|x| x.map(|x| x.into()).simple())
+                    x.next().map(|x| x.map(|x| x.into()))
                 }
                 BinaryOrAsciiPlyMeshInteralIterator::BinaryBig(x) => {
-                    x.next().map(|x| x.map(|x| x.into()).simple())
+                    x.next().map(|x| x.map(|x| x.into()))
                 }
             }
         }
@@ -130,7 +130,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    pub fn new(mut read: R) -> PlyIOResult<Self> {
+    pub fn new(mut read: R) -> IOResult2<Self> {
         let mut line_buffer = Vec::new();
         let mut i_line = 0;
 
@@ -158,7 +158,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = PlyIOResult<DataReserve<P>>;
+    type Item = IOResult2<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(to_reserve) = self.to_reserve {
@@ -167,10 +167,8 @@ where
         } else {
             match &mut self.inner {
                 BinaryOrAsciiPlyPointsInteralIterator::Ascii(x) => x.next(),
-                BinaryOrAsciiPlyPointsInteralIterator::BinaryLittle(x) => {
-                    x.next().map(|x| x.simple())
-                }
-                BinaryOrAsciiPlyPointsInteralIterator::BinaryBig(x) => x.next().map(|x| x.simple()),
+                BinaryOrAsciiPlyPointsInteralIterator::BinaryLittle(x) => x.next(),
+                BinaryOrAsciiPlyPointsInteralIterator::BinaryBig(x) => x.next(),
             }
         }
     }

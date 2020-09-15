@@ -24,14 +24,14 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use super::types::*;
+use super::super::types::*;
 
 use std::io::Write;
 
 //------------------------------------------------------------------------------
 
 /// Saves an IsMesh3D in the ASCII .ply file format
-pub fn save_ply_ascii<M, P, W>(write: &mut W, mesh: &M) -> PlyResult<()>
+pub fn save_ply_ascii<M, P, W>(write: &mut W, mesh: &M) -> IOResult2<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
@@ -77,7 +77,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Saves an IsMesh3D in the ASCII .ply file format with additional colors
-pub fn save_ply_ascii_colored<M, P, W>(write: &mut W, mesh: &M, colors: &Vec<Rgb>) -> PlyResult<()>
+pub fn save_ply_ascii_colored<M, P, W>(write: &mut W, mesh: &M, colors: &Vec<Rgb>) -> IOResult2<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
@@ -87,7 +87,7 @@ where
     let n_faces = mesh.num_faces();
 
     if n_vertices != colors.len() {
-        return Err(PlyError::ColorArrayIncorrectLength);
+        return Err(IOError::ColorArrayLength);
     }
 
     let header = "ply\n".to_string()
@@ -145,7 +145,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Saves an IsMesh3D in the binary .ply file format
-pub fn save_ply_binary<M, P, W>(write: &mut W, mesh: &M, precision: &Precision) -> PlyResult<()>
+pub fn save_ply_binary<M, P, W>(write: &mut W, mesh: &M, precision: &Precision) -> IOResult2<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
@@ -227,7 +227,7 @@ pub fn save_ply_binary_colored<M, P, W>(
     mesh: &M,
     precision: &Precision,
     colors: &Vec<Rgb>,
-) -> PlyResult<()>
+) -> IOResult2<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
@@ -237,7 +237,7 @@ where
     let n_faces = mesh.num_faces();
 
     if n_vertices != colors.len() {
-        return Err(PlyError::ColorArrayIncorrectLength);
+        return Err(IOError::ColorArrayLength);
     }
 
     let header = match precision {

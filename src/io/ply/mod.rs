@@ -33,4 +33,4 @@ mod utils;
 pub use iterators::*;
 pub use load::*;
 pub use save::*;
-pub use types::{MeshOrPoints, PlyError};
+pub use types::{MeshOrPoints, Type};

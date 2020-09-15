@@ -66,7 +66,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = PlyIOResult<io::types::FaceDataReserve<P>>;
+    type Item = IOResult2<io::types::FaceDataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut p_iter) = self.p_iter {
@@ -136,7 +136,7 @@ where
     R: Read,
     BR: IsByteReader,
 {
-    type Item = PlyResult<io::types::FaceDataReserve<P>>;
+    type Item = IOResult2<io::types::FaceDataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut p_iter) = self.p_iter {
@@ -230,7 +230,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(&mut self) -> PlyResult<P> {
+    fn fetch_one(&mut self) -> IOResult2<P> {
         skip_bytes(&mut self.read, self.header.vertex.format.before.bytes)?;
 
         let first = read_vertex_type::<BR, _>(&mut self.read, self.header.vertex.format.first)?;
@@ -266,7 +266,7 @@ where
     R: Read,
     BR: IsByteReader,
 {
-    type Item = PlyResult<DataReserve<P>>;
+    type Item = IOResult2<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -331,7 +331,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(header: &PartialHeader, line: &[u8]) -> PlyResult<P> {
+    fn fetch_one(header: &PartialHeader, line: &[u8]) -> IOResult2<P> {
         let mut words = to_words_skip_empty(line);
 
         skip_n(&mut words, header.vertex.format.before.words);
@@ -339,21 +339,21 @@ where
         let first = words
             .next()
             .and_then(|w| from_ascii(w))
-            .ok_or(PlyError::InvalidVertex)?;
+            .ok_or(IOError::Vertex(None))?;
 
         skip_n(&mut words, header.vertex.format.between_first_snd.words);
 
         let snd = words
             .next()
             .and_then(|w| from_ascii(w))
-            .ok_or(PlyError::InvalidVertex)?;
+            .ok_or(IOError::Vertex(None))?;
 
         skip_n(&mut words, header.vertex.format.between_snd_third.words);
 
         let third = words
             .next()
             .and_then(|w| from_ascii(w))
-            .ok_or(PlyError::InvalidVertex)?;
+            .ok_or(IOError::Vertex(None))?;
 
         // no need to skip 'after' since we're done with this line anyway
 
@@ -371,7 +371,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = PlyIOResult<DataReserve<P>>;
+    type Item = IOResult2<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -384,7 +384,7 @@ where
                 return Some(
                     Self::fetch_one(&self.header, line)
                         .map(|x| DataReserve::Data(x))
-                        .line(self.i_line, line)
+                        //@todo missing line information
                         .map_err(|e| {
                             self.is_done = true;
                             e
@@ -396,7 +396,7 @@ where
         self.is_done = true;
 
         if self.current != self.header.vertex.count {
-            Some(Err(PlyError::LoadVertexCountIncorrect).simple())
+            Some(Err(IOError::VertexCount))
         } else {
             None
         }
@@ -444,7 +444,7 @@ impl<R> Iterator for PlyAsciiFacesIterator<R>
 where
     R: BufRead,
 {
-    type Item = PlyIOResult<[usize; 3]>;
+    type Item = IOResult2<[usize; 3]>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -456,8 +456,8 @@ where
                 self.i_line += 1;
                 return Some(
                     collect_index_line(&line)
-                        .ok_or(PlyError::FaceStructure)
-                        .line(self.i_line, line)
+                        .ok_or(IOError::Face(None))
+                        //@todo missing line information
                         .map_err(|e| {
                             self.is_done = true;
                             e
@@ -504,13 +504,13 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(&mut self) -> PlyResult<[usize; 3]> {
+    fn fetch_one(&mut self) -> IOResult2<[usize; 3]> {
         skip_bytes(&mut self.read, self.header.face.format.before.bytes)?;
 
         let element_count = read_face_type::<BR, _>(&mut self.read, self.header.face.format.count)?;
 
         if element_count != 3 {
-            return Err(PlyError::FaceStructure);
+            return Err(IOError::Face(None));
         }
 
         let a = read_face_type::<BR, _>(&mut self.read, self.header.face.format.index)?;
@@ -528,7 +528,7 @@ where
     R: Read,
     BR: IsByteReader,
 {
-    type Item = PlyResult<[usize; 3]>;
+    type Item = IOResult2<[usize; 3]>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {

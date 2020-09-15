@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 
 use super::{
-    super::{byte_reader::*, utils::*},
+    super::{byte_reader::*, types::*, utils::*},
     types::*,
 };
 
@@ -50,7 +50,7 @@ pub fn collect_index_line(line: &[u8]) -> Option<[usize; 3]> {
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-pub fn read_face_type<BR, R>(read: &mut R, t: FaceType) -> PlyResult<usize>
+pub fn read_face_type<BR, R>(read: &mut R, t: FaceType) -> IOResult2<usize>
 where
     BR: IsByteReader,
     R: Read,
@@ -68,7 +68,7 @@ where
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-pub fn read_vertex_type<BR, R>(read: &mut R, t: VertexType) -> PlyResult<f64>
+pub fn read_vertex_type<BR, R>(read: &mut R, t: VertexType) -> IOResult2<f64>
 where
     BR: IsByteReader,
     R: Read,

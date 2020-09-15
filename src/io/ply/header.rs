@@ -37,7 +37,7 @@ pub fn load_header<R>(
     read: &mut R,
     line_buffer: &mut Vec<u8>,
     i_line: &mut usize,
-) -> PlyIOResult<Header>
+) -> IOResult2<Header>
 where
     R: BufRead,
 {
@@ -80,7 +80,7 @@ where
                 ply_found = true;
                 continue;
             }
-            return Err(PlyError::LoadStartNotFound).line(*i_line, line);
+            return Err(IOError::MissingStart(*i_line));
         }
 
         if opt_format.is_none() {
@@ -88,7 +88,7 @@ where
                 b"format ascii 1.0" => Format::Ascii,
                 b"format binary_little_endian 1.0" => Format::LittleEndian,
                 b"format binary_big_endian 1.0" => Format::BigEndian,
-                _ => return Err(PlyError::LoadFormatNotFound).line(*i_line, line),
+                _ => return Err(IOError::UnkownFormat(*i_line)),
             });
             continue;
         }
@@ -102,8 +102,7 @@ where
                         words
                             .nth(2)
                             .and_then(|w| from_ascii(w))
-                            .ok_or(PlyError::VertexElement)
-                            .line(*i_line, line)?,
+                            .ok_or(IOError::Vertex(Some(*i_line)))?,
                     );
                     continue;
                 }
@@ -120,8 +119,7 @@ where
                         words
                             .nth(2)
                             .and_then(|w| from_ascii(w))
-                            .ok_or(PlyError::FaceElement)
-                            .line(*i_line, line)?,
+                            .ok_or(IOError::Face(Some(*i_line)))?,
                     );
                     continue;
                 }
@@ -137,25 +135,21 @@ where
 
                     let t = words
                         .next()
-                        .ok_or(PlyError::InvalidProperty)
-                        .and_then(|w| Type::try_from(w))
-                        .line(*i_line, line)?;
-                    let id = words
-                        .next()
-                        .ok_or(PlyError::InvalidProperty)
-                        .line(*i_line, line)?;
+                        .ok_or(IOError::Property(*i_line))
+                        .and_then(|w| Type::try_from(w))?;
+                    let id = words.next().ok_or(IOError::Property(*i_line))?;
                     if id == b"x" {
-                        opt_fst_type = Some(VertexType::try_from(t).line(*i_line, line)?);
+                        opt_fst_type = Some(VertexType::try_from(t)?); //@todo line info
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::X;
                         i_vertex_order += 1;
                     } else if id == b"y" {
-                        opt_snd_type = Some(VertexType::try_from(t).line(*i_line, line)?);
+                        opt_snd_type = Some(VertexType::try_from(t)?); //@todo line info
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Y;
                         i_vertex_order += 1;
                     } else if id == b"z" {
-                        opt_third_type = Some(VertexType::try_from(t).line(*i_line, line)?);
+                        opt_third_type = Some(VertexType::try_from(t)?); //@todo line info
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Z;
                         i_vertex_order += 1;
@@ -181,16 +175,14 @@ where
 
                             let t_count = words
                                 .next()
-                                .ok_or(PlyError::InvalidProperty)
+                                .ok_or(IOError::Property(*i_line))
                                 .and_then(|x| Type::try_from(x))
-                                .and_then(|x| FaceType::try_from(x))
-                                .line(*i_line, line)?;
+                                .and_then(|x| FaceType::try_from(x))?;
                             let t_index = words
                                 .next()
-                                .ok_or(PlyError::InvalidProperty)
+                                .ok_or(IOError::Property(*i_line))
                                 .and_then(|x| Type::try_from(x))
-                                .and_then(|x| FaceType::try_from(x))
-                                .line(*i_line, line)?;
+                                .and_then(|x| FaceType::try_from(x))?;
 
                             opt_face_count_type = Some(t_count);
                             opt_face_index_type = Some(t_index);
@@ -200,9 +192,8 @@ where
                         skip_n(&mut words, 1); // skip "property"
                         let t = words
                             .next()
-                            .ok_or(PlyError::InvalidProperty)
-                            .and_then(|x| Type::try_from(x))
-                            .line(*i_line, line)?;
+                            .ok_or(IOError::Property(*i_line))
+                            .and_then(|x| Type::try_from(x))?;
                         if opt_face_count_type.is_some() {
                             face_after.bytes += t.size_bytes();
                             face_after.words += 1;
@@ -213,7 +204,7 @@ where
                     }
                 }
                 _ => {
-                    return Err(PlyError::PropertyLineLocation).line(*i_line, line);
+                    return Err(IOError::Property(*i_line));
                 }
             }
 
@@ -231,7 +222,7 @@ where
                 let vertex_data = VertexData {
                     count: n_vertices,
                     format: VertexFormat {
-                        order: VertexOrder::try_from(vertex_order).line(*i_line, line)?,
+                        order: VertexOrder::try_from(vertex_order)?, //@todo line info
                         first: x_type,
                         snd: y_type,
                         third: z_type,
@@ -267,10 +258,10 @@ where
             }
         }
 
-        return Err(PlyError::LoadHeaderInvalid).line(*i_line, line);
+        return Err(IOError::Header);
     }
 
-    Err(PlyError::LoadHeaderInvalid).simple()
+    Err(IOError::Header)
 }
 
 //------------------------------------------------------------------------------

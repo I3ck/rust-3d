@@ -24,9 +24,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use core::convert::TryFrom;
 
-use std::{fmt, io::Error as ioError};
+use std::fmt;
 
-use crate::io::IOResult;
+use super::super::types::*;
 
 //------------------------------------------------------------------------------
 
@@ -65,9 +65,9 @@ impl fmt::Display for Type {
 }
 
 impl TryFrom<&[u8]> for Type {
-    type Error = PlyError;
+    type Error = IOError;
 
-    fn try_from(x: &[u8]) -> PlyResult<Self> {
+    fn try_from(x: &[u8]) -> IOResult2<Self> {
         match x {
             b"char" | b"int8" => Ok(Self::Char),
             b"uchar" | b"uint8" => Ok(Self::UChar),
@@ -77,7 +77,7 @@ impl TryFrom<&[u8]> for Type {
             b"uint" | b"uint32" => Ok(Self::UInt),
             b"float" | b"float32" => Ok(Self::Float),
             b"double" | b"float64" => Ok(Self::Double),
-            _ => Err(PlyError::InvalidType(
+            _ => Err(IOError::InvalidPlyType(
                 std::str::from_utf8(x).unwrap_or("").to_string(),
             )),
         }
@@ -113,9 +113,9 @@ pub enum VertexOrder {
 }
 
 impl TryFrom<[Xyz; 3]> for VertexOrder {
-    type Error = PlyError;
+    type Error = IOError;
 
-    fn try_from(x: [Xyz; 3]) -> PlyResult<Self> {
+    fn try_from(x: [Xyz; 3]) -> IOResult2<Self> {
         match x {
             [Xyz::X, Xyz::Y, Xyz::Z] => Ok(Self::Xyz),
             [Xyz::X, Xyz::Z, Xyz::Y] => Ok(Self::Xzy),
@@ -123,7 +123,7 @@ impl TryFrom<[Xyz; 3]> for VertexOrder {
             [Xyz::Y, Xyz::Z, Xyz::X] => Ok(Self::Yzx),
             [Xyz::Z, Xyz::X, Xyz::Y] => Ok(Self::Zxy),
             [Xyz::Z, Xyz::Y, Xyz::X] => Ok(Self::Zyx),
-            _ => Err(PlyError::InvalidVertexDimensionDefinition),
+            _ => Err(IOError::InvalidPlyVertexDimensionDefinition),
         }
     }
 }
@@ -145,13 +145,13 @@ pub enum VertexType {
 }
 
 impl TryFrom<Type> for VertexType {
-    type Error = PlyError;
+    type Error = IOError;
 
-    fn try_from(x: Type) -> PlyResult<Self> {
+    fn try_from(x: Type) -> IOResult2<Self> {
         match x {
             Type::Float => Ok(Self::Float),
             Type::Double => Ok(Self::Double),
-            t => Err(PlyError::InvalidVertexType(t)),
+            t => Err(IOError::InvalidPlyVertexType(t)),
         }
     }
 }
@@ -169,9 +169,9 @@ pub enum FaceType {
 }
 
 impl TryFrom<Type> for FaceType {
-    type Error = PlyError;
+    type Error = IOError;
 
-    fn try_from(x: Type) -> PlyResult<Self> {
+    fn try_from(x: Type) -> IOResult2<Self> {
         match x {
             Type::Char => Ok(Self::Char),
             Type::UChar => Ok(Self::UChar),
@@ -179,7 +179,7 @@ impl TryFrom<Type> for FaceType {
             Type::UShort => Ok(Self::UShort),
             Type::Int => Ok(Self::Int),
             Type::UInt => Ok(Self::UInt),
-            t => Err(PlyError::InvalidFaceType(t)),
+            t => Err(IOError::InvalidPlyFaceType(t)),
         }
     }
 }
@@ -276,77 +276,5 @@ impl Into<PartialHeader> for Header {
             Self::Full(x) => x.into(),
             Self::Partial(x) => x,
         }
-    }
-}
-
-//------------------------------------------------------------------------------
-
-/// Error type for .ply file operations
-pub enum PlyError {
-    LoadStartNotFound,
-    LoadFormatNotFound,
-    LoadHeaderInvalid,
-    LoadVertexCountIncorrect,
-    AccessFile,
-    ColorArrayIncorrectLength,
-    VertexElement,
-    FaceElement,
-    InvalidType(String),
-    InvalidVertexType(Type),
-    InvalidFaceType(Type),
-    InvalidMeshIndices,
-    InvalidProperty,
-    InvalidVertex,
-    PropertyLineLocation,
-    FaceStructure,
-    InvalidVertexDimensionDefinition,
-}
-
-/// Result type for .ply file operations
-pub type PlyIOResult<T> = IOResult<T, PlyError>;
-
-/// Result type for .ply file operations
-pub type PlyResult<T> = std::result::Result<T, PlyError>;
-
-impl fmt::Debug for PlyError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::LoadStartNotFound => write!(f, "Start of .ply header not found"),
-            Self::LoadFormatNotFound => write!(f, "Format of .ply missing or not supported"),
-            Self::LoadHeaderInvalid => write!(f, "Header of .ply seems to be invalid"),
-            Self::LoadVertexCountIncorrect => write!(f, "Vertex count of .ply not found"),
-            Self::ColorArrayIncorrectLength => {
-                write!(f, "The provided color array has an incorrect length")
-            }
-            Self::VertexElement => write!(f, "Invalid vertex element"),
-            Self::FaceElement => write!(f, "Invalid face element"),
-            Self::InvalidType(x) => write!(f, "Invalid type in header '{}'", x),
-            Self::InvalidVertexType(x) => write!(f, "Invalid vertex type in header {}", x),
-            Self::InvalidFaceType(x) => write!(f, "Invalid face type in header {}", x),
-            Self::AccessFile => write!(f, "Unable to access file"),
-            Self::InvalidMeshIndices => write!(f, "File contains invalid mesh indices"),
-            Self::InvalidProperty => write!(f, "Invalid property"),
-            Self::InvalidVertex => write!(f, "Invalid vertex definition"),
-            Self::InvalidVertexDimensionDefinition => {
-                write!(f, "Invalid order / definition of vertex dimension order")
-            }
-            Self::PropertyLineLocation => write!(f, "Found property line at unexpected location",),
-            Self::FaceStructure => write!(
-                f,
-                "Invalid face structure, only supporting 3 vertices per face"
-            ),
-        }
-    }
-}
-
-impl fmt::Display for PlyError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl From<ioError> for PlyError {
-    fn from(_error: ioError) -> Self {
-        PlyError::AccessFile
     }
 }

@@ -37,7 +37,7 @@ pub fn load_ply_either<EM, IP, P, R>(
     mut read: R,
     mesh: &mut EM,
     ip: &mut IP,
-) -> PlyIOResult<MeshOrPoints>
+) -> IOResult2<MeshOrPoints>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     IP: IsPushable<P>,
@@ -55,10 +55,10 @@ where
             match header.format {
                 Format::Ascii => load_mesh_ascii(&mut read, mesh, header, &mut i_line),
                 Format::LittleEndian => {
-                    load_mesh_binary::<LittleReader, _, _, _>(&mut read, mesh, header).simple()
+                    load_mesh_binary::<LittleReader, _, _, _>(&mut read, mesh, header)
                 }
                 Format::BigEndian => {
-                    load_mesh_binary::<BigReader, _, _, _>(&mut read, mesh, header).simple()
+                    load_mesh_binary::<BigReader, _, _, _>(&mut read, mesh, header)
                 }
             }?;
 
@@ -70,10 +70,10 @@ where
             match header.format {
                 Format::Ascii => load_points_ascii(&mut read, ip, header, i_line),
                 Format::LittleEndian => {
-                    load_points_binary::<LittleReader, _, _, _>(&mut read, ip, header).simple()
+                    load_points_binary::<LittleReader, _, _, _>(&mut read, ip, header)
                 }
                 Format::BigEndian => {
-                    load_points_binary::<BigReader, _, _, _>(&mut read, ip, header).simple()
+                    load_points_binary::<BigReader, _, _, _>(&mut read, ip, header)
                 }
             }?;
 
@@ -83,7 +83,7 @@ where
 }
 
 /// Loads an IsMesh3D from the .ply file format
-pub fn load_ply_mesh<EM, P, R>(read: R, mesh: &mut EM) -> PlyIOResult<()>
+pub fn load_ply_mesh<EM, P, R>(read: R, mesh: &mut EM) -> IOResult2<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D,
@@ -102,8 +102,7 @@ where
             }
             FaceDataReserve::Face([a, b, c]) => {
                 mesh.try_add_connection(VId(a), VId(b), VId(c))
-                    .or(Err(PlyError::InvalidMeshIndices))
-                    .simple()?;
+                    .or(Err(IOError::InvalidMeshIndices))?;
             }
         }
     }
@@ -114,7 +113,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads the points from the .ply file into IsPushable<Is3D>
-pub fn load_ply_points<IP, P, R>(read: R, ip: &mut IP) -> PlyIOResult<()>
+pub fn load_ply_points<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -142,7 +141,7 @@ fn load_points_binary<BR, IP, P, R>(
     read: &mut R,
     ip: &mut IP,
     header: PartialHeader,
-) -> PlyResult<()>
+) -> IOResult2<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -168,7 +167,7 @@ fn load_points_ascii<IP, P, R>(
     ip: &mut IP,
     header: PartialHeader,
     i_line: usize,
-) -> PlyIOResult<()>
+) -> IOResult2<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -188,7 +187,7 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_mesh_binary<BR, EM, P, R>(read: &mut R, mesh: &mut EM, header: FullHeader) -> PlyResult<()>
+fn load_mesh_binary<BR, EM, P, R>(read: &mut R, mesh: &mut EM, header: FullHeader) -> IOResult2<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D,
@@ -204,7 +203,7 @@ where
             }
             io::types::FaceDataReserve::Face([a, b, c]) => {
                 mesh.try_add_connection(VId(a), VId(b), VId(c))
-                    .or(Err(PlyError::InvalidMeshIndices))?;
+                    .or(Err(IOError::InvalidMeshIndices))?;
             }
             io::types::FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
                 mesh.reserve_vertices(n_vertices);
@@ -223,7 +222,7 @@ fn load_mesh_ascii<EM, P, R>(
     mesh: &mut EM,
     header: FullHeader,
     i_line: &mut usize,
-) -> PlyIOResult<()>
+) -> IOResult2<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D,
@@ -238,8 +237,7 @@ where
             }
             io::types::FaceDataReserve::Face([a, b, c]) => {
                 mesh.try_add_connection(VId(a), VId(b), VId(c))
-                    .or(Err(PlyError::InvalidMeshIndices))
-                    .simple()?;
+                    .or(Err(IOError::InvalidMeshIndices))?;
             }
             io::types::FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
                 mesh.reserve_vertices(n_vertices);
