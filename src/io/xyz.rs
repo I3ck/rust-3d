@@ -25,8 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 
 use std::{
-    fmt,
-    io::{BufRead, Error as ioError, Write},
+    io::{BufRead, Write},
     iter::FusedIterator,
     marker::PhantomData,
 };
@@ -68,9 +67,14 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(delim_determined: &mut bool, delim: &mut u8, line: &[u8]) -> XyzResult<P> {
+    fn fetch_one(
+        delim_determined: &mut bool,
+        delim: &mut u8,
+        i_line: usize,
+        line: &[u8],
+    ) -> IOResult2<P> {
         if !*delim_determined {
-            *delim = estimate_delimiter(2, &line).ok_or(XyzError::EstimateDelimiter)?;
+            *delim = estimate_delimiter(2, &line).ok_or(IOError::EstimateDelimiter)?;
             *delim_determined = true;
         }
 
@@ -79,17 +83,17 @@ where
         let x = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::Vertex)?;
+            .ok_or(IOError::Vertex(Some(i_line)))?;
 
         let y = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::Vertex)?;
+            .ok_or(IOError::Vertex(Some(i_line)))?;
 
         let z = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyzError::Vertex)?;
+            .ok_or(IOError::Vertex(Some(i_line)))?;
 
         Ok(P::new(x, y, z))
     }
@@ -100,7 +104,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = XyzIOResult<DataReserve<P>>;
+    type Item = IOResult2<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -109,13 +113,17 @@ where
         if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
             self.i_line += 1;
             Some(
-                Self::fetch_one(&mut self.delim_determined, &mut self.delim, line)
-                    .map(|x| DataReserve::Data(x))
-                    .line(self.i_line, line)
-                    .map_err(|e| {
-                        self.is_done = true;
-                        e
-                    }),
+                Self::fetch_one(
+                    &mut self.delim_determined,
+                    &mut self.delim,
+                    self.i_line,
+                    line,
+                )
+                .map(|x| DataReserve::Data(x))
+                .map_err(|e| {
+                    self.is_done = true;
+                    e
+                }),
             )
         } else {
             self.is_done = true;
@@ -139,7 +147,7 @@ pub fn save_xyz<RA, P, W>(
     ra: &RA,
     delim_coord: &str,
     delim_pos: &str,
-) -> XyzResult<()>
+) -> IOResult2<()>
 where
     RA: IsRandomAccessible<P>,
     P: Is3D,
@@ -160,7 +168,7 @@ where
 }
 
 /// Loads a IsPushable<Is3D> as x y z coordinates. E.g. used to load the .xyz file format or .csv file
-pub fn load_xyz<IP, P, R>(read: R, ip: &mut IP) -> XyzIOResult<()>
+pub fn load_xyz<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -176,41 +184,4 @@ where
     }
 
     Ok(())
-}
-
-//------------------------------------------------------------------------------
-
-/// Error type for .xyz file operations
-pub enum XyzError {
-    EstimateDelimiter,
-    AccessFile,
-    Vertex,
-}
-
-/// Result type for .xyz file operations
-pub type XyzResult<T> = std::result::Result<T, XyzError>;
-
-/// Result type for .xyz file operations
-pub type XyzIOResult<T> = IOResult<T, XyzError>;
-
-impl fmt::Debug for XyzError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::Vertex => write!(f, "Unable to parse vertex"),
-            Self::AccessFile => write!(f, "Unable to access file"),
-            Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
-        }
-    }
-}
-
-impl fmt::Display for XyzError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl From<ioError> for XyzError {
-    fn from(_error: ioError) -> Self {
-        XyzError::AccessFile
-    }
 }
