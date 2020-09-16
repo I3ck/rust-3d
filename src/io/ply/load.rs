@@ -37,7 +37,7 @@ pub fn load_ply_either<EM, IP, P, R>(
     mut read: R,
     mesh: &mut EM,
     ip: &mut IP,
-) -> IOResult2<MeshOrPoints>
+) -> IOResult<MeshOrPoints>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     IP: IsPushable<P>,
@@ -83,7 +83,7 @@ where
 }
 
 /// Loads an IsMesh3D from the .ply file format
-pub fn load_ply_mesh<EM, P, R>(read: R, mesh: &mut EM) -> IOResult2<()>
+pub fn load_ply_mesh<EM, P, R>(read: R, mesh: &mut EM) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D,
@@ -113,7 +113,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads the points from the .ply file into IsPushable<Is3D>
-pub fn load_ply_points<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
+pub fn load_ply_points<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -141,7 +141,7 @@ fn load_points_binary<BR, IP, P, R>(
     read: &mut R,
     ip: &mut IP,
     header: PartialHeader,
-) -> IOResult2<()>
+) -> IOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -167,7 +167,7 @@ fn load_points_ascii<IP, P, R>(
     ip: &mut IP,
     header: PartialHeader,
     i_line: usize,
-) -> IOResult2<()>
+) -> IOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -187,7 +187,7 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_mesh_binary<BR, EM, P, R>(read: &mut R, mesh: &mut EM, header: FullHeader) -> IOResult2<()>
+fn load_mesh_binary<BR, EM, P, R>(read: &mut R, mesh: &mut EM, header: FullHeader) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D,
@@ -222,7 +222,7 @@ fn load_mesh_ascii<EM, P, R>(
     mesh: &mut EM,
     header: FullHeader,
     i_line: &mut usize,
-) -> IOResult2<()>
+) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D,

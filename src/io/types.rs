@@ -86,7 +86,7 @@ pub enum IOError {
     EstimateDelimiter,
 }
 
-pub type IOResult2<T> = Result<T, IOError>; //@todo rename
+pub type IOResult<T> = Result<T, IOError>; //@todo rename
 
 impl From<std::io::Error> for IOError {
     fn from(_error: std::io::Error) -> Self {

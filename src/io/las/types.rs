@@ -44,7 +44,7 @@ pub struct Header {
 impl TryFrom<HeaderRaw> for Header {
     type Error = IOError;
 
-    fn try_from(x: HeaderRaw) -> IOResult2<Header> {
+    fn try_from(x: HeaderRaw) -> IOResult<Header> {
         if x.version_major > 1 || x.version_minor > 4 {
             return Err(IOError::UnsupportedVersion);
         }

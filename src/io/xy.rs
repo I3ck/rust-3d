@@ -72,7 +72,7 @@ where
         delim: &mut u8,
         i_line: usize,
         line: &[u8],
-    ) -> IOResult2<P> {
+    ) -> IOResult<P> {
         if !*delim_determined {
             *delim = estimate_delimiter(1, &line).ok_or(IOError::EstimateDelimiter)?;
             *delim_determined = true;
@@ -99,7 +99,7 @@ where
     P: IsBuildable2D,
     R: BufRead,
 {
-    type Item = IOResult2<DataReserve<P>>;
+    type Item = IOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -137,12 +137,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Saves an IsRandomAccessible<Is2D> as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xy file format or .csv files
-pub fn save_xy<RA, P, W>(
-    write: &mut W,
-    ra: &RA,
-    delim_coord: &str,
-    delim_pos: &str,
-) -> IOResult2<()>
+pub fn save_xy<RA, P, W>(write: &mut W, ra: &RA, delim_coord: &str, delim_pos: &str) -> IOResult<()>
 where
     RA: IsRandomAccessible<P>,
     P: Is2D,
@@ -158,7 +153,7 @@ where
 }
 
 /// Loads a IsPushable<Is2D> as x y coordinates. E.g. used to load the .xy file format or .csv files
-pub fn load_xy<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
+pub fn load_xy<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable2D,

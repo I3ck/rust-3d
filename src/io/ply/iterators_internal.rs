@@ -66,7 +66,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = IOResult2<io::types::FaceDataReserve<P>>;
+    type Item = IOResult<io::types::FaceDataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut p_iter) = self.p_iter {
@@ -136,7 +136,7 @@ where
     R: Read,
     BR: IsByteReader,
 {
-    type Item = IOResult2<io::types::FaceDataReserve<P>>;
+    type Item = IOResult<io::types::FaceDataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut p_iter) = self.p_iter {
@@ -230,7 +230,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(&mut self) -> IOResult2<P> {
+    fn fetch_one(&mut self) -> IOResult<P> {
         skip_bytes(&mut self.read, self.header.vertex.format.before.bytes)?;
 
         let first = read_vertex_type::<BR, _>(&mut self.read, self.header.vertex.format.first)?;
@@ -266,7 +266,7 @@ where
     R: Read,
     BR: IsByteReader,
 {
-    type Item = IOResult2<DataReserve<P>>;
+    type Item = IOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -331,7 +331,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(header: &PartialHeader, i_line: usize, line: &[u8]) -> IOResult2<P> {
+    fn fetch_one(header: &PartialHeader, i_line: usize, line: &[u8]) -> IOResult<P> {
         let mut words = to_words_skip_empty(line);
 
         skip_n(&mut words, header.vertex.format.before.words);
@@ -371,7 +371,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = IOResult2<DataReserve<P>>;
+    type Item = IOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -443,7 +443,7 @@ impl<R> Iterator for PlyAsciiFacesIterator<R>
 where
     R: BufRead,
 {
-    type Item = IOResult2<[usize; 3]>;
+    type Item = IOResult<[usize; 3]>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -502,7 +502,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(&mut self) -> IOResult2<[usize; 3]> {
+    fn fetch_one(&mut self) -> IOResult<[usize; 3]> {
         skip_bytes(&mut self.read, self.header.face.format.before.bytes)?;
 
         let element_count = read_face_type::<BR, _>(&mut self.read, self.header.face.format.count)?;
@@ -526,7 +526,7 @@ where
     R: Read,
     BR: IsByteReader,
 {
-    type Item = IOResult2<[usize; 3]>;
+    type Item = IOResult<[usize; 3]>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {

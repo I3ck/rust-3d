@@ -31,7 +31,7 @@ use std::io::Write;
 //------------------------------------------------------------------------------
 
 /// Saves an IsMesh3D in the ASCII .ply file format
-pub fn save_ply_ascii<M, P, W>(write: &mut W, mesh: &M) -> IOResult2<()>
+pub fn save_ply_ascii<M, P, W>(write: &mut W, mesh: &M) -> IOResult<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
@@ -77,7 +77,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Saves an IsMesh3D in the ASCII .ply file format with additional colors
-pub fn save_ply_ascii_colored<M, P, W>(write: &mut W, mesh: &M, colors: &Vec<Rgb>) -> IOResult2<()>
+pub fn save_ply_ascii_colored<M, P, W>(write: &mut W, mesh: &M, colors: &Vec<Rgb>) -> IOResult<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
@@ -145,7 +145,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Saves an IsMesh3D in the binary .ply file format
-pub fn save_ply_binary<M, P, W>(write: &mut W, mesh: &M, precision: &Precision) -> IOResult2<()>
+pub fn save_ply_binary<M, P, W>(write: &mut W, mesh: &M, precision: &Precision) -> IOResult<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,
@@ -227,7 +227,7 @@ pub fn save_ply_binary_colored<M, P, W>(
     mesh: &M,
     precision: &Precision,
     colors: &Vec<Rgb>,
-) -> IOResult2<()>
+) -> IOResult<()>
 where
     M: IsMesh<P, Face3>,
     P: IsBuildable3D,

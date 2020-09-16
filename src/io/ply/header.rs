@@ -37,7 +37,7 @@ pub fn load_header<R>(
     read: &mut R,
     line_buffer: &mut Vec<u8>,
     i_line: &mut usize,
-) -> IOResult2<Header>
+) -> IOResult<Header>
 where
     R: BufRead,
 {

@@ -63,7 +63,7 @@ where
     }
 
     #[inline(always)]
-    pub fn fetch_one(i_line: usize, line: &[u8]) -> IOResult2<P> {
+    pub fn fetch_one(i_line: usize, line: &[u8]) -> IOResult<P> {
         let mut words = to_words_skip_empty(line);
 
         let x = words
@@ -90,7 +90,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = IOResult2<DataReserve<P>>;
+    type Item = IOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -167,7 +167,7 @@ where
 }
 
 /// Loads IsPushable<Is3D> from the .pts file format
-pub fn load_pts<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
+pub fn load_pts<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,

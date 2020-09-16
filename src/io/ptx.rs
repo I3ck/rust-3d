@@ -70,7 +70,7 @@ where
         line: &[u8],
         must_transform: bool,
         transformation: &Matrix4,
-    ) -> IOResult2<P> {
+    ) -> IOResult<P> {
         let mut words = to_words_skip_empty(line);
 
         let x = words
@@ -96,7 +96,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_header(&mut self, columns: usize) -> IOResult2<()> {
+    fn fetch_header(&mut self, columns: usize) -> IOResult<()> {
         let mut line = fetch_line(&mut self.read, &mut self.line_buffer)?;
         self.i_line += 1;
 
@@ -156,7 +156,7 @@ where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: BufRead,
 {
-    type Item = IOResult2<DataReserve<P>>;
+    type Item = IOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -217,7 +217,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads points from .ptx file into IsPushable<Is3D>
-pub fn load_ptx<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
+pub fn load_ptx<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D + IsMatrix4Transformable,

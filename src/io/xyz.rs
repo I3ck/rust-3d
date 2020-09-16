@@ -72,7 +72,7 @@ where
         delim: &mut u8,
         i_line: usize,
         line: &[u8],
-    ) -> IOResult2<P> {
+    ) -> IOResult<P> {
         if !*delim_determined {
             *delim = estimate_delimiter(2, &line).ok_or(IOError::EstimateDelimiter)?;
             *delim_determined = true;
@@ -104,7 +104,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = IOResult2<DataReserve<P>>;
+    type Item = IOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -147,7 +147,7 @@ pub fn save_xyz<RA, P, W>(
     ra: &RA,
     delim_coord: &str,
     delim_pos: &str,
-) -> IOResult2<()>
+) -> IOResult<()>
 where
     RA: IsRandomAccessible<P>,
     P: Is3D,
@@ -168,7 +168,7 @@ where
 }
 
 /// Loads a IsPushable<Is3D> as x y z coordinates. E.g. used to load the .xyz file format or .csv file
-pub fn load_xyz<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
+pub fn load_xyz<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,

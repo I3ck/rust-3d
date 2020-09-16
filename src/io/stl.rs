@@ -52,7 +52,7 @@ pub struct StlFace<P, N> {
 //------------------------------------------------------------------------------
 
 /// Saves an IsMesh3D in the ASCII .stl file format
-pub fn save_stl_ascii<M, P, W>(write: &mut W, mesh: &M) -> IOResult2<()>
+pub fn save_stl_ascii<M, P, W>(write: &mut W, mesh: &M) -> IOResult<()>
 where
     M: IsMesh3D<P>,
     P: IsBuildable3D,
@@ -102,7 +102,7 @@ where
     N: IsBuildable3D,
     R: BufRead,
 {
-    pub fn new(mut read: R, format: StlFormat) -> IOResult2<Self> {
+    pub fn new(mut read: R, format: StlFormat) -> IOResult<Self> {
         if is_ascii(&mut read, format)? {
             Ok(Self {
                 inner: BinaryOrAsciiIterator::Ascii(StlAsciiIterator::new(read)),
@@ -121,7 +121,7 @@ where
     N: IsBuildable3D,
     R: BufRead,
 {
-    type Item = IOResult2<DataReserve<StlFace<P, N>>>;
+    type Item = IOResult<DataReserve<StlFace<P, N>>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         match &mut self.inner {
@@ -193,7 +193,7 @@ where
     N: IsBuildable3D,
     R: Read,
 {
-    type Item = IOResult2<DataReserve<StlFace<P, N>>>;
+    type Item = IOResult<DataReserve<StlFace<P, N>>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -301,7 +301,7 @@ where
     N: IsBuildable3D,
     R: BufRead,
 {
-    type Item = IOResult2<DataReserve<StlFace<P, N>>>;
+    type Item = IOResult<DataReserve<StlFace<P, N>>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -348,7 +348,7 @@ pub fn load_stl_mesh_duped<EM, P, N, R, IPN>(
     format: StlFormat,
     mesh: &mut EM,
     face_normals: &mut IPN,
-) -> IOResult2<()>
+) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D,
@@ -382,7 +382,7 @@ pub fn load_stl_mesh_unique<EM, P, N, R, IPN>(
     format: StlFormat,
     mesh: &mut EM,
     face_normals: &mut IPN,
-) -> IOResult2<()>
+) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -443,7 +443,7 @@ pub fn load_stl_triplets<IP, P, N, R, IPN>(
     format: StlFormat,
     ip: &mut IP,
     face_normals: &mut IPN,
-) -> IOResult2<()>
+) -> IOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -475,7 +475,7 @@ where
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-fn is_ascii<R>(read: &mut R, format: StlFormat) -> IOResult2<bool>
+fn is_ascii<R>(read: &mut R, format: StlFormat) -> IOResult<bool>
 where
     R: BufRead,
 {
@@ -509,7 +509,7 @@ struct StlTriangle {
 }
 
 #[inline(always)]
-fn read_stl_triangle<R>(read: &mut R) -> IOResult2<StlTriangle>
+fn read_stl_triangle<R>(read: &mut R) -> IOResult<StlTriangle>
 where
     R: Read,
 {
@@ -532,7 +532,7 @@ fn read_stl_facet<P, N, R>(
     read: &mut R,
     line_buffer: &mut Vec<u8>,
     i_line: &mut usize,
-) -> IOResult2<(P, P, P, N)>
+) -> IOResult<(P, P, P, N)>
 where
     P: IsBuildable3D,
     N: IsBuildable3D,

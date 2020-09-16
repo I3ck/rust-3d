@@ -113,7 +113,7 @@ pub enum VertexOrder {
 impl TryFrom<[Xyz; 3]> for VertexOrder {
     type Error = IOError;
 
-    fn try_from(x: [Xyz; 3]) -> IOResult2<Self> {
+    fn try_from(x: [Xyz; 3]) -> IOResult<Self> {
         match x {
             [Xyz::X, Xyz::Y, Xyz::Z] => Ok(Self::Xyz),
             [Xyz::X, Xyz::Z, Xyz::Y] => Ok(Self::Xzy),

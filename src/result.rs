@@ -58,7 +58,7 @@ pub enum ErrorKind {
     ClusterTooBig,
     CantCalculateAngleIfZeroLength,
     TriFace3DNotSpanningVolume,
-    IOError2(IOError), //@todo rename
+    IOError(IOError),
 }
 
 //------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ impl fmt::Debug for ErrorKind {
                 f,
                 "TriFace3D must be constructed from points spanning a volume"
             ),
-            Self::IOError2(x) => x.fmt(f),
+            Self::IOError(x) => x.fmt(f),
         }
     }
 }
@@ -126,6 +126,6 @@ impl From<ioError> for ErrorKind {
 
 impl From<IOError> for ErrorKind {
     fn from(error: IOError) -> Self {
-        Self::IOError2(error)
+        Self::IOError(error)
     }
 }

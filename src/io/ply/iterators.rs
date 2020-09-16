@@ -47,7 +47,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    pub fn new(mut read: R) -> IOResult2<Self> {
+    pub fn new(mut read: R) -> IOResult<Self> {
         let mut line_buffer = Vec::new();
         let mut i_line = 0;
 
@@ -81,7 +81,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = IOResult2<FaceDataReserve<P>>;
+    type Item = IOResult<FaceDataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(to_reserve_data_faces) = self.to_reserve_data_faces {
@@ -130,7 +130,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    pub fn new(mut read: R) -> IOResult2<Self> {
+    pub fn new(mut read: R) -> IOResult<Self> {
         let mut line_buffer = Vec::new();
         let mut i_line = 0;
 
@@ -158,7 +158,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = IOResult2<DataReserve<P>>;
+    type Item = IOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(to_reserve) = self.to_reserve {

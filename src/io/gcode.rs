@@ -74,7 +74,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = IOResult2<DataReserve<P>>;
+    type Item = IOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -182,7 +182,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads a IsPushable<Is3D> as x y z coordinates from gcode
-pub fn load_gcode_points<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
+pub fn load_gcode_points<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,

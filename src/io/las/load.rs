@@ -56,7 +56,7 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-    pub fn new(read: R) -> IOResult2<Self> {
+    pub fn new(read: R) -> IOResult<Self> {
         Ok(Self {
             read,
             is_done: false,
@@ -68,7 +68,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(&mut self) -> IOResult2<P> {
+    fn fetch_one(&mut self) -> IOResult<P> {
         if let Some(ref header) = self.header {
             self.read.read_exact(&mut self.buffer)?;
 
@@ -90,7 +90,7 @@ where
     P: IsBuildable3D,
     R: BufRead + Seek,
 {
-    type Item = IOResult2<DataReserve<P>>;
+    type Item = IOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -139,7 +139,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads points from .las file into IsPushable<IsBuildable3D>
-pub fn load_las<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
+pub fn load_las<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -159,7 +159,7 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_header<R>(mut read: R) -> IOResult2<HeaderRaw>
+fn load_header<R>(mut read: R) -> IOResult<HeaderRaw>
 where
     R: Read,
 {

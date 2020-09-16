@@ -50,7 +50,7 @@ pub fn collect_index_line(line: &[u8]) -> Option<[usize; 3]> {
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-pub fn read_face_type<BR, R>(read: &mut R, t: FaceType) -> IOResult2<usize>
+pub fn read_face_type<BR, R>(read: &mut R, t: FaceType) -> IOResult<usize>
 where
     BR: IsByteReader,
     R: Read,
@@ -68,7 +68,7 @@ where
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-pub fn read_vertex_type<BR, R>(read: &mut R, t: VertexType) -> IOResult2<f64>
+pub fn read_vertex_type<BR, R>(read: &mut R, t: VertexType) -> IOResult<f64>
 where
     BR: IsByteReader,
     R: Read,

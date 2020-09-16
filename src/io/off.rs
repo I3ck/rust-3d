@@ -70,7 +70,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = IOResult2<DataReserve<P>>;
+    type Item = IOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -174,7 +174,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_face(i_line: usize, line: &[u8]) -> IOResult2<[usize; 3]> {
+    fn fetch_face(i_line: usize, line: &[u8]) -> IOResult<[usize; 3]> {
         let mut words = to_words_skip_empty(line);
 
         let count_face = words.next().ok_or(IOError::FaceVertexCount)?;
@@ -202,7 +202,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_counts(i_line: usize, line: &[u8]) -> IOResult2<[usize; 2]> {
+    fn fetch_counts(i_line: usize, line: &[u8]) -> IOResult<[usize; 2]> {
         let mut words = to_words_skip_empty(line);
         let n_vertices = words
             .next()
@@ -222,7 +222,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = IOResult2<FaceDataReserve<P>>;
+    type Item = IOResult<FaceDataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -290,7 +290,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads an IsMesh3D from the off file format
-pub fn load_off_mesh<EM, P, R>(read: R, mesh: &mut EM) -> IOResult2<()>
+pub fn load_off_mesh<EM, P, R>(read: R, mesh: &mut EM) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -318,7 +318,7 @@ where
 }
 
 /// Loads IsPushable<Is3D> from the .off file format
-pub fn load_off_points<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
+pub fn load_off_points<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -339,7 +339,7 @@ where
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn fetch_vertex<P>(i_line: usize, line: &[u8]) -> IOResult2<P>
+fn fetch_vertex<P>(i_line: usize, line: &[u8]) -> IOResult<P>
 where
     P: IsBuildable3D,
 {

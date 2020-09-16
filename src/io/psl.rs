@@ -61,12 +61,12 @@ where
         }
     }
     #[inline(always)]
-    fn initialize(&mut self) -> IOResult2<()> {
+    fn initialize(&mut self) -> IOResult<()> {
         self.n_passes_left = fetch_header_return_n_passes(&mut self.read)?;
         Ok(())
     }
     #[inline(always)]
-    fn fetch_counts(&mut self) -> IOResult2<()> {
+    fn fetch_counts(&mut self) -> IOResult<()> {
         self.n_lines_left = if self.n_lines_left == 0 && self.n_passes_left > 0 {
             fetch_pass_header_return_n_lines(&mut self.read)?
         } else {
@@ -100,7 +100,7 @@ where
     P: IsBuildable3D,
     R: Read,
 {
-    type Item = IOResult2<DataReserve<P>>;
+    type Item = IOResult<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -148,7 +148,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads a IsPushable<Is3D> as x y z coordinates from .psl files
-pub fn load_psl<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
+pub fn load_psl<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -169,7 +169,7 @@ where
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn fetch_header_return_n_passes<R>(read: &mut R) -> IOResult2<i32>
+fn fetch_header_return_n_passes<R>(read: &mut R) -> IOResult<i32>
 where
     R: Read,
 {
@@ -203,7 +203,7 @@ where
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn fetch_pass_header_return_n_lines<R>(read: &mut R) -> IOResult2<i32>
+fn fetch_pass_header_return_n_lines<R>(read: &mut R) -> IOResult<i32>
 where
     R: Read,
 {
@@ -222,7 +222,7 @@ where
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn fetch_line_header_return_n_points<R>(read: &mut R) -> IOResult2<i32>
+fn fetch_line_header_return_n_points<R>(read: &mut R) -> IOResult<i32>
 where
     R: Read,
 {
@@ -246,7 +246,7 @@ where
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn fetch_point<R, P>(read: &mut R) -> IOResult2<P>
+fn fetch_point<R, P>(read: &mut R) -> IOResult<P>
 where
     R: Read,
     P: IsBuildable3D,
