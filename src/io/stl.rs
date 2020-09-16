@@ -25,8 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 
 use std::{
-    fmt,
-    io::{BufRead, Error as ioError, Read, Write},
+    io::{BufRead, Read, Write},
     iter::FusedIterator,
     marker::PhantomData,
 };
@@ -53,7 +52,7 @@ pub struct StlFace<P, N> {
 //------------------------------------------------------------------------------
 
 /// Saves an IsMesh3D in the ASCII .stl file format
-pub fn save_stl_ascii<M, P, W>(write: &mut W, mesh: &M) -> StlResult<()>
+pub fn save_stl_ascii<M, P, W>(write: &mut W, mesh: &M) -> IOResult2<()>
 where
     M: IsMesh3D<P>,
     P: IsBuildable3D,
@@ -103,8 +102,8 @@ where
     N: IsBuildable3D,
     R: BufRead,
 {
-    pub fn new(mut read: R, format: StlFormat) -> StlIOResult<Self> {
-        if is_ascii(&mut read, format).simple()? {
+    pub fn new(mut read: R, format: StlFormat) -> IOResult2<Self> {
+        if is_ascii(&mut read, format)? {
             Ok(Self {
                 inner: BinaryOrAsciiIterator::Ascii(StlAsciiIterator::new(read)),
             })
@@ -122,7 +121,7 @@ where
     N: IsBuildable3D,
     R: BufRead,
 {
-    type Item = StlIOResult<DataReserve<StlFace<P, N>>>;
+    type Item = IOResult2<DataReserve<StlFace<P, N>>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         match &mut self.inner {
@@ -194,7 +193,7 @@ where
     N: IsBuildable3D,
     R: Read,
 {
-    type Item = StlIOResult<DataReserve<StlFace<P, N>>>;
+    type Item = IOResult2<DataReserve<StlFace<P, N>>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -207,19 +206,19 @@ where
                 let mut buffer = [0u8; 75];
                 if let Err(e) = self.read.read_exact(&mut buffer) {
                     self.is_done = true;
-                    return Some(Err(e.into()).simple());
+                    return Some(Err(e.into()));
                 }
             }
 
             return match LittleReader::read_u32(&mut self.read) {
                 Err(e) => {
                     self.is_done = true;
-                    Some(Err(e.into()).simple())
+                    Some(Err(e.into()))
                 }
                 Ok(n_triangles) => {
                     if n_triangles > MAX_TRIANGLES_BINARY {
                         self.is_done = true;
-                        return Some(Err(StlError::InvalidFaceCount).simple());
+                        return Some(Err(IOError::FaceCount(None)));
                     }
 
                     self.n_triangles = n_triangles as usize;
@@ -234,7 +233,7 @@ where
             match read_stl_triangle(&mut self.read) {
                 Err(e) => {
                     self.is_done = true;
-                    Some(Err(e).simple())
+                    Some(Err(e))
                 }
                 Ok(t) => {
                     let n = N::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
@@ -302,7 +301,7 @@ where
     N: IsBuildable3D,
     R: BufRead,
 {
-    type Item = StlIOResult<DataReserve<StlFace<P, N>>>;
+    type Item = IOResult2<DataReserve<StlFace<P, N>>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -312,11 +311,7 @@ where
             self.header_read = true;
 
             // skip first line
-            if let Err(e) = self
-                .read
-                .read_until(b'\n', &mut self.line_buffer)
-                .index(self.i_line)
-            {
+            if let Err(e) = self.read.read_until(b'\n', &mut self.line_buffer) {
                 self.is_done = true;
                 return Some(Err(e.into()));
             }
@@ -325,9 +320,7 @@ where
 
         match read_stl_facet(&mut self.read, &mut self.line_buffer, &mut self.i_line) {
             Ok((a, b, c, n)) => return Some(Ok(DataReserve::Data(StlFace { a, b, c, n }))),
-            Err(WithLineInfo::None(StlError::LoadFileEndReached))
-            | Err(WithLineInfo::Index(_, StlError::LoadFileEndReached))
-            | Err(WithLineInfo::Line(_, _, StlError::LoadFileEndReached)) => {
+            Err(IOError::EndReached) => {
                 self.is_done = true;
                 return None;
             }
@@ -355,7 +348,7 @@ pub fn load_stl_mesh_duped<EM, P, N, R, IPN>(
     format: StlFormat,
     mesh: &mut EM,
     face_normals: &mut IPN,
-) -> StlIOResult<()>
+) -> IOResult2<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D,
@@ -389,7 +382,7 @@ pub fn load_stl_mesh_unique<EM, P, N, R, IPN>(
     format: StlFormat,
     mesh: &mut EM,
     face_normals: &mut IPN,
-) -> StlIOResult<()>
+) -> IOResult2<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -450,7 +443,7 @@ pub fn load_stl_triplets<IP, P, N, R, IPN>(
     format: StlFormat,
     ip: &mut IP,
     face_normals: &mut IPN,
-) -> StlIOResult<()>
+) -> IOResult2<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -482,7 +475,7 @@ where
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-fn is_ascii<R>(read: &mut R, format: StlFormat) -> StlResult<bool>
+fn is_ascii<R>(read: &mut R, format: StlFormat) -> IOResult2<bool>
 where
     R: BufRead,
 {
@@ -516,7 +509,7 @@ struct StlTriangle {
 }
 
 #[inline(always)]
-fn read_stl_triangle<R>(read: &mut R) -> StlResult<StlTriangle>
+fn read_stl_triangle<R>(read: &mut R) -> IOResult2<StlTriangle>
 where
     R: Read,
 {
@@ -539,7 +532,7 @@ fn read_stl_facet<P, N, R>(
     read: &mut R,
     line_buffer: &mut Vec<u8>,
     i_line: &mut usize,
-) -> StlIOResult<(P, P, P, N)>
+) -> IOResult2<(P, P, P, N)>
 where
     P: IsBuildable3D,
     N: IsBuildable3D,
@@ -547,59 +540,53 @@ where
 {
     let mut line: &[u8];
 
-    line = trim_start(fetch_line(read, line_buffer).index(*i_line)?);
+    line = trim_start(fetch_line(read, line_buffer)?);
     *i_line += 1;
 
     if line.starts_with(b"endsolid") {
-        return Err(StlError::LoadFileEndReached).line(*i_line, line);
+        return Err(IOError::EndReached);
     }
 
     if !line.starts_with(b"facet") {
-        return Err(StlError::Facet).line(*i_line, line);
+        return Err(IOError::Face(Some(*i_line)));
     }
 
     let n = read_stl_normal(&line).unwrap_or(N::new(0.0, 0.0, 1.0));
 
-    line = trim_start(fetch_line(read, line_buffer).index(*i_line)?);
+    line = trim_start(fetch_line(read, line_buffer)?);
     *i_line += 1;
 
     if !line.starts_with(b"outer loop") {
-        return Err(StlError::Loop).line(*i_line, line);
+        return Err(IOError::Loop(*i_line));
     }
 
-    line = fetch_line(read, line_buffer).index(*i_line)?;
+    line = fetch_line(read, line_buffer)?;
     *i_line += 1;
 
-    let a = read_stl_vertex(&line)
-        .ok_or(StlError::Vertex)
-        .line(*i_line, line)?;
+    let a = read_stl_vertex(&line).ok_or(IOError::Vertex(Some(*i_line)))?;
 
-    line = fetch_line(read, line_buffer).index(*i_line)?;
+    line = fetch_line(read, line_buffer)?;
     *i_line += 1;
 
-    let b = read_stl_vertex(&line)
-        .ok_or(StlError::Vertex)
-        .line(*i_line, line)?;
+    let b = read_stl_vertex(&line).ok_or(IOError::Vertex(Some(*i_line)))?;
 
-    line = fetch_line(read, line_buffer).index(*i_line)?;
+    line = fetch_line(read, line_buffer)?;
     *i_line += 1;
 
-    let c = read_stl_vertex(&line)
-        .ok_or(StlError::Vertex)
-        .line(*i_line, line)?;
+    let c = read_stl_vertex(&line).ok_or(IOError::Vertex(Some(*i_line)))?;
 
-    line = trim_start(fetch_line(read, line_buffer).index(*i_line)?);
+    line = trim_start(fetch_line(read, line_buffer)?);
     *i_line += 1;
 
     if !line.starts_with(b"endloop") {
-        return Err(StlError::EndLoop).line(*i_line, line);
+        return Err(IOError::EndLoop(*i_line));
     }
 
-    line = trim_start(fetch_line(read, line_buffer).index(*i_line)?);
+    line = trim_start(fetch_line(read, line_buffer)?);
     *i_line += 1;
 
     if !line.starts_with(b"endfacet") {
-        return Err(StlError::EndFacet).line(*i_line, line);
+        return Err(IOError::Face(Some(*i_line)));
     }
 
     Ok((a, b, c, n))
@@ -669,95 +656,5 @@ pub enum StlFormat {
 impl Default for StlFormat {
     fn default() -> Self {
         Self::Auto
-    }
-}
-
-//------------------------------------------------------------------------------
-
-/// Error type for .stl file operations
-pub enum StlError {
-    LoadFileEndReached,
-    AccessFile,
-    BinaryData,
-    InvalidFaceCount,
-    Facet,
-    EndFacet,
-    Vertex,
-    Loop,
-    EndLoop,
-}
-
-/// Result type for .stl file operations
-pub type StlResult<T> = std::result::Result<T, StlError>;
-
-/// Result type for .stl file operations
-pub type StlIOResult<T> = IOResult<T, StlError>;
-
-impl fmt::Debug for StlError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::LoadFileEndReached => write!(f, "Unexpected reach of .stl file end"),
-            Self::AccessFile => write!(f, "Unable to access file"),
-            Self::BinaryData => write!(f, "Binary data seems to be invalid"),
-            Self::InvalidFaceCount => write!(f, "Containing an invalid face count"),
-            Self::Facet => write!(f, "Unable to parse facet"),
-            Self::EndFacet => write!(f, "Unable to parse endfacet"),
-            Self::Vertex => write!(f, "Unable to parse vertex"),
-            Self::Loop => write!(f, "Unable to parse loop"),
-            Self::EndLoop => write!(f, "Unable to parse endloop"),
-        }
-    }
-}
-
-impl fmt::Display for StlError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl From<ioError> for StlError {
-    fn from(_error: ioError) -> Self {
-        StlError::AccessFile
-    }
-}
-
-impl From<WithLineInfo<ioError>> for WithLineInfo<StlError> {
-    fn from(other: WithLineInfo<ioError>) -> Self {
-        match other {
-            WithLineInfo::<ioError>::None(x) => WithLineInfo::None(StlError::from(x)),
-            WithLineInfo::<ioError>::Index(i, x) => WithLineInfo::Index(i, StlError::from(x)),
-            WithLineInfo::<ioError>::Line(i, l, x) => WithLineInfo::Line(i, l, StlError::from(x)),
-        }
-    }
-}
-
-impl From<WithLineInfo<FetchLineError>> for WithLineInfo<StlError> {
-    fn from(other: WithLineInfo<FetchLineError>) -> Self {
-        match other {
-            WithLineInfo::<FetchLineError>::None(x) => WithLineInfo::None(StlError::from(x)),
-            WithLineInfo::<FetchLineError>::Index(i, x) => {
-                WithLineInfo::Index(i, StlError::from(x))
-            }
-            WithLineInfo::<FetchLineError>::Line(i, l, x) => {
-                WithLineInfo::Line(i, l, StlError::from(x))
-            }
-        }
-    }
-}
-
-impl From<std::array::TryFromSliceError> for StlError {
-    fn from(_error: std::array::TryFromSliceError) -> Self {
-        StlError::BinaryData
-    }
-}
-impl From<FromBytesError> for StlError {
-    fn from(_error: FromBytesError) -> Self {
-        StlError::BinaryData
-    }
-}
-
-impl From<FetchLineError> for StlError {
-    fn from(_error: FetchLineError) -> Self {
-        StlError::LoadFileEndReached
     }
 }

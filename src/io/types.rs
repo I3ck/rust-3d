@@ -119,6 +119,8 @@ pub enum IOError {
     Columns(usize),
     Rows(usize),
     Matrix(usize),
+    Loop(usize),
+    EndLoop(usize),
 }
 
 pub type IOResult2<T> = Result<T, IOError>; //@todo rename
@@ -175,6 +177,8 @@ impl std::fmt::Debug for IOError {
             Self::Columns(x) => write!(f, "Columns could not be parsed on line {}", x),
             Self::Rows(x) => write!(f, "Rows could not be parsed on line {}", x),
             Self::Matrix(x) => write!(f, "Transformation matrix could not be parsed on line {}", x),
+            Self::Loop(x) => write!(f, "Unable to parse loop on line {}", x),
+            Self::EndLoop(x) => write!(f, "Unable to parse endloop on line {}", x),
         }
     }
 }
