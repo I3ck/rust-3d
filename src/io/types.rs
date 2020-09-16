@@ -104,9 +104,9 @@ pub enum IOError {
     FaceVertexCount,
     InvalidMeshIndices,
     ColorArrayLength,
-    InvalidPlyType(String),
-    InvalidPlyVertexType(Type),
-    InvalidPlyFaceType(Type),
+    InvalidPlyType(String, usize),
+    InvalidPlyVertexType(Type, usize),
+    InvalidPlyFaceType(Type, usize),
     InvalidPlyVertexDimensionDefinition,
     Vertex(Option<usize>),
     Face(Option<usize>),
@@ -164,9 +164,13 @@ impl std::fmt::Debug for IOError {
             Self::VertexCount(None) => write!(f, "Vertex count does not match"),
             Self::VertexCount(Some(x)) => write!(f, "Vertex count does not match on line {}", x),
             Self::ColorArrayLength => write!(f, "Length of color array does not match others"),
-            Self::InvalidPlyType(x) => write!(f, "Invalid type in header '{}'", x),
-            Self::InvalidPlyVertexType(x) => write!(f, "Invalid vertex type in header {}", x),
-            Self::InvalidPlyFaceType(x) => write!(f, "Invalid face type in header {}", x),
+            Self::InvalidPlyType(s, x) => write!(f, "Invalid type '{}' in header '{}'", s, x),
+            Self::InvalidPlyVertexType(t, x) => {
+                write!(f, "Invalid vertex type '{}' in header {}", t, x)
+            }
+            Self::InvalidPlyFaceType(t, x) => {
+                write!(f, "Invalid face type '{}' in header {}", t, x)
+            }
             Self::InvalidMeshIndices => write!(f, "File contains invalid mesh indices"),
             Self::InvalidPlyVertexDimensionDefinition => {
                 write!(f, "Invalid order / definition of vertex dimension order")

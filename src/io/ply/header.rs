@@ -136,20 +136,31 @@ where
                     let t = words
                         .next()
                         .ok_or(IOError::Property(*i_line))
-                        .and_then(|w| Type::try_from(w))?;
+                        .and_then(|w| {
+                            Type::try_from(w).map_err(|s| IOError::InvalidPlyType(s, *i_line))
+                        })?;
                     let id = words.next().ok_or(IOError::Property(*i_line))?;
                     if id == b"x" {
-                        opt_fst_type = Some(VertexType::try_from(t)?); //@todo line info
+                        opt_fst_type = Some(
+                            VertexType::try_from(t)
+                                .map_err(|t| IOError::InvalidPlyVertexType(t, *i_line))?,
+                        );
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::X;
                         i_vertex_order += 1;
                     } else if id == b"y" {
-                        opt_snd_type = Some(VertexType::try_from(t)?); //@todo line info
+                        opt_snd_type = Some(
+                            VertexType::try_from(t)
+                                .map_err(|t| IOError::InvalidPlyVertexType(t, *i_line))?,
+                        );
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Y;
                         i_vertex_order += 1;
                     } else if id == b"z" {
-                        opt_third_type = Some(VertexType::try_from(t)?); //@todo line info
+                        opt_third_type = Some(
+                            VertexType::try_from(t)
+                                .map_err(|t| IOError::InvalidPlyVertexType(t, *i_line))?,
+                        );
                         n_types_found += 1;
                         vertex_order[i_vertex_order] = Xyz::Z;
                         i_vertex_order += 1;
@@ -176,13 +187,25 @@ where
                             let t_count = words
                                 .next()
                                 .ok_or(IOError::Property(*i_line))
-                                .and_then(|x| Type::try_from(x))
-                                .and_then(|x| FaceType::try_from(x))?;
+                                .and_then(|x| {
+                                    Type::try_from(x)
+                                        .map_err(|s| IOError::InvalidPlyType(s, *i_line))
+                                })
+                                .and_then(|x| {
+                                    FaceType::try_from(x)
+                                        .map_err(|t| IOError::InvalidPlyFaceType(t, *i_line))
+                                })?;
                             let t_index = words
                                 .next()
                                 .ok_or(IOError::Property(*i_line))
-                                .and_then(|x| Type::try_from(x))
-                                .and_then(|x| FaceType::try_from(x))?;
+                                .and_then(|x| {
+                                    Type::try_from(x)
+                                        .map_err(|s| IOError::InvalidPlyType(s, *i_line))
+                                })
+                                .and_then(|x| {
+                                    FaceType::try_from(x)
+                                        .map_err(|t| IOError::InvalidPlyFaceType(t, *i_line))
+                                })?;
 
                             opt_face_count_type = Some(t_count);
                             opt_face_index_type = Some(t_index);
@@ -193,7 +216,9 @@ where
                         let t = words
                             .next()
                             .ok_or(IOError::Property(*i_line))
-                            .and_then(|x| Type::try_from(x))?;
+                            .and_then(|x| {
+                                Type::try_from(x).map_err(|s| IOError::InvalidPlyType(s, *i_line))
+                            })?;
                         if opt_face_count_type.is_some() {
                             face_after.bytes += t.size_bytes();
                             face_after.words += 1;

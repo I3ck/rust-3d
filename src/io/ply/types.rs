@@ -65,9 +65,9 @@ impl fmt::Display for Type {
 }
 
 impl TryFrom<&[u8]> for Type {
-    type Error = IOError;
+    type Error = String;
 
-    fn try_from(x: &[u8]) -> IOResult2<Self> {
+    fn try_from(x: &[u8]) -> std::result::Result<Self, Self::Error> {
         match x {
             b"char" | b"int8" => Ok(Self::Char),
             b"uchar" | b"uint8" => Ok(Self::UChar),
@@ -77,9 +77,7 @@ impl TryFrom<&[u8]> for Type {
             b"uint" | b"uint32" => Ok(Self::UInt),
             b"float" | b"float32" => Ok(Self::Float),
             b"double" | b"float64" => Ok(Self::Double),
-            _ => Err(IOError::InvalidPlyType(
-                std::str::from_utf8(x).unwrap_or("").to_string(),
-            )),
+            _ => Err(std::str::from_utf8(x).unwrap_or("").to_string()),
         }
     }
 }
@@ -145,13 +143,13 @@ pub enum VertexType {
 }
 
 impl TryFrom<Type> for VertexType {
-    type Error = IOError;
+    type Error = Type;
 
-    fn try_from(x: Type) -> IOResult2<Self> {
+    fn try_from(x: Type) -> std::result::Result<Self, Self::Error> {
         match x {
             Type::Float => Ok(Self::Float),
             Type::Double => Ok(Self::Double),
-            t => Err(IOError::InvalidPlyVertexType(t)),
+            t => Err(t),
         }
     }
 }
@@ -169,9 +167,9 @@ pub enum FaceType {
 }
 
 impl TryFrom<Type> for FaceType {
-    type Error = IOError;
+    type Error = Type;
 
-    fn try_from(x: Type) -> IOResult2<Self> {
+    fn try_from(x: Type) -> std::result::Result<Self, Self::Error> {
         match x {
             Type::Char => Ok(Self::Char),
             Type::UChar => Ok(Self::UChar),
@@ -179,7 +177,7 @@ impl TryFrom<Type> for FaceType {
             Type::UShort => Ok(Self::UShort),
             Type::Int => Ok(Self::Int),
             Type::UInt => Ok(Self::UInt),
-            t => Err(IOError::InvalidPlyFaceType(t)),
+            t => Err(t),
         }
     }
 }
