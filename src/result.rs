@@ -59,7 +59,6 @@ pub enum ErrorKind {
     CantCalculateAngleIfZeroLength,
     TriFace3DNotSpanningVolume,
     StlError(StlError),
-    PtxError(PtxError),
     XyError(XyError),
     XyzError(XyzError),
     IOError2(IOError), //@todo rename
@@ -101,7 +100,6 @@ impl fmt::Debug for ErrorKind {
                 "TriFace3D must be constructed from points spanning a volume"
             ),
             Self::StlError(x) => x.fmt(f),
-            Self::PtxError(x) => x.fmt(f),
             Self::XyError(x) => x.fmt(f),
             Self::XyzError(x) => x.fmt(f),
             Self::IOError2(x) => x.fmt(f),

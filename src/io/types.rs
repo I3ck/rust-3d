@@ -115,6 +115,10 @@ pub enum IOError {
     LineParse(usize),
     InvalidProperty(usize),
     UnkownFormat(usize),
+    EndReached,
+    Columns(usize),
+    Rows(usize),
+    Matrix(usize),
 }
 
 pub type IOResult2<T> = Result<T, IOError>; //@todo rename
@@ -167,6 +171,10 @@ impl std::fmt::Debug for IOError {
             Self::FaceCount(None) => write!(f, "Unable to parse face count"),
             Self::FaceCount(Some(x)) => write!(f, "Unable to parse face count on line {}", x),
             Self::FaceVertexCount => write!(f, "Unable to parse vertex count of face"),
+            Self::EndReached => write!(f, "Unexpected reach of file end"),
+            Self::Columns(x) => write!(f, "Columns could not be parsed on line {}", x),
+            Self::Rows(x) => write!(f, "Rows could not be parsed on line {}", x),
+            Self::Matrix(x) => write!(f, "Transformation matrix could not be parsed on line {}", x),
         }
     }
 }
@@ -174,6 +182,12 @@ impl std::fmt::Debug for IOError {
 impl std::fmt::Display for IOError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{:?}", self)
+    }
+}
+
+impl From<super::utils::FetchLineError> for IOError {
+    fn from(_error: super::utils::FetchLineError) -> Self {
+        IOError::EndReached
     }
 }
 
