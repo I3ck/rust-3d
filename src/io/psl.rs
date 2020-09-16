@@ -24,12 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use std::{
-    fmt,
-    io::{Error as ioError, Read},
-    iter::FusedIterator,
-    marker::PhantomData,
-};
+use std::{io::Read, iter::FusedIterator, marker::PhantomData};
 
 use super::{byte_reader::*, types::*};
 
@@ -66,12 +61,12 @@ where
         }
     }
     #[inline(always)]
-    fn initialize(&mut self) -> PslResult<()> {
+    fn initialize(&mut self) -> IOResult2<()> {
         self.n_passes_left = fetch_header_return_n_passes(&mut self.read)?;
         Ok(())
     }
     #[inline(always)]
-    fn fetch_counts(&mut self) -> PslResult<()> {
+    fn fetch_counts(&mut self) -> IOResult2<()> {
         self.n_lines_left = if self.n_lines_left == 0 && self.n_passes_left > 0 {
             fetch_pass_header_return_n_lines(&mut self.read)?
         } else {
@@ -105,7 +100,7 @@ where
     P: IsBuildable3D,
     R: Read,
 {
-    type Item = PslResult<DataReserve<P>>;
+    type Item = IOResult2<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -153,7 +148,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads a IsPushable<Is3D> as x y z coordinates from .psl files
-pub fn load_psl<IP, P, R>(read: R, ip: &mut IP) -> PslResult<()>
+pub fn load_psl<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -174,7 +169,7 @@ where
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn fetch_header_return_n_passes<R>(read: &mut R) -> PslResult<i32>
+fn fetch_header_return_n_passes<R>(read: &mut R) -> IOResult2<i32>
 where
     R: Read,
 {
@@ -208,7 +203,7 @@ where
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn fetch_pass_header_return_n_lines<R>(read: &mut R) -> PslResult<i32>
+fn fetch_pass_header_return_n_lines<R>(read: &mut R) -> IOResult2<i32>
 where
     R: Read,
 {
@@ -227,7 +222,7 @@ where
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn fetch_line_header_return_n_points<R>(read: &mut R) -> PslResult<i32>
+fn fetch_line_header_return_n_points<R>(read: &mut R) -> IOResult2<i32>
 where
     R: Read,
 {
@@ -251,7 +246,7 @@ where
 //------------------------------------------------------------------------------
 
 #[inline(always)]
-fn fetch_point<R, P>(read: &mut R) -> PslResult<P>
+fn fetch_point<R, P>(read: &mut R) -> IOResult2<P>
 where
     R: Read,
     P: IsBuildable3D,
@@ -261,34 +256,4 @@ where
     let z = LittleReader::read_f32(read)?;
 
     Ok(P::new(x as f64, y as f64, z as f64))
-}
-
-//------------------------------------------------------------------------------
-
-/// Error type for .psl file operations
-pub enum PslError {
-    AccessFile,
-}
-
-/// Result type for .psl file operations
-pub type PslResult<T> = std::result::Result<T, PslError>;
-
-impl fmt::Debug for PslError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::AccessFile => write!(f, "Unable to access file"),
-        }
-    }
-}
-
-impl fmt::Display for PslError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl From<ioError> for PslError {
-    fn from(_error: ioError) -> Self {
-        PslError::AccessFile
-    }
 }
