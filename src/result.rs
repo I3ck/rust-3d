@@ -40,7 +40,7 @@ pub enum ErrorKind {
     TooFewPoints,
     BoundingBoxMissing,
     NormalizeVecWithoutLength,
-    IOError,
+    FileError,
     ParseError,
     IndexOutOfBounds,
     IncorrectFaceID,
@@ -71,7 +71,7 @@ impl fmt::Debug for ErrorKind {
             Self::TooFewPoints => write!(f, "Container had too few points for the operation"),
             Self::BoundingBoxMissing => write!(f, "Bounding box is missing for the operation"),
             Self::NormalizeVecWithoutLength => write!(f, "Can't normalize a vector of length 0"),
-            Self::IOError => write!(f, "Can't read or write a file"),
+            Self::FileError => write!(f, "Can't read or write a file"),
             Self::ParseError => write!(f, "Can't parse data"),
             Self::IndexOutOfBounds => write!(f, "Tried to access an out of bounds index"),
             Self::IncorrectFaceID => write!(f, "Used an incorrect face id"),
@@ -120,7 +120,7 @@ impl From<ParseIntError> for ErrorKind {
 
 impl From<ioError> for ErrorKind {
     fn from(_error: ioError) -> Self {
-        ErrorKind::IOError
+        ErrorKind::FileError
     }
 }
 
