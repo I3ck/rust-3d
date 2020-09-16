@@ -121,6 +121,7 @@ pub enum IOError {
     Matrix(usize),
     Loop(usize),
     EndLoop(usize),
+    EstimateDelimiter,
 }
 
 pub type IOResult2<T> = Result<T, IOError>; //@todo rename
@@ -179,6 +180,7 @@ impl std::fmt::Debug for IOError {
             Self::Matrix(x) => write!(f, "Transformation matrix could not be parsed on line {}", x),
             Self::Loop(x) => write!(f, "Unable to parse loop on line {}", x),
             Self::EndLoop(x) => write!(f, "Unable to parse endloop on line {}", x),
+            Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
         }
     }
 }

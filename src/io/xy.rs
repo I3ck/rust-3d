@@ -25,8 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 
 use std::{
-    fmt,
-    io::{BufRead, Error as ioError, Write},
+    io::{BufRead, Write},
     iter::FusedIterator,
     marker::PhantomData,
 };
@@ -68,9 +67,14 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(delim_determined: &mut bool, delim: &mut u8, line: &[u8]) -> XyResult<P> {
+    fn fetch_one(
+        delim_determined: &mut bool,
+        delim: &mut u8,
+        i_line: usize,
+        line: &[u8],
+    ) -> IOResult2<P> {
         if !*delim_determined {
-            *delim = estimate_delimiter(1, &line).ok_or(XyError::EstimateDelimiter)?;
+            *delim = estimate_delimiter(1, &line).ok_or(IOError::EstimateDelimiter)?;
             *delim_determined = true;
         }
 
@@ -79,12 +83,12 @@ where
         let x = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyError::Vertex)?;
+            .ok_or(IOError::Vertex(Some(i_line)))?;
 
         let y = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(XyError::Vertex)?;
+            .ok_or(IOError::Vertex(Some(i_line)))?;
 
         Ok(P::new(x, y))
     }
@@ -95,7 +99,7 @@ where
     P: IsBuildable2D,
     R: BufRead,
 {
-    type Item = XyIOResult<DataReserve<P>>;
+    type Item = IOResult2<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -104,13 +108,17 @@ where
         if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
             self.i_line += 1;
             Some(
-                Self::fetch_one(&mut self.delim_determined, &mut self.delim, line)
-                    .map(|x| DataReserve::Data(x))
-                    .line(self.i_line, line)
-                    .map_err(|e| {
-                        self.is_done = true;
-                        e
-                    }),
+                Self::fetch_one(
+                    &mut self.delim_determined,
+                    &mut self.delim,
+                    self.i_line,
+                    line,
+                )
+                .map(|x| DataReserve::Data(x))
+                .map_err(|e| {
+                    self.is_done = true;
+                    e
+                }),
             )
         } else {
             self.is_done = true;
@@ -129,7 +137,12 @@ where
 //------------------------------------------------------------------------------
 
 /// Saves an IsRandomAccessible<Is2D> as x y coordinates with a specified delimiter between coordinates and positions. E.g. used to create the .xy file format or .csv files
-pub fn save_xy<RA, P, W>(write: &mut W, ra: &RA, delim_coord: &str, delim_pos: &str) -> XyResult<()>
+pub fn save_xy<RA, P, W>(
+    write: &mut W,
+    ra: &RA,
+    delim_coord: &str,
+    delim_pos: &str,
+) -> IOResult2<()>
 where
     RA: IsRandomAccessible<P>,
     P: Is2D,
@@ -145,7 +158,7 @@ where
 }
 
 /// Loads a IsPushable<Is2D> as x y coordinates. E.g. used to load the .xy file format or .csv files
-pub fn load_xy<IP, P, R>(read: R, ip: &mut IP) -> XyIOResult<()>
+pub fn load_xy<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable2D,
@@ -161,41 +174,4 @@ where
     }
 
     Ok(())
-}
-
-//------------------------------------------------------------------------------
-
-/// Error type for .xy file operations
-pub enum XyError {
-    EstimateDelimiter,
-    AccessFile,
-    Vertex,
-}
-
-/// Result type for .xy file operations
-pub type XyResult<T> = std::result::Result<T, XyError>;
-
-/// Result type for .xy file operations
-pub type XyIOResult<T> = IOResult<T, XyError>;
-
-impl fmt::Debug for XyError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::Vertex => write!(f, "Unable to parse vertex"),
-            Self::AccessFile => write!(f, "Unable to access file"),
-            Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
-        }
-    }
-}
-
-impl fmt::Display for XyError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl From<ioError> for XyError {
-    fn from(_error: ioError) -> Self {
-        XyError::AccessFile
-    }
 }
