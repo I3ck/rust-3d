@@ -331,7 +331,7 @@ where
     }
 
     #[inline(always)]
-    fn fetch_one(header: &PartialHeader, line: &[u8]) -> IOResult2<P> {
+    fn fetch_one(header: &PartialHeader, i_line: usize, line: &[u8]) -> IOResult2<P> {
         let mut words = to_words_skip_empty(line);
 
         skip_n(&mut words, header.vertex.format.before.words);
@@ -339,21 +339,21 @@ where
         let first = words
             .next()
             .and_then(|w| from_ascii(w))
-            .ok_or(IOError::Vertex(None))?;
+            .ok_or(IOError::Vertex(Some(i_line)))?;
 
         skip_n(&mut words, header.vertex.format.between_first_snd.words);
 
         let snd = words
             .next()
             .and_then(|w| from_ascii(w))
-            .ok_or(IOError::Vertex(None))?;
+            .ok_or(IOError::Vertex(Some(i_line)))?;
 
         skip_n(&mut words, header.vertex.format.between_snd_third.words);
 
         let third = words
             .next()
             .and_then(|w| from_ascii(w))
-            .ok_or(IOError::Vertex(None))?;
+            .ok_or(IOError::Vertex(Some(i_line)))?;
 
         // no need to skip 'after' since we're done with this line anyway
 
@@ -382,9 +382,8 @@ where
             while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
                 self.i_line += 1;
                 return Some(
-                    Self::fetch_one(&self.header, line)
+                    Self::fetch_one(&self.header, self.i_line, line)
                         .map(|x| DataReserve::Data(x))
-                        //@todo missing line information
                         .map_err(|e| {
                             self.is_done = true;
                             e
@@ -456,8 +455,7 @@ where
                 self.i_line += 1;
                 return Some(
                     collect_index_line(&line)
-                        .ok_or(IOError::Face(None))
-                        //@todo missing line information
+                        .ok_or(IOError::Face(Some(self.i_line)))
                         .map_err(|e| {
                             self.is_done = true;
                             e

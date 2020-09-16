@@ -95,7 +95,6 @@ where
                     .next()
                     .and_then(|word| from_ascii(word))
                     .ok_or(IOError::VertexCount(Some(self.i_line)))
-                    //@todo missing line info
                 {
                     Ok(n) => {
                         self.n_vertices = Some(n);
@@ -114,7 +113,6 @@ where
                 return Some(
                     fetch_vertex(self.i_line, line)
                         .map(|x| DataReserve::Data(x))
-                        //@todo missing line info
                         .map_err(|e| {
                             self.is_done = true;
                             e
