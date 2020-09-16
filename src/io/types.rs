@@ -99,8 +99,8 @@ pub enum IOError {
     UnsupportedVersion,
     UnknownPointFormat,
     BinaryData,
-    VertexCount,
-    FaceCount,
+    VertexCount(Option<usize>),
+    FaceCount(Option<usize>),
     FaceVertexCount,
     InvalidMeshIndices,
     ColorArrayLength,
@@ -154,7 +154,8 @@ impl std::fmt::Debug for IOError {
             Self::Face(Some(x)) => write!(f, "Unable to parse face on line {}", x),
             Self::Face(None) => write!(f, "Unable to parse face"),
             Self::Property(x) => write!(f, "Unable to parse property on line {}", x),
-            Self::VertexCount => write!(f, "Vertex count does not match"),
+            Self::VertexCount(None) => write!(f, "Vertex count does not match"),
+            Self::VertexCount(Some(x)) => write!(f, "Vertex count does not match on line {}", x),
             Self::ColorArrayLength => write!(f, "Length of color array does not match others"),
             Self::InvalidPlyType(x) => write!(f, "Invalid type in header '{}'", x),
             Self::InvalidPlyVertexType(x) => write!(f, "Invalid vertex type in header {}", x),
@@ -163,7 +164,8 @@ impl std::fmt::Debug for IOError {
             Self::InvalidPlyVertexDimensionDefinition => {
                 write!(f, "Invalid order / definition of vertex dimension order")
             }
-            Self::FaceCount => write!(f, "Unable to parse face count"),
+            Self::FaceCount(None) => write!(f, "Unable to parse face count"),
+            Self::FaceCount(Some(x)) => write!(f, "Unable to parse face count on line {}", x),
             Self::FaceVertexCount => write!(f, "Unable to parse vertex count of face"),
         }
     }

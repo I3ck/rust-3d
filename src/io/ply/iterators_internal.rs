@@ -396,7 +396,7 @@ where
         self.is_done = true;
 
         if self.current != self.header.vertex.count {
-            Some(Err(IOError::VertexCount))
+            Some(Err(IOError::VertexCount(Some(self.i_line))))
         } else {
             None
         }

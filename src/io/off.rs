@@ -94,7 +94,7 @@ where
                 match words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or(IOError::VertexCount)
+                    .ok_or(IOError::VertexCount(Some(self.i_line)))
                     //@todo missing line info
                 {
                     Ok(n) => {
@@ -204,16 +204,16 @@ where
     }
 
     #[inline(always)]
-    fn fetch_counts(line: &[u8]) -> IOResult2<[usize; 2]> {
+    fn fetch_counts(i_line: usize, line: &[u8]) -> IOResult2<[usize; 2]> {
         let mut words = to_words_skip_empty(line);
         let n_vertices = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(IOError::VertexCount)?;
+            .ok_or(IOError::VertexCount(Some(i_line)))?;
         let n_faces = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(IOError::FaceCount)?;
+            .ok_or(IOError::FaceCount(Some(i_line)))?;
 
         Ok([n_vertices, n_faces])
     }
@@ -243,7 +243,7 @@ where
             }
 
             if self.counts.is_none() {
-                match Self::fetch_counts(line) {
+                match Self::fetch_counts(self.i_line, line) {
                     Ok(counts) => {
                         self.counts = Some(counts);
                         return Some(Ok(FaceDataReserve::ReserveDataFaces(counts[0], counts[1])));

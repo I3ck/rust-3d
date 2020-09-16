@@ -24,12 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use std::{
-    fmt,
-    io::{BufRead, Error as ioError},
-    iter::FusedIterator,
-    marker::PhantomData,
-};
+use std::{io::BufRead, iter::FusedIterator, marker::PhantomData};
 
 use super::{types::*, utils::*};
 
@@ -68,23 +63,23 @@ where
     }
 
     #[inline(always)]
-    pub fn fetch_one(line: &[u8]) -> PtsResult<P> {
+    pub fn fetch_one(i_line: usize, line: &[u8]) -> IOResult2<P> {
         let mut words = to_words_skip_empty(line);
 
         let x = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(PtsError::Vertex)?;
+            .ok_or(IOError::Vertex(Some(i_line)))?;
 
         let y = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(PtsError::Vertex)?;
+            .ok_or(IOError::Vertex(Some(i_line)))?;
 
         let z = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(PtsError::Vertex)?;
+            .ok_or(IOError::Vertex(Some(i_line)))?;
 
         Ok(P::new(x, y, z))
     }
@@ -95,7 +90,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = PtsIOResult<DataReserve<P>>;
+    type Item = IOResult2<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -114,8 +109,7 @@ where
                     self.n_vertices = match words
                         .next()
                         .and_then(|word| from_ascii(word))
-                        .ok_or(PtsError::VertexCount)
-                        .line(self.i_line, line)
+                        .ok_or(IOError::VertexCount(Some(self.i_line)))
                     {
                         Ok(n) => Some(n),
                         Err(e) => {
@@ -130,9 +124,8 @@ where
                     if self.n_vertices_added < n {
                         self.n_vertices_added += 1;
                         return Some(
-                            Self::fetch_one(line)
+                            Self::fetch_one(self.i_line, line)
                                 .map(|x| DataReserve::Data(x))
-                                .line(self.i_line, line)
                                 .map_err(|e| {
                                     self.is_done = true;
                                     e
@@ -145,8 +138,7 @@ where
                         self.n_vertices = match words
                             .next()
                             .and_then(|word| from_ascii(word))
-                            .ok_or(PtsError::VertexCount)
-                            .line(self.i_line, line)
+                            .ok_or(IOError::VertexCount(Some(self.i_line)))
                         {
                             Ok(n) => Some(n),
                             Err(e) => {
@@ -175,7 +167,7 @@ where
 }
 
 /// Loads IsPushable<Is3D> from the .pts file format
-pub fn load_pts<IP, P, R>(read: R, ip: &mut IP) -> PtsIOResult<()>
+pub fn load_pts<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -191,39 +183,4 @@ where
     }
 
     Ok(())
-}
-
-//------------------------------------------------------------------------------
-
-/// Error type for .pts file operations
-pub enum PtsError {
-    AccessFile,
-    VertexCount,
-    Vertex,
-}
-
-/// Result type for .pts file operations
-pub type PtsIOResult<T> = IOResult<T, PtsError>;
-type PtsResult<T> = std::result::Result<T, PtsError>;
-
-impl fmt::Debug for PtsError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::AccessFile => write!(f, "Unable to access file"),
-            Self::VertexCount => write!(f, "Unable to parse vertex count"),
-            Self::Vertex => write!(f, "Unable to parse vertex"),
-        }
-    }
-}
-
-impl fmt::Display for PtsError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl From<ioError> for PtsError {
-    fn from(_error: ioError) -> Self {
-        PtsError::AccessFile
-    }
 }
