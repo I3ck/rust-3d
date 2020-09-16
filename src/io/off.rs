@@ -24,12 +24,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use crate::*;
 
-use std::{
-    fmt,
-    io::{BufRead, Error as ioError},
-    iter::FusedIterator,
-    marker::PhantomData,
-};
+use std::{io::BufRead, iter::FusedIterator, marker::PhantomData};
 
 use super::{types::*, utils::*};
 
@@ -75,7 +70,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = OffIOResult<DataReserve<P>>;
+    type Item = IOResult2<DataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -99,8 +94,8 @@ where
                 match words
                     .next()
                     .and_then(|word| from_ascii(word))
-                    .ok_or(OffError::VertexCount)
-                    .line(self.i_line, line)
+                    .ok_or(IOError::VertexCount)
+                    //@todo missing line info
                 {
                     Ok(n) => {
                         self.n_vertices = Some(n);
@@ -117,9 +112,9 @@ where
             if self.n_added < self.n_vertices.unwrap() {
                 self.n_added += 1;
                 return Some(
-                    fetch_vertex(line)
+                    fetch_vertex(self.i_line, line)
                         .map(|x| DataReserve::Data(x))
-                        .line(self.i_line, line)
+                        //@todo missing line info
                         .map_err(|e| {
                             self.is_done = true;
                             e
@@ -181,44 +176,44 @@ where
     }
 
     #[inline(always)]
-    fn fetch_face(line: &[u8]) -> OffResult<[usize; 3]> {
+    fn fetch_face(i_line: usize, line: &[u8]) -> IOResult2<[usize; 3]> {
         let mut words = to_words_skip_empty(line);
 
-        let count_face = words.next().ok_or(OffError::FaceVertexCount)?;
+        let count_face = words.next().ok_or(IOError::FaceVertexCount)?;
 
         if count_face == b"3" {
             let a = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::Face)?;
+                .ok_or(IOError::Face(Some(i_line)))?;
 
             let b = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::Face)?;
+                .ok_or(IOError::Face(Some(i_line)))?;
 
             let c = words
                 .next()
                 .and_then(|word| from_ascii(word))
-                .ok_or(OffError::Face)?;
+                .ok_or(IOError::Face(Some(i_line)))?;
 
             Ok([a, b, c])
         } else {
-            Err(OffError::FaceVertexCount)
+            Err(IOError::FaceVertexCount)
         }
     }
 
     #[inline(always)]
-    fn fetch_counts(line: &[u8]) -> OffResult<[usize; 2]> {
+    fn fetch_counts(line: &[u8]) -> IOResult2<[usize; 2]> {
         let mut words = to_words_skip_empty(line);
         let n_vertices = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(OffError::VertexCount)?;
+            .ok_or(IOError::VertexCount)?;
         let n_faces = words
             .next()
             .and_then(|word| from_ascii(word))
-            .ok_or(OffError::FaceCount)?;
+            .ok_or(IOError::FaceCount)?;
 
         Ok([n_vertices, n_faces])
     }
@@ -229,7 +224,7 @@ where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = OffIOResult<FaceDataReserve<P>>;
+    type Item = IOResult2<FaceDataReserve<P>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -255,7 +250,7 @@ where
                     }
                     Err(e) => {
                         self.is_done = true;
-                        return Some(Err(e).line(self.i_line, line));
+                        return Some(Err(e));
                     }
                 }
             }
@@ -265,13 +260,10 @@ where
                 (if self.n_vertices_added < self.counts.unwrap()[0] {
                     self.n_vertices_added += 1;
 
-                    fetch_vertex(line)
-                        .map(|x| FaceDataReserve::Data(x))
-                        .line(self.i_line, line)
+                    fetch_vertex(self.i_line, line).map(|x| FaceDataReserve::Data(x))
                 } else {
-                    Self::fetch_face(line)
+                    Self::fetch_face(self.i_line, line)
                         .map(|x| FaceDataReserve::Face(x))
-                        .line(self.i_line, line)
                         .map_err(|e| {
                             self.is_done = true;
                             e
@@ -300,7 +292,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads an IsMesh3D from the off file format
-pub fn load_off_mesh<EM, P, R>(read: R, mesh: &mut EM) -> OffIOResult<()>
+pub fn load_off_mesh<EM, P, R>(read: R, mesh: &mut EM) -> IOResult2<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + Clone,
@@ -312,8 +304,7 @@ where
         match rd? {
             FaceDataReserve::Face([a, b, c]) => {
                 mesh.try_add_connection(VId(a), VId(b), VId(c))
-                    .map_err(|_| OffError::InvalidMeshIndices)
-                    .simple()?;
+                    .map_err(|_| IOError::InvalidMeshIndices)?;
             }
             FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
                 mesh.reserve_vertices(n_vertices);
@@ -329,7 +320,7 @@ where
 }
 
 /// Loads IsPushable<Is3D> from the .off file format
-pub fn load_off_points<IP, P, R>(read: R, ip: &mut IP) -> OffIOResult<()>
+pub fn load_off_points<IP, P, R>(read: R, ip: &mut IP) -> IOResult2<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
@@ -349,51 +340,8 @@ where
 
 //------------------------------------------------------------------------------
 
-/// Error type for .off file operations
-pub enum OffError {
-    AccessFile,
-    InvalidMeshIndices,
-    VertexCount,
-    FaceCount,
-    Vertex,
-    Face,
-    FaceVertexCount,
-}
-
-/// Result type for .off file operations
-pub type OffIOResult<T> = IOResult<T, OffError>;
-type OffResult<T> = std::result::Result<T, OffError>;
-
-impl fmt::Debug for OffError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::AccessFile => write!(f, "Unable to access file"),
-            Self::VertexCount => write!(f, "Unable to parse vertex count"),
-            Self::FaceCount => write!(f, "Unable to parse face count"),
-            Self::Vertex => write!(f, "Unable to parse vertex"),
-            Self::Face => write!(f, "Unable to parse face"),
-            Self::FaceVertexCount => write!(f, "Unable to parse vertex count of face"),
-            Self::InvalidMeshIndices => write!(f, "File contains invalid mesh indices"),
-        }
-    }
-}
-
-impl fmt::Display for OffError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl From<ioError> for OffError {
-    fn from(_error: ioError) -> Self {
-        OffError::AccessFile
-    }
-}
-
-//------------------------------------------------------------------------------
-
 #[inline(always)]
-fn fetch_vertex<P>(line: &[u8]) -> OffResult<P>
+fn fetch_vertex<P>(i_line: usize, line: &[u8]) -> IOResult2<P>
 where
     P: IsBuildable3D,
 {
@@ -402,17 +350,17 @@ where
     let x = words
         .next()
         .and_then(|word| from_ascii(word))
-        .ok_or(OffError::Vertex)?;
+        .ok_or(IOError::Vertex(Some(i_line)))?;
 
     let y = words
         .next()
         .and_then(|word| from_ascii(word))
-        .ok_or(OffError::Vertex)?;
+        .ok_or(IOError::Vertex(Some(i_line)))?;
 
     let z = words
         .next()
         .and_then(|word| from_ascii(word))
-        .ok_or(OffError::Vertex)?;
+        .ok_or(IOError::Vertex(Some(i_line)))?;
 
     Ok(P::new(x, y, z))
 }

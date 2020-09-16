@@ -100,6 +100,8 @@ pub enum IOError {
     UnknownPointFormat,
     BinaryData,
     VertexCount,
+    FaceCount,
+    FaceVertexCount,
     InvalidMeshIndices,
     ColorArrayLength,
     InvalidPlyType(String),
@@ -161,6 +163,8 @@ impl std::fmt::Debug for IOError {
             Self::InvalidPlyVertexDimensionDefinition => {
                 write!(f, "Invalid order / definition of vertex dimension order")
             }
+            Self::FaceCount => write!(f, "Unable to parse face count"),
+            Self::FaceVertexCount => write!(f, "Unable to parse vertex count of face"),
         }
     }
 }
