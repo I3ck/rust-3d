@@ -22,10 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for types used for IO actions
 
-use std::{
-    fmt::{Display, Formatter},
-    result::Result,
-};
+use std::result::Result;
 
 use super::from_bytes::FromBytesError;
 
@@ -33,20 +30,10 @@ use super::ply::Type;
 
 //------------------------------------------------------------------------------
 
-/// Trait for adding line information to (error) types
-pub trait LineInfoResult<T, E>: Sized {
-    fn simple(self) -> Result<T, WithLineInfo<E>>;
-    fn index(self, i: usize) -> Result<T, WithLineInfo<E>>;
-    fn line(self, i: usize, line: &[u8]) -> Result<T, WithLineInfo<E>>;
-}
-
-//------------------------------------------------------------------------------
-
 pub enum DataReserve<T> {
     Data(T),
     Reserve(usize),
 }
-//@todo implement From<T> and use
 
 //------------------------------------------------------------------------------
 
@@ -61,31 +48,6 @@ impl<T> From<DataReserve<T>> for FaceDataReserve<T> {
         match x {
             DataReserve::Data(x) => Self::Data(x),
             DataReserve::Reserve(n_d) => Self::ReserveDataFaces(n_d, 0),
-        }
-    }
-}
-
-//------------------------------------------------------------------------------
-
-/// Wrapper type with additional line information
-#[derive(Debug)]
-pub enum WithLineInfo<T> {
-    None(T),
-    Index(usize, T),
-    Line(usize, String, T),
-}
-
-//------------------------------------------------------------------------------
-
-impl<T> Display for WithLineInfo<T>
-where
-    T: Display,
-{
-    fn fmt(&self, f: &mut Formatter) -> std::result::Result<(), std::fmt::Error> {
-        match self {
-            Self::None(x) => write!(f, "{}", x),
-            Self::Index(i, x) => write!(f, "Line #{}: '{}'", i, x),
-            Self::Line(i, l, x) => write!(f, "Line #{}: '{}' '{}'", i, x, l),
         }
     }
 }
@@ -198,25 +160,5 @@ impl std::fmt::Display for IOError {
 impl From<super::utils::FetchLineError> for IOError {
     fn from(_error: super::utils::FetchLineError) -> Self {
         IOError::EndReached
-    }
-}
-
-//------------------------------------------------------------------------------
-
-/// Result type for errors with additional line information
-pub type IOResult<T, E> = Result<T, WithLineInfo<E>>;
-
-impl<T, E> LineInfoResult<T, E> for Result<T, E> {
-    #[inline(always)]
-    fn simple(self) -> Result<T, WithLineInfo<E>> {
-        self.map_err(|e| WithLineInfo::None(e))
-    }
-    #[inline(always)]
-    fn index(self, i: usize) -> Result<T, WithLineInfo<E>> {
-        self.map_err(|e| WithLineInfo::Index(i, e))
-    }
-    #[inline(always)]
-    fn line(self, i: usize, line: &[u8]) -> Result<T, WithLineInfo<E>> {
-        self.map_err(|e| WithLineInfo::Line(i, String::from_utf8_lossy(line).to_string(), e))
     }
 }
