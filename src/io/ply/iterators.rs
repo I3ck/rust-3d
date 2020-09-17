@@ -92,15 +92,9 @@ where
             )))
         } else {
             match &mut self.inner {
-                BinaryOrAsciiPlyMeshInteralIterator::Ascii(x) => {
-                    x.next().map(|x| x.map(|x| x.into()))
-                }
-                BinaryOrAsciiPlyMeshInteralIterator::BinaryLittle(x) => {
-                    x.next().map(|x| x.map(|x| x.into()))
-                }
-                BinaryOrAsciiPlyMeshInteralIterator::BinaryBig(x) => {
-                    x.next().map(|x| x.map(|x| x.into()))
-                }
+                BinaryOrAsciiPlyMeshInteralIterator::Ascii(x) => x.next(),
+                BinaryOrAsciiPlyMeshInteralIterator::BinaryLittle(x) => x.next(),
+                BinaryOrAsciiPlyMeshInteralIterator::BinaryBig(x) => x.next(),
             }
         }
     }
