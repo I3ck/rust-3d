@@ -32,5 +32,7 @@ mod utils;
 
 pub use iterators::*;
 pub use load::*;
+pub use header::load_header; //@todo rename load_ply_header?
+pub use types::Header; //@todo rename PlyHeader?
 pub use save::*;
 pub use types::{MeshOrPoints, Type};
