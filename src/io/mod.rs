@@ -26,7 +26,7 @@ mod stl;
 pub use self::stl::*;
 
 mod ply;
-pub use self::ply::{*, Header}; //@todo why explicit Header use required?
+pub use self::ply::{Header, *}; //@todo why explicit Header use required?
 
 mod las;
 pub use self::las::*;

@@ -42,11 +42,29 @@ const MAX_TRIANGLES_BINARY: u32 = 1_000_000_000;
 
 //------------------------------------------------------------------------------
 
-pub struct StlFace<P, N> {
+pub struct StlFace<P, N>
+where
+    P: Is3D,
+    N: Is3D,
+{
     pub a: P,
     pub b: P,
     pub c: P,
     pub n: N,
+}
+
+impl<P, N> StlFace<P, N>
+where
+    P: IsBuildable3D,
+    N: IsEditable3D,
+{
+    /// Calculates the normal from a, b, c if currently unset
+    pub fn update_normal_if_unset(&mut self) {
+        if self.n.x() == 0.0 && self.n.y() == 0.0 && self.n.z() == 0.0 {
+            let n = normal_of_face(&self.a, &self.b, &self.c);
+            self.n.set_xyz(n.x(), n.y(), n.z())
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
