@@ -490,6 +490,22 @@ where
 }
 
 //------------------------------------------------------------------------------
+
+/// Figures out the format of a .stl file by performing a deep test.  
+/// Since some files incorrectly use the solid keyword, this might be necessary
+/// Note that read is in an undefined state afterwards, you'll e.g. need to reopen the file for further reads
+pub fn is_ascii_deep<R>(read: R) -> bool
+where
+    R: BufRead,
+{
+    let mut iterator = StlAsciiIterator::<Point3D, Point3D, R>::new(read);
+    match iterator.next() {
+        Some(Ok(_)) => true,
+        _ => false,
+    }
+}
+
+//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
