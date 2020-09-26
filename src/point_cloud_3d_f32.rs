@@ -30,7 +30,7 @@ use std::marker::PhantomData;
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, PartialEq, PartialOrd, Clone, Default)]
+#[derive(Debug, PartialEq, PartialOrd, Clone)]
 /// PointCloud3Df32, a collection of positions within 3D space stored lossy as f32 vector for easier usage during rendering
 pub struct PointCloud3Df32<P>
 where
@@ -45,6 +45,7 @@ where
     P: IsBuildable3D,
 {
     /// Creates a new, empty point cloud
+    //@todo consider removal only using default()
     pub fn new() -> PointCloud3Df32<P> {
         PointCloud3Df32 {
             data: Vec::new(),
@@ -57,6 +58,17 @@ where
             data: Vec::with_capacity(3 * n),
             _phantom: PhantomData::default(),
         }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+impl<P> Default for PointCloud3Df32<P>
+where
+    P: IsBuildable3D,
+{
+    fn default() -> Self {
+        Self::new()
     }
 }
 
