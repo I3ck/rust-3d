@@ -241,7 +241,7 @@ where
 
                     self.n_triangles = n_triangles as usize;
 
-                    Some(Ok(DataReserve::Reserve(n_triangles as usize)))
+                    Some(Ok(DataReserve::ReserveExact(n_triangles as usize)))
                 }
             };
         }

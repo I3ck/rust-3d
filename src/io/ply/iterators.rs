@@ -157,7 +157,7 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(to_reserve) = self.to_reserve {
             self.to_reserve = None;
-            Some(Ok(DataReserve::Reserve(to_reserve)))
+            Some(Ok(DataReserve::ReserveExact(to_reserve)))
         } else {
             match &mut self.inner {
                 BinaryOrAsciiPlyPointsInteralIterator::Ascii(x) => x.next(),

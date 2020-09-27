@@ -98,7 +98,7 @@ where
                 {
                     Ok(n) => {
                         self.n_vertices = Some(n);
-                        return Some(Ok(DataReserve::Reserve(self.n_vertices.unwrap())));
+                        return Some(Ok(DataReserve::ReserveExact(self.n_vertices.unwrap())));
                     }
                     Err(e) => {
                         self.is_done = true;

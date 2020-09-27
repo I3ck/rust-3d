@@ -105,7 +105,7 @@ where
                     self.buffer = vec![0u8; header.point_record_length as usize];
                     let n = header.n_point_records;
                     self.header = Some(header);
-                    return Some(Ok(DataReserve::Reserve(n as usize)));
+                    return Some(Ok(DataReserve::ReserveExact(n as usize)));
                 } else {
                     self.is_done = true;
                     return Some(Err(IOError::BinaryData));
