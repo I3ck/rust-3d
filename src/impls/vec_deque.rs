@@ -51,6 +51,9 @@ impl<T> IsPushable<T> for VecDeque<T> {
     fn reserve(&mut self, n: usize) {
         self.reserve(n)
     }
+    fn reserve_exact(&mut self, n: usize) {
+        self.reserve_exact(n)
+    }
 }
 
 impl<T> IsDataContainer<T> for VecDeque<T>
@@ -59,6 +62,9 @@ where
 {
     fn reserve_d(&mut self, n: usize) {
         self.reserve(n)
+    }
+    fn reserve_d_exact(&mut self, n: usize) {
+        self.reserve_exact(n)
     }
     fn len_d(&self) -> usize {
         self.len()

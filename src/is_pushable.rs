@@ -26,6 +26,8 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 pub trait IsPushable<T> {
     /// Should push an element to the end of collection
     fn push(&mut self, x: T);
-    /// Should reserve space for n additional elements, but can be left unimplemented
+    /// Should reserve space for at least n additional elements, but can be left unimplemented
     fn reserve(&mut self, n: usize);
+    /// Should reserve space for exactly n additional elements, but can be left unimplemented
+    fn reserve_exact(&mut self, n: usize);
 }

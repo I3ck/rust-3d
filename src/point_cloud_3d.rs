@@ -71,9 +71,13 @@ where
             f(&mut *p);
         }
     }
-    /// Reserves number of vertices
+    /// Reserves at least number of vertices
     pub fn reserve_vertices(&mut self, n: usize) {
         self.data.reserve(n)
+    }
+    /// Reserves exactly number of vertices
+    pub fn reserve_vertices_exact(&mut self, n: usize) {
+        self.data.reserve_exact(n)
     }
 }
 
@@ -116,6 +120,10 @@ where
 {
     fn reserve_d(&mut self, n: usize) {
         self.data.reserve(n);
+    }
+
+    fn reserve_d_exact(&mut self, n: usize) {
+        self.data.reserve_exact(n);
     }
 
     fn len_d(&self) -> usize {
@@ -186,6 +194,9 @@ where
     }
     fn reserve(&mut self, n: usize) {
         self.data.reserve(n)
+    }
+    fn reserve_exact(&mut self, n: usize) {
+        self.data.reserve_exact(n)
     }
 }
 

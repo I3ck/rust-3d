@@ -65,7 +65,7 @@ where
             Ok(MeshOrPoints::Mesh)
         }
         Header::Partial(header) => {
-            ip.reserve(header.vertex.count);
+            ip.reserve_exact(header.vertex.count);
 
             match header.format {
                 Format::Ascii => load_points_ascii(&mut read, ip, header, i_line),

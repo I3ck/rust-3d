@@ -87,6 +87,9 @@ where
     fn reserve(&mut self, n: usize) {
         self.data.reserve(3 * n)
     }
+    fn reserve_exact(&mut self, n: usize) {
+        self.data.reserve_exact(3 * n)
+    }
 }
 
 //@todo ISDataContainer : IsPushable
@@ -96,6 +99,10 @@ where
 {
     fn reserve_d(&mut self, n: usize) {
         self.data.reserve(3 * n);
+    }
+
+    fn reserve_d_exact(&mut self, n: usize) {
+        self.data.reserve_exact(3 * n);
     }
 
     fn len_d(&self) -> usize {

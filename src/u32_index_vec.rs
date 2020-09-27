@@ -61,6 +61,10 @@ impl IsIndexContainer for U32IndexVec {
         self.data.reserve(n)
     }
 
+    fn reserve_exact(&mut self, n: usize) {
+        self.data.reserve_exact(n)
+    }
+
     fn iter(&self) -> IsIndexContainerIterator<Self> {
         IsIndexContainerIterator::new(self)
     }

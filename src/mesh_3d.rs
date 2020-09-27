@@ -117,6 +117,10 @@ where
     fn reserve_faces(&mut self, n: usize) {
         self.topology.reserve(3 * n)
     }
+
+    fn reserve_faces_exact(&mut self, n: usize) {
+        self.topology.reserve_exact(3 * n)
+    }
 }
 
 impl<P, ID, IC> IsVertexEditableMesh<P, Face3> for Mesh3D<P, ID, IC>
@@ -141,6 +145,10 @@ where
 
     fn reserve_vertices(&mut self, n: usize) {
         self.pc.reserve_d(n)
+    }
+
+    fn reserve_vertices_exact(&mut self, n: usize) {
+        self.pc.reserve_d_exact(n)
     }
 }
 

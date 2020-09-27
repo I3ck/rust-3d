@@ -35,6 +35,8 @@ where
     fn add_vertex(&mut self, vertex: V) -> VId;
     /// Should change vertex at vId to the given vertex returning an error on failure
     fn change_vertex(&mut self, vid: VId, vertex: V) -> Result<()>;
-    /// Should reserve space for n additional vertices
+    /// Should reserve space for at least n additional vertices
     fn reserve_vertices(&mut self, n: usize);
+    /// Should reserve space for exactly n additional vertices
+    fn reserve_vertices_exact(&mut self, n: usize);
 }

@@ -25,8 +25,11 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 /// IsIndexContainer trait for containers holding indices
 
 pub trait IsIndexContainer: Clone + Default {
-    /// Should reserve space for n more elements
+    /// Should reserve space for at least n more elements
     fn reserve(&mut self, n: usize);
+
+    /// Should reserve space for exactly n more elements
+    fn reserve_exact(&mut self, n: usize);
 
     /// Should ensure that given number can be supported
     fn ensure_supported(&mut self, x: usize);
@@ -49,7 +52,7 @@ pub trait IsIndexContainer: Clone + Default {
     /// Creates a new object with the given capacity
     fn with_capacity(n: usize) -> Self {
         let mut result = Self::default();
-        result.reserve(n);
+        result.reserve_exact(n);
         result
     }
 
@@ -64,7 +67,7 @@ pub trait IsIndexContainer: Clone + Default {
     fn with_capacity_and_support_for(n: usize, x: usize) -> Self {
         let mut result = Self::default();
         result.ensure_supported(x);
-        result.reserve(n);
+        result.reserve_exact(n);
         result
     }
 }

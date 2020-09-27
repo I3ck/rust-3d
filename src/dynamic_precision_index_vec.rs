@@ -250,6 +250,15 @@ impl IsIndexContainer for DynamicPrecisionIndexVec {
         }
     }
 
+    fn reserve_exact(&mut self, n: usize) {
+        match self.mode {
+            Mode::U8(ref mut vec) => vec.reserve_exact(n),
+            Mode::U16(ref mut vec) => vec.reserve_exact(n),
+            Mode::U32(ref mut vec) => vec.reserve_exact(n),
+            Mode::Usize(ref mut vec) => vec.reserve_exact(n),
+        }
+    }
+
     fn iter(&self) -> IsIndexContainerIterator<Self> {
         IsIndexContainerIterator::new(self)
     }
@@ -260,7 +269,7 @@ impl From<&Vec<usize>> for DynamicPrecisionIndexVec {
         let mut result = Self::new();
         if let Some(max) = vec.iter().max() {
             result.ensure_supported(max);
-            result.reserve(vec.len());
+            result.reserve_exact(vec.len());
             for x in vec.iter() {
                 result.push(x)
             }
@@ -281,7 +290,7 @@ impl From<&Vec<u32>> for DynamicPrecisionIndexVec {
         let mut result = Self::new();
         if let Some(max) = vec.iter().max() {
             result.ensure_supported(*max as usize);
-            result.reserve(vec.len());
+            result.reserve_exact(vec.len());
             for x in vec.iter() {
                 result.push(*x as usize)
             }
@@ -302,7 +311,7 @@ impl From<&Vec<u16>> for DynamicPrecisionIndexVec {
         let mut result = Self::new();
         if let Some(max) = vec.iter().max() {
             result.ensure_supported(*max as usize);
-            result.reserve(vec.len());
+            result.reserve_exact(vec.len());
             for x in vec.iter() {
                 result.push(*x as usize)
             }

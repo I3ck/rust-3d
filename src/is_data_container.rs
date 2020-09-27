@@ -24,8 +24,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /// IsDataContainer trait used for data containers allowing for different storage types than using the abstracted type
 pub trait IsDataContainer<T> {
-    /// Should reserve space for n elements of type T
+    /// Should reserve space for at least n elements of type T
     fn reserve_d(&mut self, n: usize);
+    /// Should reserve space for exactly n elements of type T
+    fn reserve_d_exact(&mut self, n: usize);
     /// Should return the number of T elements in the container
     fn len_d(&self) -> usize;
     /// Should push a T to the end of the container

@@ -115,6 +115,10 @@ where
     fn reserve_vertices(&mut self, n: usize) {
         self.mesh.reserve_vertices(n)
     }
+
+    fn reserve_vertices_exact(&mut self, n: usize) {
+        self.mesh.reserve_vertices_exact(n)
+    }
 }
 
 impl<M, T, IC> IsSearchableMesh<T, Face3> for SearchableMesh<M, T, IC>
