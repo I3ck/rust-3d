@@ -378,13 +378,17 @@ where
 
     for fr in iterator {
         match fr? {
+            DataReserve::Data(face) => {
+                mesh.add_face(face.a, face.b, face.c);
+                face_normals.push(face.n);
+            }
             DataReserve::Reserve(n) => {
                 mesh.reserve_vertices(3 * n);
                 mesh.reserve_faces(n);
             }
-            DataReserve::Data(face) => {
-                mesh.add_face(face.a, face.b, face.c);
-                face_normals.push(face.n);
+            DataReserve::ReserveExact(n) => {
+                mesh.reserve_vertices_exact(3 * n);
+                mesh.reserve_faces_exact(n);
             }
         }
     }
@@ -413,11 +417,6 @@ where
 
     for fr in iterator {
         match fr? {
-            DataReserve::Reserve(n) => {
-                //Can't reserve vertices since not sure how many are unique
-                mesh.reserve_faces(n);
-                face_normals.reserve(n);
-            }
             DataReserve::Data(face) => {
                 let (a, b, c, n) = (face.a, face.b, face.c, face.n);
                 let id_a = *map.entry(a.clone()).or_insert_with(|| {
@@ -447,6 +446,16 @@ where
                     Err(_) => (),
                 }
             }
+            DataReserve::Reserve(n) => {
+                //Can't reserve vertices since not sure how many are unique
+                mesh.reserve_faces(n);
+                face_normals.reserve(n);
+            }
+            DataReserve::ReserveExact(n) => {
+                //Can't reserve vertices since not sure how many are unique
+                mesh.reserve_faces_exact(n);
+                face_normals.reserve_exact(n);
+            }
         }
     }
 
@@ -473,15 +482,19 @@ where
 
     for fr in iterator {
         match fr? {
-            DataReserve::Reserve(n) => {
-                ip.reserve(3 * n);
-                face_normals.reserve(n);
-            }
             DataReserve::Data(face) => {
                 ip.push(face.a);
                 ip.push(face.b);
                 ip.push(face.c);
                 face_normals.push(face.n);
+            }
+            DataReserve::Reserve(n) => {
+                ip.reserve(3 * n);
+                face_normals.reserve(n);
+            }
+            DataReserve::ReserveExact(n) => {
+                ip.reserve_exact(3 * n);
+                face_normals.reserve_exact(n);
             }
         }
     }

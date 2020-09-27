@@ -33,6 +33,7 @@ use super::ply::Type;
 pub enum DataReserve<T> {
     Data(T),
     Reserve(usize),
+    ReserveExact(usize),
 }
 
 //------------------------------------------------------------------------------
@@ -41,6 +42,7 @@ pub enum FaceDataReserve<T> {
     Face([usize; 3]), //@todo VId or usize?
     Data(T),
     ReserveDataFaces(usize, usize),
+    ReserveDataFacesExact(usize, usize),
 }
 
 impl<T> From<DataReserve<T>> for FaceDataReserve<T> {
@@ -48,6 +50,7 @@ impl<T> From<DataReserve<T>> for FaceDataReserve<T> {
         match x {
             DataReserve::Data(x) => Self::Data(x),
             DataReserve::Reserve(n_d) => Self::ReserveDataFaces(n_d, 0),
+            DataReserve::ReserveExact(n_d) => Self::ReserveDataFacesExact(n_d, 0),
         }
     }
 }

@@ -227,8 +227,9 @@ where
 
     for rd in iterator {
         match rd? {
-            DataReserve::Reserve(x) => ip.reserve(x),
             DataReserve::Data(x) => ip.push(x),
+            DataReserve::Reserve(x) => ip.reserve(x),
+            DataReserve::ReserveExact(x) => ip.reserve_exact(x),
         }
     }
 

@@ -96,13 +96,17 @@ where
             FaceDataReserve::Data(p) => {
                 mesh.add_vertex(p);
             }
+            FaceDataReserve::Face([a, b, c]) => {
+                mesh.try_add_connection(VId(a), VId(b), VId(c))
+                    .or(Err(IOError::InvalidMeshIndices))?;
+            }
             FaceDataReserve::ReserveDataFaces(n_d, n_f) => {
                 mesh.reserve_vertices(n_d);
                 mesh.reserve_faces(n_f);
             }
-            FaceDataReserve::Face([a, b, c]) => {
-                mesh.try_add_connection(VId(a), VId(b), VId(c))
-                    .or(Err(IOError::InvalidMeshIndices))?;
+            FaceDataReserve::ReserveDataFacesExact(n_d, n_f) => {
+                mesh.reserve_vertices_exact(n_d);
+                mesh.reserve_faces_exact(n_f);
             }
         }
     }
@@ -123,8 +127,9 @@ where
 
     for rp in iterator {
         match rp? {
-            DataReserve::Reserve(x) => ip.reserve(x),
             DataReserve::Data(x) => ip.push(x),
+            DataReserve::Reserve(x) => ip.reserve(x),
+            DataReserve::ReserveExact(x) => ip.reserve_exact(x),
         }
     }
 
@@ -154,6 +159,7 @@ where
         match p? {
             DataReserve::Data(x) => ip.push(x),
             DataReserve::Reserve(n) => ip.reserve(n),
+            DataReserve::ReserveExact(n) => ip.reserve_exact(n),
         }
     }
 
@@ -179,6 +185,7 @@ where
         match p? {
             DataReserve::Data(x) => ip.push(x),
             DataReserve::Reserve(n) => ip.reserve(n),
+            DataReserve::ReserveExact(n) => ip.reserve_exact(n),
         }
     }
 
@@ -208,6 +215,10 @@ where
             io::types::FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
                 mesh.reserve_vertices(n_vertices);
                 mesh.reserve_faces(n_faces);
+            }
+            io::types::FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
+                mesh.reserve_vertices_exact(n_vertices);
+                mesh.reserve_faces_exact(n_faces);
             }
         }
     }
@@ -242,6 +253,10 @@ where
             io::types::FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
                 mesh.reserve_vertices(n_vertices);
                 mesh.reserve_faces(n_faces);
+            }
+            io::types::FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
+                mesh.reserve_vertices_exact(n_vertices);
+                mesh.reserve_faces_exact(n_faces);
             }
         }
     }

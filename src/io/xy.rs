@@ -165,6 +165,7 @@ where
         match p? {
             DataReserve::Data(x) => ip.push(x),
             DataReserve::Reserve(n) => ip.reserve(n),
+            DataReserve::ReserveExact(n) => ip.reserve_exact(n),
         }
     }
 

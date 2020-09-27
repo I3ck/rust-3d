@@ -201,6 +201,10 @@ where
                 mesh.reserve_vertices(n_vertices);
                 mesh.reserve_faces(n_faces);
             }
+            io::types::FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
+                mesh.reserve_vertices_exact(n_vertices);
+                mesh.reserve_faces_exact(n_faces);
+            }
         }
     }
 
@@ -220,6 +224,7 @@ where
         match p? {
             DataReserve::Data(x) => ip.push(x),
             DataReserve::Reserve(n) => ip.reserve(n),
+            DataReserve::ReserveExact(n) => ip.reserve_exact(n),
         }
     }
 

@@ -300,6 +300,9 @@ where
 
     for rd in iterator {
         match rd? {
+            FaceDataReserve::Data(x) => {
+                mesh.add_vertex(x);
+            }
             FaceDataReserve::Face([a, b, c]) => {
                 mesh.try_add_connection(VId(a), VId(b), VId(c))
                     .map_err(|_| IOError::InvalidMeshIndices)?;
@@ -308,8 +311,9 @@ where
                 mesh.reserve_vertices(n_vertices);
                 mesh.reserve_faces(n_faces);
             }
-            FaceDataReserve::Data(x) => {
-                mesh.add_vertex(x);
+            FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
+                mesh.reserve_vertices_exact(n_vertices);
+                mesh.reserve_faces_exact(n_faces);
             }
         }
     }
@@ -328,8 +332,9 @@ where
 
     for rd in iterator {
         match rd? {
-            DataReserve::Reserve(x) => ip.reserve(x),
             DataReserve::Data(x) => ip.push(x),
+            DataReserve::Reserve(x) => ip.reserve(x),
+            DataReserve::ReserveExact(x) => ip.reserve_exact(x),
         }
     }
 
