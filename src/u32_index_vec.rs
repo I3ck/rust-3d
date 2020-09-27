@@ -65,3 +65,9 @@ impl IsIndexContainer for U32IndexVec {
         IsIndexContainerIterator::new(self)
     }
 }
+
+impl AsRef<Vec<u32>> for U32IndexVec {
+    fn as_ref(&self) -> &Vec<u32> {
+        &self.data
+    }
+}
