@@ -114,6 +114,7 @@ pub enum IOError {
     GLBJSONBufferViews,
     GLBJSONMeshes,
     GLBJSONMesh,
+    GLBStride,
 }
 
 pub type IOResult<T> = Result<T, IOError>; //@todo rename
@@ -221,6 +222,7 @@ impl std::fmt::Debug for IOError {
             }
             Self::GLBJSONMeshes => write!(f, "JSON meshes of .glb file could not be parsed"),
             Self::GLBJSONMesh => write!(f, "JSON mesh of .glb file could not be parsed"),
+            Self::GLBStride => write!(f, "Invalid stride value in .glb file"),
         }
     }
 }

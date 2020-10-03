@@ -170,7 +170,11 @@ where
                 seek_start: self.chunk.pos + acc_pos.byte_offset + bw_pos.byte_offset,
                 to_fetch: acc_pos.count as usize,
                 bytes_to_skip: if let Some(stride) = bw_pos.byte_stride {
-                    (stride - 3 * 4) as usize //@todo ensure never fails
+                    let size = 3 * 4;
+                    if stride < size {
+                        return Err(IOError::GLBStride);
+                    }
+                    (stride - size) as usize
                 } else {
                     0
                 },
@@ -185,12 +189,15 @@ where
                 seek_start: self.chunk.pos + acc_id.byte_offset + bw_id.byte_offset,
                 to_fetch: acc_id.count as usize / 3,
                 bytes_to_skip: if let Some(stride) = bw_id.byte_stride {
-                    //@todo ensure never fails
-                    match ct {
-                        IndexComponentType::U8 => (stride - 3 * 1) as usize, // 3 * 1byte
-                        IndexComponentType::U16 => (stride - 3 * 2) as usize, // 3 * 2bytes
-                        IndexComponentType::U32 => (stride - 3 * 4) as usize, // 3 * 4bytes
+                    let size = match ct {
+                        IndexComponentType::U8 => 3 * 1,  // 3 * 1byte
+                        IndexComponentType::U16 => 3 * 2, // 3 * 2bytes
+                        IndexComponentType::U32 => 3 * 4, // 3 * 4bytes
+                    };
+                    if stride < size {
+                        return Err(IOError::GLBStride);
                     }
+                    (stride - size) as usize
                 } else {
                     0
                 },
