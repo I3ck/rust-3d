@@ -156,10 +156,11 @@ where
 
     #[inline(always)]
     fn fetch_data(&mut self) -> IOResult<bool> {
-        if let Some(mesh) = self
-            .current_node()
-            .and_then(|x| x.mesh_or_children.mesh().clone())
-        {
+        if let (Some(current_node), Some(mesh)) = (
+            self.current_node(),
+            self.current_node()
+                .and_then(|x| x.mesh_or_children.mesh().clone()),
+        ) {
             //@todo can avoid clones?
             //@todo avoid clone
             if mesh.primitives.is_empty() {
@@ -178,7 +179,7 @@ where
                 } else {
                     0
                 },
-                transformation: self.transformation(),
+                transformation: current_node.transformation.clone(),
             };
 
             let acc_id = &primitive.indices;
@@ -232,7 +233,6 @@ where
             .clone()
         {
             //@todo avoid clone
-            //unwrap safe due to ensure call
             let n_primitives = mesh.primitives.len();
             if self.current_primitive + 1 < n_primitives {
                 self.current_primitive += 1;
@@ -291,12 +291,6 @@ where
         } else {
             Ok(false)
         }
-    }
-
-    #[inline(always)]
-    //@todo useless function now?
-    fn transformation(&self) -> Option<Matrix4> {
-        self.current_node().unwrap().transformation.clone() //@todo avoid clone here
     }
 }
 

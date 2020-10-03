@@ -298,11 +298,11 @@ impl Node {
         if let Some(children) = val.get("children").and_then(|x| x.as_array()) {
             for child in children {
                 if let Some(id) = child.as_u64() {
-                    if let Some(n) = Node::new(
-                        arrays,
-                        arrays.nodes.get(id as usize).unwrap(),
-                        parent_transformation,
-                    ) {
+                    if let Some(n) = arrays
+                        .nodes
+                        .get(id as usize)
+                        .and_then(|node_val| Node::new(arrays, node_val, parent_transformation))
+                    {
                         result.push(n)
                     }
                 }
@@ -317,7 +317,7 @@ impl Node {
             arrays
                 .meshes
                 .get(mesh_id as usize)
-                .and_then(|x| Mesh::new(arrays, x).ok()) //@todo don't use ok(), proper error handling
+                .and_then(|x| Mesh::new(arrays, x).ok())
         } else {
             None
         }
@@ -375,11 +375,9 @@ impl Primitive {
                 .and_then(|x| x.as_u64())
                 .ok_or(IOError::GLBJSONIndices)?;
             let positions = Accessor::new(arrays, &arrays.accessors[positions_id as usize])
-                .and_then(|x| PosAccessor::new(x))
-                .unwrap(); //@todo unwrap
+                .and_then(|x| PosAccessor::new(x))?;
             let indices = Accessor::new(arrays, &arrays.accessors[indices_id as usize])
-                .and_then(|x| IndexAccessor::new(x))
-                .unwrap(); //@todo unwrap
+                .and_then(|x| IndexAccessor::new(x))?;
             Ok(Self { positions, indices })
         } else {
             Err(IOError::GLBPrimitiveMode4Only)
