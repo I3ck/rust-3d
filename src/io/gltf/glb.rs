@@ -348,6 +348,7 @@ where
     f_settings: FaceIterSettings,
     points_pushed: usize,
     index_offset: usize,
+    data_faces_to_reserve: [usize; 2],
     phantom: PhantomData<P>,
 }
 
@@ -363,6 +364,7 @@ where
             f_settings: Default::default(),
             points_pushed: 0,
             index_offset: 0,
+            data_faces_to_reserve: [0, 0],
             phantom: PhantomData,
         }
     }
@@ -371,6 +373,7 @@ where
         self.p_settings = p;
         self.f_settings = f;
         self.index_offset = self.points_pushed;
+        self.data_faces_to_reserve = [self.p_settings.to_fetch, self.f_settings.to_fetch];
 
         if self.p_settings.to_fetch != 0 {
             self.seek_to_points()
@@ -480,7 +483,13 @@ where
 {
     type Item = IOResult<FaceDataReserve<P>>;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.p_settings.to_fetch != 0 {
+        if self.data_faces_to_reserve != [0, 0] {
+            self.data_faces_to_reserve = [0, 0];
+            Some(Ok(FaceDataReserve::ReserveDataFaces(
+                self.data_faces_to_reserve[0],
+                self.data_faces_to_reserve[1],
+            )))
+        } else if self.p_settings.to_fetch != 0 {
             Some(self.fetch_point())
         } else if self.f_settings.to_fetch != 0 {
             Some(self.fetch_face())
@@ -499,7 +508,6 @@ where
 
 //------------------------------------------------------------------------------
 
-//@todo calls to reserve
 fn read_file_header<R>(read: &mut R) -> IOResult<FileHeader>
 where
     R: Read,
