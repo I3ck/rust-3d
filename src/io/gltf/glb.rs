@@ -156,11 +156,8 @@ where
     fn fetch_data(&mut self) -> IOResult<bool> {
         if let (Some(current_node), Some(mesh)) = (
             self.current_node(),
-            self.current_node()
-                .and_then(|x| x.mesh_or_children.mesh().clone()),
+            self.current_node().and_then(|x| x.mesh_or_children.mesh()),
         ) {
-            //@todo can avoid clones?
-            //@todo avoid clone
             if mesh.primitives.is_empty() {
                 return Ok(false);
             }
@@ -225,12 +222,7 @@ where
 
     #[inline(always)]
     fn next_primitive(&mut self) -> IOResult<bool> {
-        if let Some(mesh) = self
-            .current_node()
-            .and_then(|x| x.mesh_or_children.mesh())
-            .clone()
-        {
-            //@todo avoid clone
+        if let Some(mesh) = self.current_node().and_then(|x| x.mesh_or_children.mesh()) {
             let n_primitives = mesh.primitives.len();
             if self.current_primitive + 1 < n_primitives {
                 self.current_primitive += 1;
