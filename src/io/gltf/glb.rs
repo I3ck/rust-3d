@@ -98,9 +98,9 @@ where
         let pos_chunk_json = read.seek(SeekFrom::Current(0))?;
         let chunk_json =
             read_chunk(&mut read, pos_chunk_json).and_then(|x| JSONChunk::try_from(x))?;
-        let pos_chunk_bin = read.seek(SeekFrom::Current(0))? + 8; // +8 since two u32 are part of the header //@todo implement better
-        let chunk_bin =
-            read_chunk(&mut read, pos_chunk_bin).and_then(|x| BinChunkHeader::try_from(x))?;
+        let pos_chunk_bin = read.seek(SeekFrom::Current(0))? + 8; // +8 since two u32 are part of the header
+        let chunk_bin = read_chunk_header(&mut read, pos_chunk_bin)
+            .and_then(|x| BinChunkHeader::try_from(x))?;
 
         let json = parse_json(&chunk_json)?;
 

@@ -672,15 +672,15 @@ pub struct BinChunkHeader {
     pub length: u32,
 }
 
-impl TryFrom<Chunk> for BinChunkHeader {
+impl TryFrom<ChunkHeader> for BinChunkHeader {
     type Error = IOError;
-    fn try_from(x: Chunk) -> IOResult<Self> {
-        if x.header.ctype != TYPE_BIN {
+    fn try_from(x: ChunkHeader) -> IOResult<Self> {
+        if x.ctype != TYPE_BIN {
             Err(IOError::GLBBinChunk)
         } else {
             Ok(Self {
-                pos: x.header.pos,
-                length: x.header.length,
+                pos: x.pos,
+                length: x.length,
             })
         }
     }
