@@ -24,32 +24,33 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //------------------------------------------------------------------------------
 
-use std::convert::TryFrom;
+use std::{collections::HashSet, convert::TryFrom};
 
 use super::super::types::*;
-
-use std::collections::HashSet;
 
 use crate::*;
 
 //------------------------------------------------------------------------------
 
-//@todo this currently ignores the scene structure and will just display all nodes
 #[derive(Debug)]
 pub struct Root {
     pub root_nodes: Vec<Node>,
 }
 
 impl Root {
-    pub fn new(val: &serde_json::Value) -> Self {
+    pub fn new(val: &serde_json::Value) -> IOResult<Self> {
         let mut child_nodes = HashSet::new();
-        let nodes = val.get("nodes").and_then(|x| x.as_array()).unwrap(); //@todo unwrap
+        let nodes = val
+            .get("nodes")
+            .and_then(|x| x.as_array())
+            .ok_or(IOError::GLBJSONNodes)?;
 
         for node in nodes {
             if let Some(children) = node.get("children").and_then(|x| x.as_array()) {
                 for child in children {
-                    let id = child.as_u64().unwrap(); //@todo unwrap
-                    child_nodes.insert(id);
+                    if let Some(id) = child.as_u64() {
+                        child_nodes.insert(id);
+                    }
                 }
             }
         }
@@ -57,11 +58,13 @@ impl Root {
         let mut root_nodes = Vec::new();
         for (id, node) in nodes.iter().enumerate() {
             if !child_nodes.contains(&(id as u64)) {
-                root_nodes.push(Node::new(val, node, &None))
+                if let Some(n) = Node::new(val, node, &None) {
+                    root_nodes.push(n)
+                }
             }
         }
 
-        Self { root_nodes }
+        Ok(Self { root_nodes })
     }
 }
 
@@ -213,7 +216,7 @@ impl Node {
         root: &serde_json::Value,
         val: &serde_json::Value,
         parent_transformation: &Option<Matrix4>,
-    ) -> Self {
+    ) -> Option<Self> {
         let transformations = Transformations::new(val);
 
         let transformation = match (parent_transformation, transformations.transformation()) {
@@ -227,19 +230,22 @@ impl Node {
         let mesh = Self::read_mesh(root, val);
 
         // Simplification, just treat the Mesh as another child node
-        if !children.is_empty() || mesh.is_none() {
-            if let Some(m) = mesh {
-                children.push(Self::new_from_mesh(m, transformation.clone()))
-            }
-
-            Self {
+        match (mesh, children.is_empty()) {
+            (None, true) => None,
+            (None, false) => Some(Self {
                 transformation,
                 mesh_or_children: MeshOrChildren::Children(children),
-            }
-        } else {
-            Self {
+            }),
+            (Some(m), true) => Some(Self {
                 transformation,
-                mesh_or_children: MeshOrChildren::Mesh(mesh.unwrap()), //unwrap safe due to is_none check above (@todo consider rewrite)
+                mesh_or_children: MeshOrChildren::Mesh(m),
+            }),
+            (Some(m), false) => {
+                children.push(Self::new_from_mesh(m, transformation.clone()));
+                Some(Self {
+                    transformation,
+                    mesh_or_children: MeshOrChildren::Children(children),
+                })
             }
         }
     }
@@ -261,13 +267,13 @@ impl Node {
         let mut result = Vec::new();
         if let Some(children) = val.get("children").and_then(|x| x.as_array()) {
             for child in children {
-                let id = child.as_u64().unwrap(); //@todo unwrap
-                result.push(Node::new(
-                    root,
-                    nodes.get(id as usize).unwrap(),
-                    parent_transformation,
-                ))
-                //@todo unwrap
+                if let Some(id) = child.as_u64() {
+                    if let Some(n) =
+                        Node::new(root, nodes.get(id as usize).unwrap(), parent_transformation)
+                    {
+                        result.push(n)
+                    }
+                }
             }
         }
 
@@ -322,24 +328,10 @@ pub struct Primitive {
 }
 
 impl Primitive {
-    //@todo ensure mode == 4 for now
-    /*
-        The type of primitives to render. All valid values correspond to WebGL enums.
-
-            Type: integer
-            Required: No, default: 4
-            Allowed values:
-                0 POINTS
-                1 LINES
-                2 LINE_LOOP
-                3 LINE_STRIP
-                4 TRIANGLES
-                5 TRIANGLE_STRIP
-                6 TRIANGLE_FAN
-    */
     pub fn new(root: &serde_json::Value, val: &serde_json::Value) -> IOResult<Self> {
         let mode = val.get("mode").and_then(|x| x.as_u64()).unwrap_or(4);
         if mode == 4 {
+            // TRIANGLES
             let accessors = root
                 .get("accessors")
                 .and_then(|x| x.as_array())
@@ -555,7 +547,7 @@ impl PosAccessor {
 
 #[derive(Debug, Clone)]
 pub struct BufferView {
-    pub buffer: u64, //@todo later also hold the buffer?
+    pub buffer: u64,
     pub byte_length: u64,
     pub byte_offset: u64,
     pub byte_stride: Option<u64>,
@@ -676,7 +668,7 @@ impl TryFrom<Chunk> for BinChunk {
 //------------------------------------------------------------------------------
 
 const VALID_MAGIC: u32 = 0x46546C67; //"glTF"
-const VALID_VERSION: u32 = 2; // @todo also supporting < 2 out of the box?
+const VALID_VERSION: u32 = 2;
 const TYPE_JSON: u32 = 0x4E4F534A; // "JSON"
 const TYPE_BIN: u32 = 0x004E4942; // "BIN"
 

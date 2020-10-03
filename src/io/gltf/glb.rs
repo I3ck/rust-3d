@@ -105,7 +105,7 @@ where
 
         let json = parse_json(&chunk_json)?;
 
-        let root = Root::new(&json);
+        let root = Root::new(&json)?;
 
         let mut result = Self {
             header,
