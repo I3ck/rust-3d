@@ -667,12 +667,12 @@ impl TryFrom<Chunk> for JSONChunk {
 //------------------------------------------------------------------------------
 
 #[derive(Debug)]
-pub struct BinChunk {
+pub struct BinChunkHeader {
     pub pos: u64,
     pub length: u32,
 }
 
-impl TryFrom<Chunk> for BinChunk {
+impl TryFrom<Chunk> for BinChunkHeader {
     type Error = IOError;
     fn try_from(x: Chunk) -> IOResult<Self> {
         if x.header.ctype != TYPE_BIN {

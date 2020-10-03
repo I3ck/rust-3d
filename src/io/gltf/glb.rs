@@ -79,9 +79,7 @@ where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: Read + Seek,
 {
-    #[allow(dead_code)] //@todo remove / will be used later
-    header: FileHeader,
-    chunk: BinChunk, //@todo later don't hold in memory
+    chunk: BinChunkHeader,
     root: Root,
     is_done: bool,
     node_trace: Vec<usize>,
@@ -96,19 +94,19 @@ where
     R: Read + Seek,
 {
     pub fn new(mut read: R) -> IOResult<Self> {
-        let header = read_file_header(&mut read)?;
+        let _header = read_file_header(&mut read)?;
         let pos_chunk_json = read.seek(SeekFrom::Current(0))?;
         let chunk_json =
             read_chunk(&mut read, pos_chunk_json).and_then(|x| JSONChunk::try_from(x))?;
         let pos_chunk_bin = read.seek(SeekFrom::Current(0))? + 8; // +8 since two u32 are part of the header //@todo implement better
-        let chunk_bin = read_chunk(&mut read, pos_chunk_bin).and_then(|x| BinChunk::try_from(x))?; //@todo optional
+        let chunk_bin =
+            read_chunk(&mut read, pos_chunk_bin).and_then(|x| BinChunkHeader::try_from(x))?;
 
         let json = parse_json(&chunk_json)?;
 
         let root = Root::new(&json)?;
 
         let mut result = Self {
-            header,
             root,
             chunk: chunk_bin,
             is_done: false,
@@ -248,7 +246,6 @@ where
     #[inline(always)]
     fn decended_left(&self, mut trace: Vec<usize>) -> Vec<usize> {
         if let Some(node) = self.node_of_trace(&trace) {
-            //@todo should always be true actually
             if !node
                 .mesh_or_children
                 .children()
@@ -266,7 +263,6 @@ where
     }
 
     #[inline(always)]
-    //@todo currently won't ever visit meshes of nodes with children
     fn trace_for_next_node(&self, mut trace: Vec<usize>) -> Option<Vec<usize>> {
         if trace.is_empty() {
             None
@@ -424,7 +420,6 @@ where
                     skip_bytes(&mut self.read, self.f_settings.bytes_to_skip)?
                 }
 
-                //@todo this will yield some invalid faces
                 Ok(FaceDataReserve::Face([
                     vid1 as usize + o,
                     vid2 as usize + o,
@@ -439,7 +434,7 @@ where
                 if self.f_settings.to_fetch != 0 && self.f_settings.bytes_to_skip != 0 {
                     skip_bytes(&mut self.read, self.f_settings.bytes_to_skip)?
                 }
-                //@todo this will yield some invalid faces
+
                 Ok(FaceDataReserve::Face([
                     vid1 as usize + o,
                     vid2 as usize + o,
@@ -456,7 +451,6 @@ where
                     skip_bytes(&mut self.read, self.f_settings.bytes_to_skip)?
                 }
 
-                //@todo this will yield some invalid faces
                 Ok(FaceDataReserve::Face([
                     vid1 as usize + o,
                     vid2 as usize + o,
@@ -505,10 +499,7 @@ where
 
 //------------------------------------------------------------------------------
 
-//@todo the first buffer must use glb data blob, others could point to external sources
-//@todo assume for now, that only the first type is used
 //@todo calls to reserve
-//@todo proper errors instead of only Option
 fn read_file_header<R>(read: &mut R) -> IOResult<FileHeader>
 where
     R: Read,
