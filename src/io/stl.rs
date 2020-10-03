@@ -69,6 +69,7 @@ where
 
 //------------------------------------------------------------------------------
 
+//@todo implement binary write
 /// Saves an IsMesh3D in the ASCII .stl file format
 pub fn save_stl_ascii<M, P, W>(write: &mut W, mesh: &M) -> IOResult<()>
 where

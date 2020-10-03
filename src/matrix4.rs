@@ -35,6 +35,37 @@ pub struct Matrix4 {
 }
 
 impl Matrix4 {
+    /// Creates a transposed matrix
+    pub fn transposed(&self) -> Self {
+        Self {
+            data: [
+                [
+                    self.data[0][0],
+                    self.data[1][0],
+                    self.data[2][0],
+                    self.data[3][0],
+                ],
+                [
+                    self.data[0][1],
+                    self.data[1][1],
+                    self.data[2][1],
+                    self.data[3][1],
+                ],
+                [
+                    self.data[0][2],
+                    self.data[1][2],
+                    self.data[2][2],
+                    self.data[3][2],
+                ],
+                [
+                    self.data[0][3],
+                    self.data[1][3],
+                    self.data[2][3],
+                    self.data[3][3],
+                ],
+            ],
+        }
+    }
     /// Creates a new identity matrix
     pub fn identity() -> Matrix4 {
         Matrix4 {
@@ -217,6 +248,34 @@ impl Matrix4 {
         result.data[3][3] = 1.0;
         Ok(result)
     }
+    //@todo type for Quaternion
+    pub fn from_unit_quaternion(q: &[f64; 4]) -> Matrix4 {
+        let mut m = Matrix4::default();
+        let sqw = q[3] * q[3];
+        let sqx = q[0] * q[0];
+        let sqy = q[1] * q[1];
+        let sqz = q[2] * q[2];
+
+        m.data[0][0] = sqx - sqy - sqz + sqw;
+        m.data[1][1] = -sqx + sqy - sqz + sqw;
+        m.data[2][2] = -sqx - sqy + sqz + sqw;
+
+        let tmp1 = q[0] * q[1];
+        let tmp2 = q[2] * q[3];
+        m.data[1][0] = 2.0 * (tmp1 + tmp2);
+        m.data[0][1] = 2.0 * (tmp1 - tmp2);
+
+        let tmp1 = q[0] * q[2];
+        let tmp2 = q[1] * q[3];
+        m.data[2][0] = 2.0 * (tmp1 - tmp2);
+        m.data[0][2] = 2.0 * (tmp1 + tmp2);
+        let tmp1 = q[1] * q[2];
+        let tmp2 = q[0] * q[3];
+        m.data[2][1] = 2.0 * (tmp1 + tmp2);
+        m.data[1][2] = 2.0 * (tmp1 - tmp2);
+
+        m
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -224,6 +283,19 @@ impl Matrix4 {
 impl Default for Matrix4 {
     fn default() -> Self {
         Self::identity()
+    }
+}
+
+impl From<[f64; 16]> for Matrix4 {
+    fn from(m: [f64; 16]) -> Self {
+        Self {
+            data: [
+                [m[0], m[1], m[2], m[3]],
+                [m[4], m[5], m[6], m[7]],
+                [m[8], m[9], m[10], m[11]],
+                [m[12], m[13], m[14], m[15]],
+            ],
+        }
     }
 }
 

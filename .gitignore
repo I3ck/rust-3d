@@ -5,6 +5,7 @@ Cargo.lock
 extrusionMesh.ply
 extrusionMesh.stl
 .idea/
+tmp/
 
 
 *.tmp
