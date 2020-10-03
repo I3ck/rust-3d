@@ -39,12 +39,34 @@ pub struct Root {
 
 impl Root {
     pub fn new(val: &serde_json::Value) -> IOResult<Self> {
-        let mut child_nodes = HashSet::new();
         let nodes = val
             .get("nodes")
             .and_then(|x| x.as_array())
             .ok_or(IOError::GLBJSONNodes)?;
 
+        let meshes = val
+            .get("meshes")
+            .and_then(|x| x.as_array())
+            .ok_or(IOError::GLBJSONAccessors)?;
+
+        let accessors = val
+            .get("accessors")
+            .and_then(|x| x.as_array())
+            .ok_or(IOError::GLBJSONAccessors)?;
+
+        let buffer_views = val
+            .get("bufferViews")
+            .and_then(|x| x.as_array())
+            .ok_or(IOError::GLBJSONBufferViews)?;
+
+        let arrays = JSONArrays {
+            nodes,
+            meshes,
+            accessors,
+            buffer_views,
+        };
+
+        let mut child_nodes = HashSet::new();
         for node in nodes {
             if let Some(children) = node.get("children").and_then(|x| x.as_array()) {
                 for child in children {
@@ -58,7 +80,7 @@ impl Root {
         let mut root_nodes = Vec::new();
         for (id, node) in nodes.iter().enumerate() {
             if !child_nodes.contains(&(id as u64)) {
-                if let Some(n) = Node::new(val, node, &None) {
+                if let Some(n) = Node::new(&arrays, node, &None) {
                     root_nodes.push(n)
                 }
             }
@@ -66,6 +88,15 @@ impl Root {
 
         Ok(Self { root_nodes })
     }
+}
+
+//------------------------------------------------------------------------------
+
+pub struct JSONArrays<'a> {
+    pub nodes: &'a Vec<serde_json::Value>,
+    pub meshes: &'a Vec<serde_json::Value>,
+    pub accessors: &'a Vec<serde_json::Value>,
+    pub buffer_views: &'a Vec<serde_json::Value>,
 }
 
 //------------------------------------------------------------------------------
@@ -213,7 +244,7 @@ pub struct Node {
 
 impl Node {
     pub fn new(
-        root: &serde_json::Value,
+        arrays: &JSONArrays,
         val: &serde_json::Value,
         parent_transformation: &Option<Matrix4>,
     ) -> Option<Self> {
@@ -226,8 +257,8 @@ impl Node {
             (Some(parent), Some(ref this)) => Some(parent * this),
         };
 
-        let mut children = Self::read_children(root, val, &transformation);
-        let mesh = Self::read_mesh(root, val);
+        let mut children = Self::read_children(arrays, val, &transformation);
+        let mesh = Self::read_mesh(arrays, val);
 
         // Simplification, just treat the Mesh as another child node
         match (mesh, children.is_empty()) {
@@ -259,18 +290,19 @@ impl Node {
 
     //@todo this could cause endless recursion in case the file is malformed
     fn read_children(
-        root: &serde_json::Value,
+        arrays: &JSONArrays,
         val: &serde_json::Value,
         parent_transformation: &Option<Matrix4>,
     ) -> Vec<Node> {
-        let nodes = root.get("nodes").and_then(|x| x.as_array()).unwrap(); //@todo unwrap
         let mut result = Vec::new();
         if let Some(children) = val.get("children").and_then(|x| x.as_array()) {
             for child in children {
                 if let Some(id) = child.as_u64() {
-                    if let Some(n) =
-                        Node::new(root, nodes.get(id as usize).unwrap(), parent_transformation)
-                    {
+                    if let Some(n) = Node::new(
+                        arrays,
+                        arrays.nodes.get(id as usize).unwrap(),
+                        parent_transformation,
+                    ) {
                         result.push(n)
                     }
                 }
@@ -280,11 +312,12 @@ impl Node {
         result
     }
 
-    fn read_mesh(root: &serde_json::Value, val: &serde_json::Value) -> Option<Mesh> {
+    fn read_mesh(arrays: &JSONArrays, val: &serde_json::Value) -> Option<Mesh> {
         if let Some(mesh_id) = val.get("mesh").and_then(|x| x.as_u64()) {
-            root.get("meshes")
-                .and_then(|x| x.get(mesh_id as usize))
-                .and_then(|x| Mesh::new(root, x).ok()) //@todo don't use ok(), proper error handling
+            arrays
+                .meshes
+                .get(mesh_id as usize)
+                .and_then(|x| Mesh::new(arrays, x).ok()) //@todo don't use ok(), proper error handling
         } else {
             None
         }
@@ -299,7 +332,7 @@ pub struct Mesh {
 }
 
 impl Mesh {
-    pub fn new(root: &serde_json::Value, val: &serde_json::Value) -> IOResult<Self> {
+    pub fn new(arrays: &JSONArrays, val: &serde_json::Value) -> IOResult<Self> {
         let primitives_array = val
             .get("primitives")
             .and_then(|x| x.as_array())
@@ -308,7 +341,7 @@ impl Mesh {
         let mut primitives = Vec::new();
         for primitive_val in primitives_array.iter() {
             // Ignoring invalid primitives
-            match Primitive::new(root, primitive_val) {
+            match Primitive::new(arrays, primitive_val) {
                 Ok(x) => primitives.push(x),
                 Err(_) => (),
             };
@@ -328,15 +361,10 @@ pub struct Primitive {
 }
 
 impl Primitive {
-    pub fn new(root: &serde_json::Value, val: &serde_json::Value) -> IOResult<Self> {
+    pub fn new(arrays: &JSONArrays, val: &serde_json::Value) -> IOResult<Self> {
         let mode = val.get("mode").and_then(|x| x.as_u64()).unwrap_or(4);
         if mode == 4 {
             // TRIANGLES
-            let accessors = root
-                .get("accessors")
-                .and_then(|x| x.as_array())
-                .map(|x| x.clone())
-                .ok_or(IOError::GLBJSONAccessors)?;
             let attributes = val.get("attributes").ok_or(IOError::GLBJSONAttributes)?;
             let positions_id = attributes
                 .get("POSITION")
@@ -346,10 +374,10 @@ impl Primitive {
                 .get("indices")
                 .and_then(|x| x.as_u64())
                 .ok_or(IOError::GLBJSONIndices)?;
-            let positions = Accessor::new(root, &accessors[positions_id as usize])
+            let positions = Accessor::new(arrays, &arrays.accessors[positions_id as usize])
                 .and_then(|x| PosAccessor::new(x))
                 .unwrap(); //@todo unwrap
-            let indices = Accessor::new(root, &accessors[indices_id as usize])
+            let indices = Accessor::new(arrays, &arrays.accessors[indices_id as usize])
                 .and_then(|x| IndexAccessor::new(x))
                 .unwrap(); //@todo unwrap
             Ok(Self { positions, indices })
@@ -453,12 +481,7 @@ pub struct Accessor {
 }
 
 impl Accessor {
-    pub fn new(root: &serde_json::Value, val: &serde_json::Value) -> IOResult<Self> {
-        let buffer_views = root
-            .get("bufferViews")
-            .and_then(|x| x.as_array())
-            .map(|x| x.clone())
-            .ok_or(IOError::GLBJSONBufferViews)?;
+    pub fn new(arrays: &JSONArrays, val: &serde_json::Value) -> IOResult<Self> {
         let buffer_view_id = val
             .get("bufferView")
             .and_then(|x| x.as_u64())
@@ -479,7 +502,7 @@ impl Accessor {
             .ok_or(IOError::GLBJSONAccessorType)
             .and_then(|x| AccessorType::new(x))?;
 
-        let buffer_view = BufferView::new(&buffer_views[buffer_view_id as usize])?;
+        let buffer_view = BufferView::new(&arrays.buffer_views[buffer_view_id as usize])?;
 
         Ok(Self {
             buffer_view,
