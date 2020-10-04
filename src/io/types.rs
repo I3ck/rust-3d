@@ -88,33 +88,37 @@ pub enum IOError {
     EndLoop(usize),
     InvalidJSON,
     EstimateDelimiter,
-    GLBHeader,
-    GLBVersion,
-    GLBJSONChunk,
-    GLBBinChunk,
-    GLBJSONPrimitives,
-    GLBJSONAttributes,
-    GLBJSONPosition,
-    GLBJSONIndices,
-    GLBPrimitiveMode4Only,
-    GLBComponentType,
-    GLBIndexComponentType,
-    GLBPosComponentType,
-    GLBAccessorType,
-    GLBIndexAccessorType,
-    GLBPosAccessorType,
-    GLBJSONBufferView,
-    GLBJSONComponentType,
-    GLBJSONAccessorType,
-    GLBJSONCount,
-    GLBJSONBuffer,
-    GLBJSONByteLength,
-    GLBJSONNodes,
-    GLBJSONAccessors,
-    GLBJSONBufferViews,
-    GLBJSONMeshes,
-    GLBJSONMesh,
-    GLBStride,
+    Glb(GlbError),
+}
+
+pub enum GlbError {
+    Header,
+    Version,
+    JSONChunk,
+    BinChunk,
+    JSONPrimitives,
+    JSONAttributes,
+    JSONPosition,
+    JSONIndices,
+    PrimitiveMode4Only,
+    ComponentType,
+    IndexComponentType,
+    PosComponentType,
+    AccessorType,
+    IndexAccessorType,
+    PosAccessorType,
+    JSONBufferView,
+    JSONComponentType,
+    JSONAccessorType,
+    JSONCount,
+    JSONBuffer,
+    JSONByteLength,
+    JSONNodes,
+    JSONAccessors,
+    JSONBufferViews,
+    JSONMeshes,
+    JSONMesh,
+    Stride,
 }
 
 pub type IOResult<T> = Result<T, IOError>; //@todo rename
@@ -179,50 +183,7 @@ impl std::fmt::Debug for IOError {
             Self::EndLoop(x) => write!(f, "Unable to parse endloop on line {}", x),
             Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
             Self::InvalidJSON => write!(f, "Unable to parse JSON format"),
-            Self::GLBHeader => write!(f, "Invalid header of .glb file"),
-            Self::GLBVersion => write!(f, "Version of .glb file not supported"),
-            Self::GLBJSONChunk => write!(f, "JSON chunk of .glb file is invalid"),
-            Self::GLBBinChunk => write!(f, "Binary chunk of .glb file is invalid"),
-            Self::GLBJSONPrimitives => {
-                write!(f, "JSON primitives of .glb file could not be parsed")
-            }
-            Self::GLBJSONAttributes => {
-                write!(f, "JSON attributes of .glb file could not be parsed")
-            }
-            Self::GLBJSONPosition => write!(f, "JSON positions of .glb file could not be parsed"),
-            Self::GLBJSONIndices => write!(f, "JSON indices of .glb file could not be parsed"),
-            Self::GLBPrimitiveMode4Only => write!(
-                f,
-                "Only supporting primitive mode 4 of shapes (triangles) in .glb"
-            ),
-            Self::GLBComponentType => write!(f, "Invalid component type in .glb"),
-            Self::GLBIndexComponentType => write!(f, "Invalid index component type in .glb"),
-            Self::GLBPosComponentType => write!(f, "Invalid position component type in .glb"),
-            Self::GLBAccessorType => write!(f, "Invalid accessor type in .glb"),
-            Self::GLBIndexAccessorType => write!(f, "Invalid index accessor type in .glb"),
-            Self::GLBPosAccessorType => write!(f, "Invalid position accessor type in .glb"),
-            Self::GLBJSONBufferView => {
-                write!(f, "JSON bufferView of .glb file could not be parsed")
-            }
-            Self::GLBJSONComponentType => {
-                write!(f, "JSON componentType of .glb file could not be parsed")
-            }
-            Self::GLBJSONAccessorType => {
-                write!(f, "JSON accessor type of .glb file could not be parsed")
-            }
-            Self::GLBJSONCount => write!(f, "JSON count of .glb file could not be parsed"),
-            Self::GLBJSONBuffer => write!(f, "JSON buffer of .glb file could not be parsed"),
-            Self::GLBJSONByteLength => {
-                write!(f, "JSON byteLength of .glb file could not be parsed")
-            }
-            Self::GLBJSONNodes => write!(f, "JSON nodes of .glb file could not be parsed"),
-            Self::GLBJSONAccessors => write!(f, "JSON accessors of .glb file could not be parsed"),
-            Self::GLBJSONBufferViews => {
-                write!(f, "JSON bufferViews of .glb file could not be parsed")
-            }
-            Self::GLBJSONMeshes => write!(f, "JSON meshes of .glb file could not be parsed"),
-            Self::GLBJSONMesh => write!(f, "JSON mesh of .glb file could not be parsed"),
-            Self::GLBStride => write!(f, "Invalid stride value in .glb file"),
+            Self::Glb(x) => write!(f, "{:?}", x),
         }
     }
 }
@@ -243,5 +204,54 @@ impl From<serde_json::error::Error> for IOError {
     fn from(_error: serde_json::error::Error) -> Self {
         //@todo use more information
         IOError::InvalidJSON
+    }
+}
+
+//------------------------------------------------------------------------------
+
+impl std::fmt::Debug for GlbError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::Header => write!(f, "Invalid header of .glb file"),
+            Self::Version => write!(f, "Version of .glb file not supported"),
+            Self::JSONChunk => write!(f, "JSON chunk of .glb file is invalid"),
+            Self::BinChunk => write!(f, "Binary chunk of .glb file is invalid"),
+            Self::JSONPrimitives => write!(f, "JSON primitives of .glb file could not be parsed"),
+            Self::JSONAttributes => write!(f, "JSON attributes of .glb file could not be parsed"),
+            Self::JSONPosition => write!(f, "JSON positions of .glb file could not be parsed"),
+            Self::JSONIndices => write!(f, "JSON indices of .glb file could not be parsed"),
+            Self::PrimitiveMode4Only => write!(
+                f,
+                "Only supporting primitive mode 4 of shapes (triangles) in .glb"
+            ),
+            Self::ComponentType => write!(f, "Invalid component type in .glb"),
+            Self::IndexComponentType => write!(f, "Invalid index component type in .glb"),
+            Self::PosComponentType => write!(f, "Invalid position component type in .glb"),
+            Self::AccessorType => write!(f, "Invalid accessor type in .glb"),
+            Self::IndexAccessorType => write!(f, "Invalid index accessor type in .glb"),
+            Self::PosAccessorType => write!(f, "Invalid position accessor type in .glb"),
+            Self::JSONBufferView => write!(f, "JSON bufferView of .glb file could not be parsed"),
+            Self::JSONComponentType => {
+                write!(f, "JSON componentType of .glb file could not be parsed")
+            }
+            Self::JSONAccessorType => {
+                write!(f, "JSON accessor type of .glb file could not be parsed")
+            }
+            Self::JSONCount => write!(f, "JSON count of .glb file could not be parsed"),
+            Self::JSONBuffer => write!(f, "JSON buffer of .glb file could not be parsed"),
+            Self::JSONByteLength => write!(f, "JSON byteLength of .glb file could not be parsed"),
+            Self::JSONNodes => write!(f, "JSON nodes of .glb file could not be parsed"),
+            Self::JSONAccessors => write!(f, "JSON accessors of .glb file could not be parsed"),
+            Self::JSONBufferViews => write!(f, "JSON bufferViews of .glb file could not be parsed"),
+            Self::JSONMeshes => write!(f, "JSON meshes of .glb file could not be parsed"),
+            Self::JSONMesh => write!(f, "JSON mesh of .glb file could not be parsed"),
+            Self::Stride => write!(f, "Invalid stride value in .glb file"),
+        }
+    }
+}
+
+impl std::fmt::Display for GlbError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self)
     }
 }

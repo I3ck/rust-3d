@@ -173,7 +173,7 @@ where
                 bytes_to_skip: if let Some(stride) = bw_pos.byte_stride {
                     let size = 3 * 4;
                     if stride < size {
-                        return Err(IOError::GLBStride);
+                        return Err(IOError::Glb(GlbError::Stride));
                     }
                     (stride - size) as usize
                 } else {
@@ -196,7 +196,7 @@ where
                             IndexComponentType::U32 => 3 * 4, // 3 * 4bytes
                         };
                         if stride < size {
-                            return Err(IOError::GLBStride);
+                            return Err(IOError::Glb(GlbError::Stride));
                         }
                         (stride - size) as usize
                     } else {

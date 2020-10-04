@@ -42,22 +42,22 @@ impl Root {
         let nodes = val
             .get("nodes")
             .and_then(|x| x.as_array())
-            .ok_or(IOError::GLBJSONNodes)?;
+            .ok_or(IOError::Glb(GlbError::JSONNodes))?;
 
         let meshes = val
             .get("meshes")
             .and_then(|x| x.as_array())
-            .ok_or(IOError::GLBJSONAccessors)?;
+            .ok_or(IOError::Glb(GlbError::JSONAccessors))?;
 
         let accessors = val
             .get("accessors")
             .and_then(|x| x.as_array())
-            .ok_or(IOError::GLBJSONAccessors)?;
+            .ok_or(IOError::Glb(GlbError::JSONAccessors))?;
 
         let buffer_views = val
             .get("bufferViews")
             .and_then(|x| x.as_array())
-            .ok_or(IOError::GLBJSONBufferViews)?;
+            .ok_or(IOError::Glb(GlbError::JSONBufferViews))?;
 
         let arrays = JSONArrays {
             nodes,
@@ -336,7 +336,7 @@ impl Mesh {
         let primitives_array = val
             .get("primitives")
             .and_then(|x| x.as_array())
-            .ok_or(IOError::GLBJSONPrimitives)?;
+            .ok_or(IOError::Glb(GlbError::JSONPrimitives))?;
 
         let mut primitives = Vec::new();
         for primitive_val in primitives_array.iter() {
@@ -365,11 +365,13 @@ impl Primitive {
         let mode = val.get("mode").and_then(|x| x.as_u64()).unwrap_or(4);
         if mode == 4 {
             // TRIANGLES
-            let attributes = val.get("attributes").ok_or(IOError::GLBJSONAttributes)?;
+            let attributes = val
+                .get("attributes")
+                .ok_or(IOError::Glb(GlbError::JSONAttributes))?;
             let positions_id = attributes
                 .get("POSITION")
                 .and_then(|x| x.as_u64())
-                .ok_or(IOError::GLBJSONPosition)?;
+                .ok_or(IOError::Glb(GlbError::JSONPosition))?;
             let indices_id = val.get("indices").and_then(|x| x.as_u64());
             let positions = Accessor::new(arrays, &arrays.accessors[positions_id as usize])
                 .and_then(|x| PosAccessor::new(x))?;
@@ -379,7 +381,7 @@ impl Primitive {
 
             Ok(Self { positions, indices })
         } else {
-            Err(IOError::GLBPrimitiveMode4Only)
+            Err(IOError::Glb(GlbError::PrimitiveMode4Only))
         }
     }
 }
@@ -400,7 +402,7 @@ impl IndexComponentType {
             ComponentType::U16 => Ok(Self::U16),
             ComponentType::U32 => Ok(Self::U32),
             ComponentType::I8 | ComponentType::I16 | ComponentType::F32 => {
-                Err(IOError::GLBIndexComponentType)
+                Err(IOError::Glb(GlbError::IndexComponentType))
             }
         }
     }
@@ -433,7 +435,7 @@ impl ComponentType {
             5123 => Ok(Self::U16),
             5125 => Ok(Self::U32),
             5126 => Ok(Self::F32),
-            _ => Err(IOError::GLBComponentType),
+            _ => Err(IOError::Glb(GlbError::ComponentType)),
         }
     }
 }
@@ -461,7 +463,7 @@ impl AccessorType {
             "MAT2" => Ok(Self::Mat2),
             "MAT3" => Ok(Self::Mat3),
             "MAT4" => Ok(Self::Mat4),
-            _ => Err(IOError::GLBAccessorType),
+            _ => Err(IOError::Glb(GlbError::AccessorType)),
         }
     }
 }
@@ -482,21 +484,21 @@ impl Accessor {
         let buffer_view_id = val
             .get("bufferView")
             .and_then(|x| x.as_u64())
-            .ok_or(IOError::GLBJSONBufferView)?;
+            .ok_or(IOError::Glb(GlbError::JSONBufferView))?;
         let byte_offset = val.get("byteOffset").and_then(|x| x.as_u64()).unwrap_or(0);
         let component_type = val
             .get("componentType")
             .and_then(|x| x.as_u64())
-            .ok_or(IOError::GLBJSONComponentType)
+            .ok_or(IOError::Glb(GlbError::JSONComponentType))
             .and_then(|x| ComponentType::new(x))?;
         let count = val
             .get("count")
             .and_then(|x| x.as_u64())
-            .ok_or(IOError::GLBJSONCount)?;
+            .ok_or(IOError::Glb(GlbError::JSONCount))?;
         let accessor_type = val
             .get("type")
             .and_then(|x| x.as_str())
-            .ok_or(IOError::GLBJSONAccessorType)
+            .ok_or(IOError::Glb(GlbError::JSONAccessorType))
             .and_then(|x| AccessorType::new(x))?;
 
         let buffer_view = BufferView::new(&arrays.buffer_views[buffer_view_id as usize])?;
@@ -524,7 +526,7 @@ pub struct IndexAccessor {
 impl IndexAccessor {
     pub fn new(accessor: Accessor) -> IOResult<Self> {
         if accessor.accessor_type != AccessorType::Scalar {
-            return Err(IOError::GLBIndexAccessorType);
+            return Err(IOError::Glb(GlbError::IndexAccessorType));
         }
         let component_type = IndexComponentType::new(accessor.component_type)?;
 
@@ -549,10 +551,10 @@ pub struct PosAccessor {
 impl PosAccessor {
     pub fn new(accessor: Accessor) -> IOResult<Self> {
         if accessor.accessor_type != AccessorType::Vec3 {
-            return Err(IOError::GLBPosAccessorType);
+            return Err(IOError::Glb(GlbError::PosAccessorType));
         }
         if accessor.component_type != ComponentType::F32 {
-            return Err(IOError::GLBPosComponentType);
+            return Err(IOError::Glb(GlbError::PosComponentType));
         }
 
         Ok(Self {
@@ -578,11 +580,11 @@ impl BufferView {
         let buffer = val
             .get("buffer")
             .and_then(|x| x.as_u64())
-            .ok_or(IOError::GLBJSONBuffer)?;
+            .ok_or(IOError::Glb(GlbError::JSONBuffer))?;
         let byte_length = val
             .get("byteLength")
             .and_then(|x| x.as_u64())
-            .ok_or(IOError::GLBJSONByteLength)?;
+            .ok_or(IOError::Glb(GlbError::JSONByteLength))?;
         let byte_offset = val.get("byteOffset").and_then(|x| x.as_u64()).unwrap_or(0);
         let byte_stride = val.get("byteStride").and_then(|x| x.as_u64());
 
@@ -615,9 +617,9 @@ impl TryFrom<RawFileHeader> for FileHeader {
     type Error = IOError;
     fn try_from(x: RawFileHeader) -> IOResult<Self> {
         if x.magic != VALID_MAGIC {
-            Err(IOError::GLBHeader)
+            Err(IOError::Glb(GlbError::Header))
         } else if x.version != VALID_VERSION {
-            Err(IOError::GLBVersion)
+            Err(IOError::Glb(GlbError::Version))
         } else {
             Ok(Self { length: x.length })
         }
@@ -653,7 +655,7 @@ impl TryFrom<Chunk> for JSONChunk {
     type Error = IOError;
     fn try_from(x: Chunk) -> IOResult<Self> {
         if x.header.ctype != TYPE_JSON {
-            Err(IOError::GLBJSONChunk)
+            Err(IOError::Glb(GlbError::JSONChunk))
         } else {
             Ok(Self {
                 length: x.header.length,
@@ -675,7 +677,7 @@ impl TryFrom<ChunkHeader> for BinChunkHeader {
     type Error = IOError;
     fn try_from(x: ChunkHeader) -> IOResult<Self> {
         if x.ctype != TYPE_BIN {
-            Err(IOError::GLBBinChunk)
+            Err(IOError::Glb(GlbError::BinChunk))
         } else {
             Ok(Self {
                 pos: x.pos,
