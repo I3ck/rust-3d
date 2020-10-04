@@ -74,6 +74,7 @@ where
 
 //------------------------------------------------------------------------------
 
+/// Iterator to incrementally load a .glb file
 pub struct GlbIterator<P, R>
 where
     P: IsBuildable3D + IsMatrix4Transformable,
