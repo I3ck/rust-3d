@@ -416,18 +416,21 @@ where
         Ok(FaceDataReserve::Data(p))
     }
 
-    //@todo avoid clone by not using self?
-    fn fetch_face(&mut self, f_settings: FaceIterSettings) -> IOResult<FaceDataReserve<P>> {
-        let o = self.index_offset;
+    fn fetch_face(
+        index_offset: usize,
+        read: &mut R,
+        f_settings: &FaceIterSettings,
+    ) -> IOResult<FaceDataReserve<P>> {
+        let o = index_offset;
 
         match f_settings.component_type {
             IndexComponentType::U8 => {
-                let vid1 = LittleReader::read_u8(&mut self.read)?;
-                let vid2 = LittleReader::read_u8(&mut self.read)?;
-                let vid3 = LittleReader::read_u8(&mut self.read)?;
+                let vid1 = LittleReader::read_u8(read)?;
+                let vid2 = LittleReader::read_u8(read)?;
+                let vid3 = LittleReader::read_u8(read)?;
 
                 if f_settings.to_fetch != 0 && f_settings.bytes_to_skip != 0 {
-                    skip_bytes(&mut self.read, f_settings.bytes_to_skip)?
+                    skip_bytes(read, f_settings.bytes_to_skip)?
                 }
 
                 Ok(FaceDataReserve::Face([
@@ -437,12 +440,12 @@ where
                 ]))
             }
             IndexComponentType::U16 => {
-                let vid1 = LittleReader::read_u16(&mut self.read)?;
-                let vid2 = LittleReader::read_u16(&mut self.read)?;
-                let vid3 = LittleReader::read_u16(&mut self.read)?;
+                let vid1 = LittleReader::read_u16(read)?;
+                let vid2 = LittleReader::read_u16(read)?;
+                let vid3 = LittleReader::read_u16(read)?;
 
                 if f_settings.to_fetch != 0 && f_settings.bytes_to_skip != 0 {
-                    skip_bytes(&mut self.read, f_settings.bytes_to_skip)?
+                    skip_bytes(read, f_settings.bytes_to_skip)?
                 }
 
                 Ok(FaceDataReserve::Face([
@@ -453,12 +456,12 @@ where
             }
 
             IndexComponentType::U32 => {
-                let vid1 = LittleReader::read_u32(&mut self.read)?;
-                let vid2 = LittleReader::read_u32(&mut self.read)?;
-                let vid3 = LittleReader::read_u32(&mut self.read)?;
+                let vid1 = LittleReader::read_u32(read)?;
+                let vid2 = LittleReader::read_u32(read)?;
+                let vid3 = LittleReader::read_u32(read)?;
 
                 if f_settings.to_fetch != 0 && f_settings.bytes_to_skip != 0 {
-                    skip_bytes(&mut self.read, f_settings.bytes_to_skip)?
+                    skip_bytes(read, f_settings.bytes_to_skip)?
                 }
 
                 Ok(FaceDataReserve::Face([
@@ -502,8 +505,11 @@ where
         } else if let Some(f_settings) = &mut self.f_settings {
             if f_settings.to_fetch != 0 {
                 f_settings.to_fetch -= 1;
-                let clone = f_settings.clone(); //@todo avoid clone
-                Some(self.fetch_face(clone))
+                Some(Self::fetch_face(
+                    self.index_offset,
+                    &mut self.read,
+                    f_settings,
+                ))
             } else {
                 None
             }
