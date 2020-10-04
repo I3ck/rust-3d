@@ -182,27 +182,30 @@ where
                 transformation: current_node.transformation.clone(),
             };
 
-            let acc_id = &primitive.indices;
-            let bw_id = &acc_id.buffer_view;
-            let ct = acc_id.component_type;
+            let f_settings = if let Some(acc_id) = &primitive.indices {
+                let bw_id = &acc_id.buffer_view;
+                let ct = acc_id.component_type;
 
-            let f_settings = FaceIterSettings {
-                seek_start: self.chunk.pos + acc_id.byte_offset + bw_id.byte_offset,
-                to_fetch: acc_id.count as usize / 3,
-                bytes_to_skip: if let Some(stride) = bw_id.byte_stride {
-                    let size = match ct {
-                        IndexComponentType::U8 => 3 * 1,  // 3 * 1byte
-                        IndexComponentType::U16 => 3 * 2, // 3 * 2bytes
-                        IndexComponentType::U32 => 3 * 4, // 3 * 4bytes
-                    };
-                    if stride < size {
-                        return Err(IOError::GLBStride);
-                    }
-                    (stride - size) as usize
-                } else {
-                    0
-                },
-                component_type: ct,
+                Some(FaceIterSettings {
+                    seek_start: self.chunk.pos + acc_id.byte_offset + bw_id.byte_offset,
+                    to_fetch: acc_id.count as usize / 3,
+                    bytes_to_skip: if let Some(stride) = bw_id.byte_stride {
+                        let size = match ct {
+                            IndexComponentType::U8 => 3 * 1,  // 3 * 1byte
+                            IndexComponentType::U16 => 3 * 2, // 3 * 2bytes
+                            IndexComponentType::U32 => 3 * 4, // 3 * 4bytes
+                        };
+                        if stride < size {
+                            return Err(IOError::GLBStride);
+                        }
+                        (stride - size) as usize
+                    } else {
+                        0
+                    },
+                    component_type: ct,
+                })
+            } else {
+                None
             };
 
             self.pf_iterator.update(p_settings, f_settings)?;
@@ -330,7 +333,7 @@ struct PointIterSettings {
     pub transformation: Option<Matrix4>,
 }
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 struct FaceIterSettings {
     pub seek_start: u64,
     pub to_fetch: usize,
@@ -345,7 +348,7 @@ where
 {
     read: R,
     p_settings: PointIterSettings,
-    f_settings: FaceIterSettings,
+    f_settings: Option<FaceIterSettings>,
     points_pushed: usize,
     index_offset: usize,
     data_faces_to_reserve: [usize; 2],
@@ -369,11 +372,14 @@ where
         }
     }
 
-    pub fn update(&mut self, p: PointIterSettings, f: FaceIterSettings) -> IOResult<()> {
+    pub fn update(&mut self, p: PointIterSettings, f: Option<FaceIterSettings>) -> IOResult<()> {
         self.p_settings = p;
         self.f_settings = f;
         self.index_offset = self.points_pushed;
-        self.data_faces_to_reserve = [self.p_settings.to_fetch, self.f_settings.to_fetch];
+        self.data_faces_to_reserve = [
+            self.p_settings.to_fetch,
+            self.f_settings.as_ref().map(|x| x.to_fetch).unwrap_or(0),
+        ];
 
         if self.p_settings.to_fetch != 0 {
             self.seek_to_points()
@@ -383,7 +389,8 @@ where
     }
 
     pub fn is_done(&self) -> bool {
-        self.p_settings.to_fetch == 0 && self.f_settings.to_fetch == 0
+        self.p_settings.to_fetch == 0
+            && self.f_settings.as_ref().map(|x| x.to_fetch).unwrap_or(0) == 0
     }
 
     fn fetch_point(&mut self) -> IOResult<FaceDataReserve<P>> {
@@ -409,18 +416,18 @@ where
         Ok(FaceDataReserve::Data(p))
     }
 
-    fn fetch_face(&mut self) -> IOResult<FaceDataReserve<P>> {
-        self.f_settings.to_fetch -= 1;
+    //@todo avoid clone by not using self?
+    fn fetch_face(&mut self, f_settings: FaceIterSettings) -> IOResult<FaceDataReserve<P>> {
         let o = self.index_offset;
 
-        match self.f_settings.component_type {
+        match f_settings.component_type {
             IndexComponentType::U8 => {
                 let vid1 = LittleReader::read_u8(&mut self.read)?;
                 let vid2 = LittleReader::read_u8(&mut self.read)?;
                 let vid3 = LittleReader::read_u8(&mut self.read)?;
 
-                if self.f_settings.to_fetch != 0 && self.f_settings.bytes_to_skip != 0 {
-                    skip_bytes(&mut self.read, self.f_settings.bytes_to_skip)?
+                if f_settings.to_fetch != 0 && f_settings.bytes_to_skip != 0 {
+                    skip_bytes(&mut self.read, f_settings.bytes_to_skip)?
                 }
 
                 Ok(FaceDataReserve::Face([
@@ -434,8 +441,8 @@ where
                 let vid2 = LittleReader::read_u16(&mut self.read)?;
                 let vid3 = LittleReader::read_u16(&mut self.read)?;
 
-                if self.f_settings.to_fetch != 0 && self.f_settings.bytes_to_skip != 0 {
-                    skip_bytes(&mut self.read, self.f_settings.bytes_to_skip)?
+                if f_settings.to_fetch != 0 && f_settings.bytes_to_skip != 0 {
+                    skip_bytes(&mut self.read, f_settings.bytes_to_skip)?
                 }
 
                 Ok(FaceDataReserve::Face([
@@ -450,8 +457,8 @@ where
                 let vid2 = LittleReader::read_u32(&mut self.read)?;
                 let vid3 = LittleReader::read_u32(&mut self.read)?;
 
-                if self.f_settings.to_fetch != 0 && self.f_settings.bytes_to_skip != 0 {
-                    skip_bytes(&mut self.read, self.f_settings.bytes_to_skip)?
+                if f_settings.to_fetch != 0 && f_settings.bytes_to_skip != 0 {
+                    skip_bytes(&mut self.read, f_settings.bytes_to_skip)?
                 }
 
                 Ok(FaceDataReserve::Face([
@@ -470,8 +477,9 @@ where
     }
 
     fn seek_to_faces(&mut self) -> IOResult<()> {
-        self.read
-            .seek(SeekFrom::Start(self.f_settings.seek_start))?;
+        if let Some(f_settings) = &self.f_settings {
+            self.read.seek(SeekFrom::Start(f_settings.seek_start))?;
+        }
         Ok(())
     }
 }
@@ -491,8 +499,14 @@ where
             )))
         } else if self.p_settings.to_fetch != 0 {
             Some(self.fetch_point())
-        } else if self.f_settings.to_fetch != 0 {
-            Some(self.fetch_face())
+        } else if let Some(f_settings) = &mut self.f_settings {
+            if f_settings.to_fetch != 0 {
+                f_settings.to_fetch -= 1;
+                let clone = f_settings.clone(); //@todo avoid clone
+                Some(self.fetch_face(clone))
+            } else {
+                None
+            }
         } else {
             None
         }

@@ -357,7 +357,7 @@ impl Mesh {
 pub struct Primitive {
     //@todo consider storing normal id as well
     pub positions: PosAccessor,
-    pub indices: IndexAccessor,
+    pub indices: Option<IndexAccessor>,
 }
 
 impl Primitive {
@@ -370,14 +370,13 @@ impl Primitive {
                 .get("POSITION")
                 .and_then(|x| x.as_u64())
                 .ok_or(IOError::GLBJSONPosition)?;
-            let indices_id = val
-                .get("indices")
-                .and_then(|x| x.as_u64())
-                .ok_or(IOError::GLBJSONIndices)?;
+            let indices_id = val.get("indices").and_then(|x| x.as_u64());
             let positions = Accessor::new(arrays, &arrays.accessors[positions_id as usize])
                 .and_then(|x| PosAccessor::new(x))?;
-            let indices = Accessor::new(arrays, &arrays.accessors[indices_id as usize])
-                .and_then(|x| IndexAccessor::new(x))?;
+            let indices = indices_id
+                .and_then(|x| Accessor::new(arrays, &arrays.accessors[x as usize]).ok())
+                .and_then(|x| IndexAccessor::new(x).ok());
+
             Ok(Self { positions, indices })
         } else {
             Err(IOError::GLBPrimitiveMode4Only)
