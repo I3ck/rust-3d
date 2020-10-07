@@ -418,7 +418,6 @@ where
 {
     root_read: R,
     folder_path: PathBuf,
-    #[allow(dead_code)]
     uri_readers: HashMap<PathBuf, File>,
     p_settings: PointIterSettings,
     f_settings: Option<FaceIterSettings>,
@@ -584,7 +583,7 @@ where
                         .seek(SeekFrom::Start(f_settings.seek_start))?;
                 }
                 Some(x) => {
-                    let path = self.folder_path.join(x); //@todo unwrap
+                    let path = self.folder_path.join(x);
                     let mut read = if let Some(x) = self.uri_readers.get(&path) {
                         x
                     } else {
