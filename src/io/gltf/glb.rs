@@ -166,6 +166,10 @@ where
 
             let acc_pos = &primitive.positions;
             let bw_pos = &acc_pos.buffer_view;
+            match bw_pos.buffer.uri {
+                None => (),
+                Some(_) => return Err(IOError::Glb(GlbError::BufferUriNotSupported))
+            }
 
             let p_settings = PointIterSettings {
                 seek_start: self.chunk.pos + acc_pos.byte_offset + bw_pos.byte_offset,
