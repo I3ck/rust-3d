@@ -122,6 +122,7 @@ pub enum GltfError {
     JSONMesh,
     Stride,
     BufferUriNotSupported,
+    BufferUriAccess,
 }
 
 pub type IOResult<T> = Result<T, IOError>; //@todo rename
@@ -273,6 +274,7 @@ impl std::fmt::Debug for GltfError {
             Self::BufferUriNotSupported => {
                 write!(f, "Buffers with uri value aren't currently supported")
             }
+            Self::BufferUriAccess => write!(f, "Could not access buffer file defined via uri"),
         }
     }
 }

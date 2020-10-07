@@ -564,7 +564,8 @@ where
                 let mut read = if let Some(x) = self.uri_readers.get(&path) {
                     x
                 } else {
-                    let entry = File::open(path.clone())?;
+                    let entry = File::open(path.clone())
+                        .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?;
                     self.uri_readers.insert(path.clone(), entry);
                     self.uri_readers.get(&path).as_ref().unwrap() //unwrap safe, since just inserted
                 };
@@ -587,7 +588,8 @@ where
                     let mut read = if let Some(x) = self.uri_readers.get(&path) {
                         x
                     } else {
-                        let entry = File::open(path.clone())?;
+                        let entry = File::open(path.clone())
+                            .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?;
                         self.uri_readers.insert(path.clone(), entry);
                         self.uri_readers.get(&path).as_ref().unwrap() //unwrap safe, since just inserted
                     };
