@@ -25,7 +25,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 
 use std::{
+    collections::HashMap,
     convert::TryFrom,
+    fs::File,
     io::{Read, Seek, SeekFrom},
     iter::FusedIterator,
     marker::PhantomData,
@@ -168,10 +170,11 @@ where
             let bw_pos = &acc_pos.buffer_view;
             match bw_pos.buffer.uri {
                 None => (),
-                Some(_) => return Err(IOError::Glb(GlbError::BufferUriNotSupported))
+                Some(_) => return Err(IOError::Glb(GlbError::BufferUriNotSupported)),
             }
 
             let p_settings = PointIterSettings {
+                uri: None,
                 seek_start: self.chunk.pos + acc_pos.byte_offset + bw_pos.byte_offset,
                 to_fetch: acc_pos.count as usize,
                 bytes_to_skip: if let Some(stride) = bw_pos.byte_stride {
@@ -191,6 +194,7 @@ where
                 let ct = acc_id.component_type;
 
                 Some(FaceIterSettings {
+                    uri: None,
                     seek_start: self.chunk.pos + acc_id.byte_offset + bw_id.byte_offset,
                     to_fetch: acc_id.count as usize / 3,
                     bytes_to_skip: if let Some(stride) = bw_id.byte_stride {
@@ -331,6 +335,7 @@ where
 
 #[derive(Default, Debug)]
 struct PointIterSettings {
+    pub uri: Option<String>, //@todo &str?
     pub seek_start: u64,
     pub to_fetch: usize,
     pub bytes_to_skip: usize,
@@ -339,6 +344,7 @@ struct PointIterSettings {
 
 #[derive(Default, Debug, Clone)]
 struct FaceIterSettings {
+    pub uri: Option<String>, //@todo &str?
     pub seek_start: u64,
     pub to_fetch: usize,
     pub bytes_to_skip: usize,
@@ -350,7 +356,9 @@ where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: Read + Seek,
 {
-    read: R,
+    root_read: R,
+    #[allow(dead_code)]
+    uri_readers: HashMap<String, File>,
     p_settings: PointIterSettings,
     f_settings: Option<FaceIterSettings>,
     points_pushed: usize,
@@ -364,9 +372,10 @@ where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: Read + Seek,
 {
-    pub fn new(read: R) -> Self {
+    pub fn new(root_read: R) -> Self {
         Self {
-            read,
+            root_read,
+            uri_readers: HashMap::default(),
             p_settings: Default::default(),
             f_settings: Default::default(),
             points_pushed: 0,
@@ -397,34 +406,39 @@ where
             && self.f_settings.as_ref().map(|x| x.to_fetch).unwrap_or(0) == 0
     }
 
-    fn fetch_point(&mut self) -> IOResult<FaceDataReserve<P>> {
-        self.points_pushed += 1;
-        self.p_settings.to_fetch -= 1;
+    //@todo inline all these
 
-        let x = LittleReader::read_f32(&mut self.read)?;
-        let y = LittleReader::read_f32(&mut self.read)?;
-        let z = LittleReader::read_f32(&mut self.read)?;
+    fn fetch_point<R2>(
+        read: &mut R2,
+        p_settings: &PointIterSettings,
+    ) -> IOResult<FaceDataReserve<P>>
+    where
+        R2: Read,
+    {
+        let x = LittleReader::read_f32(read)?;
+        let y = LittleReader::read_f32(read)?;
+        let z = LittleReader::read_f32(read)?;
 
-        if self.p_settings.to_fetch != 0 && self.p_settings.bytes_to_skip != 0 {
-            skip_bytes(&mut self.read, self.p_settings.bytes_to_skip)?
+        if p_settings.to_fetch != 0 && p_settings.bytes_to_skip != 0 {
+            skip_bytes(read, p_settings.bytes_to_skip)?
         }
 
         let mut p = P::new(x as f64, y as f64, z as f64);
-        if let Some(t) = &self.p_settings.transformation {
+        if let Some(t) = &p_settings.transformation {
             p.transform(t)
         }
 
-        if self.p_settings.to_fetch == 0 {
-            self.seek_to_faces()?
-        }
         Ok(FaceDataReserve::Data(p))
     }
 
-    fn fetch_face(
+    fn fetch_face<R2>(
         index_offset: usize,
-        read: &mut R,
+        read: &mut R2,
         f_settings: &FaceIterSettings,
-    ) -> IOResult<FaceDataReserve<P>> {
+    ) -> IOResult<FaceDataReserve<P>>
+    where
+        R2: Read,
+    {
         let o = index_offset;
 
         match f_settings.component_type {
@@ -478,14 +492,38 @@ where
     }
 
     fn seek_to_points(&mut self) -> IOResult<()> {
-        self.read
-            .seek(SeekFrom::Start(self.p_settings.seek_start))?;
+        match &self.p_settings.uri {
+            None => {
+                self.root_read
+                    .seek(SeekFrom::Start(self.p_settings.seek_start))?;
+            }
+            Some(x) => {
+                let read = self
+                    .uri_readers
+                    .entry(x.clone())
+                    .or_insert_with(|| File::open(x).unwrap()); //@todo unwrap, //@todo buffering //@todo uri cloning
+                read.seek(SeekFrom::Start(self.p_settings.seek_start))?;
+            }
+        }
+
         Ok(())
     }
 
     fn seek_to_faces(&mut self) -> IOResult<()> {
         if let Some(f_settings) = &self.f_settings {
-            self.read.seek(SeekFrom::Start(f_settings.seek_start))?;
+            match &f_settings.uri {
+                None => {
+                    self.root_read
+                        .seek(SeekFrom::Start(f_settings.seek_start))?;
+                }
+                Some(x) => {
+                    let read = self
+                        .uri_readers
+                        .entry(x.clone())
+                        .or_insert_with(|| File::open(x).unwrap()); //@todo unwrap, //@todo buffering //@todo uri cloning
+                    read.seek(SeekFrom::Start(f_settings.seek_start))?;
+                }
+            }
         }
         Ok(())
     }
@@ -505,15 +543,42 @@ where
                 self.data_faces_to_reserve[1],
             )))
         } else if self.p_settings.to_fetch != 0 {
-            Some(self.fetch_point())
+            self.points_pushed += 1;
+            self.p_settings.to_fetch -= 1;
+
+            let result = match &self.p_settings.uri {
+                None => Self::fetch_point(&mut self.root_read, &self.p_settings),
+                Some(x) => {
+                    let mut read = self
+                        .uri_readers
+                        .entry(x.clone())
+                        .or_insert_with(|| File::open(x).unwrap()); //@todo unwrap, //@todo buffering //@todo uri cloning //@todo should be able to fail here, since seek must insert
+                    Self::fetch_point(&mut read, &self.p_settings)
+                }
+            };
+
+            if self.p_settings.to_fetch == 0 {
+                match self.seek_to_faces() {
+                    Err(e) => Some(Err(e)),
+                    Ok(_) => Some(result),
+                }
+            } else {
+                Some(result)
+            }
         } else if let Some(f_settings) = &mut self.f_settings {
             if f_settings.to_fetch != 0 {
                 f_settings.to_fetch -= 1;
-                Some(Self::fetch_face(
-                    self.index_offset,
-                    &mut self.read,
-                    f_settings,
-                ))
+
+                Some(match &f_settings.uri {
+                    None => Self::fetch_face(self.index_offset, &mut self.root_read, f_settings),
+                    Some(x) => {
+                        let mut read = self
+                            .uri_readers
+                            .entry(x.clone())
+                            .or_insert_with(|| File::open(x).unwrap()); //@todo unwrap, //@todo buffering //@todo uri cloning //@todo should be able to fail here, since seek must insert
+                        Self::fetch_face(self.index_offset, &mut read, f_settings)
+                    }
+                })
             } else {
                 None
             }
