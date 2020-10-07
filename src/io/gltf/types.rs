@@ -42,27 +42,27 @@ impl Root {
         let nodes = val
             .get("nodes")
             .and_then(|x| x.as_array())
-            .ok_or(IOError::Glb(GlbError::JSONNodes))?;
+            .ok_or(IOError::Gltf(GltfError::JSONNodes))?;
 
         let meshes = val
             .get("meshes")
             .and_then(|x| x.as_array())
-            .ok_or(IOError::Glb(GlbError::JSONAccessors))?;
+            .ok_or(IOError::Gltf(GltfError::JSONAccessors))?;
 
         let accessors = val
             .get("accessors")
             .and_then(|x| x.as_array())
-            .ok_or(IOError::Glb(GlbError::JSONAccessors))?;
+            .ok_or(IOError::Gltf(GltfError::JSONAccessors))?;
 
         let buffer_views = val
             .get("bufferViews")
             .and_then(|x| x.as_array())
-            .ok_or(IOError::Glb(GlbError::JSONBufferViews))?;
+            .ok_or(IOError::Gltf(GltfError::JSONBufferViews))?;
 
         let buffers = val
             .get("buffers")
             .and_then(|x| x.as_array())
-            .ok_or(IOError::Glb(GlbError::JSONBuffers))?;
+            .ok_or(IOError::Gltf(GltfError::JSONBuffers))?;
 
         let arrays = JSONArrays {
             nodes,
@@ -343,7 +343,7 @@ impl Mesh {
         let primitives_array = val
             .get("primitives")
             .and_then(|x| x.as_array())
-            .ok_or(IOError::Glb(GlbError::JSONPrimitives))?;
+            .ok_or(IOError::Gltf(GltfError::JSONPrimitives))?;
 
         let mut primitives = Vec::new();
         for primitive_val in primitives_array.iter() {
@@ -374,11 +374,11 @@ impl Primitive {
             // TRIANGLES
             let attributes = val
                 .get("attributes")
-                .ok_or(IOError::Glb(GlbError::JSONAttributes))?;
+                .ok_or(IOError::Gltf(GltfError::JSONAttributes))?;
             let positions_id = attributes
                 .get("POSITION")
                 .and_then(|x| x.as_u64())
-                .ok_or(IOError::Glb(GlbError::JSONPosition))?;
+                .ok_or(IOError::Gltf(GltfError::JSONPosition))?;
             let indices_id = val.get("indices").and_then(|x| x.as_u64());
             let positions = Accessor::new(arrays, &arrays.accessors[positions_id as usize])
                 .and_then(|x| PosAccessor::new(x))?;
@@ -388,7 +388,7 @@ impl Primitive {
 
             Ok(Self { positions, indices })
         } else {
-            Err(IOError::Glb(GlbError::PrimitiveMode4Only))
+            Err(IOError::Gltf(GltfError::PrimitiveMode4Only))
         }
     }
 }
@@ -409,7 +409,7 @@ impl IndexComponentType {
             ComponentType::U16 => Ok(Self::U16),
             ComponentType::U32 => Ok(Self::U32),
             ComponentType::I8 | ComponentType::I16 | ComponentType::F32 => {
-                Err(IOError::Glb(GlbError::IndexComponentType))
+                Err(IOError::Gltf(GltfError::IndexComponentType))
             }
         }
     }
@@ -442,7 +442,7 @@ impl ComponentType {
             5123 => Ok(Self::U16),
             5125 => Ok(Self::U32),
             5126 => Ok(Self::F32),
-            _ => Err(IOError::Glb(GlbError::ComponentType)),
+            _ => Err(IOError::Gltf(GltfError::ComponentType)),
         }
     }
 }
@@ -470,7 +470,7 @@ impl AccessorType {
             "MAT2" => Ok(Self::Mat2),
             "MAT3" => Ok(Self::Mat3),
             "MAT4" => Ok(Self::Mat4),
-            _ => Err(IOError::Glb(GlbError::AccessorType)),
+            _ => Err(IOError::Gltf(GltfError::AccessorType)),
         }
     }
 }
@@ -491,21 +491,21 @@ impl Accessor {
         let buffer_view_id = val
             .get("bufferView")
             .and_then(|x| x.as_u64())
-            .ok_or(IOError::Glb(GlbError::JSONBufferView))?;
+            .ok_or(IOError::Gltf(GltfError::JSONBufferView))?;
         let byte_offset = val.get("byteOffset").and_then(|x| x.as_u64()).unwrap_or(0);
         let component_type = val
             .get("componentType")
             .and_then(|x| x.as_u64())
-            .ok_or(IOError::Glb(GlbError::JSONComponentType))
+            .ok_or(IOError::Gltf(GltfError::JSONComponentType))
             .and_then(|x| ComponentType::new(x))?;
         let count = val
             .get("count")
             .and_then(|x| x.as_u64())
-            .ok_or(IOError::Glb(GlbError::JSONCount))?;
+            .ok_or(IOError::Gltf(GltfError::JSONCount))?;
         let accessor_type = val
             .get("type")
             .and_then(|x| x.as_str())
-            .ok_or(IOError::Glb(GlbError::JSONAccessorType))
+            .ok_or(IOError::Gltf(GltfError::JSONAccessorType))
             .and_then(|x| AccessorType::new(x))?;
 
         let buffer_view = BufferView::new(arrays, &arrays.buffer_views[buffer_view_id as usize])?;
@@ -533,7 +533,7 @@ pub struct IndexAccessor {
 impl IndexAccessor {
     pub fn new(accessor: Accessor) -> IOResult<Self> {
         if accessor.accessor_type != AccessorType::Scalar {
-            return Err(IOError::Glb(GlbError::IndexAccessorType));
+            return Err(IOError::Gltf(GltfError::IndexAccessorType));
         }
         let component_type = IndexComponentType::new(accessor.component_type)?;
 
@@ -558,10 +558,10 @@ pub struct PosAccessor {
 impl PosAccessor {
     pub fn new(accessor: Accessor) -> IOResult<Self> {
         if accessor.accessor_type != AccessorType::Vec3 {
-            return Err(IOError::Glb(GlbError::PosAccessorType));
+            return Err(IOError::Gltf(GltfError::PosAccessorType));
         }
         if accessor.component_type != ComponentType::F32 {
-            return Err(IOError::Glb(GlbError::PosComponentType));
+            return Err(IOError::Gltf(GltfError::PosComponentType));
         }
 
         Ok(Self {
@@ -587,11 +587,11 @@ impl BufferView {
         let buffer_id = val
             .get("buffer")
             .and_then(|x| x.as_u64())
-            .ok_or(IOError::Glb(GlbError::JSONBuffer))?;
+            .ok_or(IOError::Gltf(GltfError::JSONBuffer))?;
         let byte_length = val
             .get("byteLength")
             .and_then(|x| x.as_u64())
-            .ok_or(IOError::Glb(GlbError::JSONByteLength))?;
+            .ok_or(IOError::Gltf(GltfError::JSONByteLength))?;
         let byte_offset = val.get("byteOffset").and_then(|x| x.as_u64()).unwrap_or(0);
         let byte_stride = val.get("byteStride").and_then(|x| x.as_u64());
         let buffer = Buffer::new(&arrays.buffers[buffer_id as usize])?;
@@ -618,7 +618,7 @@ impl Buffer {
         let byte_length = val
             .get("byteLength")
             .and_then(|x| x.as_u64())
-            .ok_or(IOError::Glb(GlbError::JSONBufferLength))?;
+            .ok_or(IOError::Gltf(GltfError::JSONBufferLength))?;
         let uri = val
             .get("uri")
             .and_then(|x| x.as_str())
@@ -647,9 +647,9 @@ impl TryFrom<RawFileHeader> for FileHeader {
     type Error = IOError;
     fn try_from(x: RawFileHeader) -> IOResult<Self> {
         if x.magic != VALID_MAGIC {
-            Err(IOError::Glb(GlbError::Header))
+            Err(IOError::Gltf(GltfError::Header))
         } else if x.version != VALID_VERSION {
-            Err(IOError::Glb(GlbError::Version))
+            Err(IOError::Gltf(GltfError::Version))
         } else {
             Ok(Self { length: x.length })
         }
@@ -685,7 +685,7 @@ impl TryFrom<Chunk> for JSONChunk {
     type Error = IOError;
     fn try_from(x: Chunk) -> IOResult<Self> {
         if x.header.ctype != TYPE_JSON {
-            Err(IOError::Glb(GlbError::JSONChunk))
+            Err(IOError::Gltf(GltfError::JSONChunk))
         } else {
             Ok(Self {
                 length: x.header.length,
@@ -707,7 +707,7 @@ impl TryFrom<ChunkHeader> for BinChunkHeader {
     type Error = IOError;
     fn try_from(x: ChunkHeader) -> IOResult<Self> {
         if x.ctype != TYPE_BIN {
-            Err(IOError::Glb(GlbError::BinChunk))
+            Err(IOError::Gltf(GltfError::BinChunk))
         } else {
             Ok(Self {
                 pos: x.pos,

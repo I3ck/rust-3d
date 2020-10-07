@@ -25,4 +25,4 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 mod load;
 mod types;
 
-pub use load::{load_glb, load_gltf, GlbIterator};
+pub use load::{load_glb, load_gltf, GltfIterator};

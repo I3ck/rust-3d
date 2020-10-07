@@ -50,7 +50,7 @@ where
     P: IsBuildable3D + IsMatrix4Transformable + Clone,
     R: Read + Seek,
 {
-    let iterator = GlbIterator::<P, R>::new_glb(read, reference_path)?;
+    let iterator = GltfIterator::<P, R>::new_glb(read, reference_path)?;
 
     for rd in iterator {
         match rd? {
@@ -82,7 +82,7 @@ where
     P: IsBuildable3D + IsMatrix4Transformable + Clone,
     R: Read + Seek,
 {
-    let iterator = GlbIterator::<P, R>::new_gltf(read, reference_path)?;
+    let iterator = GltfIterator::<P, R>::new_gltf(read, reference_path)?;
 
     for rd in iterator {
         match rd? {
@@ -110,7 +110,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .glTF or .glb file
-pub struct GlbIterator<P, R>
+pub struct GltfIterator<P, R>
 where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: Read + Seek,
@@ -124,7 +124,7 @@ where
     phantom: PhantomData<P>,
 }
 
-impl<P, R> GlbIterator<P, R>
+impl<P, R> GltfIterator<P, R>
 where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: Read + Seek,
@@ -235,7 +235,7 @@ where
                 bytes_to_skip: if let Some(stride) = bw_pos.byte_stride {
                     let size = 3 * 4;
                     if stride < size {
-                        return Err(IOError::Glb(GlbError::Stride));
+                        return Err(IOError::Gltf(GltfError::Stride));
                     }
                     (stride - size) as usize
                 } else {
@@ -264,7 +264,7 @@ where
                             IndexComponentType::U32 => 3 * 4, // 3 * 4bytes
                         };
                         if stride < size {
-                            return Err(IOError::Glb(GlbError::Stride));
+                            return Err(IOError::Gltf(GltfError::Stride));
                         }
                         (stride - size) as usize
                     } else {
@@ -361,7 +361,7 @@ where
     }
 }
 
-impl<P, R> Iterator for GlbIterator<P, R>
+impl<P, R> Iterator for GltfIterator<P, R>
 where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: Read + Seek,
@@ -384,7 +384,7 @@ where
     }
 }
 
-impl<P, R> FusedIterator for GlbIterator<P, R>
+impl<P, R> FusedIterator for GltfIterator<P, R>
 where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: Read + Seek,
