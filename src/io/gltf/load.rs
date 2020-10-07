@@ -25,7 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 
 use std::{
-    collections::HashMap,
+    collections::{hash_map::Entry, HashMap},
     convert::TryFrom,
     fs::File,
     io::{Read, Seek, SeekFrom},
@@ -561,14 +561,15 @@ where
             }
             Some(x) => {
                 let path = self.folder_path.join(x);
-                let mut read = if let Some(x) = self.uri_readers.get(&path) {
-                    x
-                } else {
-                    let entry = File::open(path.clone())
-                        .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?;
-                    self.uri_readers.insert(path.clone(), entry);
-                    self.uri_readers.get(&path).as_ref().unwrap() //unwrap safe, since just inserted
+                let read = match self.uri_readers.entry(path.clone()) {
+                    Entry::Occupied(x) => x.into_mut(),
+                    Entry::Vacant(x) => {
+                        let entry = File::open(path.clone())
+                            .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?;
+                        x.insert(entry)
+                    }
                 };
+
                 read.seek(SeekFrom::Start(self.p_settings.seek_start))?;
             }
         }
@@ -586,14 +587,15 @@ where
                 }
                 Some(x) => {
                     let path = self.folder_path.join(x);
-                    let mut read = if let Some(x) = self.uri_readers.get(&path) {
-                        x
-                    } else {
-                        let entry = File::open(path.clone())
-                            .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?;
-                        self.uri_readers.insert(path.clone(), entry);
-                        self.uri_readers.get(&path).as_ref().unwrap() //unwrap safe, since just inserted
+                    let read = match self.uri_readers.entry(path.clone()) {
+                        Entry::Occupied(x) => x.into_mut(),
+                        Entry::Vacant(x) => {
+                            let entry = File::open(path.clone())
+                                .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?;
+                            x.insert(entry)
+                        }
                     };
+
                     read.seek(SeekFrom::Start(f_settings.seek_start))?;
                 }
             }
