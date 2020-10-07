@@ -28,7 +28,7 @@ use std::{
     collections::{hash_map::Entry, HashMap},
     convert::TryFrom,
     fs::File,
-    io::{Read, Seek, SeekFrom},
+    io::{BufReader, Read, Seek, SeekFrom},
     iter::FusedIterator,
     marker::PhantomData,
     path::PathBuf,
@@ -418,7 +418,7 @@ where
 {
     root_read: R,
     folder_path: PathBuf,
-    uri_readers: HashMap<PathBuf, File>,
+    uri_readers: HashMap<PathBuf, BufReader<File>>,
     p_settings: PointIterSettings,
     f_settings: Option<FaceIterSettings>,
     points_pushed: usize,
@@ -564,8 +564,10 @@ where
                 let read = match self.uri_readers.entry(path.clone()) {
                     Entry::Occupied(x) => x.into_mut(),
                     Entry::Vacant(x) => {
-                        let entry = File::open(path.clone())
-                            .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?;
+                        let entry = BufReader::new(
+                            File::open(path.clone())
+                                .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?,
+                        );
                         x.insert(entry)
                     }
                 };
@@ -590,8 +592,10 @@ where
                     let read = match self.uri_readers.entry(path.clone()) {
                         Entry::Occupied(x) => x.into_mut(),
                         Entry::Vacant(x) => {
-                            let entry = File::open(path.clone())
-                                .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?;
+                            let entry = BufReader::new(
+                                File::open(path.clone())
+                                    .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?,
+                            );
                             x.insert(entry)
                         }
                     };
@@ -625,7 +629,7 @@ where
                 None => Self::fetch_point(&mut self.root_read, &self.p_settings),
                 Some(x) => {
                     let path = self.folder_path.join(x);
-                    Self::fetch_point(&mut self.uri_readers.get(&path).unwrap(), &self.p_settings)
+                    Self::fetch_point(self.uri_readers.get_mut(&path).unwrap(), &self.p_settings)
                 } //unwrap safe, since inserting in seek
             };
 
@@ -647,7 +651,7 @@ where
                         let path = self.folder_path.join(x);
                         Self::fetch_face(
                             self.index_offset,
-                            &mut self.uri_readers.get(&path).unwrap(),
+                            self.uri_readers.get_mut(&path).unwrap(),
                             f_settings,
                         )
                     } //unwrap safe, since inserting in seek
