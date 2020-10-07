@@ -20,7 +20,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//! Module for IO operations of the glb file format
+//! Module for load operations of the glTF file formats
 
 use crate::*;
 
@@ -75,9 +75,41 @@ where
     Ok(())
 }
 
+/// Loads an IsMesh3D from the glTF file format
+pub fn load_gltf<EM, P, R>(read: R, reference_path: PathBuf, mesh: &mut EM) -> IOResult<()>
+where
+    EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
+    P: IsBuildable3D + IsMatrix4Transformable + Clone,
+    R: Read + Seek,
+{
+    let iterator = GlbIterator::<P, R>::new_gltf(read, reference_path)?;
+
+    for rd in iterator {
+        match rd? {
+            FaceDataReserve::Data(x) => {
+                mesh.add_vertex(x);
+            }
+            FaceDataReserve::Face([a, b, c]) => {
+                mesh.try_add_connection(VId(a), VId(b), VId(c))
+                    .map_err(|_| IOError::InvalidMeshIndices)?;
+            }
+            FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
+                mesh.reserve_vertices(n_vertices);
+                mesh.reserve_faces(n_faces);
+            }
+            FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
+                mesh.reserve_vertices_exact(n_vertices);
+                mesh.reserve_faces_exact(n_faces);
+            }
+        }
+    }
+
+    Ok(())
+}
+
 //------------------------------------------------------------------------------
 
-/// Iterator to incrementally load a .glb file
+/// Iterator to incrementally load a .glTF or .glb file
 pub struct GlbIterator<P, R>
 where
     P: IsBuildable3D + IsMatrix4Transformable,
@@ -97,6 +129,7 @@ where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: Read + Seek,
 {
+    /// Creates an iterator for reading a .glb file
     pub fn new_glb(mut read: R, reference_path: PathBuf) -> IOResult<Self> {
         let _header = read_file_header(&mut read)?;
         let pos_chunk_json = read.seek(SeekFrom::Current(0))?;
@@ -126,6 +159,7 @@ where
         Ok(result)
     }
 
+    /// Creates an iterator for reading a .glTF file
     pub fn new_gltf(mut read: R, reference_path: PathBuf) -> IOResult<Self> {
         let json: serde_json::Value = serde_json::from_reader(&mut read)?;
         let root = Root::new(&json)?;

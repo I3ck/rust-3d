@@ -22,7 +22,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for IO operations of the glTF file formats
 
-mod glb;
+mod load;
 mod types;
 
-pub use glb::{load_glb, GlbIterator};
+pub use load::{load_glb, load_gltf, GlbIterator};
