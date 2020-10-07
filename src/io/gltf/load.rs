@@ -467,8 +467,7 @@ where
             && self.f_settings.as_ref().map(|x| x.to_fetch).unwrap_or(0) == 0
     }
 
-    //@todo inline all these
-
+    #[inline(always)]
     fn fetch_point<R2>(
         read: &mut R2,
         p_settings: &PointIterSettings,
@@ -492,6 +491,7 @@ where
         Ok(FaceDataReserve::Data(p))
     }
 
+    #[inline(always)]
     fn fetch_face<R2>(
         index_offset: usize,
         read: &mut R2,
@@ -552,6 +552,7 @@ where
         }
     }
 
+    #[inline(always)]
     fn seek_to_points(&mut self) -> IOResult<()> {
         match &self.p_settings.uri {
             None => {
@@ -575,6 +576,7 @@ where
         Ok(())
     }
 
+    #[inline(always)]
     fn seek_to_faces(&mut self) -> IOResult<()> {
         if let Some(f_settings) = &self.f_settings {
             match &f_settings.uri {
