@@ -419,7 +419,7 @@ where
     root_read: R,
     reference_path: PathBuf,
     #[allow(dead_code)]
-    uri_readers: HashMap<String, File>,
+    uri_readers: HashMap<PathBuf, File>,
     p_settings: PointIterSettings,
     f_settings: Option<FaceIterSettings>,
     points_pushed: usize,
@@ -561,10 +561,13 @@ where
             }
             Some(x) => {
                 let path = self.reference_path.parent().unwrap().join(x); //@todo unwrap
-                let read = self
-                    .uri_readers
-                    .entry(x.clone())
-                    .or_insert_with(|| File::open(path).unwrap()); //@todo unwrap, //@todo buffering //@todo uri cloning
+                let mut read = if let Some(x) = self.uri_readers.get(&path) {
+                    x
+                } else {
+                    let entry = File::open(path.clone())?;
+                    self.uri_readers.insert(path.clone(), entry);
+                    self.uri_readers.get(&path).as_ref().unwrap() //unwrap safe, since just inserted
+                };
                 read.seek(SeekFrom::Start(self.p_settings.seek_start))?;
             }
         }
@@ -581,10 +584,13 @@ where
                 }
                 Some(x) => {
                     let path = self.reference_path.parent().unwrap().join(x); //@todo unwrap
-                    let read = self
-                        .uri_readers
-                        .entry(x.clone())
-                        .or_insert_with(|| File::open(path).unwrap()); //@todo unwrap, //@todo buffering //@todo uri cloning
+                    let mut read = if let Some(x) = self.uri_readers.get(&path) {
+                        x
+                    } else {
+                        let entry = File::open(path.clone())?;
+                        self.uri_readers.insert(path.clone(), entry);
+                        self.uri_readers.get(&path).as_ref().unwrap() //unwrap safe, since just inserted
+                    };
                     read.seek(SeekFrom::Start(f_settings.seek_start))?;
                 }
             }
@@ -613,12 +619,9 @@ where
             let result = match &self.p_settings.uri {
                 None => Self::fetch_point(&mut self.root_read, &self.p_settings),
                 Some(x) => {
-                    let mut read = self
-                        .uri_readers
-                        .entry(x.clone())
-                        .or_insert_with(|| File::open(x).unwrap()); //@todo unwrap, //@todo buffering //@todo uri cloning //@todo should be able to fail here, since seek must insert
-                    Self::fetch_point(&mut read, &self.p_settings)
-                }
+                    let path = self.reference_path.parent().unwrap().join(x); //@todo unwrap
+                    Self::fetch_point(&mut self.uri_readers.get(&path).unwrap(), &self.p_settings)
+                } //unwrap safe, since inserting in seek
             };
 
             if self.p_settings.to_fetch == 0 {
@@ -636,12 +639,13 @@ where
                 Some(match &f_settings.uri {
                     None => Self::fetch_face(self.index_offset, &mut self.root_read, f_settings),
                     Some(x) => {
-                        let mut read = self
-                            .uri_readers
-                            .entry(x.clone())
-                            .or_insert_with(|| File::open(x).unwrap()); //@todo unwrap, //@todo buffering //@todo uri cloning //@todo should be able to fail here, since seek must insert
-                        Self::fetch_face(self.index_offset, &mut read, f_settings)
-                    }
+                        let path = self.reference_path.parent().unwrap().join(x); //@todo unwrap
+                        Self::fetch_face(
+                            self.index_offset,
+                            &mut self.uri_readers.get(&path).unwrap(),
+                            f_settings,
+                        )
+                    } //unwrap safe, since inserting in seek
                 })
             } else {
                 None
