@@ -619,7 +619,10 @@ impl Buffer {
             .get("byteLength")
             .and_then(|x| x.as_u64())
             .ok_or(IOError::Glb(GlbError::JSONBufferLength))?;
-        let uri = val.get("uri").map(|x| x.to_string());
+        let uri = val
+            .get("uri")
+            .and_then(|x| x.as_str())
+            .map(|x| x.to_string());
         Ok(Self { byte_length, uri })
     }
 }

@@ -31,6 +31,7 @@ use std::{
     io::{Read, Seek, SeekFrom},
     iter::FusedIterator,
     marker::PhantomData,
+    path::PathBuf,
 };
 
 use super::{
@@ -43,13 +44,13 @@ use serde_json;
 //------------------------------------------------------------------------------
 
 /// Loads an IsMesh3D from the glb file format
-pub fn load_glb<EM, P, R>(read: R, mesh: &mut EM) -> IOResult<()>
+pub fn load_glb<EM, P, R>(read: R, reference_path: PathBuf, mesh: &mut EM) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + IsMatrix4Transformable + Clone,
     R: Read + Seek,
 {
-    let iterator = GlbIterator::<P, R>::new(read)?;
+    let iterator = GlbIterator::<P, R>::new_glb(read, reference_path)?;
 
     for rd in iterator {
         match rd? {
@@ -82,7 +83,7 @@ where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: Read + Seek,
 {
-    chunk: BinChunkHeader,
+    chunk_offset: u64,
     root: Root,
     is_done: bool,
     node_trace: Vec<usize>,
@@ -96,7 +97,7 @@ where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: Read + Seek,
 {
-    pub fn new(mut read: R) -> IOResult<Self> {
+    pub fn new_glb(mut read: R, reference_path: PathBuf) -> IOResult<Self> {
         let _header = read_file_header(&mut read)?;
         let pos_chunk_json = read.seek(SeekFrom::Current(0))?;
         let chunk_json =
@@ -111,11 +112,31 @@ where
 
         let mut result = Self {
             root,
-            chunk: chunk_bin,
+            chunk_offset: chunk_bin.pos,
             is_done: false,
             node_trace: vec![0],
             current_primitive: 0,
-            pf_iterator: PointFaceIterator::new(read),
+            pf_iterator: PointFaceIterator::new(read, reference_path),
+            phantom: PhantomData,
+        };
+
+        result.node_trace = result.decended_left(result.node_trace.clone());
+        result.fetch_data()?;
+
+        Ok(result)
+    }
+
+    pub fn new_gltf(mut read: R, reference_path: PathBuf) -> IOResult<Self> {
+        let json: serde_json::Value = serde_json::from_reader(&mut read)?;
+        let root = Root::new(&json)?;
+
+        let mut result = Self {
+            root,
+            chunk_offset: 0,
+            is_done: false,
+            node_trace: vec![0],
+            current_primitive: 0,
+            pf_iterator: PointFaceIterator::new(read, reference_path),
             phantom: PhantomData,
         };
 
@@ -168,14 +189,14 @@ where
 
             let acc_pos = &primitive.positions;
             let bw_pos = &acc_pos.buffer_view;
-            match bw_pos.buffer.uri {
-                None => (),
-                Some(_) => return Err(IOError::Glb(GlbError::BufferUriNotSupported)),
-            }
+            let (uri_pos, offset_pos) = match &bw_pos.buffer.uri {
+                None => (None, self.chunk_offset),
+                Some(x) => (Some(x.clone()), 0),
+            };
 
             let p_settings = PointIterSettings {
-                uri: None,
-                seek_start: self.chunk.pos + acc_pos.byte_offset + bw_pos.byte_offset,
+                uri: uri_pos,
+                seek_start: offset_pos + acc_pos.byte_offset + bw_pos.byte_offset,
                 to_fetch: acc_pos.count as usize,
                 bytes_to_skip: if let Some(stride) = bw_pos.byte_stride {
                     let size = 3 * 4;
@@ -193,9 +214,14 @@ where
                 let bw_id = &acc_id.buffer_view;
                 let ct = acc_id.component_type;
 
+                let (uri_id, offset_id) = match &bw_id.buffer.uri {
+                    None => (None, self.chunk_offset),
+                    Some(x) => (Some(x.clone()), 0),
+                };
+
                 Some(FaceIterSettings {
-                    uri: None,
-                    seek_start: self.chunk.pos + acc_id.byte_offset + bw_id.byte_offset,
+                    uri: uri_id,
+                    seek_start: offset_id + acc_id.byte_offset + bw_id.byte_offset,
                     to_fetch: acc_id.count as usize / 3,
                     bytes_to_skip: if let Some(stride) = bw_id.byte_stride {
                         let size = match ct {
@@ -357,6 +383,7 @@ where
     R: Read + Seek,
 {
     root_read: R,
+    reference_path: PathBuf,
     #[allow(dead_code)]
     uri_readers: HashMap<String, File>,
     p_settings: PointIterSettings,
@@ -372,9 +399,10 @@ where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: Read + Seek,
 {
-    pub fn new(root_read: R) -> Self {
+    pub fn new(root_read: R, reference_path: PathBuf) -> Self {
         Self {
             root_read,
+            reference_path,
             uri_readers: HashMap::default(),
             p_settings: Default::default(),
             f_settings: Default::default(),
@@ -498,10 +526,11 @@ where
                     .seek(SeekFrom::Start(self.p_settings.seek_start))?;
             }
             Some(x) => {
+                let path = self.reference_path.parent().unwrap().join(x); //@todo unwrap
                 let read = self
                     .uri_readers
                     .entry(x.clone())
-                    .or_insert_with(|| File::open(x).unwrap()); //@todo unwrap, //@todo buffering //@todo uri cloning
+                    .or_insert_with(|| File::open(path).unwrap()); //@todo unwrap, //@todo buffering //@todo uri cloning
                 read.seek(SeekFrom::Start(self.p_settings.seek_start))?;
             }
         }
@@ -517,10 +546,11 @@ where
                         .seek(SeekFrom::Start(f_settings.seek_start))?;
                 }
                 Some(x) => {
+                    let path = self.reference_path.parent().unwrap().join(x); //@todo unwrap
                     let read = self
                         .uri_readers
                         .entry(x.clone())
-                        .or_insert_with(|| File::open(x).unwrap()); //@todo unwrap, //@todo buffering //@todo uri cloning
+                        .or_insert_with(|| File::open(path).unwrap()); //@todo unwrap, //@todo buffering //@todo uri cloning
                     read.seek(SeekFrom::Start(f_settings.seek_start))?;
                 }
             }

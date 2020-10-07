@@ -253,7 +253,9 @@ impl std::fmt::Debug for GlbError {
             Self::JSONMeshes => write!(f, "JSON meshes of .glb file could not be parsed"),
             Self::JSONMesh => write!(f, "JSON mesh of .glb file could not be parsed"),
             Self::Stride => write!(f, "Invalid stride value in .glb file"),
-            Self::BufferUriNotSupported => write!(f, "Buffers with uri value aren't currently supported"),
+            Self::BufferUriNotSupported => {
+                write!(f, "Buffers with uri value aren't currently supported")
+            }
         }
     }
 }
