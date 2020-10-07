@@ -25,6 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 use crate::*;
 
 use std::{
+    cell::RefCell,
     collections::{hash_map::Entry, HashMap},
     convert::TryFrom,
     fs::File,
@@ -32,6 +33,7 @@ use std::{
     iter::FusedIterator,
     marker::PhantomData,
     path::PathBuf,
+    rc::Rc,
 };
 
 use super::{
@@ -418,9 +420,11 @@ where
 {
     root_read: R,
     folder_path: PathBuf,
-    uri_readers: HashMap<PathBuf, BufReader<File>>,
+    uri_readers: HashMap<PathBuf, Rc<RefCell<BufReader<File>>>>,
     p_settings: PointIterSettings,
     f_settings: Option<FaceIterSettings>,
+    p_reader: Option<Rc<RefCell<BufReader<File>>>>,
+    f_reader: Option<Rc<RefCell<BufReader<File>>>>,
     points_pushed: usize,
     index_offset: usize,
     data_faces_to_reserve: [usize; 2],
@@ -439,6 +443,8 @@ where
             uri_readers: HashMap::default(),
             p_settings: Default::default(),
             f_settings: Default::default(),
+            p_reader: None,
+            f_reader: None,
             points_pushed: 0,
             index_offset: 0,
             data_faces_to_reserve: [0, 0],
@@ -558,21 +564,24 @@ where
             None => {
                 self.root_read
                     .seek(SeekFrom::Start(self.p_settings.seek_start))?;
+                self.p_reader = None;
             }
             Some(x) => {
                 let path = self.folder_path.join(x);
                 let read = match self.uri_readers.entry(path.clone()) {
                     Entry::Occupied(x) => x.into_mut(),
                     Entry::Vacant(x) => {
-                        let entry = BufReader::new(
+                        let entry = Rc::new(RefCell::new(BufReader::new(
                             File::open(path.clone())
                                 .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?,
-                        );
+                        )));
                         x.insert(entry)
                     }
                 };
 
-                read.seek(SeekFrom::Start(self.p_settings.seek_start))?;
+                read.borrow_mut()
+                    .seek(SeekFrom::Start(self.p_settings.seek_start))?;
+                self.p_reader = Some(read.clone());
             }
         }
 
@@ -586,21 +595,24 @@ where
                 None => {
                     self.root_read
                         .seek(SeekFrom::Start(f_settings.seek_start))?;
+                    self.f_reader = None;
                 }
                 Some(x) => {
                     let path = self.folder_path.join(x);
                     let read = match self.uri_readers.entry(path.clone()) {
                         Entry::Occupied(x) => x.into_mut(),
                         Entry::Vacant(x) => {
-                            let entry = BufReader::new(
+                            let entry = Rc::new(RefCell::new(BufReader::new(
                                 File::open(path.clone())
                                     .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?,
-                            );
+                            )));
                             x.insert(entry)
                         }
                     };
 
-                    read.seek(SeekFrom::Start(f_settings.seek_start))?;
+                    read.borrow_mut()
+                        .seek(SeekFrom::Start(f_settings.seek_start))?;
+                    self.f_reader = Some(read.clone());
                 }
             }
         }
@@ -625,12 +637,9 @@ where
             self.points_pushed += 1;
             self.p_settings.to_fetch -= 1;
 
-            let result = match &self.p_settings.uri {
+            let result = match &self.p_reader {
                 None => Self::fetch_point(&mut self.root_read, &self.p_settings),
-                Some(x) => {
-                    let path = self.folder_path.join(x);
-                    Self::fetch_point(self.uri_readers.get_mut(&path).unwrap(), &self.p_settings)
-                } //unwrap safe, since inserting in seek
+                Some(r) => Self::fetch_point(&mut *r.borrow_mut(), &self.p_settings),
             };
 
             if self.p_settings.to_fetch == 0 {
@@ -645,15 +654,10 @@ where
             if f_settings.to_fetch != 0 {
                 f_settings.to_fetch -= 1;
 
-                Some(match &f_settings.uri {
+                Some(match &self.f_reader {
                     None => Self::fetch_face(self.index_offset, &mut self.root_read, f_settings),
-                    Some(x) => {
-                        let path = self.folder_path.join(x);
-                        Self::fetch_face(
-                            self.index_offset,
-                            self.uri_readers.get_mut(&path).unwrap(),
-                            f_settings,
-                        )
+                    Some(r) => {
+                        Self::fetch_face(self.index_offset, &mut *r.borrow_mut(), f_settings)
                     } //unwrap safe, since inserting in seek
                 })
             } else {
