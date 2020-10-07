@@ -59,11 +59,17 @@ impl Root {
             .and_then(|x| x.as_array())
             .ok_or(IOError::Glb(GlbError::JSONBufferViews))?;
 
+        let buffers = val
+            .get("buffers")
+            .and_then(|x| x.as_array())
+            .ok_or(IOError::Glb(GlbError::JSONBuffers))?;
+
         let arrays = JSONArrays {
             nodes,
             meshes,
             accessors,
             buffer_views,
+            buffers,
         };
 
         let mut child_nodes = HashSet::new();
@@ -97,6 +103,7 @@ pub struct JSONArrays<'a> {
     pub meshes: &'a Vec<serde_json::Value>,
     pub accessors: &'a Vec<serde_json::Value>,
     pub buffer_views: &'a Vec<serde_json::Value>,
+    pub buffers: &'a Vec<serde_json::Value>,
 }
 
 //------------------------------------------------------------------------------
@@ -501,7 +508,7 @@ impl Accessor {
             .ok_or(IOError::Glb(GlbError::JSONAccessorType))
             .and_then(|x| AccessorType::new(x))?;
 
-        let buffer_view = BufferView::new(&arrays.buffer_views[buffer_view_id as usize])?;
+        let buffer_view = BufferView::new(arrays, &arrays.buffer_views[buffer_view_id as usize])?;
 
         Ok(Self {
             buffer_view,
@@ -569,15 +576,15 @@ impl PosAccessor {
 
 #[derive(Debug, Clone)]
 pub struct BufferView {
-    pub buffer: u64,
+    pub buffer: Buffer,
     pub byte_length: u64,
     pub byte_offset: u64,
     pub byte_stride: Option<u64>,
 }
 
 impl BufferView {
-    pub fn new(val: &serde_json::Value) -> IOResult<Self> {
-        let buffer = val
+    pub fn new(arrays: &JSONArrays, val: &serde_json::Value) -> IOResult<Self> {
+        let buffer_id = val
             .get("buffer")
             .and_then(|x| x.as_u64())
             .ok_or(IOError::Glb(GlbError::JSONBuffer))?;
@@ -587,6 +594,7 @@ impl BufferView {
             .ok_or(IOError::Glb(GlbError::JSONByteLength))?;
         let byte_offset = val.get("byteOffset").and_then(|x| x.as_u64()).unwrap_or(0);
         let byte_stride = val.get("byteStride").and_then(|x| x.as_u64());
+        let buffer = Buffer::new(&arrays.buffers[buffer_id as usize])?;
 
         Ok(Self {
             buffer,
@@ -594,6 +602,25 @@ impl BufferView {
             byte_offset,
             byte_stride,
         })
+    }
+}
+
+//------------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+pub struct Buffer {
+    pub byte_length: u64,
+    pub uri: Option<String>,
+}
+
+impl Buffer {
+    pub fn new(val: &serde_json::Value) -> IOResult<Self> {
+        let byte_length = val
+            .get("byteLength")
+            .and_then(|x| x.as_u64())
+            .ok_or(IOError::Glb(GlbError::JSONBufferLength))?;
+        let uri = val.get("uri").map(|x| x.to_string());
+        Ok(Self { byte_length, uri })
     }
 }
 

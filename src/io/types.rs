@@ -112,10 +112,12 @@ pub enum GlbError {
     JSONAccessorType,
     JSONCount,
     JSONBuffer,
+    JSONBufferLength,
     JSONByteLength,
     JSONNodes,
     JSONAccessors,
     JSONBufferViews,
+    JSONBuffers,
     JSONMeshes,
     JSONMesh,
     Stride,
@@ -240,9 +242,13 @@ impl std::fmt::Debug for GlbError {
             Self::JSONCount => write!(f, "JSON count of .glb file could not be parsed"),
             Self::JSONBuffer => write!(f, "JSON buffer of .glb file could not be parsed"),
             Self::JSONByteLength => write!(f, "JSON byteLength of .glb file could not be parsed"),
+            Self::JSONBufferLength => {
+                write!(f, "JSON length of buffer of .glb file could not be parsed")
+            }
             Self::JSONNodes => write!(f, "JSON nodes of .glb file could not be parsed"),
             Self::JSONAccessors => write!(f, "JSON accessors of .glb file could not be parsed"),
             Self::JSONBufferViews => write!(f, "JSON bufferViews of .glb file could not be parsed"),
+            Self::JSONBuffers => write!(f, "JSON buffers of .glb file could not be parsed"),
             Self::JSONMeshes => write!(f, "JSON meshes of .glb file could not be parsed"),
             Self::JSONMesh => write!(f, "JSON mesh of .glb file could not be parsed"),
             Self::Stride => write!(f, "Invalid stride value in .glb file"),
