@@ -44,13 +44,13 @@ use serde_json;
 //------------------------------------------------------------------------------
 
 /// Loads an IsMesh3D from the glb file format
-pub fn load_glb<EM, P, R>(read: R, reference_path: PathBuf, mesh: &mut EM) -> IOResult<()>
+pub fn load_glb<EM, P, R>(read: R, folder_path: PathBuf, mesh: &mut EM) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + IsMatrix4Transformable + Clone,
     R: Read + Seek,
 {
-    let iterator = GltfIterator::<P, R>::new_glb(read, reference_path)?;
+    let iterator = GltfIterator::<P, R>::new_glb(read, folder_path)?;
 
     for rd in iterator {
         match rd? {
@@ -76,13 +76,13 @@ where
 }
 
 /// Loads an IsMesh3D from the glTF file format
-pub fn load_gltf<EM, P, R>(read: R, reference_path: PathBuf, mesh: &mut EM) -> IOResult<()>
+pub fn load_gltf<EM, P, R>(read: R, folder_path: PathBuf, mesh: &mut EM) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     P: IsBuildable3D + IsMatrix4Transformable + Clone,
     R: Read + Seek,
 {
-    let iterator = GltfIterator::<P, R>::new_gltf(read, reference_path)?;
+    let iterator = GltfIterator::<P, R>::new_gltf(read, folder_path)?;
 
     for rd in iterator {
         match rd? {
@@ -130,7 +130,7 @@ where
     R: Read + Seek,
 {
     /// Creates an iterator for reading a .glb file
-    pub fn new_glb(mut read: R, reference_path: PathBuf) -> IOResult<Self> {
+    pub fn new_glb(mut read: R, folder_path: PathBuf) -> IOResult<Self> {
         let _header = read_file_header(&mut read)?;
         let pos_chunk_json = read.seek(SeekFrom::Current(0))?;
         let chunk_json =
@@ -149,7 +149,7 @@ where
             is_done: false,
             node_trace: vec![0],
             current_primitive: 0,
-            pf_iterator: PointFaceIterator::new(read, reference_path),
+            pf_iterator: PointFaceIterator::new(read, folder_path),
             phantom: PhantomData,
         };
 
@@ -160,7 +160,7 @@ where
     }
 
     /// Creates an iterator for reading a .glTF file
-    pub fn new_gltf(mut read: R, reference_path: PathBuf) -> IOResult<Self> {
+    pub fn new_gltf(mut read: R, folder_path: PathBuf) -> IOResult<Self> {
         let json: serde_json::Value = serde_json::from_reader(&mut read)?;
         let root = Root::new(&json)?;
 
@@ -170,7 +170,7 @@ where
             is_done: false,
             node_trace: vec![0],
             current_primitive: 0,
-            pf_iterator: PointFaceIterator::new(read, reference_path),
+            pf_iterator: PointFaceIterator::new(read, folder_path),
             phantom: PhantomData,
         };
 
@@ -417,7 +417,7 @@ where
     R: Read + Seek,
 {
     root_read: R,
-    reference_path: PathBuf,
+    folder_path: PathBuf,
     #[allow(dead_code)]
     uri_readers: HashMap<PathBuf, File>,
     p_settings: PointIterSettings,
@@ -433,10 +433,10 @@ where
     P: IsBuildable3D + IsMatrix4Transformable,
     R: Read + Seek,
 {
-    pub fn new(root_read: R, reference_path: PathBuf) -> Self {
+    pub fn new(root_read: R, folder_path: PathBuf) -> Self {
         Self {
             root_read,
-            reference_path,
+            folder_path,
             uri_readers: HashMap::default(),
             p_settings: Default::default(),
             f_settings: Default::default(),
@@ -560,7 +560,7 @@ where
                     .seek(SeekFrom::Start(self.p_settings.seek_start))?;
             }
             Some(x) => {
-                let path = self.reference_path.parent().unwrap().join(x); //@todo unwrap
+                let path = self.folder_path.join(x);
                 let mut read = if let Some(x) = self.uri_readers.get(&path) {
                     x
                 } else {
@@ -584,7 +584,7 @@ where
                         .seek(SeekFrom::Start(f_settings.seek_start))?;
                 }
                 Some(x) => {
-                    let path = self.reference_path.parent().unwrap().join(x); //@todo unwrap
+                    let path = self.folder_path.join(x); //@todo unwrap
                     let mut read = if let Some(x) = self.uri_readers.get(&path) {
                         x
                     } else {
@@ -621,7 +621,7 @@ where
             let result = match &self.p_settings.uri {
                 None => Self::fetch_point(&mut self.root_read, &self.p_settings),
                 Some(x) => {
-                    let path = self.reference_path.parent().unwrap().join(x); //@todo unwrap
+                    let path = self.folder_path.join(x);
                     Self::fetch_point(&mut self.uri_readers.get(&path).unwrap(), &self.p_settings)
                 } //unwrap safe, since inserting in seek
             };
@@ -641,7 +641,7 @@ where
                 Some(match &f_settings.uri {
                     None => Self::fetch_face(self.index_offset, &mut self.root_read, f_settings),
                     Some(x) => {
-                        let path = self.reference_path.parent().unwrap().join(x); //@todo unwrap
+                        let path = self.folder_path.join(x);
                         Self::fetch_face(
                             self.index_offset,
                             &mut self.uri_readers.get(&path).unwrap(),
