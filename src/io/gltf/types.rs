@@ -25,6 +25,7 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //------------------------------------------------------------------------------
 
 use std::{
+    cell::RefCell,
     collections::HashSet,
     convert::TryFrom,
     fs::File,
@@ -38,6 +39,10 @@ use super::super::types::*;
 use crate::*;
 
 use base64::decode;
+
+//------------------------------------------------------------------------------
+
+const BASE64_PATTERN: &str = "data:application/octet-stream;base64,";
 
 //------------------------------------------------------------------------------
 
@@ -618,7 +623,7 @@ impl BufferView {
 
 //@todo rename
 pub enum CursorOrFile {
-    Cursor(u64, Rc<Vec<u8>>),
+    Cursor(u64, Data),
     File(BufReader<File>),
 }
 
@@ -639,18 +644,47 @@ impl CursorOrFile {
 #[derive(Debug, Clone)] //@todo try drop Clone
 pub enum UriOrData {
     Uri(PathBuf),
-    Data(Rc<Vec<u8>>),
+    Data(Data),
 }
 
 impl UriOrData {
-    pub fn new(data: String) -> IOResult<Self> {
-        const PATTERN: &str = "data:application/octet-stream;base64,";
-        if data.starts_with(PATTERN) {
-            decode(&data[PATTERN.len()..])
-                .map(|x| Self::Data(Rc::new(x)))
-                .map_err(|_| IOError::Gltf(GltfError::Base64Decode))
+    pub fn new(data: String) -> Self {
+        if data.starts_with(BASE64_PATTERN) {
+            Self::Data(Data::new(data))
         } else {
-            Ok(Self::Uri(PathBuf::from(data)))
+            Self::Uri(PathBuf::from(data))
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+//@todo rename to make clear it's just pointers
+#[derive(Debug, Clone)]
+pub struct Data {
+    raw: Rc<RefCell<String>>,
+    decoded: Rc<RefCell<Vec<u8>>>,
+}
+
+impl Data {
+    pub fn new(raw: String) -> Self {
+        Self {
+            raw: Rc::new(RefCell::new(raw)),
+            decoded: Rc::default(),
+        }
+    }
+    pub fn get<'a>(&'a self) -> IOResult<Rc<RefCell<Vec<u8>>>> {
+        self.ensure_decoded()?;
+        Ok(self.decoded.clone())
+    }
+    fn ensure_decoded(&self) -> IOResult<()> {
+        if !self.decoded.borrow().is_empty() {
+            Ok(())
+        } else {
+            *self.decoded.borrow_mut() = decode(&self.raw.borrow()[BASE64_PATTERN.len()..])
+                .map_err(|_| IOError::Gltf(GltfError::Base64Decode))?;
+            *self.raw.borrow_mut() = String::new();
+            Ok(())
         }
     }
 }
@@ -669,15 +703,10 @@ impl Buffer {
             .get("byteLength")
             .and_then(|x| x.as_u64())
             .ok_or(IOError::Gltf(GltfError::JSONBufferLength))?;
-        let uri_or_data_str = val
+        let uri_or_data = val
             .get("uri")
             .and_then(|x| x.as_str())
-            .map(|x| x.to_string());
-
-        let uri_or_data = match uri_or_data_str {
-            None => None,
-            Some(x) => Some(UriOrData::new(x)?),
-        };
+            .map(|x| UriOrData::new(x.to_string()));
 
         Ok(Self {
             byte_length,

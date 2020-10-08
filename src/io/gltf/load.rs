@@ -657,7 +657,9 @@ where
                 None => Self::fetch_point(&mut self.root_read, &self.p_settings),
                 Some(r) => match &mut *r.borrow_mut() {
                     CursorOrFile::Cursor(seek, data) => {
-                        let mut cursor = Cursor::new(&data[*seek as usize..]);
+                        let tmp = data.get().unwrap(); //@todo unwrap
+                        let borrow = tmp.borrow();
+                        let mut cursor = Cursor::new(&borrow[*seek as usize..]);
                         let res = Self::fetch_point(&mut cursor, &self.p_settings);
                         *seek = *seek + cursor.seek(SeekFrom::Current(0)).unwrap(); //@todo unwrap
                         res
@@ -682,7 +684,9 @@ where
                     None => Self::fetch_face(self.index_offset, &mut self.root_read, f_settings),
                     Some(r) => match &mut *r.borrow_mut() {
                         CursorOrFile::Cursor(seek, data) => {
-                            let mut cursor = Cursor::new(&data[*seek as usize..]);
+                            let tmp = data.get().unwrap(); //@todo unwrap
+                            let borrow = tmp.borrow();
+                            let mut cursor = Cursor::new(&borrow[*seek as usize..]);
                             let res = Self::fetch_face(self.index_offset, &mut cursor, f_settings);
                             *seek = *seek + cursor.seek(SeekFrom::Current(0)).unwrap(); //@todo unwrap
                             res
