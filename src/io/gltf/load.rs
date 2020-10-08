@@ -227,11 +227,11 @@ where
             let bw_pos = &acc_pos.buffer_view;
             let (uri_or_data_pos, offset_pos) = match &bw_pos.buffer.uri_or_data {
                 None => (None, self.chunk_offset),
-                Some(x) => (Some(x.clone()), 0),
+                Some(x) => (Some(UriOrData::new(x.clone())?), 0), //@todo wasteful copies
             };
 
             let p_settings = PointIterSettings {
-                uri_or_data: uri_or_data_pos.map(|x| UriOrData::new(x)), //@todo wasteful copies
+                uri_or_data: uri_or_data_pos,
                 seek_start: offset_pos + acc_pos.byte_offset + bw_pos.byte_offset,
                 to_fetch: acc_pos.count as usize,
                 bytes_to_skip: if let Some(stride) = bw_pos.byte_stride {
@@ -252,11 +252,11 @@ where
 
                 let (uri_or_data_id, offset_id) = match &bw_id.buffer.uri_or_data {
                     None => (None, self.chunk_offset),
-                    Some(x) => (Some(x.clone()), 0),
+                    Some(x) => (Some(UriOrData::new(x.clone())?), 0), //@todo wasteful copies
                 };
 
                 Some(FaceIterSettings {
-                    uri_or_data: uri_or_data_id.map(|x| UriOrData::new(x)), //@todo wasteful copies
+                    uri_or_data: uri_or_data_id,
                     seek_start: offset_id + acc_id.byte_offset + bw_id.byte_offset,
                     to_fetch: acc_id.count as usize / 3,
                     bytes_to_skip: if let Some(stride) = bw_id.byte_stride {

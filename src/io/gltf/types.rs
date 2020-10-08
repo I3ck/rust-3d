@@ -615,7 +615,6 @@ impl BufferView {
 
 //------------------------------------------------------------------------------
 
-//@todo move
 pub enum CursorOrFile {
     Cursor(Cursor<Vec<u8>>), //@todo later try holding &'a Vec
     File(BufReader<File>),
@@ -639,13 +638,14 @@ pub enum UriOrData {
 }
 
 impl UriOrData {
-    pub fn new(data: String) -> Self {
-        //@todo IOResult
+    pub fn new(data: String) -> IOResult<Self> {
         const PATTERN: &str = "data:application/octet-stream;base64,";
         if data.starts_with(PATTERN) {
-            Self::Data(decode(&data[PATTERN.len()..]).ok().unwrap()) //@todo error handling //@todo unwrap
+            decode(&data[PATTERN.len()..])
+                .map(|x| Self::Data(x))
+                .map_err(|_| IOError::Gltf(GltfError::Base64Decode))
         } else {
-            Self::Uri(PathBuf::from(data))
+            Ok(Self::Uri(PathBuf::from(data)))
         }
     }
 }

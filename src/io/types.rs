@@ -123,6 +123,7 @@ pub enum GltfError {
     Stride,
     BufferUriNotSupported,
     BufferUriAccess,
+    Base64Decode,
 }
 
 pub type IOResult<T> = Result<T, IOError>; //@todo rename
@@ -275,6 +276,7 @@ impl std::fmt::Debug for GltfError {
                 write!(f, "Buffers with uri value aren't currently supported")
             }
             Self::BufferUriAccess => write!(f, "Could not access buffer file defined via uri"),
+            Self::Base64Decode => write!(f, "Unable to decode base64 data in .glTF/.glb file"),
         }
     }
 }
