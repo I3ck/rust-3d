@@ -29,7 +29,7 @@ use std::{
     collections::{hash_map::Entry, HashMap},
     convert::TryFrom,
     fs::File,
-    io::{BufReader, Read, Seek, SeekFrom},
+    io::{BufReader, Cursor, Read, Seek, SeekFrom},
     iter::FusedIterator,
     marker::PhantomData,
     path::PathBuf,
@@ -225,13 +225,13 @@ where
 
             let acc_pos = &primitive.positions;
             let bw_pos = &acc_pos.buffer_view;
-            let (uri_pos, offset_pos) = match &bw_pos.buffer.uri {
+            let (uri_or_data_pos, offset_pos) = match &bw_pos.buffer.uri_or_data {
                 None => (None, self.chunk_offset),
                 Some(x) => (Some(x.clone()), 0),
             };
 
             let p_settings = PointIterSettings {
-                uri: uri_pos,
+                uri_or_data: uri_or_data_pos.map(|x| UriOrData::new(x)), //@todo wasteful copies
                 seek_start: offset_pos + acc_pos.byte_offset + bw_pos.byte_offset,
                 to_fetch: acc_pos.count as usize,
                 bytes_to_skip: if let Some(stride) = bw_pos.byte_stride {
@@ -250,13 +250,13 @@ where
                 let bw_id = &acc_id.buffer_view;
                 let ct = acc_id.component_type;
 
-                let (uri_id, offset_id) = match &bw_id.buffer.uri {
+                let (uri_or_data_id, offset_id) = match &bw_id.buffer.uri_or_data {
                     None => (None, self.chunk_offset),
                     Some(x) => (Some(x.clone()), 0),
                 };
 
                 Some(FaceIterSettings {
-                    uri: uri_id,
+                    uri_or_data: uri_or_data_id.map(|x| UriOrData::new(x)), //@todo wasteful copies
                     seek_start: offset_id + acc_id.byte_offset + bw_id.byte_offset,
                     to_fetch: acc_id.count as usize / 3,
                     bytes_to_skip: if let Some(stride) = bw_id.byte_stride {
@@ -397,7 +397,7 @@ where
 
 #[derive(Default, Debug)]
 struct PointIterSettings {
-    pub uri: Option<String>, //@todo &str?
+    pub uri_or_data: Option<UriOrData>, //@todo &str? //@todo data case causes huge copies
     pub seek_start: u64,
     pub to_fetch: usize,
     pub bytes_to_skip: usize,
@@ -406,7 +406,7 @@ struct PointIterSettings {
 
 #[derive(Default, Debug, Clone)]
 struct FaceIterSettings {
-    pub uri: Option<String>, //@todo &str?
+    pub uri_or_data: Option<UriOrData>, //@todo &str? //@todo data case causes huge copies
     pub seek_start: u64,
     pub to_fetch: usize,
     pub bytes_to_skip: usize,
@@ -420,11 +420,11 @@ where
 {
     root_read: R,
     folder_path: PathBuf,
-    uri_readers: HashMap<PathBuf, Rc<RefCell<BufReader<File>>>>,
+    uri_readers: HashMap<PathBuf, Rc<RefCell<CursorOrFile>>>,
     p_settings: PointIterSettings,
     f_settings: Option<FaceIterSettings>,
-    p_reader: Option<Rc<RefCell<BufReader<File>>>>,
-    f_reader: Option<Rc<RefCell<BufReader<File>>>>,
+    p_reader: Option<Rc<RefCell<CursorOrFile>>>,
+    f_reader: Option<Rc<RefCell<CursorOrFile>>>,
     points_pushed: usize,
     index_offset: usize,
     data_faces_to_reserve: [usize; 2],
@@ -560,29 +560,36 @@ where
 
     #[inline(always)]
     fn seek_to_points(&mut self) -> IOResult<()> {
-        match &self.p_settings.uri {
+        match &self.p_settings.uri_or_data {
             None => {
                 self.root_read
                     .seek(SeekFrom::Start(self.p_settings.seek_start))?;
                 self.p_reader = None;
             }
-            Some(x) => {
-                let path = self.folder_path.join(x);
-                let read = match self.uri_readers.entry(path.clone()) {
-                    Entry::Occupied(x) => x.into_mut(),
-                    Entry::Vacant(x) => {
-                        let entry = Rc::new(RefCell::new(BufReader::new(
-                            File::open(path.clone())
-                                .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?,
-                        )));
-                        x.insert(entry)
-                    }
-                };
+            Some(x) => match x {
+                UriOrData::Data(x) => {
+                    let mut cursor = Cursor::new(x.clone()); //@todo avoid clone here
+                    cursor.seek(SeekFrom::Start(self.p_settings.seek_start))?;
+                    self.p_reader = Some(Rc::new(RefCell::new(CursorOrFile::Cursor(cursor))));
+                }
+                UriOrData::Uri(x) => {
+                    let path = self.folder_path.join(x);
+                    let read = match self.uri_readers.entry(path.clone()) {
+                        Entry::Occupied(x) => x.into_mut(),
+                        Entry::Vacant(x) => {
+                            let entry = Rc::new(RefCell::new(CursorOrFile::File(BufReader::new(
+                                File::open(path.clone())
+                                    .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?,
+                            ))));
+                            x.insert(entry)
+                        }
+                    };
 
-                read.borrow_mut()
-                    .seek(SeekFrom::Start(self.p_settings.seek_start))?;
-                self.p_reader = Some(read.clone());
-            }
+                    read.borrow_mut()
+                        .seek(SeekFrom::Start(self.p_settings.seek_start))?;
+                    self.p_reader = Some(read.clone());
+                }
+            },
         }
 
         Ok(())
@@ -591,29 +598,38 @@ where
     #[inline(always)]
     fn seek_to_faces(&mut self) -> IOResult<()> {
         if let Some(f_settings) = &self.f_settings {
-            match &f_settings.uri {
+            match &f_settings.uri_or_data {
                 None => {
                     self.root_read
                         .seek(SeekFrom::Start(f_settings.seek_start))?;
                     self.f_reader = None;
                 }
-                Some(x) => {
-                    let path = self.folder_path.join(x);
-                    let read = match self.uri_readers.entry(path.clone()) {
-                        Entry::Occupied(x) => x.into_mut(),
-                        Entry::Vacant(x) => {
-                            let entry = Rc::new(RefCell::new(BufReader::new(
-                                File::open(path.clone())
-                                    .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?,
-                            )));
-                            x.insert(entry)
-                        }
-                    };
+                Some(x) => match x {
+                    UriOrData::Data(x) => {
+                        let mut cursor = Cursor::new(x.clone()); //@todo avoid clone here
+                        cursor.seek(SeekFrom::Start(f_settings.seek_start))?;
+                        self.f_reader = Some(Rc::new(RefCell::new(CursorOrFile::Cursor(cursor))));
+                    }
+                    UriOrData::Uri(x) => {
+                        let path = self.folder_path.join(x);
+                        let read = match self.uri_readers.entry(path.clone()) {
+                            Entry::Occupied(x) => x.into_mut(),
+                            Entry::Vacant(x) => {
+                                let entry =
+                                    Rc::new(RefCell::new(CursorOrFile::File(BufReader::new(
+                                        File::open(path.clone()).map_err(|_| {
+                                            IOError::Gltf(GltfError::BufferUriAccess)
+                                        })?,
+                                    ))));
+                                x.insert(entry)
+                            }
+                        };
 
-                    read.borrow_mut()
-                        .seek(SeekFrom::Start(f_settings.seek_start))?;
-                    self.f_reader = Some(read.clone());
-                }
+                        read.borrow_mut()
+                            .seek(SeekFrom::Start(f_settings.seek_start))?;
+                        self.f_reader = Some(read.clone());
+                    }
+                },
             }
         }
         Ok(())
@@ -639,7 +655,10 @@ where
 
             let result = match &self.p_reader {
                 None => Self::fetch_point(&mut self.root_read, &self.p_settings),
-                Some(r) => Self::fetch_point(&mut *r.borrow_mut(), &self.p_settings),
+                Some(r) => match &mut *r.borrow_mut() {
+                    CursorOrFile::Cursor(r) => Self::fetch_point(r, &self.p_settings),
+                    CursorOrFile::File(r) => Self::fetch_point(r, &self.p_settings),
+                },
             };
 
             if self.p_settings.to_fetch == 0 {
@@ -656,9 +675,12 @@ where
 
                 Some(match &self.f_reader {
                     None => Self::fetch_face(self.index_offset, &mut self.root_read, f_settings),
-                    Some(r) => {
-                        Self::fetch_face(self.index_offset, &mut *r.borrow_mut(), f_settings)
-                    } //unwrap safe, since inserting in seek
+                    Some(r) => match &mut *r.borrow_mut() {
+                        CursorOrFile::Cursor(r) => {
+                            Self::fetch_face(self.index_offset, r, f_settings)
+                        }
+                        CursorOrFile::File(r) => Self::fetch_face(self.index_offset, r, f_settings),
+                    }, //unwrap safe, since inserting in seek
                 })
             } else {
                 None
