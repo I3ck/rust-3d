@@ -42,7 +42,8 @@ use base64::decode;
 
 //------------------------------------------------------------------------------
 
-const BASE64_PATTERN: &str = "data:application/octet-stream;base64,";
+const BASE64_OCTET_STREAM: &str = "data:application/octet-stream;base64,";
+const BASE64_GLTF_BUFFER: &str = "data:application/gltf-buffer;base64,";
 
 //------------------------------------------------------------------------------
 
@@ -648,8 +649,10 @@ pub enum UriOrData {
 
 impl UriOrData {
     pub fn new(data: String) -> Self {
-        if data.starts_with(BASE64_PATTERN) {
-            Self::Data(DataPointer::new(data))
+        if data.starts_with(BASE64_OCTET_STREAM) {
+            Self::Data(DataPointer::new(data, BASE64_OCTET_STREAM.len()))
+        } else if data.starts_with(BASE64_GLTF_BUFFER) {
+            Self::Data(DataPointer::new(data, BASE64_GLTF_BUFFER.len()))
         } else {
             Self::Uri(PathBuf::from(data))
         }
@@ -662,13 +665,15 @@ impl UriOrData {
 pub struct DataPointer {
     raw: Rc<RefCell<String>>,
     decoded: Rc<RefCell<Vec<u8>>>,
+    to_skip: usize,
 }
 
 impl DataPointer {
-    pub fn new(raw: String) -> Self {
+    pub fn new(raw: String, to_skip: usize) -> Self {
         Self {
             raw: Rc::new(RefCell::new(raw)),
             decoded: Rc::default(),
+            to_skip,
         }
     }
     pub fn get<'a>(&'a self) -> IOResult<Rc<RefCell<Vec<u8>>>> {
@@ -679,7 +684,7 @@ impl DataPointer {
         if !self.decoded.borrow().is_empty() {
             Ok(())
         } else {
-            *self.decoded.borrow_mut() = decode(&self.raw.borrow()[BASE64_PATTERN.len()..])
+            *self.decoded.borrow_mut() = decode(&self.raw.borrow()[self.to_skip..])
                 .map_err(|_| IOError::Gltf(GltfError::Base64Decode))?;
             *self.raw.borrow_mut() = String::new();
             Ok(())
