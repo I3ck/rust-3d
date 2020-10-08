@@ -657,12 +657,16 @@ where
                 None => Self::fetch_point(&mut self.root_read, &self.p_settings),
                 Some(r) => match &mut *r.borrow_mut() {
                     DataOrFile::Data(seek, data) => {
-                        let tmp = data.get().unwrap(); //@todo unwrap
-                        let borrow = tmp.borrow();
-                        let mut cursor = Cursor::new(&borrow[*seek as usize..]);
-                        let res = Self::fetch_point(&mut cursor, &self.p_settings);
-                        *seek = *seek + cursor.seek(SeekFrom::Current(0)).unwrap(); //@todo unwrap
-                        res
+                        match data.get() {
+                            Err(e) => return Some(Err(e)),
+                            Ok(tmp) => {
+                                let borrow = tmp.borrow();
+                                let mut cursor = Cursor::new(&borrow[*seek as usize..]);
+                                let res = Self::fetch_point(&mut cursor, &self.p_settings);
+                                *seek = *seek + cursor.seek(SeekFrom::Current(0)).unwrap(); //safe, since not really moving the cursor
+                                res
+                            }
+                        }
                     }
                     DataOrFile::File(r) => Self::fetch_point(r, &self.p_settings),
                 },
@@ -684,12 +688,20 @@ where
                     None => Self::fetch_face(self.index_offset, &mut self.root_read, f_settings),
                     Some(r) => match &mut *r.borrow_mut() {
                         DataOrFile::Data(seek, data) => {
-                            let tmp = data.get().unwrap(); //@todo unwrap
-                            let borrow = tmp.borrow();
-                            let mut cursor = Cursor::new(&borrow[*seek as usize..]);
-                            let res = Self::fetch_face(self.index_offset, &mut cursor, f_settings);
-                            *seek = *seek + cursor.seek(SeekFrom::Current(0)).unwrap(); //@todo unwrap
-                            res
+                            match data.get() {
+                                Err(e) => return Some(Err(e)),
+                                Ok(tmp) => {
+                                    let borrow = tmp.borrow();
+                                    let mut cursor = Cursor::new(&borrow[*seek as usize..]);
+                                    let res = Self::fetch_face(
+                                        self.index_offset,
+                                        &mut cursor,
+                                        f_settings,
+                                    );
+                                    *seek = *seek + cursor.seek(SeekFrom::Current(0)).unwrap(); //safe, since not really moving the cursor
+                                    res
+                                }
+                            }
                         }
                         DataOrFile::File(r) => Self::fetch_face(self.index_offset, r, f_settings),
                     }, //unwrap safe, since inserting in seek
