@@ -28,8 +28,9 @@ use std::{
     collections::HashSet,
     convert::TryFrom,
     fs::File,
-    io::{BufReader, Cursor, Seek, SeekFrom},
+    io::{BufReader, Seek, SeekFrom},
     path::PathBuf,
+    rc::Rc,
 };
 
 use super::super::types::*;
@@ -615,16 +616,20 @@ impl BufferView {
 
 //------------------------------------------------------------------------------
 
+//@todo rename
 pub enum CursorOrFile {
-    Cursor(Cursor<Vec<u8>>), //@todo later try holding &'a Vec
+    Cursor(u64, Rc<Vec<u8>>),
     File(BufReader<File>),
 }
 
 impl CursorOrFile {
-    pub fn seek(&mut self, sf: SeekFrom) -> std::result::Result<u64, std::io::Error> {
+    pub fn seek(&mut self, start: u64) -> std::result::Result<u64, std::io::Error> {
         match self {
-            Self::Cursor(x) => x.seek(sf),
-            Self::File(x) => x.seek(sf),
+            Self::Cursor(i, _) => {
+                *i = start;
+                Ok(start)
+            }
+            Self::File(x) => x.seek(SeekFrom::Start(start)),
         }
     }
 }
@@ -634,7 +639,7 @@ impl CursorOrFile {
 #[derive(Debug, Clone)] //@todo try drop Clone
 pub enum UriOrData {
     Uri(PathBuf),
-    Data(Vec<u8>),
+    Data(Rc<Vec<u8>>),
 }
 
 impl UriOrData {
@@ -642,7 +647,7 @@ impl UriOrData {
         const PATTERN: &str = "data:application/octet-stream;base64,";
         if data.starts_with(PATTERN) {
             decode(&data[PATTERN.len()..])
-                .map(|x| Self::Data(x))
+                .map(|x| Self::Data(Rc::new(x)))
                 .map_err(|_| IOError::Gltf(GltfError::Base64Decode))
         } else {
             Ok(Self::Uri(PathBuf::from(data)))
@@ -655,7 +660,7 @@ impl UriOrData {
 #[derive(Debug, Clone)]
 pub struct Buffer {
     pub byte_length: u64,
-    pub uri_or_data: Option<String>,
+    pub uri_or_data: Option<UriOrData>,
 }
 
 impl Buffer {
@@ -664,10 +669,16 @@ impl Buffer {
             .get("byteLength")
             .and_then(|x| x.as_u64())
             .ok_or(IOError::Gltf(GltfError::JSONBufferLength))?;
-        let uri_or_data = val
+        let uri_or_data_str = val
             .get("uri")
             .and_then(|x| x.as_str())
             .map(|x| x.to_string());
+
+        let uri_or_data = match uri_or_data_str {
+            None => None,
+            Some(x) => Some(UriOrData::new(x)?),
+        };
+
         Ok(Self {
             byte_length,
             uri_or_data,
