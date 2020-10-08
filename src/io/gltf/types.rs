@@ -621,16 +621,15 @@ impl BufferView {
 
 //------------------------------------------------------------------------------
 
-//@todo rename
-pub enum CursorOrFile {
-    Cursor(u64, Data),
+pub enum DataOrFile {
+    Data(u64, DataPointer),
     File(BufReader<File>),
 }
 
-impl CursorOrFile {
+impl DataOrFile {
     pub fn seek(&mut self, start: u64) -> std::result::Result<u64, std::io::Error> {
         match self {
-            Self::Cursor(i, _) => {
+            Self::Data(i, _) => {
                 *i = start;
                 Ok(start)
             }
@@ -641,16 +640,16 @@ impl CursorOrFile {
 
 //------------------------------------------------------------------------------
 
-#[derive(Debug, Clone)] //@todo try drop Clone
+#[derive(Debug, Clone)]
 pub enum UriOrData {
     Uri(PathBuf),
-    Data(Data),
+    Data(DataPointer),
 }
 
 impl UriOrData {
     pub fn new(data: String) -> Self {
         if data.starts_with(BASE64_PATTERN) {
-            Self::Data(Data::new(data))
+            Self::Data(DataPointer::new(data))
         } else {
             Self::Uri(PathBuf::from(data))
         }
@@ -659,14 +658,13 @@ impl UriOrData {
 
 //------------------------------------------------------------------------------
 
-//@todo rename to make clear it's just pointers
 #[derive(Debug, Clone)]
-pub struct Data {
+pub struct DataPointer {
     raw: Rc<RefCell<String>>,
     decoded: Rc<RefCell<Vec<u8>>>,
 }
 
-impl Data {
+impl DataPointer {
     pub fn new(raw: String) -> Self {
         Self {
             raw: Rc::new(RefCell::new(raw)),

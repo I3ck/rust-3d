@@ -420,11 +420,11 @@ where
 {
     root_read: R,
     folder_path: PathBuf,
-    uri_readers: HashMap<PathBuf, Rc<RefCell<CursorOrFile>>>,
+    uri_readers: HashMap<PathBuf, Rc<RefCell<DataOrFile>>>,
     p_settings: PointIterSettings,
     f_settings: Option<FaceIterSettings>,
-    p_reader: Option<Rc<RefCell<CursorOrFile>>>,
-    f_reader: Option<Rc<RefCell<CursorOrFile>>>,
+    p_reader: Option<Rc<RefCell<DataOrFile>>>,
+    f_reader: Option<Rc<RefCell<DataOrFile>>>,
     points_pushed: usize,
     index_offset: usize,
     data_faces_to_reserve: [usize; 2],
@@ -568,7 +568,7 @@ where
             }
             Some(x) => match x {
                 UriOrData::Data(x) => {
-                    self.p_reader = Some(Rc::new(RefCell::new(CursorOrFile::Cursor(
+                    self.p_reader = Some(Rc::new(RefCell::new(DataOrFile::Data(
                         self.p_settings.seek_start,
                         x.clone(),
                     ))));
@@ -578,7 +578,7 @@ where
                     let read = match self.uri_readers.entry(path.clone()) {
                         Entry::Occupied(x) => x.into_mut(),
                         Entry::Vacant(x) => {
-                            let entry = Rc::new(RefCell::new(CursorOrFile::File(BufReader::new(
+                            let entry = Rc::new(RefCell::new(DataOrFile::File(BufReader::new(
                                 File::open(path.clone())
                                     .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?,
                             ))));
@@ -606,7 +606,7 @@ where
                 }
                 Some(x) => match x {
                     UriOrData::Data(x) => {
-                        self.f_reader = Some(Rc::new(RefCell::new(CursorOrFile::Cursor(
+                        self.f_reader = Some(Rc::new(RefCell::new(DataOrFile::Data(
                             f_settings.seek_start,
                             x.clone(),
                         ))));
@@ -617,7 +617,7 @@ where
                             Entry::Occupied(x) => x.into_mut(),
                             Entry::Vacant(x) => {
                                 let entry =
-                                    Rc::new(RefCell::new(CursorOrFile::File(BufReader::new(
+                                    Rc::new(RefCell::new(DataOrFile::File(BufReader::new(
                                         File::open(path.clone()).map_err(|_| {
                                             IOError::Gltf(GltfError::BufferUriAccess)
                                         })?,
@@ -656,7 +656,7 @@ where
             let result = match &self.p_reader {
                 None => Self::fetch_point(&mut self.root_read, &self.p_settings),
                 Some(r) => match &mut *r.borrow_mut() {
-                    CursorOrFile::Cursor(seek, data) => {
+                    DataOrFile::Data(seek, data) => {
                         let tmp = data.get().unwrap(); //@todo unwrap
                         let borrow = tmp.borrow();
                         let mut cursor = Cursor::new(&borrow[*seek as usize..]);
@@ -664,7 +664,7 @@ where
                         *seek = *seek + cursor.seek(SeekFrom::Current(0)).unwrap(); //@todo unwrap
                         res
                     }
-                    CursorOrFile::File(r) => Self::fetch_point(r, &self.p_settings),
+                    DataOrFile::File(r) => Self::fetch_point(r, &self.p_settings),
                 },
             };
 
@@ -683,7 +683,7 @@ where
                 Some(match &self.f_reader {
                     None => Self::fetch_face(self.index_offset, &mut self.root_read, f_settings),
                     Some(r) => match &mut *r.borrow_mut() {
-                        CursorOrFile::Cursor(seek, data) => {
+                        DataOrFile::Data(seek, data) => {
                             let tmp = data.get().unwrap(); //@todo unwrap
                             let borrow = tmp.borrow();
                             let mut cursor = Cursor::new(&borrow[*seek as usize..]);
@@ -691,7 +691,7 @@ where
                             *seek = *seek + cursor.seek(SeekFrom::Current(0)).unwrap(); //@todo unwrap
                             res
                         }
-                        CursorOrFile::File(r) => Self::fetch_face(self.index_offset, r, f_settings),
+                        DataOrFile::File(r) => Self::fetch_face(self.index_offset, r, f_settings),
                     }, //unwrap safe, since inserting in seek
                 })
             } else {
