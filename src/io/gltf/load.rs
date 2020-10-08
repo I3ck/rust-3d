@@ -397,7 +397,7 @@ where
 
 #[derive(Default, Debug)]
 struct PointIterSettings {
-    pub uri_or_data: Option<UriOrData>, //@todo &str? //@todo data case causes huge copies
+    pub uri_or_data: Option<UriOrData>,
     pub seek_start: u64,
     pub to_fetch: usize,
     pub bytes_to_skip: usize,
@@ -406,7 +406,7 @@ struct PointIterSettings {
 
 #[derive(Default, Debug, Clone)]
 struct FaceIterSettings {
-    pub uri_or_data: Option<UriOrData>, //@todo &str? //@todo data case causes huge copies
+    pub uri_or_data: Option<UriOrData>,
     pub seek_start: u64,
     pub to_fetch: usize,
     pub bytes_to_skip: usize,
