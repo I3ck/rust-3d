@@ -58,12 +58,14 @@ impl<T> From<DataReserve<T>> for FaceDataReserve<T> {
 //------------------------------------------------------------------------------
 
 //@todo consider split into load/save
+#[derive(Clone)]
 pub enum IOError {
     AccessFile,
     Header,
     UnsupportedVersion,
     UnknownPointFormat,
     BinaryData,
+    Threading,
     VertexCount(Option<usize>),
     FaceCount(Option<usize>),
     FaceVertexCount,
@@ -91,6 +93,7 @@ pub enum IOError {
     Gltf(GltfError),
 }
 
+#[derive(Clone)]
 pub enum GltfError {
     Header,
     Version,
@@ -188,6 +191,7 @@ impl std::fmt::Debug for IOError {
             Self::EndLoop(x) => write!(f, "Unable to parse endloop on line {}", x),
             Self::EstimateDelimiter => write!(f, "Unable to estimate delimiter"),
             Self::InvalidJSON => write!(f, "Unable to parse JSON format"),
+            Self::Threading => write!(f, "Error during multi threading"),
             Self::Gltf(x) => write!(f, "{:?}", x),
         }
     }
