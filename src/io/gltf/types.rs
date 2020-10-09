@@ -681,7 +681,7 @@ impl DataPointer {
         Ok(self.decoded.clone())
     }
     fn ensure_decoded(&self) -> IOResult<()> {
-        if !self.decoded.borrow().is_empty() {
+        if self.raw.borrow().is_empty() {
             Ok(())
         } else {
             *self.decoded.borrow_mut() = decode(&self.raw.borrow()[self.to_skip..])
