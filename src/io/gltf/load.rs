@@ -397,7 +397,7 @@ where
 
 #[derive(Default, Debug)]
 struct PointIterSettings {
-    pub uri_or_data: Option<UriOrData>,
+    pub uri_or_data: Option<UriOrDataPointer>,
     pub seek_start: u64,
     pub to_fetch: usize,
     pub bytes_to_skip: usize,
@@ -406,7 +406,7 @@ struct PointIterSettings {
 
 #[derive(Default, Debug, Clone)]
 struct FaceIterSettings {
-    pub uri_or_data: Option<UriOrData>,
+    pub uri_or_data: Option<UriOrDataPointer>,
     pub seek_start: u64,
     pub to_fetch: usize,
     pub bytes_to_skip: usize,
@@ -420,11 +420,11 @@ where
 {
     root_read: R,
     folder_path: PathBuf,
-    uri_readers: HashMap<PathBuf, Rc<RefCell<DataOrFile>>>,
+    uri_readers: HashMap<PathBuf, Rc<RefCell<FileOrDataPointer>>>,
     p_settings: PointIterSettings,
     f_settings: Option<FaceIterSettings>,
-    p_reader: Option<Rc<RefCell<DataOrFile>>>,
-    f_reader: Option<Rc<RefCell<DataOrFile>>>,
+    p_reader: Option<Rc<RefCell<FileOrDataPointer>>>,
+    f_reader: Option<Rc<RefCell<FileOrDataPointer>>>,
     points_pushed: usize,
     index_offset: usize,
     data_faces_to_reserve: [usize; 2],
@@ -567,21 +567,22 @@ where
                 self.p_reader = None;
             }
             Some(x) => match x {
-                UriOrData::Data(x) => {
-                    self.p_reader = Some(Rc::new(RefCell::new(DataOrFile::Data(
+                UriOrDataPointer::DataPointer(x) => {
+                    self.p_reader = Some(Rc::new(RefCell::new(FileOrDataPointer::DataPointer(
                         self.p_settings.seek_start,
                         x.clone(),
                     ))));
                 }
-                UriOrData::Uri(x) => {
+                UriOrDataPointer::Uri(x) => {
                     let path = self.folder_path.join(x);
                     let read = match self.uri_readers.entry(path.clone()) {
                         Entry::Occupied(x) => x.into_mut(),
                         Entry::Vacant(x) => {
-                            let entry = Rc::new(RefCell::new(DataOrFile::File(BufReader::new(
-                                File::open(path.clone())
-                                    .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?,
-                            ))));
+                            let entry =
+                                Rc::new(RefCell::new(FileOrDataPointer::File(BufReader::new(
+                                    File::open(path.clone())
+                                        .map_err(|_| IOError::Gltf(GltfError::BufferUriAccess))?,
+                                ))));
                             x.insert(entry)
                         }
                     };
@@ -605,19 +606,18 @@ where
                     self.f_reader = None;
                 }
                 Some(x) => match x {
-                    UriOrData::Data(x) => {
-                        self.f_reader = Some(Rc::new(RefCell::new(DataOrFile::Data(
-                            f_settings.seek_start,
-                            x.clone(),
-                        ))));
+                    UriOrDataPointer::DataPointer(x) => {
+                        self.f_reader = Some(Rc::new(RefCell::new(
+                            FileOrDataPointer::DataPointer(f_settings.seek_start, x.clone()),
+                        )));
                     }
-                    UriOrData::Uri(x) => {
+                    UriOrDataPointer::Uri(x) => {
                         let path = self.folder_path.join(x);
                         let read = match self.uri_readers.entry(path.clone()) {
                             Entry::Occupied(x) => x.into_mut(),
                             Entry::Vacant(x) => {
                                 let entry =
-                                    Rc::new(RefCell::new(DataOrFile::File(BufReader::new(
+                                    Rc::new(RefCell::new(FileOrDataPointer::File(BufReader::new(
                                         File::open(path.clone()).map_err(|_| {
                                             IOError::Gltf(GltfError::BufferUriAccess)
                                         })?,
@@ -656,7 +656,7 @@ where
             let result = match &self.p_reader {
                 None => Self::fetch_point(&mut self.root_read, &self.p_settings),
                 Some(r) => match &mut *r.borrow_mut() {
-                    DataOrFile::Data(seek, data) => {
+                    FileOrDataPointer::DataPointer(seek, data) => {
                         match data.get() {
                             Err(e) => return Some(Err(e)),
                             Ok(tmp) => {
@@ -668,7 +668,7 @@ where
                             }
                         }
                     }
-                    DataOrFile::File(r) => Self::fetch_point(r, &self.p_settings),
+                    FileOrDataPointer::File(r) => Self::fetch_point(r, &self.p_settings),
                 },
             };
 
@@ -687,7 +687,7 @@ where
                 Some(match &self.f_reader {
                     None => Self::fetch_face(self.index_offset, &mut self.root_read, f_settings),
                     Some(r) => match &mut *r.borrow_mut() {
-                        DataOrFile::Data(seek, data) => {
+                        FileOrDataPointer::DataPointer(seek, data) => {
                             match data.get() {
                                 Err(e) => return Some(Err(e)),
                                 Ok(tmp) => {
@@ -703,7 +703,9 @@ where
                                 }
                             }
                         }
-                        DataOrFile::File(r) => Self::fetch_face(self.index_offset, r, f_settings),
+                        FileOrDataPointer::File(r) => {
+                            Self::fetch_face(self.index_offset, r, f_settings)
+                        }
                     }, //unwrap safe, since inserting in seek
                 })
             } else {

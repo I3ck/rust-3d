@@ -622,15 +622,15 @@ impl BufferView {
 
 //------------------------------------------------------------------------------
 
-pub enum DataOrFile {
-    Data(u64, DataPointer),
+pub enum FileOrDataPointer {
+    DataPointer(u64, DataPointer),
     File(BufReader<File>),
 }
 
-impl DataOrFile {
+impl FileOrDataPointer {
     pub fn seek(&mut self, start: u64) -> std::result::Result<u64, std::io::Error> {
         match self {
-            Self::Data(i, _) => {
+            Self::DataPointer(i, _) => {
                 *i = start;
                 Ok(start)
             }
@@ -642,17 +642,17 @@ impl DataOrFile {
 //------------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
-pub enum UriOrData {
+pub enum UriOrDataPointer {
     Uri(PathBuf),
-    Data(DataPointer),
+    DataPointer(DataPointer),
 }
 
-impl UriOrData {
+impl UriOrDataPointer {
     pub fn new(data: String) -> Self {
         if data.starts_with(BASE64_OCTET_STREAM) {
-            Self::Data(DataPointer::new(data, BASE64_OCTET_STREAM.len()))
+            Self::DataPointer(DataPointer::new(data, BASE64_OCTET_STREAM.len()))
         } else if data.starts_with(BASE64_GLTF_BUFFER) {
-            Self::Data(DataPointer::new(data, BASE64_GLTF_BUFFER.len()))
+            Self::DataPointer(DataPointer::new(data, BASE64_GLTF_BUFFER.len()))
         } else {
             Self::Uri(PathBuf::from(data))
         }
@@ -697,7 +697,7 @@ impl DataPointer {
 #[derive(Debug, Clone)]
 pub struct Buffer {
     pub byte_length: u64,
-    pub uri_or_data: Option<UriOrData>,
+    pub uri_or_data: Option<UriOrDataPointer>,
 }
 
 impl Buffer {
@@ -709,7 +709,7 @@ impl Buffer {
         let uri_or_data = val
             .get("uri")
             .and_then(|x| x.as_str())
-            .map(|x| UriOrData::new(x.to_string()));
+            .map(|x| UriOrDataPointer::new(x.to_string()));
 
         Ok(Self {
             byte_length,
