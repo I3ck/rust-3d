@@ -32,7 +32,6 @@ use std::{
     io::{BufReader, Seek, SeekFrom},
     path::PathBuf,
     rc::Rc,
-    sync::{Arc, Mutex},
 };
 
 use super::super::types::*;
@@ -664,57 +663,32 @@ impl UriOrDataPointer {
 
 #[derive(Debug, Clone)]
 pub struct DataPointer {
-    decoded_done: Rc<RefCell<Vec<u8>>>,
-    decoded_work: Arc<Mutex<IOResult<(bool, Vec<u8>)>>>,
-    work_done: RefCell<bool>,
+    raw: Rc<RefCell<String>>,
+    decoded: Rc<RefCell<Vec<u8>>>,
     to_skip: usize,
 }
 
 impl DataPointer {
     pub fn new(raw: String, to_skip: usize) -> Self {
-        let decoded_done = Rc::default();
-        let decoded_work = Arc::new(Mutex::new(Ok((false, Vec::new()))));
-
-        let decoded_work_thread = decoded_work.clone();
-
-        std::thread::spawn(move || Self::decode_async(raw, to_skip, decoded_work_thread));
-
         Self {
-            decoded_done,
-            decoded_work,
-            work_done: RefCell::new(false),
+            raw: Rc::new(RefCell::new(raw)),
+            decoded: Rc::default(),
             to_skip,
         }
     }
     pub fn get<'a>(&'a self) -> IOResult<Rc<RefCell<Vec<u8>>>> {
         self.ensure_decoded()?;
-        Ok(self.decoded_done.clone())
+        Ok(self.decoded.clone())
     }
     fn ensure_decoded(&self) -> IOResult<()> {
-        if *self.work_done.borrow() {
+        if self.raw.borrow().is_empty() {
             Ok(())
         } else {
-            loop {
-                let mut lck = self.decoded_work.lock().map_err(|_| IOError::Threading)?;
-                match &mut *lck {
-                    Err(e) => return Err(e.clone()),
-                    Ok((false, _)) => (),
-                    Ok((true, x)) => {
-                        std::mem::swap(x, &mut *self.decoded_done.borrow_mut());
-                        *self.work_done.borrow_mut() = true;
-                        break;
-                    }
-                }
-                std::thread::sleep(std::time::Duration::from_nanos(10)); // Ensure decode thread can aquire lock
-            }
+            *self.decoded.borrow_mut() = decode(&self.raw.borrow()[self.to_skip..])
+                .map_err(|_| IOError::Gltf(GltfError::Base64Decode))?;
+            *self.raw.borrow_mut() = String::new();
             Ok(())
         }
-    }
-    fn decode_async(raw: String, to_skip: usize, result: Arc<Mutex<IOResult<(bool, Vec<u8>)>>>) {
-        let mut lck = result.lock().unwrap(); // Nothing we can do here. Let the thread die
-        *lck = decode(&raw[to_skip..])
-            .map_err(|_| IOError::Gltf(GltfError::Base64Decode))
-            .map(|x| (true, x))
     }
 }
 
