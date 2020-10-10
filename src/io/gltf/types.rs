@@ -665,7 +665,7 @@ impl UriOrDataPointer {
 #[derive(Debug, Clone)]
 pub struct DataPointer {
     decoded_done: Rc<RefCell<Vec<u8>>>,
-    decoded_work: Arc<Mutex<IOResult<Vec<u8>>>>,
+    decoded_work: Arc<Mutex<IOResult<(bool, Vec<u8>)>>>,
     work_done: RefCell<bool>,
     to_skip: usize,
 }
@@ -673,7 +673,7 @@ pub struct DataPointer {
 impl DataPointer {
     pub fn new(raw: String, to_skip: usize) -> Self {
         let decoded_done = Rc::default();
-        let decoded_work = Arc::new(Mutex::new(Ok(Vec::new())));
+        let decoded_work = Arc::new(Mutex::new(Ok((false, Vec::new()))));
 
         let decoded_work_thread = decoded_work.clone();
 
@@ -694,20 +694,27 @@ impl DataPointer {
         if *self.work_done.borrow() {
             Ok(())
         } else {
-            let mut lck = self.decoded_work.lock().map_err(|_| IOError::Threading)?;
-            match &mut *lck {
-                Err(e) => return Err(e.clone()),
-                Ok(x) => {
-                    std::mem::swap(x, &mut *self.decoded_done.borrow_mut());
-                    *self.work_done.borrow_mut() = true
+            loop {
+                let mut lck = self.decoded_work.lock().map_err(|_| IOError::Threading)?;
+                match &mut *lck {
+                    Err(e) => return Err(e.clone()),
+                    Ok((false, _)) => (),
+                    Ok((true, x)) => {
+                        std::mem::swap(x, &mut *self.decoded_done.borrow_mut());
+                        *self.work_done.borrow_mut() = true;
+                        break;
+                    }
                 }
+                std::thread::sleep(std::time::Duration::from_nanos(10)); // Ensure decode thread can aquire lock
             }
             Ok(())
         }
     }
-    fn decode_async(raw: String, to_skip: usize, result: Arc<Mutex<IOResult<Vec<u8>>>>) {
+    fn decode_async(raw: String, to_skip: usize, result: Arc<Mutex<IOResult<(bool, Vec<u8>)>>>) {
         let mut lck = result.lock().unwrap(); // Nothing we can do here. Let the thread die
-        *lck = decode(&raw[to_skip..]).map_err(|_| IOError::Gltf(GltfError::Base64Decode));
+        *lck = decode(&raw[to_skip..])
+            .map_err(|_| IOError::Gltf(GltfError::Base64Decode))
+            .map(|x| (true, x))
     }
 }
 
