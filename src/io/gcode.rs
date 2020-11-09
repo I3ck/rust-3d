@@ -230,17 +230,22 @@ fn command(line: &[u8]) -> Option<[Option<f64>; 3]> {
             continue;
         }
 
+        let end = if n >= 2 && word[n - 1] == b';' {
+            n - 1
+        } else {
+            n
+        };
         match word[0] {
             b'X' => {
-                x = Some(from_ascii(&word[1..])?);
+                x = Some(from_ascii(&word[1..end])?);
                 n_found += 1
             }
             b'Y' => {
-                y = Some(from_ascii(&word[1..])?);
+                y = Some(from_ascii(&word[1..end])?);
                 n_found += 1
             }
             b'Z' => {
-                z = Some(from_ascii(&word[1..])?);
+                z = Some(from_ascii(&word[1..end])?);
                 n_found += 1
             }
             _ => (),
