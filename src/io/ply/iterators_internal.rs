@@ -338,21 +338,21 @@ where
 
         let first = words
             .next()
-            .and_then(|w| from_ascii(w))
+            .and_then(|w| fast_float::parse(w).ok())
             .ok_or(IOError::Vertex(Some(i_line)))?;
 
         skip_n(&mut words, header.vertex.format.between_first_snd.words);
 
         let snd = words
             .next()
-            .and_then(|w| from_ascii(w))
+            .and_then(|w| fast_float::parse(w).ok())
             .ok_or(IOError::Vertex(Some(i_line)))?;
 
         skip_n(&mut words, header.vertex.format.between_snd_third.words);
 
         let third = words
             .next()
-            .and_then(|w| from_ascii(w))
+            .and_then(|w| fast_float::parse(w).ok())
             .ok_or(IOError::Vertex(Some(i_line)))?;
 
         // no need to skip 'after' since we're done with this line anyway

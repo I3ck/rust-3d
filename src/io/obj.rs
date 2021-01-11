@@ -245,17 +245,17 @@ where
 
     let x = words
         .next()
-        .and_then(|w| from_ascii(w))
+        .and_then(|w| fast_float::parse(w).ok())
         .ok_or(IOError::Vertex(Some(i_line)))?;
 
     let y = words
         .next()
-        .and_then(|w| from_ascii(w))
+        .and_then(|w| fast_float::parse(w).ok())
         .ok_or(IOError::Vertex(Some(i_line)))?;
 
     let z = words
         .next()
-        .and_then(|w| from_ascii(w))
+        .and_then(|w| fast_float::parse(w).ok())
         .ok_or(IOError::Vertex(Some(i_line)))?;
 
     Ok(P::new(x, y, z))
