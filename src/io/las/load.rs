@@ -38,9 +38,9 @@ use super::super::{from_bytes::*, types::*};
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .las file
-pub struct LasIterator<P, R>
+pub struct LasIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead + Seek,
 {
     read: R,
@@ -51,9 +51,9 @@ where
     phantom_p: PhantomData<P>,
 }
 
-impl<P, R> LasIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> LasIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead + Seek,
 {
     pub fn new(read: R) -> IOResult<Self> {
@@ -85,53 +85,68 @@ where
     }
 }
 
-impl<P, R> Iterator for LasIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for LasIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead + Seek,
 {
-    type Item = IOResult<DataReserve<P>>;
+    type Item = IOResult<StackVec<DataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
         }
-        if self.header.is_none() {
-            if let Ok(header) = load_header(&mut self.read).and_then(|x| Header::try_from(x)) {
-                if let Ok(_) = self
-                    .read
-                    .seek(SeekFrom::Start(header.offset_point_data as u64))
-                {
-                    self.buffer = vec![0u8; header.point_record_length as usize];
-                    let n = header.n_point_records;
-                    self.header = Some(header);
-                    return Some(Ok(DataReserve::ReserveExact(n as usize)));
+
+        let mut chunk = StackVec::default();
+
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if self.header.is_none() {
+                if let Ok(header) = load_header(&mut self.read).and_then(|x| Header::try_from(x)) {
+                    if let Ok(_) = self
+                        .read
+                        .seek(SeekFrom::Start(header.offset_point_data as u64))
+                    {
+                        self.buffer = vec![0u8; header.point_record_length as usize];
+                        let n = header.n_point_records;
+                        self.header = Some(header);
+                        chunk.push(DataReserve::ReserveExact(n as usize)).unwrap()
+                    // unwrap safe since we only call this if chunk.has_space()
+                    } else {
+                        self.is_done = true;
+                        return Some(Err(IOError::BinaryData));
+                    }
                 } else {
                     self.is_done = true;
-                    return Some(Err(IOError::BinaryData));
+                    return Some(Err(IOError::Header));
+                }
+            }
+            // unwrap safe since header is always assigned
+            else if self.current < self.header.as_ref().unwrap().n_point_records as usize {
+                self.current += 1;
+
+                match self.fetch_one() {
+                    Err(e) => {
+                        self.is_done = true;
+                        return Some(Err(e));
+                    }
+                    Ok(x) => chunk.push(DataReserve::Data(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
                 }
             } else {
                 self.is_done = true;
-                return Some(Err(IOError::Header));
+                if chunk.has_data() {
+                    return Some(Ok(chunk));
+                }
+                return None;
             }
-        }
-        // unwrap safe since header is always assigned
-        if self.current < self.header.as_ref().unwrap().n_point_records as usize {
-            self.current += 1;
-            Some(self.fetch_one().map(|x| DataReserve::Data(x)).map_err(|e| {
-                self.is_done = true;
-                e
-            }))
-        } else {
-            self.is_done = true;
-            None
         }
     }
 }
 
-impl<P, R> FusedIterator for LasIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for LasIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead + Seek,
 {
 }
@@ -139,19 +154,21 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads points from .las file into IsPushable<IsBuildable3D>
-pub fn load_las<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
+pub fn load_las<IP, P, R, const CHUNK_SIZE: usize>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead + Seek,
 {
-    let iterator = LasIterator::new(read)?;
+    let iterator = LasIterator::<_, _, CHUNK_SIZE>::new(read)?;
 
-    for rd in iterator {
-        match rd? {
-            DataReserve::Data(x) => ip.push(x),
-            DataReserve::Reserve(x) => ip.reserve(x),
-            DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+    for chunk in iterator {
+        for x in chunk? {
+            match x {
+                DataReserve::Data(x) => ip.push(x),
+                DataReserve::Reserve(x) => ip.reserve(x),
+                DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+            }
         }
     }
 

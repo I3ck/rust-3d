@@ -33,18 +33,18 @@ use super::{header::*, iterators_internal::*, types::*};
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a mesh from a .ply file
-pub struct PlyMeshIterator<P, R>
+pub struct PlyMeshIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    inner: BinaryOrAsciiPlyMeshInteralIterator<P, R>,
+    inner: BinaryOrAsciiPlyMeshInteralIterator<P, R, CHUNK_SIZE>,
     to_reserve_data_faces: Option<(usize, usize)>,
 }
 
-impl<P, R> PlyMeshIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> PlyMeshIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     pub fn new(mut read: R) -> IOResult<Self> {
@@ -76,20 +76,20 @@ where
     }
 }
 
-impl<P, R> Iterator for PlyMeshIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for PlyMeshIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    type Item = IOResult<FaceDataReserve<P>>;
+    type Item = IOResult<StackVec<FaceDataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(to_reserve_data_faces) = self.to_reserve_data_faces {
             self.to_reserve_data_faces = None;
-            Some(Ok(FaceDataReserve::ReserveDataFaces(
+            Some(Ok(StackVec::single(FaceDataReserve::ReserveDataFaces(
                 to_reserve_data_faces.0,
                 to_reserve_data_faces.1,
-            )))
+            ))))
         } else {
             match &mut self.inner {
                 BinaryOrAsciiPlyMeshInteralIterator::Ascii(x) => x.next(),
@@ -100,9 +100,9 @@ where
     }
 }
 
-impl<P, R> FusedIterator for PlyMeshIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for PlyMeshIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
 }
@@ -110,18 +110,18 @@ where
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load points from a .ply file
-pub struct PlyPointsIterator<P, R>
+pub struct PlyPointsIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    inner: BinaryOrAsciiPlyPointsInteralIterator<P, R>,
+    inner: BinaryOrAsciiPlyPointsInteralIterator<P, R, CHUNK_SIZE>,
     to_reserve: Option<usize>,
 }
 
-impl<P, R> PlyPointsIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> PlyPointsIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     pub fn new(mut read: R) -> IOResult<Self> {
@@ -147,17 +147,17 @@ where
     }
 }
 
-impl<P, R> Iterator for PlyPointsIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for PlyPointsIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    type Item = IOResult<DataReserve<P>>;
+    type Item = IOResult<StackVec<DataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(to_reserve) = self.to_reserve {
             self.to_reserve = None;
-            Some(Ok(DataReserve::ReserveExact(to_reserve)))
+            Some(Ok(StackVec::single(DataReserve::ReserveExact(to_reserve))))
         } else {
             match &mut self.inner {
                 BinaryOrAsciiPlyPointsInteralIterator::Ascii(x) => x.next(),
@@ -168,9 +168,9 @@ where
     }
 }
 
-impl<P, R> FusedIterator for PlyPointsIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for PlyPointsIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
 }

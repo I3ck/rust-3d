@@ -46,30 +46,36 @@ use serde_json;
 //------------------------------------------------------------------------------
 
 /// Loads an IsMesh3D from the glb file format
-pub fn load_glb<EM, P, R>(read: R, folder_path: PathBuf, mesh: &mut EM) -> IOResult<()>
+pub fn load_glb<EM, P, R, const CHUNK_SIZE: usize>(
+    read: R,
+    folder_path: PathBuf,
+    mesh: &mut EM,
+) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D + IsMatrix4Transformable + Clone,
+    P: IsBuildable3D + IsMatrix4Transformable + Clone + Default,
     R: Read + Seek,
 {
-    let iterator = GltfIterator::<P, R>::new_glb(read, folder_path)?;
+    let iterator = GltfIterator::<P, R, CHUNK_SIZE>::new_glb(read, folder_path)?;
 
-    for rd in iterator {
-        match rd? {
-            FaceDataReserve::Data(x) => {
-                mesh.add_vertex(x);
-            }
-            FaceDataReserve::Face([a, b, c]) => {
-                mesh.try_add_connection(VId(a), VId(b), VId(c))
-                    .map_err(|_| IOError::InvalidMeshIndices)?;
-            }
-            FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
-                mesh.reserve_vertices(n_vertices);
-                mesh.reserve_faces(n_faces);
-            }
-            FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
-                mesh.reserve_vertices_exact(n_vertices);
-                mesh.reserve_faces_exact(n_faces);
+    for chunk in iterator {
+        for x in chunk? {
+            match x {
+                FaceDataReserve::Data(p) => {
+                    mesh.add_vertex(p);
+                }
+                FaceDataReserve::Face([a, b, c]) => {
+                    mesh.try_add_connection(VId(a), VId(b), VId(c))
+                        .or(Err(IOError::InvalidMeshIndices))?;
+                }
+                FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
+                    mesh.reserve_vertices(n_vertices);
+                    mesh.reserve_faces(n_faces);
+                }
+                FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
+                    mesh.reserve_vertices_exact(n_vertices);
+                    mesh.reserve_faces_exact(n_faces);
+                }
             }
         }
     }
@@ -78,30 +84,36 @@ where
 }
 
 /// Loads an IsMesh3D from the glTF file format
-pub fn load_gltf<EM, P, R>(read: R, folder_path: PathBuf, mesh: &mut EM) -> IOResult<()>
+pub fn load_gltf<EM, P, R, const CHUNK_SIZE: usize>(
+    read: R,
+    folder_path: PathBuf,
+    mesh: &mut EM,
+) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D + IsMatrix4Transformable + Clone,
+    P: IsBuildable3D + IsMatrix4Transformable + Clone + Default,
     R: Read + Seek,
 {
-    let iterator = GltfIterator::<P, R>::new_gltf(read, folder_path)?;
+    let iterator = GltfIterator::<P, R, CHUNK_SIZE>::new_gltf(read, folder_path)?;
 
-    for rd in iterator {
-        match rd? {
-            FaceDataReserve::Data(x) => {
-                mesh.add_vertex(x);
-            }
-            FaceDataReserve::Face([a, b, c]) => {
-                mesh.try_add_connection(VId(a), VId(b), VId(c))
-                    .map_err(|_| IOError::InvalidMeshIndices)?;
-            }
-            FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
-                mesh.reserve_vertices(n_vertices);
-                mesh.reserve_faces(n_faces);
-            }
-            FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
-                mesh.reserve_vertices_exact(n_vertices);
-                mesh.reserve_faces_exact(n_faces);
+    for chunk in iterator {
+        for x in chunk? {
+            match x {
+                FaceDataReserve::Data(p) => {
+                    mesh.add_vertex(p);
+                }
+                FaceDataReserve::Face([a, b, c]) => {
+                    mesh.try_add_connection(VId(a), VId(b), VId(c))
+                        .or(Err(IOError::InvalidMeshIndices))?;
+                }
+                FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
+                    mesh.reserve_vertices(n_vertices);
+                    mesh.reserve_faces(n_faces);
+                }
+                FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
+                    mesh.reserve_vertices_exact(n_vertices);
+                    mesh.reserve_faces_exact(n_faces);
+                }
             }
         }
     }
@@ -112,9 +124,9 @@ where
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .glTF or .glb file
-pub struct GltfIterator<P, R>
+pub struct GltfIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D + IsMatrix4Transformable,
+    P: IsBuildable3D + IsMatrix4Transformable + Default,
     R: Read + Seek,
 {
     chunk_offset: u64,
@@ -122,13 +134,13 @@ where
     is_done: bool,
     node_trace: Vec<usize>,
     current_primitive: usize,
-    pf_iterator: PointFaceIterator<P, R>,
+    pf_iterator: PointFaceIterator<P, R, CHUNK_SIZE>,
     phantom: PhantomData<P>,
 }
 
-impl<P, R> GltfIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> GltfIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D + IsMatrix4Transformable,
+    P: IsBuildable3D + IsMatrix4Transformable + Default,
     R: Read + Seek,
 {
     /// Creates an iterator for reading a .glb file
@@ -363,12 +375,12 @@ where
     }
 }
 
-impl<P, R> Iterator for GltfIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for GltfIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D + IsMatrix4Transformable,
+    P: IsBuildable3D + IsMatrix4Transformable + Default,
     R: Read + Seek,
 {
-    type Item = IOResult<FaceDataReserve<P>>;
+    type Item = IOResult<StackVec<FaceDataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -386,9 +398,9 @@ where
     }
 }
 
-impl<P, R> FusedIterator for GltfIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for GltfIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D + IsMatrix4Transformable,
+    P: IsBuildable3D + IsMatrix4Transformable + Default,
     R: Read + Seek,
 {
 }
@@ -413,9 +425,9 @@ struct FaceIterSettings {
     pub component_type: IndexComponentType,
 }
 
-struct PointFaceIterator<P, R>
+struct PointFaceIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D + IsMatrix4Transformable,
+    P: IsBuildable3D + IsMatrix4Transformable + Default,
     R: Read + Seek,
 {
     root_read: R,
@@ -428,12 +440,13 @@ where
     points_pushed: usize,
     index_offset: usize,
     data_faces_to_reserve: [usize; 2],
+    is_done: bool,
     phantom: PhantomData<P>,
 }
 
-impl<P, R> PointFaceIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> PointFaceIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D + IsMatrix4Transformable,
+    P: IsBuildable3D + IsMatrix4Transformable + Default,
     R: Read + Seek,
 {
     pub fn new(root_read: R, folder_path: PathBuf) -> Self {
@@ -448,6 +461,7 @@ where
             points_pushed: 0,
             index_offset: 0,
             data_faces_to_reserve: [0, 0],
+            is_done: false,
             phantom: PhantomData,
         }
     }
@@ -636,90 +650,129 @@ where
     }
 }
 
-impl<P, R> Iterator for PointFaceIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for PointFaceIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D + IsMatrix4Transformable,
+    P: IsBuildable3D + IsMatrix4Transformable + Default,
     R: Read + Seek,
 {
-    type Item = IOResult<FaceDataReserve<P>>;
+    type Item = IOResult<StackVec<FaceDataReserve<P>, CHUNK_SIZE>>;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.data_faces_to_reserve != [0, 0] {
-            self.data_faces_to_reserve = [0, 0];
-            Some(Ok(FaceDataReserve::ReserveDataFaces(
-                self.data_faces_to_reserve[0],
-                self.data_faces_to_reserve[1],
-            )))
-        } else if self.p_settings.to_fetch != 0 {
-            self.points_pushed += 1;
-            self.p_settings.to_fetch -= 1;
+        if self.is_done {
+            return None;
+        }
 
-            let result = match &self.p_reader {
-                None => Self::fetch_point(&mut self.root_read, &self.p_settings),
-                Some(r) => match &mut *r.borrow_mut() {
-                    FileOrDataPointer::DataPointer(seek, data) => {
-                        match data.get() {
-                            Err(e) => return Some(Err(e)),
-                            Ok(tmp) => {
-                                let borrow = tmp.borrow();
-                                let mut cursor = Cursor::new(&borrow[*seek as usize..]);
-                                let res = Self::fetch_point(&mut cursor, &self.p_settings);
-                                *seek = *seek + cursor.seek(SeekFrom::Current(0)).unwrap(); //safe, since not really moving the cursor
-                                res
-                            }
-                        }
-                    }
-                    FileOrDataPointer::File(r) => Self::fetch_point(r, &self.p_settings),
-                },
-            };
+        let mut chunk = StackVec::default();
 
-            if self.p_settings.to_fetch == 0 {
-                match self.seek_to_faces() {
-                    Err(e) => Some(Err(e)),
-                    Ok(_) => Some(result),
-                }
-            } else {
-                Some(result)
-            }
-        } else if let Some(f_settings) = &mut self.f_settings {
-            if f_settings.to_fetch != 0 {
-                f_settings.to_fetch -= 1;
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if self.data_faces_to_reserve != [0, 0] {
+                self.data_faces_to_reserve = [0, 0];
+                chunk
+                    .push(FaceDataReserve::ReserveDataFaces(
+                        self.data_faces_to_reserve[0],
+                        self.data_faces_to_reserve[1],
+                    ))
+                    .unwrap() // unwrap safe since we only call this if chunk.has_space()
+            } else if self.p_settings.to_fetch != 0 {
+                self.points_pushed += 1;
+                self.p_settings.to_fetch -= 1;
 
-                Some(match &self.f_reader {
-                    None => Self::fetch_face(self.index_offset, &mut self.root_read, f_settings),
+                let result = match &self.p_reader {
+                    None => Self::fetch_point(&mut self.root_read, &self.p_settings),
                     Some(r) => match &mut *r.borrow_mut() {
-                        FileOrDataPointer::DataPointer(seek, data) => {
-                            match data.get() {
+                        FileOrDataPointer::DataPointer(seek, chunk) => {
+                            match chunk.get() {
                                 Err(e) => return Some(Err(e)),
                                 Ok(tmp) => {
                                     let borrow = tmp.borrow();
                                     let mut cursor = Cursor::new(&borrow[*seek as usize..]);
-                                    let res = Self::fetch_face(
-                                        self.index_offset,
-                                        &mut cursor,
-                                        f_settings,
-                                    );
+                                    let res = Self::fetch_point(&mut cursor, &self.p_settings);
                                     *seek = *seek + cursor.seek(SeekFrom::Current(0)).unwrap(); //safe, since not really moving the cursor
                                     res
                                 }
                             }
                         }
-                        FileOrDataPointer::File(r) => {
-                            Self::fetch_face(self.index_offset, r, f_settings)
-                        }
-                    }, //unwrap safe, since inserting in seek
-                })
+                        FileOrDataPointer::File(r) => Self::fetch_point(r, &self.p_settings),
+                    },
+                };
+
+                if self.p_settings.to_fetch == 0 {
+                    match self.seek_to_faces() {
+                        Err(e) => return Some(Err(e)),
+                        Ok(_) => match result {
+                            Err(e) => return Some(Err(e)),
+                            Ok(x) => chunk.push(x).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                        },
+                    }
+                } else {
+                    match result {
+                        Err(e) => return Some(Err(e)),
+                        Ok(x) => chunk.push(x).unwrap(), // unwrap safe since we only call this if chunk.has_space(),
+                    }
+                }
+            } else if let Some(f_settings) = &mut self.f_settings {
+                if f_settings.to_fetch != 0 {
+                    f_settings.to_fetch -= 1;
+
+                    match &self.f_reader {
+                        None => match Self::fetch_face(
+                            self.index_offset,
+                            &mut self.root_read,
+                            f_settings,
+                        ) {
+                            Err(e) => return Some(Err(e)),
+                            Ok(x) => chunk.push(x).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                        },
+                        Some(r) => match &mut *r.borrow_mut() {
+                            FileOrDataPointer::DataPointer(seek, dp) => {
+                                match dp.get() {
+                                    Err(e) => return Some(Err(e)),
+                                    Ok(tmp) => {
+                                        let borrow = tmp.borrow();
+                                        let mut cursor = Cursor::new(&borrow[*seek as usize..]);
+                                        let res = Self::fetch_face(
+                                            self.index_offset,
+                                            &mut cursor,
+                                            f_settings,
+                                        );
+                                        *seek = *seek + cursor.seek(SeekFrom::Current(0)).unwrap(); //safe, since not really moving the cursor
+                                        match res {
+                                            Err(e) => return Some(Err(e)),
+                                            Ok(x) => chunk.push(x).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                                        }
+                                    }
+                                }
+                            }
+                            FileOrDataPointer::File(r) => {
+                                match Self::fetch_point(r, &self.p_settings) {
+                                    Err(e) => return Some(Err(e)),
+                                    Ok(x) => chunk.push(x).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                                }
+                            }
+                        }, //unwrap safe, since inserting in seek
+                    }
+                } else {
+                    self.is_done = true;
+                    if chunk.has_data() {
+                        return Some(Ok(chunk));
+                    }
+                    return None;
+                }
             } else {
-                None
+                self.is_done = true;
+                if chunk.has_data() {
+                    return Some(Ok(chunk));
+                }
+                return None;
             }
-        } else {
-            None
         }
     }
 }
 
-impl<P, R> FusedIterator for PointFaceIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for PointFaceIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D + IsMatrix4Transformable,
+    P: IsBuildable3D + IsMatrix4Transformable + Default,
     R: Read + Seek,
 {
 }

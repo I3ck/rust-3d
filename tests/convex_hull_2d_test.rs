@@ -30,7 +30,7 @@ use std::{fs::File, io::BufReader};
 fn convex_hull_2d_test() {
     //@todo rather weak test, find better input data for this
     let mut pc = PointCloud2D::<Point2D>::new();
-    load_xy(
+    load_xy::<_, _, _, 30>(
         &mut BufReader::new(File::open("tests/data/test_square.xy").unwrap()),
         &mut pc,
     )

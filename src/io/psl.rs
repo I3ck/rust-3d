@@ -30,9 +30,9 @@ use super::{byte_reader::*, types::*};
 
 //------------------------------------------------------------------------------
 
-pub struct PslIterator<P, R>
+pub struct PslIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
 {
     read: R,
@@ -44,9 +44,9 @@ where
     phantom: PhantomData<P>,
 }
 
-impl<P, R> PslIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> PslIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
 {
     pub fn new(read: R) -> Self {
@@ -95,12 +95,12 @@ where
     }
 }
 
-impl<P, R> Iterator for PslIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for PslIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
 {
-    type Item = IOResult<DataReserve<P>>;
+    type Item = IOResult<StackVec<DataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -115,32 +115,38 @@ where
             }
         }
 
-        if let Err(e) = self.fetch_counts() {
-            self.is_done = true;
-            return Some(Err(e));
-        }
+        let mut chunk = StackVec::default();
 
-        if self.n_point_left == 0 {
-            self.is_done = true;
-            return None;
-        }
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if let Err(e) = self.fetch_counts() {
+                self.is_done = true;
+                return Some(Err(e));
+            } else if self.n_point_left == 0 {
+                self.is_done = true;
+                if chunk.has_data() {
+                    return Some(Ok(chunk));
+                }
+                return None;
+            }
 
-        self.reduce_count();
+            self.reduce_count();
 
-        return Some(
-            fetch_point(&mut self.read)
-                .map(|x| DataReserve::Data(x))
-                .map_err(|e| {
+            match fetch_point(&mut self.read) {
+                Err(e) => {
                     self.is_done = true;
-                    e
-                }),
-        );
+                    return Some(Err(e));
+                }
+                Ok(x) => chunk.push(DataReserve::Data(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+            }
+        }
     }
 }
 
-impl<P, R> FusedIterator for PslIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for PslIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
 {
 }
@@ -148,19 +154,21 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads a IsPushable<Is3D> as x y z coordinates from .psl files
-pub fn load_psl<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
+pub fn load_psl<IP, P, R, const CHUNK_SIZE: usize>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
 {
-    let iterator = PslIterator::new(read);
+    let iterator = PslIterator::<_, _, CHUNK_SIZE>::new(read);
 
-    for p in iterator {
-        match p? {
-            DataReserve::Data(x) => ip.push(x),
-            DataReserve::Reserve(n) => ip.reserve(n),
-            DataReserve::ReserveExact(n) => ip.reserve_exact(n),
+    for chunk in iterator {
+        for x in chunk? {
+            match x {
+                DataReserve::Data(x) => ip.push(x),
+                DataReserve::Reserve(x) => ip.reserve(x),
+                DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+            }
         }
     }
 

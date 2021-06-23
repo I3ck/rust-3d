@@ -33,7 +33,7 @@ use super::{header::*, iterators::*, iterators_internal::*, types::*};
 //------------------------------------------------------------------------------
 
 /// Loads an IsMesh3D from the .ply file format if possible, otherwise tries loading point data. Returning which of the two was possible
-pub fn load_ply_either<EM, IP, P, R>(
+pub fn load_ply_either<EM, IP, P, R, const CHUNK_SIZE: usize>(
     mut read: R,
     mesh: &mut EM,
     ip: &mut IP,
@@ -41,7 +41,7 @@ pub fn load_ply_either<EM, IP, P, R>(
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
     IP: IsPushable<P>,
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     let mut line_buffer = Vec::new();
@@ -53,12 +53,14 @@ where
             mesh.reserve_faces(header.face.count);
 
             match header.format {
-                Format::Ascii => load_mesh_ascii(&mut read, mesh, header, &mut i_line),
+                Format::Ascii => {
+                    load_mesh_ascii::<_, _, _, CHUNK_SIZE>(&mut read, mesh, header, &mut i_line)
+                }
                 Format::LittleEndian => {
-                    load_mesh_binary::<LittleReader, _, _, _>(&mut read, mesh, header)
+                    load_mesh_binary::<LittleReader, _, _, _, CHUNK_SIZE>(&mut read, mesh, header)
                 }
                 Format::BigEndian => {
-                    load_mesh_binary::<BigReader, _, _, _>(&mut read, mesh, header)
+                    load_mesh_binary::<BigReader, _, _, _, CHUNK_SIZE>(&mut read, mesh, header)
                 }
             }?;
 
@@ -68,12 +70,14 @@ where
             ip.reserve_exact(header.vertex.count);
 
             match header.format {
-                Format::Ascii => load_points_ascii(&mut read, ip, header, i_line),
+                Format::Ascii => {
+                    load_points_ascii::<_, _, _, CHUNK_SIZE>(&mut read, ip, header, i_line)
+                }
                 Format::LittleEndian => {
-                    load_points_binary::<LittleReader, _, _, _>(&mut read, ip, header)
+                    load_points_binary::<LittleReader, _, _, _, CHUNK_SIZE>(&mut read, ip, header)
                 }
                 Format::BigEndian => {
-                    load_points_binary::<BigReader, _, _, _>(&mut read, ip, header)
+                    load_points_binary::<BigReader, _, _, _, CHUNK_SIZE>(&mut read, ip, header)
                 }
             }?;
 
@@ -83,30 +87,32 @@ where
 }
 
 /// Loads an IsMesh3D from the .ply file format
-pub fn load_ply_mesh<EM, P, R>(read: R, mesh: &mut EM) -> IOResult<()>
+pub fn load_ply_mesh<EM, P, R, const CHUNK_SIZE: usize>(read: R, mesh: &mut EM) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    let iterator = PlyMeshIterator::new(read)?;
+    let iterator = PlyMeshIterator::<_, _, CHUNK_SIZE>::new(read)?;
 
-    for fr in iterator {
-        match fr? {
-            FaceDataReserve::Data(p) => {
-                mesh.add_vertex(p);
-            }
-            FaceDataReserve::Face([a, b, c]) => {
-                mesh.try_add_connection(VId(a), VId(b), VId(c))
-                    .or(Err(IOError::InvalidMeshIndices))?;
-            }
-            FaceDataReserve::ReserveDataFaces(n_d, n_f) => {
-                mesh.reserve_vertices(n_d);
-                mesh.reserve_faces(n_f);
-            }
-            FaceDataReserve::ReserveDataFacesExact(n_d, n_f) => {
-                mesh.reserve_vertices_exact(n_d);
-                mesh.reserve_faces_exact(n_f);
+    for data in iterator {
+        for x in data? {
+            match x {
+                FaceDataReserve::Face([a, b, c]) => {
+                    mesh.try_add_connection(VId(a), VId(b), VId(c))
+                        .or(Err(IOError::InvalidMeshIndices))?;
+                }
+                FaceDataReserve::Data(p) => {
+                    mesh.add_vertex(p);
+                }
+                FaceDataReserve::ReserveDataFaces(n_d, n_f) => {
+                    mesh.reserve_vertices(n_d);
+                    mesh.reserve_faces(n_f);
+                }
+                FaceDataReserve::ReserveDataFacesExact(n_d, n_f) => {
+                    mesh.reserve_vertices_exact(n_d);
+                    mesh.reserve_faces_exact(n_f);
+                }
             }
         }
     }
@@ -117,19 +123,21 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads the points from the .ply file into IsPushable<Is3D>
-pub fn load_ply_points<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
+pub fn load_ply_points<IP, P, R, const CHUNK_SIZE: usize>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    let iterator = PlyPointsIterator::new(read)?;
+    let iterator = PlyPointsIterator::<_, _, CHUNK_SIZE>::new(read)?;
 
-    for rp in iterator {
-        match rp? {
-            DataReserve::Data(x) => ip.push(x),
-            DataReserve::Reserve(x) => ip.reserve(x),
-            DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+    for data in iterator {
+        for x in data? {
+            match x {
+                DataReserve::Data(x) => ip.push(x),
+                DataReserve::Reserve(x) => ip.reserve(x),
+                DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+            }
         }
     }
 
@@ -142,24 +150,26 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_points_binary<BR, IP, P, R>(
+fn load_points_binary<BR, IP, P, R, const CHUNK_SIZE: usize>(
     read: &mut R,
     ip: &mut IP,
     header: PartialHeader,
 ) -> IOResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
     BR: IsByteReader,
 {
-    let iterator = PlyBinaryPointsIterator::<BR, _, _>::new(read, header);
+    let iterator = PlyBinaryPointsIterator::<BR, _, _, CHUNK_SIZE>::new(read, header);
 
-    for p in iterator {
-        match p? {
-            DataReserve::Data(x) => ip.push(x),
-            DataReserve::Reserve(n) => ip.reserve(n),
-            DataReserve::ReserveExact(n) => ip.reserve_exact(n),
+    for data in iterator {
+        for x in data? {
+            match x {
+                DataReserve::Data(x) => ip.push(x),
+                DataReserve::Reserve(x) => ip.reserve(x),
+                DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+            }
         }
     }
 
@@ -168,7 +178,7 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_points_ascii<IP, P, R>(
+fn load_points_ascii<IP, P, R, const CHUNK_SIZE: usize>(
     read: &mut R,
     ip: &mut IP,
     header: PartialHeader,
@@ -176,16 +186,18 @@ fn load_points_ascii<IP, P, R>(
 ) -> IOResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    let iterator = PlyAsciiPointsIterator::new(read, header, i_line);
+    let iterator = PlyAsciiPointsIterator::<_, _, CHUNK_SIZE>::new(read, header, i_line);
 
-    for p in iterator {
-        match p? {
-            DataReserve::Data(x) => ip.push(x),
-            DataReserve::Reserve(n) => ip.reserve(n),
-            DataReserve::ReserveExact(n) => ip.reserve_exact(n),
+    for data in iterator {
+        for x in data? {
+            match x {
+                DataReserve::Data(x) => ip.push(x),
+                DataReserve::Reserve(x) => ip.reserve(x),
+                DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+            }
         }
     }
 
@@ -194,31 +206,37 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_mesh_binary<BR, EM, P, R>(read: &mut R, mesh: &mut EM, header: FullHeader) -> IOResult<()>
+fn load_mesh_binary<BR, EM, P, R, const CHUNK_SIZE: usize>(
+    read: &mut R,
+    mesh: &mut EM,
+    header: FullHeader,
+) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
     BR: IsByteReader,
 {
-    let iterator = PlyBinaryMeshIterator::<BR, _, _>::new(read, header);
+    let iterator = PlyBinaryMeshIterator::<BR, _, _, CHUNK_SIZE>::new(read, header);
 
-    for fd in iterator {
-        match fd? {
-            io::types::FaceDataReserve::Data(p) => {
-                mesh.add_vertex(p);
-            }
-            io::types::FaceDataReserve::Face([a, b, c]) => {
-                mesh.try_add_connection(VId(a), VId(b), VId(c))
-                    .or(Err(IOError::InvalidMeshIndices))?;
-            }
-            io::types::FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
-                mesh.reserve_vertices(n_vertices);
-                mesh.reserve_faces(n_faces);
-            }
-            io::types::FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
-                mesh.reserve_vertices_exact(n_vertices);
-                mesh.reserve_faces_exact(n_faces);
+    for data in iterator {
+        for x in data? {
+            match x {
+                FaceDataReserve::Face([a, b, c]) => {
+                    mesh.try_add_connection(VId(a), VId(b), VId(c))
+                        .or(Err(IOError::InvalidMeshIndices))?;
+                }
+                FaceDataReserve::Data(p) => {
+                    mesh.add_vertex(p);
+                }
+                FaceDataReserve::ReserveDataFaces(n_d, n_f) => {
+                    mesh.reserve_vertices(n_d);
+                    mesh.reserve_faces(n_f);
+                }
+                FaceDataReserve::ReserveDataFacesExact(n_d, n_f) => {
+                    mesh.reserve_vertices_exact(n_d);
+                    mesh.reserve_faces_exact(n_f);
+                }
             }
         }
     }
@@ -228,7 +246,7 @@ where
 
 //------------------------------------------------------------------------------
 
-fn load_mesh_ascii<EM, P, R>(
+fn load_mesh_ascii<EM, P, R, const CHUNK_SIZE: usize>(
     read: &mut R,
     mesh: &mut EM,
     header: FullHeader,
@@ -236,27 +254,29 @@ fn load_mesh_ascii<EM, P, R>(
 ) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    let iterator = PlyAsciiMeshIterator::new(read, header, *i_line);
+    let iterator = PlyAsciiMeshIterator::<_, _, CHUNK_SIZE>::new(read, header, *i_line);
 
-    for fd in iterator {
-        match fd? {
-            io::types::FaceDataReserve::Data(p) => {
-                mesh.add_vertex(p);
-            }
-            io::types::FaceDataReserve::Face([a, b, c]) => {
-                mesh.try_add_connection(VId(a), VId(b), VId(c))
-                    .or(Err(IOError::InvalidMeshIndices))?;
-            }
-            io::types::FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
-                mesh.reserve_vertices(n_vertices);
-                mesh.reserve_faces(n_faces);
-            }
-            io::types::FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
-                mesh.reserve_vertices_exact(n_vertices);
-                mesh.reserve_faces_exact(n_faces);
+    for data in iterator {
+        for x in data? {
+            match x {
+                FaceDataReserve::Data(p) => {
+                    mesh.add_vertex(p);
+                }
+                FaceDataReserve::Face([a, b, c]) => {
+                    mesh.try_add_connection(VId(a), VId(b), VId(c))
+                        .or(Err(IOError::InvalidMeshIndices))?;
+                }
+                FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
+                    mesh.reserve_vertices(n_vertices);
+                    mesh.reserve_faces(n_faces);
+                }
+                FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
+                    mesh.reserve_vertices_exact(n_vertices);
+                    mesh.reserve_faces_exact(n_faces);
+                }
             }
         }
     }

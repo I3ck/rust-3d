@@ -31,9 +31,9 @@ use super::{types::*, utils::*};
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .pts file
-pub struct PtsIterator<P, R>
+pub struct PtsIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     read: R,
@@ -45,9 +45,9 @@ where
     phantom_p: PhantomData<P>,
 }
 
-impl<P, R> PtsIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> PtsIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     pub fn new(read: R) -> Self {
@@ -85,55 +85,32 @@ where
     }
 }
 
-impl<P, R> Iterator for PtsIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for PtsIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    type Item = IOResult<DataReserve<P>>;
+    type Item = IOResult<StackVec<DataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
         }
-        while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
-            self.i_line += 1;
 
-            if line.is_empty() {
-                continue;
-            }
+        let mut chunk = StackVec::default();
 
-            match self.n_vertices {
-                None => {
-                    let mut words = to_words_skip_empty(line);
-                    self.n_vertices = match words
-                        .next()
-                        .and_then(|word| from_ascii(word))
-                        .ok_or(IOError::VertexCount(Some(self.i_line)))
-                    {
-                        Ok(n) => Some(n),
-                        Err(e) => {
-                            self.is_done = true;
-                            return Some(Err(e));
-                        }
-                    };
-                    // unwrap safe since assigned above
-                    return Some(Ok(DataReserve::Reserve(self.n_vertices.unwrap())));
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+                self.i_line += 1;
+
+                if line.is_empty() {
+                    continue;
                 }
-                Some(n) => {
-                    if self.n_vertices_added < n {
-                        self.n_vertices_added += 1;
-                        return Some(
-                            Self::fetch_one(self.i_line, line)
-                                .map(|x| DataReserve::Data(x))
-                                .map_err(|e| {
-                                    self.is_done = true;
-                                    e
-                                }),
-                        );
-                    } else {
-                        // New block
-                        self.n_vertices_added = 0;
+
+                match self.n_vertices {
+                    None => {
                         let mut words = to_words_skip_empty(line);
                         self.n_vertices = match words
                             .next()
@@ -147,39 +124,75 @@ where
                             }
                         };
                         // unwrap safe since assigned above
-                        return Some(Ok(DataReserve::Reserve(self.n_vertices.unwrap())));
+                        chunk
+                            .push(DataReserve::Reserve(self.n_vertices.unwrap()))
+                            .unwrap() // unwrap safe since we only call this if chunk.has_space()
+                    }
+                    Some(n) => {
+                        if self.n_vertices_added < n {
+                            self.n_vertices_added += 1;
+                            match Self::fetch_one(self.i_line, line) {
+                                Err(e) => {
+                                    self.is_done = true;
+                                    return Some(Err(e));
+                                }
+                                Ok(x) => chunk.push(DataReserve::Data(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                            }
+                        } else {
+                            // New block
+                            self.n_vertices_added = 0;
+                            let mut words = to_words_skip_empty(line);
+                            self.n_vertices = match words
+                                .next()
+                                .and_then(|word| from_ascii(word))
+                                .ok_or(IOError::VertexCount(Some(self.i_line)))
+                            {
+                                Ok(n) => Some(n),
+                                Err(e) => {
+                                    self.is_done = true;
+                                    return Some(Err(e));
+                                }
+                            };
+                            // unwrap safe since assigned above
+                            chunk
+                                .push(DataReserve::Reserve(self.n_vertices.unwrap()))
+                                .unwrap() // unwrap safe since we only call this if chunk.has_space()
+                        }
                     }
                 }
+            } else {
+                if chunk.has_data() {
+                    return Some(Ok(chunk));
+                }
+                return None;
             }
         }
-
-        self.is_done = true;
-
-        None
     }
 }
 
-impl<P, R> FusedIterator for PtsIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for PtsIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
 }
 
 /// Loads IsPushable<Is3D> from the .pts file format
-pub fn load_pts<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
+pub fn load_pts<IP, P, R, const CHUNK_SIZE: usize>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    let iterator = PtsIterator::new(read);
+    let iterator = PtsIterator::<_, _, CHUNK_SIZE>::new(read);
 
-    for rd in iterator {
-        match rd? {
-            DataReserve::Data(x) => ip.push(x),
-            DataReserve::Reserve(x) => ip.reserve(x),
-            DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+    for chunk in iterator {
+        for x in chunk? {
+            match x {
+                DataReserve::Data(x) => ip.push(x),
+                DataReserve::Reserve(x) => ip.reserve(x),
+                DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+            }
         }
     }
 

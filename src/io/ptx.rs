@@ -31,9 +31,9 @@ use super::{types::*, utils::*};
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .ptx file
-pub struct PtxIterator<P, R>
+pub struct PtxIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D + IsMatrix4Transformable,
+    P: IsBuildable3D + IsMatrix4Transformable + Default,
     R: BufRead,
 {
     read: R,
@@ -46,9 +46,9 @@ where
     phantom_p: PhantomData<P>,
 }
 
-impl<P, R> PtxIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> PtxIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D + IsMatrix4Transformable,
+    P: IsBuildable3D + IsMatrix4Transformable + Default,
     R: BufRead,
 {
     pub fn new(read: R) -> Self {
@@ -151,65 +151,86 @@ where
     }
 }
 
-impl<P, R> Iterator for PtxIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for PtxIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D + IsMatrix4Transformable,
+    P: IsBuildable3D + IsMatrix4Transformable + Default,
     R: BufRead,
 {
-    type Item = IOResult<DataReserve<P>>;
+    type Item = IOResult<StackVec<DataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
         }
-        if self.n_points_to_fetch == 0 {
-            let first_line = fetch_line(&mut self.read, &mut self.line_buffer);
-            if first_line.is_err() {
-                self.is_done = true;
-                return None;
-            }
-            self.i_line += 1;
-            // unwrap safe, is_err() checked above
-            match from_ascii(first_line.as_ref().unwrap())
-                .ok_or(IOError::Columns(self.i_line))
-                .and_then(|columns| self.fetch_header(columns))
-            {
-                Ok(()) => return Some(Ok(DataReserve::Reserve(self.n_points_to_fetch))),
-                Err(e) => {
+
+        let mut chunk = StackVec::default();
+
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if self.n_points_to_fetch == 0 {
+                let first_line = fetch_line(&mut self.read, &mut self.line_buffer);
+                if first_line.is_err() {
                     self.is_done = true;
-                    return Some(Err(e));
+                    if chunk.has_data() {
+                        return Some(Ok(chunk));
+                    }
+                    return None;
                 }
-            }
-        } else if self.n_points_to_fetch > 0 {
-            self.n_points_to_fetch -= 1;
-            match fetch_line(&mut self.read, &mut self.line_buffer) {
-                Ok(line) => {
-                    self.i_line += 1;
-                    Some(
-                        Self::fetch_one(
+
+                self.i_line += 1;
+                // unwrap safe, is_err() checked above
+                match from_ascii(first_line.as_ref().unwrap())
+                    .ok_or(IOError::Columns(self.i_line))
+                    .and_then(|columns| self.fetch_header(columns))
+                {
+                    Ok(()) => {
+                        chunk
+                            .push(DataReserve::Reserve(self.n_points_to_fetch))
+                            .unwrap() // unwrap safe since we only call this if chunk.has_space()
+                    }
+                    Err(e) => {
+                        self.is_done = true;
+                        return Some(Err(e));
+                    }
+                }
+            } else if self.n_points_to_fetch > 0 {
+                self.n_points_to_fetch -= 1;
+                match fetch_line(&mut self.read, &mut self.line_buffer) {
+                    Ok(line) => {
+                        self.i_line += 1;
+                        match Self::fetch_one(
                             self.i_line,
                             line,
                             self.must_transform,
                             &self.transformation,
-                        )
-                        .map(|x| DataReserve::Data(x)),
-                    )
+                        ) {
+                            Err(e) => {
+                                self.is_done = true;
+                                return Some(Err(e));
+                            }
+                            Ok(x) => chunk.push(DataReserve::Data(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                        }
+                    }
+                    Err(e) => {
+                        self.is_done = true;
+                        return Some(Err(e.into()));
+                    }
                 }
-                Err(e) => {
-                    self.is_done = true;
-                    Some(Err(e.into()))
+            } else {
+                self.is_done = true;
+                if chunk.has_data() {
+                    return Some(Ok(chunk));
                 }
+                return None;
             }
-        } else {
-            self.is_done = true;
-            None
         }
     }
 }
 
-impl<P, R> FusedIterator for PtxIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for PtxIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D + IsMatrix4Transformable,
+    P: IsBuildable3D + IsMatrix4Transformable + Default,
     R: BufRead,
 {
 }
@@ -217,19 +238,21 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads points from .ptx file into IsPushable<Is3D>
-pub fn load_ptx<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
+pub fn load_ptx<IP, P, R, const CHUNK_SIZE: usize>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D + IsMatrix4Transformable,
+    P: IsBuildable3D + IsMatrix4Transformable + Default,
     R: BufRead,
 {
-    let iterator = PtxIterator::new(read);
+    let iterator = PtxIterator::<_, _, CHUNK_SIZE>::new(read);
 
-    for rd in iterator {
-        match rd? {
-            DataReserve::Data(x) => ip.push(x),
-            DataReserve::Reserve(x) => ip.reserve(x),
-            DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+    for chunk in iterator {
+        for x in chunk? {
+            match x {
+                DataReserve::Data(x) => ip.push(x),
+                DataReserve::Reserve(x) => ip.reserve(x),
+                DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+            }
         }
     }
 

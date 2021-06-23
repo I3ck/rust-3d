@@ -22,11 +22,129 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //! Module for types used for IO actions
 
-use std::result::Result;
+use std::{mem::MaybeUninit, result::Result};
 
 use super::from_bytes::FromBytesError;
 
 use super::ply::Type;
+
+//------------------------------------------------------------------------------
+
+#[derive(Debug)]
+pub enum StackVecError {
+    PushingFull,
+}
+
+/// SIZE must be >= 1
+pub struct StackVec<T, const SIZE: usize> {
+    size: usize,
+    data: [T; SIZE],
+}
+
+impl<T, const SIZE: usize> StackVec<T, SIZE> {
+    pub fn push(&mut self, x: T) -> Result<(), StackVecError> {
+        if self.has_space() {
+            self.data[self.size] = x;
+            self.size += 1;
+            Ok(())
+        } else {
+            Err(StackVecError::PushingFull)
+        }
+    }
+
+    pub fn data(&self) -> &[T] {
+        &self.data[..self.size]
+    }
+
+    pub fn data_mut(&mut self) -> &mut [T] {
+        &mut self.data[0..self.size]
+    }
+
+    pub fn has_space(&self) -> bool {
+        self.size < SIZE
+    }
+
+    pub fn is_full(&self) -> bool {
+        self.size >= SIZE
+    }
+
+    pub fn has_data(&self) -> bool {
+        self.size > 0
+    }
+
+    pub fn len(&self) -> usize {
+        self.size
+    }
+}
+
+impl<T, const SIZE: usize> StackVec<T, SIZE>
+where
+    T: Default,
+{
+    fn default_data<U>() -> [U; SIZE]
+    where
+        U: Default,
+    {
+        // https://github.com/rust-lang/rust/issues/61956
+        let mut data: [MaybeUninit<U>; SIZE] = unsafe { MaybeUninit::uninit().assume_init() };
+
+        for elem in &mut data[..] {
+            *elem = MaybeUninit::new(U::default());
+        }
+
+        let ptr = &mut data as *mut _ as *mut [U; SIZE];
+        let res = unsafe { ptr.read() };
+        core::mem::forget(data);
+        res
+    }
+
+    pub fn convert<U>(self) -> StackVec<U, SIZE>
+    where
+        T: Into<U>,
+        U: Default,
+    {
+        let mut data = Self::default_data();
+        let mut i = 0;
+        for x in self.data {
+            data[i] = x.into();
+            i += 1;
+        }
+        StackVec::<U, SIZE> {
+            size: self.size,
+            data: data,
+        }
+    }
+
+    pub fn single(x: T) -> Self {
+        let mut result = Self::default();
+        result.push(x).unwrap(); // unwrap fine assuming SIZE >= 1
+        result
+    }
+}
+
+impl<T, const SIZE: usize> Default for StackVec<T, SIZE>
+where
+    T: Default,
+{
+    fn default() -> Self {
+        Self {
+            size: 0,
+            data: Self::default_data(),
+        }
+    }
+}
+
+impl<T, const SIZE: usize> IntoIterator for StackVec<T, SIZE>
+where
+    T: Default,
+{
+    type Item = T;
+    type IntoIter = core::iter::Take<std::array::IntoIter<T, SIZE>>;
+
+    fn into_iter(self) -> <Self as IntoIterator>::IntoIter {
+        IntoIterator::into_iter(self.data).take(self.size)
+    }
+}
 
 //------------------------------------------------------------------------------
 
@@ -36,13 +154,38 @@ pub enum DataReserve<T> {
     ReserveExact(usize),
 }
 
+impl<T> Default for DataReserve<T> {
+    fn default() -> Self {
+        Self::Reserve(0)
+    }
+}
+
+//------------------------------------------------------------------------------
+
+pub enum FaceData<T> {
+    Face([usize; 3]),
+    Data(T),
+}
+
+impl<T> Default for FaceData<T> {
+    fn default() -> Self {
+        Self::Face([0, 0, 0])
+    }
+}
+
 //------------------------------------------------------------------------------
 
 pub enum FaceDataReserve<T> {
-    Face([usize; 3]), //@todo VId or usize?
     Data(T),
+    Face([usize; 3]),
     ReserveDataFaces(usize, usize),
     ReserveDataFacesExact(usize, usize),
+}
+
+impl<T> Default for FaceDataReserve<T> {
+    fn default() -> Self {
+        Self::ReserveDataFaces(0, 0)
+    }
 }
 
 impl<T> From<DataReserve<T>> for FaceDataReserve<T> {
@@ -51,6 +194,15 @@ impl<T> From<DataReserve<T>> for FaceDataReserve<T> {
             DataReserve::Data(x) => Self::Data(x),
             DataReserve::Reserve(n_d) => Self::ReserveDataFaces(n_d, 0),
             DataReserve::ReserveExact(n_d) => Self::ReserveDataFacesExact(n_d, 0),
+        }
+    }
+}
+
+impl<T> From<FaceData<T>> for FaceDataReserve<T> {
+    fn from(x: FaceData<T>) -> Self {
+        match x {
+            FaceData::Data(x) => Self::Data(x),
+            FaceData::Face(x) => Self::Face(x),
         }
     }
 }

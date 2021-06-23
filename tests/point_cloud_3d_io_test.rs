@@ -52,7 +52,7 @@ fn point_cloud_3d_io_test() {
     {
         //@todo also compare values
         let mut pc = PointCloud3D::<Point3D>::new();
-        load_xyz(
+        load_xyz::<_, _, _, 30>(
             &mut BufReader::new(File::open("tests/data/test_cube.xyz").unwrap()),
             &mut pc,
         )

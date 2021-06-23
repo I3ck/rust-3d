@@ -31,9 +31,9 @@ use super::{types::*, utils::*};
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load points from a .obj file
-pub struct ObjPointsIterator<P, R>
+pub struct ObjPointsIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     read: R,
@@ -43,9 +43,9 @@ where
     phantom_p: PhantomData<P>,
 }
 
-impl<P, R> ObjPointsIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> ObjPointsIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     pub fn new(read: R) -> Self {
@@ -59,41 +59,51 @@ where
     }
 }
 
-impl<P, R> Iterator for ObjPointsIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for ObjPointsIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    type Item = IOResult<DataReserve<P>>;
+    type Item = IOResult<StackVec<DataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
         }
-        while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
-            self.i_line += 1;
 
-            if line.starts_with(b"v ") {
-                return Some(
-                    fetch_vertex(self.i_line, line)
-                        .map(|x| DataReserve::Data(x))
-                        .map_err(|e| {
+        let mut chunk = StackVec::default();
+
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+                self.i_line += 1;
+
+                if line.starts_with(b"v ") {
+                    match fetch_vertex(self.i_line, line) {
+                        Err(e) => {
                             self.is_done = true;
-                            e
-                        }),
-                );
+                            return Some(Err(e));
+                        }
+                        Ok(x) => {
+                            chunk.push(DataReserve::Data(x)).unwrap() // unwrap safe since we only call this if chunk.has_space()
+                        }
+                    }
+                }
+            } else {
+                self.is_done = true;
+                if chunk.has_data() {
+                    return Some(Ok(chunk));
+                }
+                return None;
             }
         }
-
-        self.is_done = true;
-
-        None
     }
 }
 
-impl<P, R> FusedIterator for ObjPointsIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for ObjPointsIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
 }
@@ -101,9 +111,9 @@ where
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a mesh from a .obj file
-pub struct ObjMeshIterator<P, R>
+pub struct ObjMeshIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     read: R,
@@ -113,9 +123,9 @@ where
     phantom_p: PhantomData<P>,
 }
 
-impl<P, R> ObjMeshIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> ObjMeshIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     pub fn new(read: R) -> Self {
@@ -129,50 +139,57 @@ where
     }
 }
 
-impl<P, R> Iterator for ObjMeshIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for ObjMeshIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    type Item = IOResult<FaceDataReserve<P>>;
+    type Item = IOResult<StackVec<FaceDataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
         }
-        while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
-            self.i_line += 1;
 
-            if line.starts_with(b"v ") {
-                return Some(
-                    fetch_vertex(self.i_line, line)
-                        .map(|x| FaceDataReserve::Data(x))
-                        .map_err(|e| {
+        let mut chunk = StackVec::default();
+
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+                self.i_line += 1;
+
+                if line.starts_with(b"v ") {
+                    match fetch_vertex(self.i_line, line) {
+                        Err(e) => {
                             self.is_done = true;
-                            e
-                        }),
-                );
-            } else if line.starts_with(b"f ") {
-                return Some(
-                    fetch_face(self.i_line, line)
-                        .map(|x| FaceDataReserve::Face(x))
-                        .map_err(|e| {
+                            return Some(Err(e));
+                        }
+                        Ok(x) => chunk.push(FaceDataReserve::Data(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                    }
+                } else if line.starts_with(b"f ") {
+                    match fetch_face(self.i_line, line) {
+                        Err(e) => {
                             self.is_done = true;
-                            e
-                        }),
-                );
+                            return Some(Err(e));
+                        }
+                        Ok(x) => chunk.push(FaceDataReserve::Face(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                    }
+                }
+            } else {
+                self.is_done = true;
+                if chunk.has_data() {
+                    return Some(Ok(chunk));
+                }
+                return None;
             }
         }
-
-        self.is_done = true;
-
-        None
     }
 }
 
-impl<P, R> FusedIterator for ObjMeshIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for ObjMeshIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
 }
@@ -180,30 +197,32 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads an IsMesh3D from the .obj file format
-pub fn load_obj_mesh<EM, P, R>(read: R, mesh: &mut EM) -> IOResult<()>
+pub fn load_obj_mesh<EM, P, R, const CHUNK_SIZE: usize>(read: R, mesh: &mut EM) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D + Clone,
+    P: IsBuildable3D + Clone + Default,
     R: BufRead,
 {
-    let iterator = ObjMeshIterator::new(read);
+    let iterator = ObjMeshIterator::<_, _, CHUNK_SIZE>::new(read);
 
-    for rd in iterator {
-        match rd? {
-            FaceDataReserve::Data(x) => {
-                mesh.add_vertex(x);
-            }
-            FaceDataReserve::Face([a, b, c]) => {
-                mesh.try_add_connection(VId(a), VId(b), VId(c))
-                    .map_err(|_| IOError::InvalidMeshIndices)?;
-            }
-            io::types::FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
-                mesh.reserve_vertices(n_vertices);
-                mesh.reserve_faces(n_faces);
-            }
-            io::types::FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
-                mesh.reserve_vertices_exact(n_vertices);
-                mesh.reserve_faces_exact(n_faces);
+    for chunk in iterator {
+        for x in chunk? {
+            match x {
+                FaceDataReserve::Data(p) => {
+                    mesh.add_vertex(p);
+                }
+                FaceDataReserve::Face([a, b, c]) => {
+                    mesh.try_add_connection(VId(a), VId(b), VId(c))
+                        .or(Err(IOError::InvalidMeshIndices))?;
+                }
+                FaceDataReserve::ReserveDataFaces(n_vertices, n_faces) => {
+                    mesh.reserve_vertices(n_vertices);
+                    mesh.reserve_faces(n_faces);
+                }
+                FaceDataReserve::ReserveDataFacesExact(n_vertices, n_faces) => {
+                    mesh.reserve_vertices_exact(n_vertices);
+                    mesh.reserve_faces_exact(n_faces);
+                }
             }
         }
     }
@@ -212,19 +231,21 @@ where
 }
 
 /// Loads IsPushable<Is3D> from the .obj file format
-pub fn load_obj_points<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
+pub fn load_obj_points<IP, P, R, const CHUNK_SIZE: usize>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    let iterator = ObjPointsIterator::new(read);
+    let iterator = ObjPointsIterator::<_, _, CHUNK_SIZE>::new(read);
 
-    for p in iterator {
-        match p? {
-            DataReserve::Data(x) => ip.push(x),
-            DataReserve::Reserve(n) => ip.reserve(n),
-            DataReserve::ReserveExact(n) => ip.reserve_exact(n),
+    for chunk in iterator {
+        for x in chunk? {
+            match x {
+                DataReserve::Data(x) => ip.push(x),
+                DataReserve::Reserve(x) => ip.reserve(x),
+                DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+            }
         }
     }
 
@@ -236,7 +257,7 @@ where
 #[inline(always)]
 fn fetch_vertex<P>(i_line: usize, line: &[u8]) -> IOResult<P>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
 {
     let mut words = to_words_skip_empty(line);
 

@@ -42,6 +42,7 @@ const MAX_TRIANGLES_BINARY: u32 = 1_000_000_000;
 
 //------------------------------------------------------------------------------
 
+#[derive(Default)] // Default not well defined, but required for some applications
 pub struct StlFace<P, N>
 where
     P: Is3D,
@@ -106,19 +107,19 @@ where
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .stl file
-pub struct StlIterator<P, N, R>
+pub struct StlIterator<P, N, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: BufRead,
 {
-    inner: BinaryOrAsciiIterator<P, N, R>,
+    inner: BinaryOrAsciiIterator<P, N, R, CHUNK_SIZE>,
 }
 
-impl<P, N, R> StlIterator<P, N, R>
+impl<P, N, R, const CHUNK_SIZE: usize> StlIterator<P, N, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: BufRead,
 {
     pub fn new(mut read: R, format: StlFormat) -> IOResult<Self> {
@@ -134,13 +135,13 @@ where
     }
 }
 
-impl<P, N, R> Iterator for StlIterator<P, N, R>
+impl<P, N, R, const CHUNK_SIZE: usize> Iterator for StlIterator<P, N, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: BufRead,
 {
-    type Item = IOResult<DataReserve<StlFace<P, N>>>;
+    type Item = IOResult<StackVec<DataReserve<StlFace<P, N>>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         match &mut self.inner {
@@ -150,32 +151,32 @@ where
     }
 }
 
-impl<P, N, R> FusedIterator for StlIterator<P, N, R>
+impl<P, N, R, const CHUNK_SIZE: usize> FusedIterator for StlIterator<P, N, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: BufRead,
 {
 }
 
 //------------------------------------------------------------------------------
 
-enum BinaryOrAsciiIterator<P, N, R>
+enum BinaryOrAsciiIterator<P, N, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: BufRead,
 {
-    Binary(StlBinaryIterator<P, N, R>),
-    Ascii(StlAsciiIterator<P, N, R>),
+    Binary(StlBinaryIterator<P, N, R, CHUNK_SIZE>),
+    Ascii(StlAsciiIterator<P, N, R, CHUNK_SIZE>),
 }
 
 //------------------------------------------------------------------------------
 
-struct StlBinaryIterator<P, N, R>
+struct StlBinaryIterator<P, N, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: Read,
 {
     read: R,
@@ -187,10 +188,10 @@ where
     phantom_n: PhantomData<N>,
 }
 
-impl<P, N, R> StlBinaryIterator<P, N, R>
+impl<P, N, R, const CHUNK_SIZE: usize> StlBinaryIterator<P, N, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: Read,
 {
     pub fn new(read: R) -> Self {
@@ -206,84 +207,96 @@ where
     }
 }
 
-impl<P, N, R> Iterator for StlBinaryIterator<P, N, R>
+impl<P, N, R, const CHUNK_SIZE: usize> Iterator for StlBinaryIterator<P, N, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: Read,
 {
-    type Item = IOResult<DataReserve<StlFace<P, N>>>;
+    type Item = IOResult<StackVec<DataReserve<StlFace<P, N>>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
         }
-        if !self.header_read {
-            self.header_read = true;
-            // Drop header ('solid' is already dropped)
-            {
-                let mut buffer = [0u8; 75];
-                if let Err(e) = self.read.read_exact(&mut buffer) {
-                    self.is_done = true;
-                    return Some(Err(e.into()));
-                }
-            }
 
-            return match LittleReader::read_u32(&mut self.read) {
-                Err(e) => {
-                    self.is_done = true;
-                    Some(Err(e.into()))
-                }
-                Ok(n_triangles) => {
-                    if n_triangles > MAX_TRIANGLES_BINARY {
+        let mut chunk = StackVec::default();
+
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if !self.header_read {
+                self.header_read = true;
+                // Drop header ('solid' is already dropped)
+                {
+                    let mut buffer = [0u8; 75];
+                    if let Err(e) = self.read.read_exact(&mut buffer) {
                         self.is_done = true;
-                        return Some(Err(IOError::FaceCount(None)));
+                        return Some(Err(e.into()));
                     }
-
-                    self.n_triangles = n_triangles as usize;
-
-                    Some(Ok(DataReserve::ReserveExact(n_triangles as usize)))
                 }
-            };
-        }
 
-        if self.current < self.n_triangles {
-            self.current += 1;
-            match read_stl_triangle(&mut self.read) {
-                Err(e) => {
-                    self.is_done = true;
-                    Some(Err(e))
-                }
-                Ok(t) => {
-                    let n = N::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
-                    let a = P::new(t.x[0] as f64, t.x[1] as f64, t.x[2] as f64);
-                    let b = P::new(t.y[0] as f64, t.y[1] as f64, t.y[2] as f64);
-                    let c = P::new(t.z[0] as f64, t.z[1] as f64, t.z[2] as f64);
+                match LittleReader::read_u32(&mut self.read) {
+                    Err(e) => {
+                        self.is_done = true;
+                        return Some(Err(e.into()));
+                    }
+                    Ok(n_triangles) => {
+                        if n_triangles > MAX_TRIANGLES_BINARY {
+                            self.is_done = true;
+                            return Some(Err(IOError::FaceCount(None)));
+                        }
 
-                    Some(Ok(DataReserve::Data(StlFace { a, b, c, n })))
+                        self.n_triangles = n_triangles as usize;
+
+                        chunk
+                            .push(DataReserve::ReserveExact(n_triangles as usize))
+                            .unwrap() // unwrap safe since we only call this if chunk.has_space()
+                    }
+                };
+            } else if self.current < self.n_triangles {
+                self.current += 1;
+                match read_stl_triangle(&mut self.read) {
+                    Err(e) => {
+                        self.is_done = true;
+                        return Some(Err(e));
+                    }
+                    Ok(t) => {
+                        let n = N::new(t.n[0] as f64, t.n[1] as f64, t.n[2] as f64);
+                        let a = P::new(t.x[0] as f64, t.x[1] as f64, t.x[2] as f64);
+                        let b = P::new(t.y[0] as f64, t.y[1] as f64, t.y[2] as f64);
+                        let c = P::new(t.z[0] as f64, t.z[1] as f64, t.z[2] as f64);
+
+                        chunk
+                            .push(DataReserve::Data(StlFace { a, b, c, n }))
+                            .unwrap() // unwrap safe since we only call this if chunk.has_space()
+                    }
                 }
+            } else {
+                self.is_done = true;
+                if chunk.has_data() {
+                    return Some(Ok(chunk));
+                }
+                return None;
             }
-        } else {
-            self.is_done = true;
-            None
         }
     }
 }
 
-impl<P, N, R> FusedIterator for StlBinaryIterator<P, N, R>
+impl<P, N, R, const CHUNK_SIZE: usize> FusedIterator for StlBinaryIterator<P, N, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: Read,
 {
 }
 
 //------------------------------------------------------------------------------
 
-struct StlAsciiIterator<P, N, R>
+struct StlAsciiIterator<P, N, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: Read,
 {
     read: R,
@@ -295,10 +308,10 @@ where
     phantom_n: PhantomData<N>,
 }
 
-impl<P, N, R> StlAsciiIterator<P, N, R>
+impl<P, N, R, const CHUNK_SIZE: usize> StlAsciiIterator<P, N, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: BufRead,
 {
     pub fn new(read: R) -> Self {
@@ -314,47 +327,59 @@ where
     }
 }
 
-impl<P, N, R> Iterator for StlAsciiIterator<P, N, R>
+impl<P, N, R, const CHUNK_SIZE: usize> Iterator for StlAsciiIterator<P, N, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: BufRead,
 {
-    type Item = IOResult<DataReserve<StlFace<P, N>>>;
+    type Item = IOResult<StackVec<DataReserve<StlFace<P, N>>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
         }
-        if !self.header_read {
-            self.header_read = true;
 
-            // skip first line
-            if let Err(e) = self.read.read_until(b'\n', &mut self.line_buffer) {
-                self.is_done = true;
-                return Some(Err(e.into()));
-            }
-            self.i_line += 1;
-        }
+        let mut chunk = StackVec::default();
 
-        match read_stl_facet(&mut self.read, &mut self.line_buffer, &mut self.i_line) {
-            Ok((a, b, c, n)) => return Some(Ok(DataReserve::Data(StlFace { a, b, c, n }))),
-            Err(IOError::EndReached) => {
-                self.is_done = true;
-                return None;
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if !self.header_read {
+                self.header_read = true;
+
+                // skip first line
+                if let Err(e) = self.read.read_until(b'\n', &mut self.line_buffer) {
+                    self.is_done = true;
+                    return Some(Err(e.into()));
+                }
+                self.i_line += 1;
             }
-            Err(x) => {
-                self.is_done = true;
-                return Some(Err(x));
+
+            match read_stl_facet(&mut self.read, &mut self.line_buffer, &mut self.i_line) {
+                Ok((a, b, c, n)) => chunk
+                    .push(DataReserve::Data(StlFace { a, b, c, n }))
+                    .unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                Err(IOError::EndReached) => {
+                    self.is_done = true;
+                    if chunk.has_data() {
+                        return Some(Ok(chunk));
+                    }
+                    return None;
+                }
+                Err(x) => {
+                    self.is_done = true;
+                    return Some(Err(x));
+                }
             }
         }
     }
 }
 
-impl<P, N, R> FusedIterator for StlAsciiIterator<P, N, R>
+impl<P, N, R, const CHUNK_SIZE: usize> FusedIterator for StlAsciiIterator<P, N, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: BufRead,
 {
 }
@@ -362,7 +387,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads a Mesh from .stl file with duplicate vertices
-pub fn load_stl_mesh_duped<EM, P, N, R, IPN>(
+pub fn load_stl_mesh_duped<EM, P, N, R, IPN, const CHUNK_SIZE: usize>(
     read: R,
     format: StlFormat,
     mesh: &mut EM,
@@ -370,26 +395,28 @@ pub fn load_stl_mesh_duped<EM, P, N, R, IPN>(
 ) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: BufRead,
     IPN: IsPushable<N>,
 {
-    let iterator = StlIterator::new(read, format)?;
+    let iterator = StlIterator::<_, _, _, CHUNK_SIZE>::new(read, format)?;
 
-    for fr in iterator {
-        match fr? {
-            DataReserve::Data(face) => {
-                mesh.add_face(face.a, face.b, face.c);
-                face_normals.push(face.n);
-            }
-            DataReserve::Reserve(n) => {
-                mesh.reserve_vertices(3 * n);
-                mesh.reserve_faces(n);
-            }
-            DataReserve::ReserveExact(n) => {
-                mesh.reserve_vertices_exact(3 * n);
-                mesh.reserve_faces_exact(n);
+    for chunk in iterator {
+        for x in chunk? {
+            match x {
+                DataReserve::Data(face) => {
+                    mesh.add_face(face.a, face.b, face.c);
+                    face_normals.push(face.n);
+                }
+                DataReserve::Reserve(n) => {
+                    mesh.reserve_vertices(3 * n);
+                    mesh.reserve_faces(n);
+                }
+                DataReserve::ReserveExact(n) => {
+                    mesh.reserve_vertices_exact(3 * n);
+                    mesh.reserve_faces_exact(n);
+                }
             }
         }
     }
@@ -400,7 +427,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads a Mesh from .stl file with unique vertices, dropping invalid triangles
-pub fn load_stl_mesh_unique<EM, P, N, R, IPN>(
+pub fn load_stl_mesh_unique<EM, P, N, R, IPN, const CHUNK_SIZE: usize>(
     read: R,
     format: StlFormat,
     mesh: &mut EM,
@@ -408,54 +435,56 @@ pub fn load_stl_mesh_unique<EM, P, N, R, IPN>(
 ) -> IOResult<()>
 where
     EM: IsFaceEditableMesh<P, Face3> + IsVertexEditableMesh<P, Face3>,
-    P: IsBuildable3D + Clone,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Clone + Default,
+    N: IsBuildable3D + Default,
     R: BufRead,
     IPN: IsPushable<N>,
 {
     let mut map = FnvHashMap::default();
-    let iterator = StlIterator::<P, N, R>::new(read, format)?;
+    let iterator = StlIterator::<P, N, R, CHUNK_SIZE>::new(read, format)?;
 
-    for fr in iterator {
-        match fr? {
-            DataReserve::Data(face) => {
-                let (a, b, c, n) = (face.a, face.b, face.c, face.n);
-                let id_a = *map.entry(a.clone()).or_insert_with(|| {
-                    let value = mesh.num_vertices();
-                    mesh.add_vertex(a);
-                    value
-                });
+    for chunk in iterator {
+        for x in chunk? {
+            match x {
+                DataReserve::Data(face) => {
+                    let (a, b, c, n) = (face.a, face.b, face.c, face.n);
+                    let id_a = *map.entry(a.clone()).or_insert_with(|| {
+                        let value = mesh.num_vertices();
+                        mesh.add_vertex(a);
+                        value
+                    });
 
-                let id_b = *map.entry(b.clone()).or_insert_with(|| {
-                    let value = mesh.num_vertices();
-                    mesh.add_vertex(b);
-                    value
-                });
+                    let id_b = *map.entry(b.clone()).or_insert_with(|| {
+                        let value = mesh.num_vertices();
+                        mesh.add_vertex(b);
+                        value
+                    });
 
-                let id_c = *map.entry(c.clone()).or_insert_with(|| {
-                    let value = mesh.num_vertices();
-                    mesh.add_vertex(c);
-                    value
-                });
+                    let id_c = *map.entry(c.clone()).or_insert_with(|| {
+                        let value = mesh.num_vertices();
+                        mesh.add_vertex(c);
+                        value
+                    });
 
-                // Ignore this issues since this only fails if a triangle uses a vertex multiple times
-                // Simply do not add this triangle and normal
-                match mesh.try_add_connection(VId(id_a), VId(id_b), VId(id_c)) {
-                    Ok(_) => {
-                        face_normals.push(n);
+                    // Ignore this issues since this only fails if a triangle uses a vertex multiple times
+                    // Simply do not add this triangle and normal
+                    match mesh.try_add_connection(VId(id_a), VId(id_b), VId(id_c)) {
+                        Ok(_) => {
+                            face_normals.push(n);
+                        }
+                        Err(_) => (),
                     }
-                    Err(_) => (),
                 }
-            }
-            DataReserve::Reserve(n) => {
-                //Can't reserve vertices since not sure how many are unique
-                mesh.reserve_faces(n);
-                face_normals.reserve(n);
-            }
-            DataReserve::ReserveExact(n) => {
-                //Can't reserve vertices since not sure how many are unique
-                mesh.reserve_faces_exact(n);
-                face_normals.reserve_exact(n);
+                DataReserve::Reserve(n) => {
+                    //Can't reserve vertices since not sure how many are unique
+                    mesh.reserve_faces(n);
+                    face_normals.reserve(n);
+                }
+                DataReserve::ReserveExact(n) => {
+                    //Can't reserve vertices since not sure how many are unique
+                    mesh.reserve_faces_exact(n);
+                    face_normals.reserve_exact(n);
+                }
             }
         }
     }
@@ -466,7 +495,7 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads points from .stl file as triplets into IsPushable<IsBuildable3D>
-pub fn load_stl_triplets<IP, P, N, R, IPN>(
+pub fn load_stl_triplets<IP, P, N, R, IPN, const CHUNK_SIZE: usize>(
     read: R,
     format: StlFormat,
     ip: &mut IP,
@@ -474,28 +503,30 @@ pub fn load_stl_triplets<IP, P, N, R, IPN>(
 ) -> IOResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D,
-    N: IsBuildable3D,
+    P: IsBuildable3D + Default,
+    N: IsBuildable3D + Default,
     R: BufRead,
     IPN: IsPushable<N>,
 {
-    let iterator = StlIterator::new(read, format)?;
+    let iterator = StlIterator::<_, _, _, CHUNK_SIZE>::new(read, format)?;
 
-    for fr in iterator {
-        match fr? {
-            DataReserve::Data(face) => {
-                ip.push(face.a);
-                ip.push(face.b);
-                ip.push(face.c);
-                face_normals.push(face.n);
-            }
-            DataReserve::Reserve(n) => {
-                ip.reserve(3 * n);
-                face_normals.reserve(n);
-            }
-            DataReserve::ReserveExact(n) => {
-                ip.reserve_exact(3 * n);
-                face_normals.reserve_exact(n);
+    for chunk in iterator {
+        for x in chunk? {
+            match x {
+                DataReserve::Data(face) => {
+                    ip.push(face.a);
+                    ip.push(face.b);
+                    ip.push(face.c);
+                    face_normals.push(face.n);
+                }
+                DataReserve::Reserve(n) => {
+                    ip.reserve(3 * n);
+                    face_normals.reserve(n);
+                }
+                DataReserve::ReserveExact(n) => {
+                    ip.reserve_exact(3 * n);
+                    face_normals.reserve_exact(n);
+                }
             }
         }
     }
@@ -508,11 +539,11 @@ where
 /// Figures out the format of a .stl file by performing a deep test.  
 /// Since some files incorrectly use the solid keyword, this might be necessary
 /// Note that read is in an undefined state afterwards, you'll e.g. need to reopen the file for further reads
-pub fn is_ascii_deep<R>(read: R) -> bool
+pub fn is_ascii_deep<R, const CHUNK_SIZE: usize>(read: R) -> bool
 where
     R: BufRead,
 {
-    let mut iterator = StlAsciiIterator::<Point3D, Point3D, R>::new(read);
+    let mut iterator = StlAsciiIterator::<Point3D, Point3D, R, CHUNK_SIZE>::new(read);
     match iterator.next() {
         Some(Ok(_)) => true,
         _ => false,

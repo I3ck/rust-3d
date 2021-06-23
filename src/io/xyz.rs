@@ -35,9 +35,9 @@ use super::{types::*, utils::*};
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .xyz file
-pub struct XyzIterator<P, R>
+pub struct XyzIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     read: R,
@@ -49,9 +49,9 @@ where
     phantom_p: PhantomData<P>,
 }
 
-impl<P, R> XyzIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> XyzIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     pub fn new(read: R) -> Self {
@@ -99,42 +99,51 @@ where
     }
 }
 
-impl<P, R> Iterator for XyzIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for XyzIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    type Item = IOResult<DataReserve<P>>;
+    type Item = IOResult<StackVec<DataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
         }
-        if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
-            self.i_line += 1;
-            Some(
-                Self::fetch_one(
+
+        let mut chunk = StackVec::default();
+
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+                self.i_line += 1;
+                match Self::fetch_one(
                     &mut self.delim_determined,
                     &mut self.delim,
                     self.i_line,
                     line,
-                )
-                .map(|x| DataReserve::Data(x))
-                .map_err(|e| {
-                    self.is_done = true;
-                    e
-                }),
-            )
-        } else {
-            self.is_done = true;
-            None
+                ) {
+                    Err(e) => {
+                        self.is_done = true;
+                        return Some(Err(e));
+                    }
+                    Ok(x) => chunk.push(DataReserve::Data(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                }
+            } else {
+                self.is_done = true;
+                if chunk.has_data() {
+                    return Some(Ok(chunk));
+                }
+                return None;
+            }
         }
     }
 }
 
-impl<P, R> FusedIterator for XyzIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for XyzIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
 }
@@ -168,19 +177,21 @@ where
 }
 
 /// Loads a IsPushable<Is3D> as x y z coordinates. E.g. used to load the .xyz file format or .csv file
-pub fn load_xyz<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
+pub fn load_xyz<IP, P, R, const CHUNK_SIZE: usize>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    let iterator = XyzIterator::new(read);
+    let iterator = XyzIterator::<_, _, CHUNK_SIZE>::new(read);
 
-    for p in iterator {
-        match p? {
-            DataReserve::Data(x) => ip.push(x),
-            DataReserve::Reserve(n) => ip.reserve(n),
-            DataReserve::ReserveExact(n) => ip.reserve_exact(n),
+    for chunk in iterator {
+        for x in chunk? {
+            match x {
+                DataReserve::Data(x) => ip.push(x),
+                DataReserve::Reserve(x) => ip.reserve(x),
+                DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+            }
         }
     }
 

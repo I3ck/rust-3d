@@ -31,7 +31,7 @@ use super::{types::*, utils::*};
 //------------------------------------------------------------------------------
 
 /// Iterator to incrementally load a .gcode file
-pub struct GcodeIterator<P, R>
+pub struct GcodeIterator<P, R, const CHUNK_SIZE: usize>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -48,7 +48,7 @@ where
     phantom_p: PhantomData<P>,
 }
 
-impl<P, R> GcodeIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> GcodeIterator<P, R, CHUNK_SIZE>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -69,72 +69,31 @@ where
     }
 }
 
-impl<P, R> Iterator for GcodeIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for GcodeIterator<P, R, CHUNK_SIZE>
 where
     P: IsBuildable3D,
     R: BufRead,
 {
-    type Item = IOResult<DataReserve<P>>;
+    type Item = IOResult<StackVec<DataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
         }
-        while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
-            self.i_line += 1;
 
-            if line.len() >= 4 && line[0] == b'G' {
-                if line[2] == b' ' && (line[1] == b'1' || line[1] == b'2' || line[1] == b'3') {
-                    // Move according to absolute/relative
-                    let mut any_changed = false;
-                    match command(&line[3..]).ok_or(IOError::LineParse(self.i_line)) {
-                        Err(e) => {
-                            self.is_done = true;
-                            return Some(Err(e));
-                        }
-                        Ok([opt_x, opt_y, opt_z]) => {
-                            if let Some(new_x) = opt_x {
-                                any_changed = true;
-                                match self.ra {
-                                    RelativeAbsolute::Absolute => self.x = new_x,
-                                    RelativeAbsolute::Relative => self.x += new_x,
-                                }
-                            }
+        let mut chunk = StackVec::default();
 
-                            if let Some(new_y) = opt_y {
-                                any_changed = true;
-                                match self.ra {
-                                    RelativeAbsolute::Absolute => self.y = new_y,
-                                    RelativeAbsolute::Relative => self.y += new_y,
-                                }
-                            }
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+                self.i_line += 1;
 
-                            if let Some(new_z) = opt_z {
-                                any_changed = true;
-                                match self.ra {
-                                    RelativeAbsolute::Absolute => self.z = new_z,
-                                    RelativeAbsolute::Relative => self.z += new_z,
-                                }
-                            }
-
-                            if any_changed {
-                                return Some(Ok(DataReserve::Data(P::new(self.x, self.y, self.z))));
-                            }
-                        }
-                    }
-                } else if line[1] == b'9' && line[3] == b' ' {
-                    // G9x
-                    if line[2] == b'0' {
-                        // G90
-                        self.ra = RelativeAbsolute::Absolute;
-                    } else if line[2] == b'1' {
-                        // G91
-                        self.ra = RelativeAbsolute::Relative;
-                    } else if line[2] == b'2' {
-                        // G92
-                        // Move according absolute
+                if line.len() >= 4 && line[0] == b'G' {
+                    if line[2] == b' ' && (line[1] == b'1' || line[1] == b'2' || line[1] == b'3') {
+                        // Move according to absolute/relative
                         let mut any_changed = false;
-                        match command(&line[4..]).ok_or(IOError::LineParse(self.i_line)) {
+                        match command(&line[3..]).ok_or(IOError::LineParse(self.i_line)) {
                             Err(e) => {
                                 self.is_done = true;
                                 return Some(Err(e));
@@ -142,37 +101,91 @@ where
                             Ok([opt_x, opt_y, opt_z]) => {
                                 if let Some(new_x) = opt_x {
                                     any_changed = true;
-                                    self.x = new_x
+                                    match self.ra {
+                                        RelativeAbsolute::Absolute => self.x = new_x,
+                                        RelativeAbsolute::Relative => self.x += new_x,
+                                    }
                                 }
 
                                 if let Some(new_y) = opt_y {
                                     any_changed = true;
-                                    self.y = new_y
+                                    match self.ra {
+                                        RelativeAbsolute::Absolute => self.y = new_y,
+                                        RelativeAbsolute::Relative => self.y += new_y,
+                                    }
                                 }
 
                                 if let Some(new_z) = opt_z {
                                     any_changed = true;
-                                    self.z = new_z
+                                    match self.ra {
+                                        RelativeAbsolute::Absolute => self.z = new_z,
+                                        RelativeAbsolute::Relative => self.z += new_z,
+                                    }
                                 }
 
                                 if any_changed {
-                                    return Some(Ok(DataReserve::Data(P::new(
-                                        self.x, self.y, self.z,
-                                    ))));
+                                    chunk
+                                        .push(DataReserve::Data(P::new(self.x, self.y, self.z)))
+                                        .unwrap(); // unwrap safe since we only call this if chunk.has_space()
+                                    continue;
+                                }
+                            }
+                        }
+                    } else if line[1] == b'9' && line[3] == b' ' {
+                        // G9x
+                        if line[2] == b'0' {
+                            // G90
+                            self.ra = RelativeAbsolute::Absolute;
+                        } else if line[2] == b'1' {
+                            // G91
+                            self.ra = RelativeAbsolute::Relative;
+                        } else if line[2] == b'2' {
+                            // G92
+                            // Move according absolute
+                            let mut any_changed = false;
+                            match command(&line[4..]).ok_or(IOError::LineParse(self.i_line)) {
+                                Err(e) => {
+                                    self.is_done = true;
+                                    return Some(Err(e));
+                                }
+                                Ok([opt_x, opt_y, opt_z]) => {
+                                    if let Some(new_x) = opt_x {
+                                        any_changed = true;
+                                        self.x = new_x
+                                    }
+
+                                    if let Some(new_y) = opt_y {
+                                        any_changed = true;
+                                        self.y = new_y
+                                    }
+
+                                    if let Some(new_z) = opt_z {
+                                        any_changed = true;
+                                        self.z = new_z
+                                    }
+
+                                    if any_changed {
+                                        chunk
+                                            .push(DataReserve::Data(P::new(self.x, self.y, self.z)))
+                                            .unwrap() // unwrap safe since we only call this if chunk.has_space()
+                                    }
                                 }
                             }
                         }
                     }
                 }
+            } else {
+                self.is_done = true;
+                if chunk.has_data() {
+                    return Some(Ok(chunk));
+                }
+                return None;
             }
         }
-        self.is_done = true;
-
-        None
     }
 }
 
-impl<P, R> FusedIterator for GcodeIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for GcodeIterator<P, R, CHUNK_SIZE>
 where
     P: IsBuildable3D,
     R: BufRead,
@@ -182,19 +195,21 @@ where
 //------------------------------------------------------------------------------
 
 /// Loads a IsPushable<Is3D> as x y z coordinates from gcode
-pub fn load_gcode_points<IP, P, R>(read: R, ip: &mut IP) -> IOResult<()>
+pub fn load_gcode_points<IP, P, R, const CHUNK_SIZE: usize>(read: R, ip: &mut IP) -> IOResult<()>
 where
     IP: IsPushable<P>,
     P: IsBuildable3D,
     R: BufRead,
 {
-    let iterator = GcodeIterator::new(read);
+    let iterator = GcodeIterator::<_, _, CHUNK_SIZE>::new(read);
 
-    for p in iterator {
-        match p? {
-            DataReserve::Data(x) => ip.push(x),
-            DataReserve::Reserve(n) => ip.reserve(n),
-            DataReserve::ReserveExact(n) => ip.reserve_exact(n),
+    for chunk in iterator {
+        for x in chunk? {
+            match x {
+                DataReserve::Data(x) => ip.push(x),
+                DataReserve::Reserve(x) => ip.reserve(x),
+                DataReserve::ReserveExact(x) => ip.reserve_exact(x),
+            }
         }
     }
 

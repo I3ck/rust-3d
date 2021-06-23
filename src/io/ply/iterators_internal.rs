@@ -36,19 +36,19 @@ use super::{types::*, utils::*};
 
 //------------------------------------------------------------------------------
 
-pub struct PlyAsciiMeshIterator<P, R>
+pub struct PlyAsciiMeshIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     header: FullHeader,
-    p_iter: Option<PlyAsciiPointsIterator<P, R>>,
-    f_iter: Option<PlyAsciiFacesIterator<R>>,
+    p_iter: Option<PlyAsciiPointsIterator<P, R, CHUNK_SIZE>>,
+    f_iter: Option<PlyAsciiFacesIterator<R, P, CHUNK_SIZE>>, //@todo order type args
 }
 
-impl<P, R> PlyAsciiMeshIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> PlyAsciiMeshIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     pub fn new(read: R, header: FullHeader, i_line: usize) -> Self {
@@ -61,17 +61,17 @@ where
     }
 }
 
-impl<P, R> Iterator for PlyAsciiMeshIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for PlyAsciiMeshIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    type Item = IOResult<io::types::FaceDataReserve<P>>;
+    type Item = IOResult<StackVec<FaceDataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut p_iter) = self.p_iter {
             match p_iter.next() {
-                Some(x) => return Some(x.map(|x| x.into())),
+                Some(x) => return Some(x.map(|x| x.convert())),
                 None => {
                     // point iteration done, switch to face iteration
                     // unwrap safe, since in if let Some()
@@ -90,33 +90,33 @@ where
             .as_mut()
             .unwrap()
             .next()
-            .map(|x| x.map(|x| io::types::FaceDataReserve::Face(x)))
+            .map(|x| x.map(|x| x.convert()))
     }
 }
 
-impl<P, R> FusedIterator for PlyAsciiMeshIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for PlyAsciiMeshIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
 }
 
 //------------------------------------------------------------------------------
 
-pub struct PlyBinaryMeshIterator<BR, P, R>
+pub struct PlyBinaryMeshIterator<BR, P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
     BR: IsByteReader,
 {
     header: FullHeader,
-    p_iter: Option<PlyBinaryPointsIterator<BR, P, R>>,
-    f_iter: Option<PlyBinaryFacesIterator<BR, R>>,
+    p_iter: Option<PlyBinaryPointsIterator<BR, P, R, CHUNK_SIZE>>,
+    f_iter: Option<PlyBinaryFacesIterator<BR, P, R, CHUNK_SIZE>>,
 }
 
-impl<BR, P, R> PlyBinaryMeshIterator<BR, P, R>
+impl<BR, P, R, const CHUNK_SIZE: usize> PlyBinaryMeshIterator<BR, P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
     BR: IsByteReader,
 {
@@ -130,18 +130,18 @@ where
     }
 }
 
-impl<BR, P, R> Iterator for PlyBinaryMeshIterator<BR, P, R>
+impl<BR, P, R, const CHUNK_SIZE: usize> Iterator for PlyBinaryMeshIterator<BR, P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
     BR: IsByteReader,
 {
-    type Item = IOResult<io::types::FaceDataReserve<P>>;
+    type Item = IOResult<StackVec<FaceDataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut p_iter) = self.p_iter {
             match p_iter.next() {
-                Some(x) => return Some(x.map(|x| x.into())),
+                Some(x) => return Some(x.map(|x| x.convert())),
                 None => {
                     // point iteration done, switch to face iteration
                     // unwrap safe, since in if let Some()
@@ -156,13 +156,14 @@ where
             .as_mut()
             .unwrap()
             .next()
-            .map(|x| x.map(|x| io::types::FaceDataReserve::Face(x)))
+            .map(|x| x.map(|x| x.convert()))
     }
 }
 
-impl<BR, P, R> FusedIterator for PlyBinaryMeshIterator<BR, P, R>
+impl<BR, P, R, const CHUNK_SIZE: usize> FusedIterator
+    for PlyBinaryMeshIterator<BR, P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
     BR: IsByteReader,
 {
@@ -170,33 +171,33 @@ where
 
 //------------------------------------------------------------------------------
 
-pub enum BinaryOrAsciiPlyPointsInteralIterator<P, R>
+pub enum BinaryOrAsciiPlyPointsInteralIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    Ascii(PlyAsciiPointsIterator<P, R>),
-    BinaryLittle(PlyBinaryPointsIterator<LittleReader, P, R>),
-    BinaryBig(PlyBinaryPointsIterator<BigReader, P, R>),
+    Ascii(PlyAsciiPointsIterator<P, R, CHUNK_SIZE>),
+    BinaryLittle(PlyBinaryPointsIterator<LittleReader, P, R, CHUNK_SIZE>),
+    BinaryBig(PlyBinaryPointsIterator<BigReader, P, R, CHUNK_SIZE>),
 }
 
 //------------------------------------------------------------------------------
 
-pub enum BinaryOrAsciiPlyMeshInteralIterator<P, R>
+pub enum BinaryOrAsciiPlyMeshInteralIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    Ascii(PlyAsciiMeshIterator<P, R>),
-    BinaryLittle(PlyBinaryMeshIterator<LittleReader, P, R>),
-    BinaryBig(PlyBinaryMeshIterator<BigReader, P, R>),
+    Ascii(PlyAsciiMeshIterator<P, R, CHUNK_SIZE>),
+    BinaryLittle(PlyBinaryMeshIterator<LittleReader, P, R, CHUNK_SIZE>),
+    BinaryBig(PlyBinaryMeshIterator<BigReader, P, R, CHUNK_SIZE>),
 }
 
 //------------------------------------------------------------------------------
 
-pub struct PlyBinaryPointsIterator<BR, P, R>
+pub struct PlyBinaryPointsIterator<BR, P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
     BR: IsByteReader,
 {
@@ -208,9 +209,9 @@ where
     phantom_br: PhantomData<BR>,
 }
 
-impl<BR, P, R> PlyBinaryPointsIterator<BR, P, R>
+impl<BR, P, R, const CHUNK_SIZE: usize> PlyBinaryPointsIterator<BR, P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
     BR: IsByteReader,
 {
@@ -260,34 +261,48 @@ where
     }
 }
 
-impl<BR, P, R> Iterator for PlyBinaryPointsIterator<BR, P, R>
+impl<BR, P, R, const CHUNK_SIZE: usize> Iterator for PlyBinaryPointsIterator<BR, P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
     BR: IsByteReader,
 {
-    type Item = IOResult<DataReserve<P>>;
+    type Item = IOResult<StackVec<DataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
         }
-        if self.current < self.header.vertex.count {
-            self.current += 1;
-            Some(self.fetch_one().map(|x| DataReserve::Data(x)).map_err(|e| {
+
+        let mut chunk = StackVec::default();
+
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if self.current < self.header.vertex.count {
+                self.current += 1;
+                match self.fetch_one() {
+                    Err(e) => {
+                        self.is_done = true;
+                        return Some(Err(e));
+                    }
+                    Ok(x) => chunk.push(DataReserve::Data(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                }
+            } else {
                 self.is_done = true;
-                e
-            }))
-        } else {
-            self.is_done = true;
-            None
+                if chunk.has_data() {
+                    return Some(Ok(chunk));
+                }
+                return None;
+            }
         }
     }
 }
 
-impl<BR, P, R> FusedIterator for PlyBinaryPointsIterator<BR, P, R>
+impl<BR, P, R, const CHUNK_SIZE: usize> FusedIterator
+    for PlyBinaryPointsIterator<BR, P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: Read,
     BR: IsByteReader,
 {
@@ -295,9 +310,9 @@ where
 
 //------------------------------------------------------------------------------
 
-pub struct PlyAsciiPointsIterator<P, R>
+pub struct PlyAsciiPointsIterator<P, R, const CHUNK_SIZE: usize>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     read: R,
@@ -309,9 +324,9 @@ where
     phantom: PhantomData<P>,
 }
 
-impl<P, R> PlyAsciiPointsIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> PlyAsciiPointsIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
     pub fn new(read: R, header: PartialHeader, i_line: usize) -> Self {
@@ -366,52 +381,63 @@ where
     }
 }
 
-impl<P, R> Iterator for PlyAsciiPointsIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> Iterator for PlyAsciiPointsIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
-    type Item = IOResult<DataReserve<P>>;
+    type Item = IOResult<StackVec<DataReserve<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
         }
-        if self.current < self.header.vertex.count {
-            self.current += 1;
-            while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
-                self.i_line += 1;
-                return Some(
-                    Self::fetch_one(&self.header, self.i_line, line)
-                        .map(|x| DataReserve::Data(x))
-                        .map_err(|e| {
+
+        let mut chunk = StackVec::default();
+
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if self.current < self.header.vertex.count {
+                //@todo error handling here might now diverge from previous version, double check
+                //@todo outer else should already cause failure?
+                self.current += 1;
+                if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+                    self.i_line += 1;
+                    match Self::fetch_one(&self.header, self.i_line, line) {
+                        Err(e) => {
                             self.is_done = true;
-                            e
-                        }),
-                );
+                            return Some(Err(e));
+                        }
+                        Ok(x) => chunk.push(DataReserve::Data(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                    }
+                }
+            } else {
+                self.is_done = true;
+
+                if self.current != self.header.vertex.count {
+                    return Some(Err(IOError::VertexCount(Some(self.i_line))));
+                } else {
+                    if chunk.has_data() {
+                        return Some(Ok(chunk));
+                    }
+                    return None;
+                }
             }
-        }
-
-        self.is_done = true;
-
-        if self.current != self.header.vertex.count {
-            Some(Err(IOError::VertexCount(Some(self.i_line))))
-        } else {
-            None
         }
     }
 }
 
-impl<P, R> FusedIterator for PlyAsciiPointsIterator<P, R>
+impl<P, R, const CHUNK_SIZE: usize> FusedIterator for PlyAsciiPointsIterator<P, R, CHUNK_SIZE>
 where
-    P: IsBuildable3D,
+    P: IsBuildable3D + Default,
     R: BufRead,
 {
 }
 
 //------------------------------------------------------------------------------
 
-pub struct PlyAsciiFacesIterator<R>
+pub struct PlyAsciiFacesIterator<R, P, const CHUNK_SIZE: usize>
 where
     R: BufRead,
 {
@@ -421,9 +447,10 @@ where
     current: usize,
     i_line: usize,
     line_buffer: Vec<u8>,
+    phantom: PhantomData<P>,
 }
 
-impl<R> PlyAsciiFacesIterator<R>
+impl<R, P, const CHUNK_SIZE: usize> PlyAsciiFacesIterator<R, P, CHUNK_SIZE>
 where
     R: BufRead,
 {
@@ -435,46 +462,62 @@ where
             current: 0,
             i_line,
             line_buffer: Vec::new(),
+            phantom: PhantomData::default(),
         }
     }
 }
 
-impl<R> Iterator for PlyAsciiFacesIterator<R>
+impl<R, P, const CHUNK_SIZE: usize> Iterator for PlyAsciiFacesIterator<R, P, CHUNK_SIZE>
 where
     R: BufRead,
 {
-    type Item = IOResult<[usize; 3]>;
+    type Item = IOResult<StackVec<FaceData<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
         }
-        if self.current < self.header.face.count {
-            self.current += 1;
-            while let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
-                self.i_line += 1;
-                return Some(
-                    collect_index_line(&line)
-                        .ok_or(IOError::Face(Some(self.i_line)))
-                        .map_err(|e| {
+
+        let mut chunk = StackVec::default();
+
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if self.current < self.header.face.count {
+                //@todo error handling here might now diverge from previous version, double check
+                //@todo outer else should already cause failure?
+                self.current += 1;
+                if let Ok(line) = fetch_line(&mut self.read, &mut self.line_buffer) {
+                    self.i_line += 1;
+
+                    match collect_index_line(&line) {
+                        None => {
                             self.is_done = true;
-                            e
-                        }),
-                );
+                            return Some(Err(IOError::Face(Some(self.i_line))));
+                        }
+                        Some(x) => chunk.push(FaceData::Face(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                    }
+                }
+            } else {
+                self.is_done = true;
+                if chunk.has_data() {
+                    return Some(Ok(chunk));
+                }
+
+                return None;
             }
         }
-
-        self.is_done = true;
-
-        None
     }
 }
 
-impl<R> FusedIterator for PlyAsciiFacesIterator<R> where R: BufRead {}
+impl<R, P, const CHUNK_SIZE: usize> FusedIterator for PlyAsciiFacesIterator<R, P, CHUNK_SIZE> where
+    R: BufRead
+{
+}
 
 //------------------------------------------------------------------------------
 
-pub struct PlyBinaryFacesIterator<BR, R>
+pub struct PlyBinaryFacesIterator<BR, P, R, const CHUNK_SIZE: usize>
 where
     R: Read,
     BR: IsByteReader,
@@ -483,10 +526,11 @@ where
     is_done: bool,
     header: FullHeader,
     current: usize,
-    phantom: PhantomData<BR>,
+    phantom_br: PhantomData<BR>,
+    phantom_p: PhantomData<P>,
 }
 
-impl<BR, R> PlyBinaryFacesIterator<BR, R>
+impl<BR, P, R, const CHUNK_SIZE: usize> PlyBinaryFacesIterator<BR, P, R, CHUNK_SIZE>
 where
     R: Read,
     BR: IsByteReader,
@@ -497,7 +541,8 @@ where
             is_done: false,
             header,
             current: 0,
-            phantom: PhantomData,
+            phantom_br: PhantomData,
+            phantom_p: PhantomData,
         }
     }
 
@@ -521,31 +566,45 @@ where
     }
 }
 
-impl<BR, R> Iterator for PlyBinaryFacesIterator<BR, R>
+impl<BR, P, R, const CHUNK_SIZE: usize> Iterator for PlyBinaryFacesIterator<BR, P, R, CHUNK_SIZE>
 where
     R: Read,
     BR: IsByteReader,
 {
-    type Item = IOResult<[usize; 3]>;
+    type Item = IOResult<StackVec<FaceData<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
             return None;
         }
-        if self.current < self.header.face.count {
-            self.current += 1;
-            Some(self.fetch_one().map_err(|e| {
+
+        let mut chunk = StackVec::default();
+
+        loop {
+            if chunk.is_full() {
+                return Some(Ok(chunk));
+            } else if self.current < self.header.face.count {
+                self.current += 1;
+                match self.fetch_one() {
+                    Err(e) => {
+                        self.is_done = true;
+                        return Some(Err(e));
+                    }
+                    Ok(x) => chunk.push(FaceData::Face(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                }
+            } else {
                 self.is_done = true;
-                e
-            }))
-        } else {
-            self.is_done = true;
-            None
+                if chunk.has_data() {
+                    return Some(Ok(chunk));
+                }
+                return None;
+            }
         }
     }
 }
 
-impl<BR, R> FusedIterator for PlyBinaryFacesIterator<BR, R>
+impl<BR, P, R, const CHUNK_SIZE: usize> FusedIterator
+    for PlyBinaryFacesIterator<BR, P, R, CHUNK_SIZE>
 where
     R: Read,
     BR: IsByteReader,

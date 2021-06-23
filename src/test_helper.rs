@@ -49,7 +49,7 @@ pub fn assert_files_equal(filepath1: &str, filepath2: &str) {
 pub fn test_filter_2d<F, P>(f: F, path_expected: &str, unique_identifier: &str)
 where
     F: IsFilter<P>,
-    P: IsBuildable2D + Clone,
+    P: IsBuildable2D + Clone + Default,
 {
     let path_tmp = ["tests/tmp/tmp", unique_identifier, ".xyz"].join("");
     let filter = FilterRandomAccessible::new(f);
@@ -57,7 +57,7 @@ where
     let mut view = View::Full;
     let mut pc = PointCloud2D::<P>::new();
     let mut f = BufReader::new(File::open("tests/data/test_square.xy").unwrap());
-    load_xy(&mut f, &mut pc).unwrap();
+    load_xy::<_, _, _, 30>(&mut f, &mut pc).unwrap();
 
     filter.filter(&pc, &mut view);
 
@@ -72,7 +72,7 @@ where
 pub fn test_filter_3d<F, P>(f: F, path_expected: &str, unique_identifier: &str)
 where
     F: IsFilter<P>,
-    P: IsBuildable3D + Clone,
+    P: IsBuildable3D + Clone + Default,
 {
     let path_tmp = ["tests/tmp/tmp", unique_identifier, ".xyz"].join("");
     let filter = FilterRandomAccessible::new(f);
@@ -80,7 +80,7 @@ where
     let mut view = View::Full;
     let mut pc = PointCloud3D::<P>::new();
     let mut f = BufReader::new(File::open("tests/data/test_cube.xyz").unwrap());
-    load_xyz(&mut f, &mut pc).unwrap();
+    load_xyz::<_, _, _, 30>(&mut f, &mut pc).unwrap();
 
     filter.filter(&pc, &mut view);
 
@@ -95,14 +95,14 @@ where
 pub fn write_expected_filter_2d<F, P>(f: F, path_expected: &str)
 where
     F: IsFilter<P>,
-    P: IsBuildable2D + Clone,
+    P: IsBuildable2D + Clone + Default,
 {
     let filter = FilterRandomAccessible::new(f);
 
     let mut view = View::Full;
     let mut pc = PointCloud2D::<P>::new();
     let mut f = BufReader::new(File::open("tests/data/test_square.xy").unwrap());
-    load_xy(&mut f, &mut pc).unwrap();
+    load_xy::<_, _, _, 30>(&mut f, &mut pc).unwrap();
 
     filter.filter(&pc, &mut view);
 
@@ -115,14 +115,14 @@ where
 pub fn write_expected_filter_3d<F, P>(f: F, path_expected: &str)
 where
     F: IsFilter<P>,
-    P: IsBuildable3D + Clone,
+    P: IsBuildable3D + Clone + Default,
 {
     let filter = FilterRandomAccessible::new(f);
 
     let mut view = View::Full;
     let mut pc = PointCloud3D::<P>::new();
     let mut f = BufReader::new(File::open("tests/data/test_cube.xyz").unwrap());
-    load_xyz(&mut f, &mut pc).unwrap();
+    load_xyz::<_, _, _, 30>(&mut f, &mut pc).unwrap();
 
     filter.filter(&pc, &mut view);
 

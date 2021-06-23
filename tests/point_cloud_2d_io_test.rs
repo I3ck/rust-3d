@@ -52,7 +52,7 @@ fn point_cloud_2d_io_test() {
     {
         //@todo also compare values
         let mut pc = PointCloud2D::<Point2D>::new();
-        load_xy(
+        load_xy::<_, _, _, 30>(
             &mut BufReader::new(File::open("tests/data/test_square.xy").unwrap()),
             &mut pc,
         )
