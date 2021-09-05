@@ -232,12 +232,12 @@ impl BoundingBox3D {
         Self: Sized,
         P: Is3D,
     {
-        other.x() > self.min.x()
-            && other.x() < self.max.x()
-            && other.y() > self.min.y()
-            && other.y() < self.max.y()
-            && other.z() > self.min.z()
-            && other.z() < self.max.z()
+        other.x() >= self.min.x()
+            && other.x() <= self.max.x()
+            && other.y() >= self.min.y()
+            && other.y() <= self.max.y()
+            && other.z() >= self.min.z()
+            && other.z() <= self.max.z()
     }
     /// Tests whether this bounding box contains the other
     pub fn has_inside(&self, other: &BoundingBox3D) -> bool {

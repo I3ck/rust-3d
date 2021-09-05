@@ -181,10 +181,10 @@ impl BoundingBox2D {
         Self: Sized,
         P: Is2D,
     {
-        other.x() > self.min.x()
-            && other.x() < self.max.x()
-            && other.y() > self.min.y()
-            && other.y() < self.max.y()
+        other.x() >= self.min.x()
+            && other.x() <= self.max.x()
+            && other.y() >= self.min.y()
+            && other.y() <= self.max.y()
     }
     /// Tests whether this bounding box contains the other
     pub fn has_inside(&self, other: &BoundingBox2D) -> bool {
