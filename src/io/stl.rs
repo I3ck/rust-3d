@@ -683,9 +683,9 @@ where
     // skip "vertex"
     words.next()?;
 
-    let x = fast_float::parse(words.next()?).ok()?;
-    let y = fast_float::parse(words.next()?).ok()?;
-    let z = fast_float::parse(words.next()?).ok()?;
+    let x = from_ascii(words.next()?)?;
+    let y = from_ascii(words.next()?)?;
+    let z = from_ascii(words.next()?)?;
 
     Some(P::new(x, y, z))
 }
@@ -705,9 +705,9 @@ where
     // skip "normal"
     words.next()?;
 
-    let i = fast_float::parse(words.next()?).ok()?;
-    let j = fast_float::parse(words.next()?).ok()?;
-    let k = fast_float::parse(words.next()?).ok()?;
+    let i = from_ascii(words.next()?)?;
+    let j = from_ascii(words.next()?)?;
+    let k = from_ascii(words.next()?)?;
 
     Some(P::new(i, j, k))
 }

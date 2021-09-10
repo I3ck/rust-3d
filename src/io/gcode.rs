@@ -252,15 +252,15 @@ fn command(line: &[u8]) -> Option<[Option<f64>; 3]> {
         };
         match word[0] {
             b'X' => {
-                x = Some(fast_float::parse(&word[1..end]).ok()?);
+                x = Some(from_ascii(&word[1..end])?);
                 n_found += 1
             }
             b'Y' => {
-                y = Some(fast_float::parse(&word[1..end]).ok()?);
+                y = Some(from_ascii(&word[1..end])?);
                 n_found += 1
             }
             b'Z' => {
-                z = Some(fast_float::parse(&word[1..end]).ok()?);
+                z = Some(from_ascii(&word[1..end])?);
                 n_found += 1
             }
             _ => (),

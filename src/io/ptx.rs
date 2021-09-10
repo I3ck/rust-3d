@@ -75,15 +75,15 @@ where
 
         let x = words
             .next()
-            .and_then(|w| fast_float::parse(w).ok())
+            .and_then(|w| from_ascii(w))
             .ok_or(IOError::Vertex(Some(i_line)))?;
         let y = words
             .next()
-            .and_then(|w| fast_float::parse(w).ok())
+            .and_then(|w| from_ascii(w))
             .ok_or(IOError::Vertex(Some(i_line)))?;
         let z = words
             .next()
-            .and_then(|w| fast_float::parse(w).ok())
+            .and_then(|w| from_ascii(w))
             .ok_or(IOError::Vertex(Some(i_line)))?;
 
         let mut p = P::new(x, y, z);
@@ -265,10 +265,10 @@ where
 fn read_matrix_row(line: &[u8]) -> Option<[f64; 4]> {
     let mut words = to_words_skip_empty(line);
 
-    let a = fast_float::parse(words.next()?).ok()?;
-    let b = fast_float::parse(words.next()?).ok()?;
-    let c = fast_float::parse(words.next()?).ok()?;
-    let d = fast_float::parse(words.next()?).ok()?;
+    let a = from_ascii(words.next()?)?;
+    let b = from_ascii(words.next()?)?;
+    let c = from_ascii(words.next()?)?;
+    let d = from_ascii(words.next()?)?;
 
     Some([a, b, c, d])
 }
