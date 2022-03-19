@@ -41,6 +41,17 @@ where
 
 //------------------------------------------------------------------------------
 
+impl<HB> Default for AABBTree2D<HB>
+where
+    HB: HasBoundingBox2D + Clone,
+{
+    fn default() -> Self {
+        Self::Empty
+    }
+}
+
+//------------------------------------------------------------------------------
+
 // currently often calculates the bounding box, try cache it
 impl<HB> AABBTree2D<HB>
 where
