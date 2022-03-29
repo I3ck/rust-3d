@@ -101,6 +101,18 @@ where
         }
     }
 
+    pub fn stats(&self) -> AABBTree2DStats {
+        self.stats_rec(0)
+    }
+
+    fn stats_rec(&self, depth_parent: u64) -> AABBTree2DStats {
+        match self {
+            Self::Empty => Default::default(), //@todo should here depth of one be counted instead?
+            Self::Leaf(leaf) => leaf.stats(depth_parent),
+            Self::Branch(branch) => branch.stats(depth_parent),
+        }
+    }
+
     fn new_rec(data: Vec<HB>, maxdepth: usize, allowed_bucket_size: usize, depth: usize) -> Self {
         match data.len() {
             0 => AABBTree2D::Empty,
@@ -255,6 +267,14 @@ where
             }
         }
     }
+
+    pub fn stats(&self, depth_parent: u64) -> AABBTree2DStats {
+        AABBTree2DStats {
+            n_nodes: 1,
+            n_elements: self.data.len(),
+            max_depth: depth_parent + 1,
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -317,4 +337,23 @@ where
             self.right.bb_crossing_y_value(y, result);
         }
     }
+
+    pub fn stats(&self, depth_parent: u64) -> AABBTree2DStats {
+        let sl = self.left.stats_rec(depth_parent+1);
+        let sr = self.right.stats_rec(depth_parent+1);
+        AABBTree2DStats {
+            n_nodes: sl.n_nodes + sr.n_nodes,
+            n_elements: sl.n_elements + sr.n_elements,
+            max_depth: std::cmp::max(sl.max_depth, sr.max_depth),
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+#[derive (Clone, Debug, Default)]
+pub struct AABBTree2DStats {
+    pub n_nodes: usize,
+    pub n_elements: usize,
+    pub max_depth: u64,
 }
