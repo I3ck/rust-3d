@@ -165,18 +165,14 @@ where
 
     fn is_left_of(compx: bool, bb: &BoundingBox2D, center: &Point2D) -> bool {
         if compx {
-            bb.min_p().x() < center.x()
+            bb.center_bb().x() < center.x()
         } else {
-            bb.min_p().y() < center.y()
+            bb.center_bb().y() < center.y()
         }
     }
 
     fn is_right_of(compx: bool, bb: &BoundingBox2D, center: &Point2D) -> bool {
-        if compx {
-            bb.max_p().x() >= center.x()
-        } else {
-            bb.max_p().y() >= center.y()
-        }
+        !Self::is_left_of(compx, bb, center)
     }
 
     fn bb_of(data: &Vec<HB>) -> Result<BoundingBox2D> {

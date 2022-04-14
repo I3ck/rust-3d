@@ -185,18 +185,14 @@ where
 
     fn is_left_of(comp: &Compare, bb: &BoundingBox3D, center: &Point3D) -> bool {
         match comp {
-            Compare::X => bb.min_p().x() < center.x(),
-            Compare::Y => bb.min_p().y() < center.y(),
-            Compare::Z => bb.min_p().z() < center.z(),
+            Compare::X => bb.center_bb().x() < center.x(),
+            Compare::Y => bb.center_bb().y() < center.y(),
+            Compare::Z => bb.center_bb().z() < center.z(),
         }
     }
 
     fn is_right_of(comp: &Compare, bb: &BoundingBox3D, center: &Point3D) -> bool {
-        match comp {
-            Compare::X => bb.max_p().x() >= center.x(),
-            Compare::Y => bb.max_p().y() >= center.y(),
-            Compare::Z => bb.max_p().z() >= center.z(),
-        }
+        !Self::is_left_of(comp, bb, center)
     }
 
     fn bb_of(data: &Vec<HB>) -> Result<BoundingBox3D> {
