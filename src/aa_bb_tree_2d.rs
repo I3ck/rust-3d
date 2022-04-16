@@ -338,7 +338,7 @@ where
         let sl = self.left.stats_rec(depth_parent+1);
         let sr = self.right.stats_rec(depth_parent+1);
         AABBTree2DStats {
-            n_nodes: sl.n_nodes + sr.n_nodes,
+            n_nodes: 1 + sl.n_nodes + sr.n_nodes,
             n_elements: sl.n_elements + sr.n_elements,
             max_depth: std::cmp::max(sl.max_depth, sr.max_depth),
         }
