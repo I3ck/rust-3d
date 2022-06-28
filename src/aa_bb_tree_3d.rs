@@ -52,13 +52,31 @@ where
 
 //------------------------------------------------------------------------------
 
-// currently often calculates the bounding box, try cache it
+//@todo currently often calculates the bounding box, try cache it
 impl<HB> AABBTree3D<HB>
 where
     HB: HasBoundingBox3D + Clone,
 {
     pub fn new(data: Vec<HB>, maxdepth: usize, allowed_bucket_size: usize) -> Self {
         Self::new_rec(data, maxdepth, allowed_bucket_size, 0)
+    }
+
+    //@todo cache maxdepth / allowed_bucket_size as members
+    //@todo rebuilds the entire tree, implement proper add
+    pub fn add(&mut self, maxdepth: usize, allowed_bucket_size: usize, x: HB) {
+        let mut flat = Vec::new();
+        std::mem::take(self).flatten_into(&mut flat);
+        flat.push(x);
+
+        *self = Self::new(flat, maxdepth, allowed_bucket_size);
+    }
+
+    pub fn flatten_into(self, target: &mut Vec<HB>) {
+        match self {
+            Self::Empty => (),
+            Self::Leaf(leaf) => leaf.flatten_into(target),
+            Self::Branch(branch) => branch.flatten_into(target),
+        }
     }
 
     pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
@@ -318,6 +336,10 @@ where
             max_depth: depth_parent + 1,
         }
     }
+
+    pub fn flatten_into(mut self, target: &mut Vec<HB>) {
+        target.append(&mut self.data);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -405,6 +427,11 @@ where
             n_elements: sl.n_elements + sr.n_elements,
             max_depth: std::cmp::max(sl.max_depth, sr.max_depth),
         }
+    }
+
+    pub fn flatten_into(self, target: &mut Vec<HB>) {
+        self.left.flatten_into(target);
+        self.right.flatten_into(target);
     }
 }
 
