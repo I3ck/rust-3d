@@ -62,9 +62,28 @@ where
     }
 
     //@todo cache maxdepth / allowed_bucket_size as members
-    //@todo cache maxdepth / allowed_bucket_size as members
     pub fn add(&mut self, x: HB, maxdepth: usize, allowed_bucket_size: usize) {
         self.add_rec(x, maxdepth, allowed_bucket_size, 0)
+    }
+
+    //@todo cache maxdepth / allowed_bucket_size as members
+    pub fn retain<F>(&mut self, maxdepth: usize, allowed_bucket_size: usize, f: &mut F)
+    where
+        F: FnMut(&HB) -> bool,
+    {
+        self.retain_rec(maxdepth, allowed_bucket_size, f, 0)
+    }
+
+    //mutates elements and MUST NOT affect the returned bounding box, otherwise order in tree will be incorrect
+    pub fn mutate_elements<F>(&mut self, f: &mut F)
+    where
+        F: FnMut(&mut HB),
+    {
+        match self {
+            Self::Empty => (),
+            Self::Leaf(leaf) => leaf.mutate_elements(f),
+            Self::Branch(branch) => branch.mutate_elements(f),
+        }
     }
 
     pub fn flatten_into(self, target: &mut Vec<HB>) {
@@ -253,6 +272,48 @@ where
             }
         }
     }
+
+    fn retain_rec<F>(
+        &mut self,
+        maxdepth: usize,
+        allowed_bucket_size: usize,
+        f: &mut F,
+        depth: usize,
+    ) where
+        F: FnMut(&HB) -> bool,
+    {
+        match self {
+            Self::Empty => (),
+            Self::Leaf(leaf) => {
+                if leaf.n_elements_after_retain(f) == 0 {
+                    *self = Self::Empty
+                } else {
+                    leaf.retain(f)
+                }
+            }
+            Self::Branch(branch) => {
+                if branch.n_elements_after_retain(f) < allowed_bucket_size {
+                    let mut flat = Vec::new();
+                    std::mem::take(self).flatten_into(&mut flat);
+                    flat.retain(f);
+                    *self = Self::new_rec(flat, maxdepth, allowed_bucket_size, depth);
+                } else {
+                    branch.retain(maxdepth, allowed_bucket_size, f, depth);
+                }
+            }
+        }
+    }
+
+    fn n_elements_after_retain<F>(&mut self, f: &mut F) -> usize
+    where
+        F: FnMut(&HB) -> bool,
+    {
+        match self {
+            Self::Empty => 0,
+            Self::Leaf(leaf) => leaf.n_elements_after_retain(f),
+            Self::Branch(branch) => branch.n_elements_after_retain(f),
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -379,6 +440,30 @@ where
     ) -> bool {
         (*bb == self.bb || bb.is_inside(&self.bb)) && self.data.len() < allowed_bucket_size
     }
+
+    fn n_elements_after_retain<F>(&self, f: &mut F) -> usize
+    where
+        F: FnMut(&HB) -> bool,
+    {
+        self.data.iter().filter(|x| f(x)).count()
+    }
+
+    fn retain<F>(&mut self, f: &mut F)
+    where
+        F: FnMut(&HB) -> bool,
+    {
+        self.data.retain(f);
+        self.bb = AABBTree3D::bb_of(&self.data).unwrap(); // if would be empty, retain wouldn't be called
+    }
+
+    fn mutate_elements<F>(&mut self, f: &mut F)
+    where
+        F: FnMut(&mut HB),
+    {
+        for x in self.data.iter_mut() {
+            f(x)
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -500,6 +585,31 @@ where
                 .add_rec(x, maxdepth, allowed_bucket_size, depth + 1)
         }
         self.bb.consume(bb);
+    }
+
+    fn n_elements_after_retain<F>(&mut self, f: &mut F) -> usize
+    where
+        F: FnMut(&HB) -> bool,
+    {
+        self.left.n_elements_after_retain(f) + self.right.n_elements_after_retain(f)
+    }
+
+    fn retain<F>(&mut self, maxdepth: usize, allowed_bucket_size: usize, f: &mut F, depth: usize)
+    where
+        F: FnMut(&HB) -> bool,
+    {
+        self.left
+            .retain_rec(maxdepth, allowed_bucket_size, f, depth + 1);
+        self.right
+            .retain_rec(maxdepth, allowed_bucket_size, f, depth + 1);
+    }
+
+    fn mutate_elements<F>(&mut self, f: &mut F)
+    where
+        F: FnMut(&mut HB),
+    {
+        self.left.mutate_elements(f);
+        self.right.mutate_elements(f);
     }
 }
 
