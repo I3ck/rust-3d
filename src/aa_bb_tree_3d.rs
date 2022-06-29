@@ -62,13 +62,9 @@ where
     }
 
     //@todo cache maxdepth / allowed_bucket_size as members
-    //@todo rebuilds the entire tree, implement proper add
-    pub fn add(&mut self, maxdepth: usize, allowed_bucket_size: usize, x: HB) {
-        let mut flat = Vec::new();
-        std::mem::take(self).flatten_into(&mut flat);
-        flat.push(x);
-
-        *self = Self::new(flat, maxdepth, allowed_bucket_size);
+    //@todo cache maxdepth / allowed_bucket_size as members
+    pub fn add(&mut self, x: HB, maxdepth: usize, allowed_bucket_size: usize) {
+        self.add_rec(x, maxdepth, allowed_bucket_size, 0)
     }
 
     pub fn flatten_into(self, target: &mut Vec<HB>) {
@@ -224,6 +220,39 @@ where
 
         Ok(result)
     }
+
+    fn accepts(
+        &self,
+        bb: &BoundingBox3D,
+        maxdepth: usize,
+        allowed_bucket_size: usize,
+        depth: usize,
+    ) -> bool {
+        match self {
+            Self::Empty => true,
+            Self::Leaf(leaf) => leaf.accepts(bb, maxdepth, allowed_bucket_size, depth),
+            Self::Branch(branch) => branch.accepts(bb, maxdepth, allowed_bucket_size, depth),
+        }
+    }
+
+    fn add_rec(&mut self, x: HB, maxdepth: usize, allowed_bucket_size: usize, depth: usize) {
+        let bb = x.bounding_box();
+        match self {
+            Self::Empty => *self = Self::Leaf(AABBTree3DLeaf::new(vec![x], bb)),
+            Self::Leaf(leaf) if leaf.accepts(&bb, maxdepth, allowed_bucket_size, depth) => {
+                leaf.data.push(x)
+            }
+            Self::Branch(branch) if branch.accepts(&bb, maxdepth, allowed_bucket_size, depth) => {
+                branch.add(x, maxdepth, allowed_bucket_size, depth)
+            }
+            _ => {
+                let mut flat = Vec::new();
+                std::mem::take(self).flatten_into(&mut flat);
+                flat.push(x);
+                *self = Self::new_rec(flat, maxdepth, allowed_bucket_size, depth);
+            }
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -340,6 +369,16 @@ where
     pub fn flatten_into(mut self, target: &mut Vec<HB>) {
         target.append(&mut self.data);
     }
+
+    fn accepts(
+        &self,
+        bb: &BoundingBox3D,
+        _maxdepth: usize,
+        allowed_bucket_size: usize,
+        _depth: usize,
+    ) -> bool {
+        (*bb == self.bb || bb.is_inside(&self.bb)) && self.data.len() < allowed_bucket_size
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -420,8 +459,8 @@ where
     }
 
     pub fn stats(&self, depth_parent: u64) -> AABBTree3DStats {
-        let sl = self.left.stats_rec(depth_parent+1);
-        let sr = self.right.stats_rec(depth_parent+1);
+        let sl = self.left.stats_rec(depth_parent + 1);
+        let sr = self.right.stats_rec(depth_parent + 1);
         AABBTree3DStats {
             n_nodes: 1 + sl.n_nodes + sr.n_nodes,
             n_elements: sl.n_elements + sr.n_elements,
@@ -432,6 +471,35 @@ where
     pub fn flatten_into(self, target: &mut Vec<HB>) {
         self.left.flatten_into(target);
         self.right.flatten_into(target);
+    }
+
+    fn accepts(
+        &self,
+        bb: &BoundingBox3D,
+        maxdepth: usize,
+        allowed_bucket_size: usize,
+        depth: usize,
+    ) -> bool {
+        self.left
+            .accepts(bb, maxdepth, allowed_bucket_size, depth + 1)
+            || self
+                .right
+                .accepts(bb, maxdepth, allowed_bucket_size, depth + 1)
+    }
+
+    fn add(&mut self, x: HB, maxdepth: usize, allowed_bucket_size: usize, depth: usize) {
+        let bb = x.bounding_box();
+        if self
+            .left
+            .accepts(&bb, maxdepth, allowed_bucket_size, depth + 1)
+        {
+            self.left
+                .add_rec(x, maxdepth, allowed_bucket_size, depth + 1)
+        } else {
+            self.right
+                .add_rec(x, maxdepth, allowed_bucket_size, depth + 1)
+        }
+        self.bb.consume(bb);
     }
 }
 
@@ -464,7 +532,7 @@ where
 
 //------------------------------------------------------------------------------
 
-#[derive (Clone, Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct AABBTree3DStats {
     pub n_nodes: usize,
     pub n_elements: usize,

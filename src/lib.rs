@@ -139,13 +139,13 @@ mod utils;
 pub use self::utils::*;
 
 mod aa_bb_tree_2d;
-pub use self::aa_bb_tree_2d::{AABBTree2DStats, AABBTree2D};
+pub use self::aa_bb_tree_2d::{AABBTree2D, AABBTree2DStats};
 
 mod strong_types;
 pub use self::strong_types::*;
 
 mod aa_bb_tree_3d;
-pub use self::aa_bb_tree_3d::{AABBTree3DStats, AABBTree3D};
+pub use self::aa_bb_tree_3d::{AABBTree3D, AABBTree3DStats};
 
 mod point_2d;
 pub use self::point_2d::Point2D;
