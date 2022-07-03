@@ -34,7 +34,10 @@ pub trait IsTopologyUnit {
     fn vid(&self, index: usize) -> Option<VId>;
 
     /// Applies the provided function to all indices within this unit
-    fn for_each_vid(&self, f: &mut dyn FnMut(VId)) {
+    fn for_each_vid<F>(&self, f: &mut F)
+    where
+        F: FnMut(VId),
+    {
         for i in 0..Self::n_vids() {
             f(self.vid(i).unwrap()) // safe as long as implementation isn't incorrect
         }

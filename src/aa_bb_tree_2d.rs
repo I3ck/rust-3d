@@ -94,7 +94,10 @@ where
         }
     }
 
-    pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
+    pub fn any<'a, F>(&'a self, f: &F) -> bool
+    where
+        F: Fn(&HB) -> bool,
+    {
         match self {
             Self::Empty => false,
             Self::Leaf(leaf) => leaf.any(f),
@@ -102,7 +105,10 @@ where
         }
     }
 
-    pub fn for_each_collision_candidate<'a>(&'a self, bb: &BoundingBox2D, f: &mut dyn FnMut(&HB)) {
+    pub fn for_each_collision_candidate<'a, F>(&'a self, bb: &BoundingBox2D, f: &mut F)
+    where
+        F: FnMut(&HB),
+    {
         match self {
             Self::Empty => (),
             Self::Leaf(leaf) => leaf.for_each_collision_candidate(bb, f),
@@ -321,7 +327,10 @@ where
         }
     }
 
-    pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
+    pub fn any<'a, F>(&'a self, f: &F) -> bool
+    where
+        F: Fn(&HB) -> bool,
+    {
         for x in self.data.iter() {
             if f(x) {
                 //unwrap fine due to early return in new
@@ -331,7 +340,10 @@ where
         false
     }
 
-    pub fn for_each_collision_candidate<'a>(&'a self, bb: &BoundingBox2D, f: &mut dyn FnMut(&HB)) {
+    pub fn for_each_collision_candidate<'a, F>(&'a self, bb: &BoundingBox2D, f: &mut F)
+    where
+        F: FnMut(&HB),
+    {
         if !self.bb.collides_with(bb) {
             return;
         }
@@ -446,11 +458,17 @@ where
         }
     }
 
-    pub fn any<'a>(&'a self, f: &dyn Fn(&HB) -> bool) -> bool {
+    pub fn any<'a, F>(&'a self, f: &F) -> bool
+    where
+        F: Fn(&HB) -> bool,
+    {
         self.left.any(f) || self.right.any(f)
     }
 
-    pub fn for_each_collision_candidate<'a>(&'a self, bb: &BoundingBox2D, f: &mut dyn FnMut(&HB)) {
+    pub fn for_each_collision_candidate<'a, F>(&'a self, bb: &BoundingBox2D, f: &mut F)
+    where
+        F: FnMut(&HB),
+    {
         if !self.bb.collides_with(bb) {
             return;
         }

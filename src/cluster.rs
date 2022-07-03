@@ -93,7 +93,10 @@ where
         })
     }
 
-    pub fn for_each_candidate<'a>(&'a self, x: f64, y: f64, f: &mut dyn FnMut(&HB)) {
+    pub fn for_each_candidate<'a, F>(&'a self, x: f64, y: f64, f: &mut F)
+    where
+        F: FnMut(&HB),
+    {
         let c_x = ((x - self.start_x) / self.incr_x) as u16;
         let c_y = ((y - self.start_y) / self.incr_y) as u16;
 
