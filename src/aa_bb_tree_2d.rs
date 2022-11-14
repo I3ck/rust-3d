@@ -421,8 +421,13 @@ where
     where
         F: FnMut(&HB) -> bool,
     {
+        let len_before = self.data.len();
+
         self.data.retain(f);
-        self.bb = AABBTree2D::bb_of(&self.data).unwrap(); // if would be empty, retain wouldn't be called
+
+        if self.data.len() != len_before {
+            self.bb = AABBTree2D::bb_of(&self.data).unwrap(); // if would be empty, retain wouldn't be called
+        }
     }
 
     fn mutate_elements<F>(&mut self, f: &mut F)
