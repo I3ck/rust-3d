@@ -393,7 +393,11 @@ where
     }
 
     pub fn flatten_into(mut self, target: &mut Vec<HB>) {
-        target.append(&mut self.data);
+        if target.is_empty() {
+            std::mem::swap(target, &mut self.data)
+        } else {
+            target.append(&mut self.data);
+        }
     }
 
     fn accepts(
