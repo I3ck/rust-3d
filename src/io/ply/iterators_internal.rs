@@ -471,7 +471,7 @@ impl<R, P, const CHUNK_SIZE: usize> Iterator for PlyAsciiFacesIterator<R, P, CHU
 where
     R: BufRead,
 {
-    type Item = IOResult<StackVec<FaceData<P>, CHUNK_SIZE>>;
+    type Item = IOResult<StackVec<crate::io::FaceData<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -495,7 +495,7 @@ where
                             self.is_done = true;
                             return Some(Err(IOError::Face(Some(self.i_line))));
                         }
-                        Some(x) => chunk.push(FaceData::Face(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                        Some(x) => chunk.push(crate::io::FaceData::Face(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
                     }
                 }
             } else {
@@ -571,7 +571,7 @@ where
     R: Read,
     BR: IsByteReader,
 {
-    type Item = IOResult<StackVec<FaceData<P>, CHUNK_SIZE>>;
+    type Item = IOResult<StackVec<crate::io::FaceData<P>, CHUNK_SIZE>>;
     #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.is_done {
@@ -590,7 +590,7 @@ where
                         self.is_done = true;
                         return Some(Err(e));
                     }
-                    Ok(x) => chunk.push(FaceData::Face(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
+                    Ok(x) => chunk.push(crate::io::FaceData::Face(x)).unwrap(), // unwrap safe since we only call this if chunk.has_space()
                 }
             } else {
                 self.is_done = true;
