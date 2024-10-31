@@ -20,8 +20,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#![deny(warnings)]
-
 //! rust-3d
 //! =======
 //! 3D/2D library written in Rust.
