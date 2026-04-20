@@ -592,6 +592,7 @@ impl PosAccessor {
 #[derive(Debug, Clone)]
 pub struct BufferView {
     pub buffer: Buffer,
+    #[allow(dead_code)]
     pub byte_length: u64,
     pub byte_offset: u64,
     pub byte_stride: Option<u64>,
@@ -696,6 +697,7 @@ impl DataPointer {
 
 #[derive(Debug, Clone)]
 pub struct Buffer {
+    #[allow(dead_code)]
     pub byte_length: u64,
     pub uri_or_data: Option<UriOrDataPointer>,
 }
@@ -731,6 +733,7 @@ pub struct RawFileHeader {
 
 #[derive(Debug)]
 pub struct FileHeader {
+    #[allow(dead_code)]
     pub length: u32,
 }
 
@@ -768,6 +771,7 @@ pub struct Chunk {
 
 #[derive(Debug)]
 pub struct JSONChunk {
+    #[allow(dead_code)]
     pub length: u32,
     pub data: Vec<u8>,
 }
@@ -791,6 +795,7 @@ impl TryFrom<Chunk> for JSONChunk {
 #[derive(Debug)]
 pub struct BinChunkHeader {
     pub pos: u64,
+    #[allow(dead_code)]
     pub length: u32,
 }
 

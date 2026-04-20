@@ -56,10 +56,12 @@ pub trait IsByteReader {
     where
         R: Read;
 
+    #[allow(dead_code)]
     fn read_i64<R>(read: &mut R) -> iRes<i64>
     where
         R: Read;
 
+    #[allow(dead_code)]
     fn read_u64<R>(read: &mut R) -> iRes<u64>
     where
         R: Read;
