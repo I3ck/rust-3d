@@ -178,7 +178,7 @@ impl IsIndexContainer for Vec<usize> {
         self.push(value)
     }
 
-    fn iter(&self) -> IsIndexContainerIterator<Self> {
+    fn iter(&self) -> IsIndexContainerIterator<'_, Self> {
         IsIndexContainerIterator::new(self)
     }
 }

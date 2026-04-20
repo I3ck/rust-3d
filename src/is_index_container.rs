@@ -47,7 +47,7 @@ pub trait IsIndexContainer: Clone + Default {
     fn push(&mut self, value: usize);
 
     /// Should return an iterator over the values
-    fn iter(&self) -> IsIndexContainerIterator<Self>;
+    fn iter(&self) -> IsIndexContainerIterator<'_, Self>;
 
     /// Creates a new object with the given capacity
     fn with_capacity(n: usize) -> Self {
